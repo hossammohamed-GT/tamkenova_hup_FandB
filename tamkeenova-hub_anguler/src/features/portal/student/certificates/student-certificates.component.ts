@@ -68,10 +68,22 @@ export class StudentCertificatesComponent {
     ctx.fillStyle = '#69757a'; ctx.font = '16px Arial'; ctx.fillText(labels.verify, 1432, 1135);
     const logos = (cert.partner_ids || []).map((id) => this.partnerLogo(id)).filter((url): url is string => !!url).slice(0, 6);
     const partnerStart = 900 - ((logos.length * 125 - 30) / 2); for (let i = 0; i < logos.length; i++) { try { const logo = await this.loadImage(logos[i]); ctx.fillStyle = '#ffffff'; ctx.fillRect(partnerStart + i * 125 - 8, 982, 111, 72); ctx.drawImage(logo, partnerStart + i * 125, 990, 95, 55); } catch {} }
-    const link = document.createElement('a'); link.download = `tamkeenova-certificate-${cert.verification_code}-${language}.png`; link.href = canvas.toDataURL('image/png'); link.click();
+    const link = document.createElement('a'); link.download = `tamkeenova-certificate-${cert.verification_code}-${language}.png`;
+    canvas.toBlob((blob) => { if (!blob) return; link.href = URL.createObjectURL(blob); link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000); }, 'image/png');
   }
 
-  private loadImage(src: string): Promise<HTMLImageElement> { return new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src; }); }
+  private async loadImage(src: string): Promise<HTMLImageElement> {
+    // Convert partner/logo resources to same-origin object URLs before drawing; otherwise
+    // the browser marks the canvas as tainted and blocks the PNG download.
+    const response = await fetch(src, { mode: 'cors' });
+    if (!response.ok) throw new Error(`Unable to load certificate image: ${response.status}`);
+    const objectUrl = URL.createObjectURL(await response.blob());
+    try {
+      return await new Promise<HTMLImageElement>((resolve, reject) => {
+        const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = objectUrl;
+      });
+    } finally { URL.revokeObjectURL(objectUrl); }
+  }
 
   printCertificate(id: string): void {
     document.querySelectorAll(".certificate-print").forEach((el) => el.classList.remove("print-target"));
