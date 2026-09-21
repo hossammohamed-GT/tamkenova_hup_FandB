@@ -1,7 +1,7 @@
 <section class="portal-page">
   <div class="portal-header"><div><h1>{{ 'admin_partners.title' | translate }}</h1><p class="text-muted">{{ 'admin_partners.subtitle' | translate }}</p></div><button class="btn-primary-sm" type="button" (click)="openCreate()">{{ 'admin_partners.add' | translate }}</button></div>
   <app-admin-nav />
-  @if (editing() || partners().length === 0) {
+  @if (showForm() || partners().length === 0) {
     <form class="partner-form surface" [formGroup]="form" (ngSubmit)="save()">
       <h3>{{ (editing() ? 'admin_partners.edit' : 'admin_partners.add') | translate }}</h3>
       <div class="partner-fields"><label>{{ 'admin_partners.name_ar' | translate }}<input formControlName="name_ar"></label><label>{{ 'admin_partners.name_en' | translate }}<input formControlName="name_en" dir="ltr"></label><label class="wide">{{ 'admin_partners.logo_url' | translate }}<input formControlName="logo_url" dir="ltr" placeholder="https://..."></label><label class="wide">{{ 'admin_partners.website_url' | translate }}<input formControlName="website_url" dir="ltr" placeholder="https://..."></label><label>{{ 'admin_partners.order' | translate }}<input type="number" min="0" formControlName="display_order"></label><label class="check"><input type="checkbox" formControlName="is_active"> {{ 'admin_partners.active' | translate }}</label></div>
