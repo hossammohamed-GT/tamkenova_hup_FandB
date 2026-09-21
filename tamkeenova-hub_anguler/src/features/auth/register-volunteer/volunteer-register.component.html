@@ -49,6 +49,7 @@
             <input
               id="username" type="text" class="field-input"
               formControlName="username"
+              (focus)="suggestUsername()"
               (input)="markTouched('username')"
               autocomplete="username" />
             <span class="field-hint" [class.is-error]="isFieldInvalid('username')">

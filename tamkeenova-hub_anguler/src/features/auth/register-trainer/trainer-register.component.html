@@ -65,35 +65,6 @@
         </div>
 
         <div class="field"
-          [class.is-valid]="isFieldValid('username')"
-          [class.is-invalid]="isFieldInvalid('username')">
-          <label class="field-label" for="username">
-            {{ 'auth.fields.username' | translate }}
-            <span class="text-muted">({{ 'auth.optional' |
-              translate }})</span>
-          </label>
-          <div class="field-input-wrap">
-            <input id="username" type="text"
-              class="field-input" formControlName="username"
-            (blur)="checkAvailability('username')"
-              (input)="markTouched('username')"
-              autocomplete="username" dir="ltr" />
-            <i class="fa-solid fa-check field-status-icon is-valid"
-              [class.is-visible]="isFieldValid('username')"></i>
-            <i class="fa-solid fa-xmark field-status-icon is-invalid"
-              [class.is-visible]="isFieldInvalid('username')"></i>
-          </div>
-          <span class="field-hint"
-            [class.is-error]="isFieldInvalid('username')">
-            @if (isFieldInvalid('username')) {
-              {{ 'auth.errors.username' | translate }}
-            } @else if (serverFieldError()?.field === 'username') {
-              {{ serverFieldError()!.key | translate }}
-            }
-          </span>
-        </div>
-
-        <div class="field"
           [class.is-valid]="isFieldValid('email')"
           [class.is-invalid]="isFieldInvalid('email')">
           <label class="field-label" for="email">{{
@@ -114,6 +85,36 @@
             @if (isFieldInvalid('email')) {
               {{ 'auth.errors.email' | translate }}
             } @else if (serverFieldError()?.field === 'email') {
+              {{ serverFieldError()!.key | translate }}
+            }
+          </span>
+        </div>
+
+        <div class="field"
+          [class.is-valid]="isFieldValid('username')"
+          [class.is-invalid]="isFieldInvalid('username')">
+          <label class="field-label" for="username">
+            {{ 'auth.fields.username' | translate }}
+            <span class="text-muted">({{ 'auth.optional' |
+              translate }})</span>
+          </label>
+          <div class="field-input-wrap">
+            <input id="username" type="text"
+              class="field-input" formControlName="username"
+              (focus)="suggestUsername()"
+            (blur)="checkAvailability('username')"
+              (input)="markTouched('username')"
+              autocomplete="username" dir="ltr" />
+            <i class="fa-solid fa-check field-status-icon is-valid"
+              [class.is-visible]="isFieldValid('username')"></i>
+            <i class="fa-solid fa-xmark field-status-icon is-invalid"
+              [class.is-visible]="isFieldInvalid('username')"></i>
+          </div>
+          <span class="field-hint"
+            [class.is-error]="isFieldInvalid('username')">
+            @if (isFieldInvalid('username')) {
+              {{ 'auth.errors.username' | translate }}
+            } @else if (serverFieldError()?.field === 'username') {
               {{ serverFieldError()!.key | translate }}
             }
           </span>
@@ -204,19 +205,21 @@
           <p class="field-hint is-error">{{
             'auth.errors.generic' | translate }}</p>
           } @else {
+          <input type="search" class="field-input" [value]="specializationSearch()" (input)="specializationSearch.set($any($event.target).value)" [placeholder]="'auth.trainer_register.specialization_search' | translate" />
           <div class="spec-grid">
-            @for (spec of specializations(); track spec.id)
-            {
-            <button type="button" class="spec-chip"
-              [class.is-active]="form.controls.specialization_id.value === spec.id"
-              (click)="selectSpecialization(spec.id)">
-              {{ spec.name_ar }}
-            </button>
+            @for (spec of filteredSpecializations(); track spec.id) {
+            <button type="button" class="spec-chip" [class.is-active]="form.controls.specialization_id.value === spec.id" (click)="selectSpecialization(spec.id)">{{ spec.name_ar }} <small>{{ spec.name_en }}</small></button>
             }
           </div>
-          <span class="field-hint">{{
-            'auth.trainer_register.specialization_not_found'
-            | translate }}</span>
+          <button type="button" class="dynamic-list-add" (click)="startSpecializationRequest()">
+            <i class="fa-solid fa-plus"></i> {{ 'auth.trainer_register.request_specialization' | translate }}
+          </button>
+          @if (requestingSpecialization()) {
+          <div class="field-row">
+            <input class="field-input" formControlName="specialization_name_ar" [placeholder]="'auth.trainer_register.new_specialization_ar' | translate" />
+            <input class="field-input" dir="ltr" formControlName="specialization_name_en" [placeholder]="'auth.trainer_register.new_specialization_en' | translate" />
+          </div>
+          }
           }
 
           <span class="field-hint"

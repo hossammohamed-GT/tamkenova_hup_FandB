@@ -404,7 +404,11 @@
       "remove": "Remove",
       "back": "Back",
       "next": "Next",
-      "submit": "Submit Application"
+      "submit": "Submit Application",
+      "specialization_search": "Search specializations",
+      "request_specialization": "Request a new specialization",
+      "new_specialization_ar": "Specialization name in Arabic",
+      "new_specialization_en": "Specialization name in English"
     },
     "volunteer_register": {
       "eyebrow": "Volunteer with us",
@@ -871,7 +875,10 @@
     "mark_read": "Mark as Read",
     "unread": "Unread",
     "view_all": "View All Notifications",
-    "approve_program": "Approve program", "reject_program": "Reject program", "view_program": "View program", "details_title": "Notification Details",
+    "approve_program": "Approve program",
+    "reject_program": "Reject program",
+    "view_program": "View program",
+    "details_title": "Notification Details",
     "consultation_details": "Consultation Details",
     "corporate_details": "Corporate Request Details",
     "student_info": "Student / Client Info",
@@ -915,7 +922,9 @@
       "account": "Account update",
       "account_msg": "There is an update on your account.",
       "update": "New notification",
-      "update_msg": "You have a new notification from Tamkeenova."
+      "update_msg": "You have a new notification from Tamkeenova.",
+      "specialization_request": "New specialization request",
+      "specialization_request_msg": "A trainer requested a new specialization."
     },
     "time": {
       "now": "just now",
@@ -1473,7 +1482,8 @@
     "TASK_EMPTY_SUBMISSION": "Add text, a link, or at least one file.",
     "TASK_SUBMISSION_FAILED": "We couldn't save the submission. Please try again.",
     "TASK_NOT_ASSIGNED": "You aren't assigned to this task.",
-    "NOTIFICATION_NOT_FOUND": "This notification no longer exists."
+    "NOTIFICATION_NOT_FOUND": "This notification no longer exists.",
+    "AUTH_PASSWORD_MISMATCH": "Passwords do not match."
   },
   "trainer_consultations": {
     "update_error": "Could not update the consultation status, please retry",

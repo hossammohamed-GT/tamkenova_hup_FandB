@@ -75,13 +75,23 @@ export class AuthService {
         }
 
         specializationId = specialization.id;
-      } else if (dto.specialization_name_ar && dto.specialization_name_en) {
-        const specialization = await this.authRepository.createSpecialization({
+      } else if (dto.specialization_name_ar) {
+        // A new specialization is reviewed by admins instead of being created immediately.
+        await this.authRepository.createSpecializationRequest({
+          user_id: user.id,
           name_ar: dto.specialization_name_ar,
-          name_en: dto.specialization_name_en,
+          name_en: dto.specialization_name_en || dto.specialization_name_ar,
         });
-
-        specializationId = specialization.id;
+        const admins = await this.authRepository.findFirstAdmin();
+        if (admins) {
+          await this.authRepository.createNotification({
+            user_id: admins.id,
+            title: 'New specialization request',
+            message: `${dto.full_name} requested the specialization ${dto.specialization_name_ar}`,
+            type: 'SPECIALIZATION_REQUEST',
+            reference_type: 'SPECIALIZATION_REQUEST',
+          });
+        }
       }
 
       const trainer = await this.authRepository.createTrainer({

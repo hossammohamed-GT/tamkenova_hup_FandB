@@ -404,7 +404,11 @@
       "remove": "حذف",
       "back": "السابق",
       "next": "التالي",
-      "submit": "إرسال الطلب"
+      "submit": "إرسال الطلب",
+      "specialization_search": "ابحث في التخصصات",
+      "request_specialization": "طلب تخصص جديد",
+      "new_specialization_ar": "اسم التخصص بالعربية",
+      "new_specialization_en": "اسم التخصص بالإنجليزية"
     },
     "volunteer_register": {
       "eyebrow": "تطوع معنا",
@@ -871,7 +875,10 @@
     "mark_read": "تحديد كمقروء",
     "unread": "غير مقروء",
     "view_all": "عرض كل الإشعارات",
-    "approve_program": "الموافقة على البرنامج", "reject_program": "رفض البرنامج", "view_program": "عرض البرنامج", "details_title": "تفاصيل الإشعار",
+    "approve_program": "الموافقة على البرنامج",
+    "reject_program": "رفض البرنامج",
+    "view_program": "عرض البرنامج",
+    "details_title": "تفاصيل الإشعار",
     "consultation_details": "تفاصيل الاستشارة",
     "corporate_details": "تفاصيل طلب الشركة",
     "student_info": "بيانات الطالب / العميل",
@@ -915,7 +922,9 @@
       "account": "تحديث على الحساب",
       "account_msg": "هناك تحديث جديد على حسابك.",
       "update": "إشعار جديد",
-      "update_msg": "لديك إشعار جديد من منصة تمكينوفا."
+      "update_msg": "لديك إشعار جديد من منصة تمكينوفا.",
+      "specialization_request": "طلب تخصص جديد",
+      "specialization_request_msg": "قام مدرب بطلب إضافة تخصص جديد."
     },
     "time": {
       "now": "الآن",
@@ -1473,7 +1482,8 @@
     "TASK_EMPTY_SUBMISSION": "أضف نصًا أو رابطًا أو ملفًا واحدًا على الأقل.",
     "TASK_SUBMISSION_FAILED": "تعذّر حفظ التسليم. حاول مرة أخرى.",
     "TASK_NOT_ASSIGNED": "لست مُسنَدًا إلى هذه المهمة.",
-    "NOTIFICATION_NOT_FOUND": "الإشعار غير موجود."
+    "NOTIFICATION_NOT_FOUND": "الإشعار غير موجود.",
+    "AUTH_PASSWORD_MISMATCH": "كلمتا المرور غير متطابقتين."
   },
   "trainer_consultations": {
     "update_error": "تعذر تحديث حالة الاستشارة، حاول تاني",
