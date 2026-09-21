@@ -53,7 +53,7 @@ export class StudentCertificatesComponent {
     for (const [x, y, sx, sy] of [[207,137,1,1],[1593,137,-1,1],[207,1136,1,-1],[1593,1136,-1,-1]] as const) { ctx.beginPath(); ctx.moveTo(x, y + sy * 105); ctx.lineTo(x, y); ctx.lineTo(x + sx * 105, y); ctx.stroke(); ctx.beginPath(); ctx.arc(x + sx * 18, y + sy * 18, 10, 0, Math.PI * 2); ctx.stroke(); }
     ctx.textAlign = 'center';
     // Brand mark + identity
-    try { const logo = await this.loadImage('/images/logo.svg'); ctx.drawImage(logo, 805, 155, 110, 110); } catch {}
+    try { const logo = await this.loadImage('/images/logo.svg'); ctx.drawImage(logo, 845, 155, 110, 110); } catch {}
     ctx.fillStyle = navy; ctx.font = 'bold 30px Arial'; ctx.fillText('TAMKEENOVA', 900, 292);
     ctx.fillStyle = gold; ctx.font = '18px Arial'; ctx.fillText('EMPOWERMENT  •  TRAINING  •  IMPACT', 900, 325);
     ctx.fillStyle = ink; ctx.font = 'bold 60px Georgia, serif'; ctx.fillText(labels.cert, 900, 445);
@@ -71,11 +71,11 @@ export class StudentCertificatesComponent {
     const qr = await QRCode.toDataURL(verifyUrl, { width: 185, margin: 1, color: { dark: navy, light: '#ffffff' } }); ctx.drawImage(await this.loadImage(qr), 1340, 915, 185, 185);
     ctx.fillStyle = '#69757a'; ctx.font = '16px Arial'; ctx.fillText(labels.verify, 1432, 1135);
     const logos = (cert.partner_ids || []).map((id) => this.partnerLogo(id)).filter((url): url is string => !!url).slice(0, 6);
-    for (let i = 0; i < logos.length; i++) { try { ctx.drawImage(await this.loadImage(logos[i]), 300 + i * 125, 990, 95, 55); } catch {} }
+    const partnerStart = 900 - ((logos.length * 125 - 30) / 2); for (let i = 0; i < logos.length; i++) { try { const logo = await this.loadImage(logos[i]); ctx.fillStyle = '#ffffff'; ctx.fillRect(partnerStart + i * 125 - 8, 982, 111, 72); ctx.drawImage(logo, partnerStart + i * 125, 990, 95, 55); } catch {} }
     const link = document.createElement('a'); link.download = `tamkeenova-certificate-${cert.verification_code}-${language}.png`; link.href = canvas.toDataURL('image/png'); link.click();
   }
 
-  private loadImage(src: string): Promise<HTMLImageElement> { return new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src; }); }
+  private loadImage(src: string): Promise<HTMLImageElement> { return new Promise((resolve, reject) => { const image = new Image(); image.crossOrigin = 'anonymous'; image.onload = () => resolve(image); image.onerror = reject; image.src = src; }); }
 
   printCertificate(id: string): void {
     document.querySelectorAll(".certificate-print").forEach((el) => el.classList.remove("print-target"));
