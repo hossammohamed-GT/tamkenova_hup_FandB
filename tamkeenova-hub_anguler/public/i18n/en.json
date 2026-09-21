@@ -161,7 +161,7 @@
     },
     "tabs": {
       "b2b": "I represent a company or organization (B2B)",
-      "b2c": "I am a student or client (B2C) , individual consultation"
+      "b2c": "I am an individual or small client"
     },
     "form": {
       "field_label": "Service or consultation field",
@@ -187,8 +187,8 @@
       "required_error": "This field is required",
       "b2b_title": "Corporate Service Request (B2B)",
       "b2b_subtitle": "Fill in all the details so our team can help you in the best way",
-      "b2c_title": "Individual Consultation with a Trainer",
-      "b2c_subtitle": "Choose a trainer and set your consultation details",
+      "b2c_title": "Request a consultation for an individual or small client",
+      "b2c_subtitle": "Your request will be reviewed and handled by our admin team",
       "select_trainer": "Select trainer",
       "trainer_placeholder": "Search and select a trainer...",
       "consultation_title": "Consultation title",
@@ -1506,4 +1506,4 @@
     "show": "Show",
     "load_error": "Could not load partners"
   }
-}
+}\n
