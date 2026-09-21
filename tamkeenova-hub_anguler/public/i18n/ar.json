@@ -819,7 +819,8 @@
     "copy_code": "نسخ الكود",
     "program": "البرنامج",
     "trainer": "المدرب",
-    "certificate_of": "شهادة إنجاز"
+    "certificate_of": "شهادة إنجاز",
+    "download_image": "تحميل صورة الشهادة"
   },
   "student_corporate": {
     "title": "طلبات الشركات",

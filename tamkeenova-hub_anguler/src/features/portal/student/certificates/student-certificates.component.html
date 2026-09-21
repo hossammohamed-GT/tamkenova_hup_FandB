@@ -79,6 +79,7 @@
           </div>
 
           <div class="cert-actions">
+            <button type="button" class="btn-accent btn-sm" (click)="downloadCertificate(cert)"><i class="fa-solid fa-download"></i> {{ 'student_certificates.download_image' | translate }}</button>
             @if (cert.pdf_url) {
               <a [href]="cert.pdf_url" target="_blank" rel="noopener" class="btn-outline btn-sm btn-link">
                 <i class="fa-solid fa-file-pdf"></i>

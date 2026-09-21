@@ -819,7 +819,8 @@
     "copy_code": "Copy Code",
     "program": "Program",
     "trainer": "Trainer",
-    "certificate_of": "Certificate of Achievement"
+    "certificate_of": "Certificate of Achievement",
+    "download_image": "Download certificate image"
   },
   "student_corporate": {
     "title": "Corporate Requests",
