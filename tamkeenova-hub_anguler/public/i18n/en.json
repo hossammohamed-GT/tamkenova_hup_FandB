@@ -3,7 +3,7 @@
     "tagline": "Empowerment & Training Platform",
     "home": "Home",
     "programs": "Programs",
-    "portal": "Trainee Portal",
+    "portal": "Verify Certificates",
     "consulting": "Consulting",
     "team": "Team",
     "gallery": "Gallery",
@@ -818,7 +818,8 @@
     "verify": "Verify",
     "copy_code": "Copy Code",
     "program": "Program",
-    "trainer": "Trainer"
+    "trainer": "Trainer",
+    "certificate_of": "Certificate of Achievement"
   },
   "student_corporate": {
     "title": "Corporate Requests",
@@ -1166,7 +1167,9 @@
     "delete_title": "Delete certificate",
     "delete_confirm": "Are you sure you want to delete the certificate",
     "no_user_found": "No user found with this name or email",
-    "min_chars_hint": "Type at least 2 characters to search"
+    "min_chars_hint": "Type at least 2 characters to search",
+    "partners": "Success partners on certificate",
+    "partners_hint": "Select the partner logos to show on this certificate."
   },
   "admin_corporate": {
     "title": "Corporate Requests",

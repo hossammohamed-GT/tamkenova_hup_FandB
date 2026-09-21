@@ -65,6 +65,19 @@
             </button>
           </div>
 
+          <div class="certificate-print" [id]="'certificate-' + cert.id">
+            <div class="certificate-brand">TAMKEENOVA</div>
+            <div class="certificate-kicker">{{ cert.certificate_type || 'CERTIFICATE' }}</div>
+            <h2>{{ 'student_certificates.certificate_of' | translate }}</h2>
+            <p class="certificate-recipient">{{ cert.trainers?.users?.full_name || cert.title }}</p>
+            <p>{{ cert.description || cert.title }}</p>
+            <strong>{{ cert.title }}</strong>
+            <div class="certificate-meta">{{ cert.issued_at | date:'yyyy/MM/dd' }} · {{ cert.verification_code }}</div>
+            <div class="certificate-partners">
+              @for (partnerId of (cert.partner_ids || []); track partnerId) { @if (partnerLogo(partnerId)) { <img [src]="partnerLogo(partnerId)" alt="Success partner" /> } }
+            </div>
+          </div>
+
           <div class="cert-actions">
             @if (cert.pdf_url) {
               <a [href]="cert.pdf_url" target="_blank" rel="noopener" class="btn-outline btn-sm btn-link">

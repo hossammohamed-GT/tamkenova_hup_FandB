@@ -351,6 +351,7 @@ model certificates {
   description       String?
   pdf_url           String?
   qr_code_url       String?
+  partner_ids       Json?
   issued_at         DateTime         @default(now()) @db.Timestamptz(6)
   is_valid          Boolean?         @default(true)
   training_hours    Int?             @default(0)

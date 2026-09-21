@@ -2,6 +2,8 @@ import {
   IsEnum,
   IsInt,
   IsOptional,
+  IsArray,
+  ArrayMaxSize,
   IsString,
   IsUUID,
   MaxLength,
@@ -37,4 +39,10 @@ export class IssueCertificateDto {
   @IsOptional()
   @IsUUID()
   program_id?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(6)
+  @IsUUID('4', { each: true })
+  partner_ids?: string[];
 }

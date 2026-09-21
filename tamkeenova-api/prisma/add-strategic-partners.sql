@@ -5,3 +5,5 @@ CREATE TABLE IF NOT EXISTS strategic_partners (
   created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_strategic_partners_active_order ON strategic_partners (is_active, display_order);
+
+ALTER TABLE certificates ADD COLUMN IF NOT EXISTS partner_ids jsonb;

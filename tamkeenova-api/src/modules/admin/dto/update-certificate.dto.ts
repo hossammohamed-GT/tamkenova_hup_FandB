@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsBoolean, IsInt, IsOptional, IsString, IsUUID, Min } from 'class-validator';
 
 
 export class UpdateCertificateDto {
@@ -18,4 +18,10 @@ export class UpdateCertificateDto {
   @IsOptional()
   @IsBoolean()
   is_valid?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(6)
+  @IsUUID('4', { each: true })
+  partner_ids?: string[];
 }

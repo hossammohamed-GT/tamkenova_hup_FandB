@@ -109,6 +109,7 @@ export interface AdminCertificate {
   certificate_url: string | null;
   verification_code: string;
   qr_code_url: string | null;
+  partner_ids?: string[] | null;
   is_valid: boolean;
   issued_at: string;
   created_at: string;
@@ -125,6 +126,7 @@ export interface IssueCertificatePayload {
   certificate_type?: CertificateType;
   trainer_id?: string;
   program_id?: string;
+  partner_ids?: string[];
 }
 
 export interface AdminCorporateRequest {

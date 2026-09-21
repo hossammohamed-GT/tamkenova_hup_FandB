@@ -141,3 +141,4 @@
   line-height: 1.6;
   color: var(--color-text);
 }
+.partner-checkboxes{display:flex;gap:.6rem;flex-wrap:wrap}.partner-checkbox{display:flex;align-items:center;gap:.4rem;padding:.45rem .6rem;border:1px solid var(--color-border);border-radius:8px;cursor:pointer}.partner-checkbox img{width:36px;height:25px;object-fit:contain;background:#fff}.partner-checkbox input{accent-color:var(--color-primary)}

@@ -220,6 +220,20 @@
           }
 
           <div class="field">
+            <label class="field-label">{{ 'admin_certificates.partners' | translate }}</label>
+            <div class="partner-checkboxes">
+              @for (partner of partners(); track partner.id) {
+                <label class="partner-checkbox">
+                  <input type="checkbox" [checked]="selectedPartnerIds().includes(partner.id)" (change)="togglePartner(partner.id)" />
+                  <img [src]="partner.logo_url" [alt]="partner.name_en" />
+                  <span>{{ partner.name_ar }}</span>
+                </label>
+              }
+            </div>
+            <small class="field-hint">{{ 'admin_certificates.partners_hint' | translate }}</small>
+          </div>
+
+          <div class="field">
             <label class="field-label" for="cert-title">{{ 'admin_certificates.f_title' | translate }}</label>
             <input id="cert-title" type="text" class="field-input" formControlName="title" />
           </div>

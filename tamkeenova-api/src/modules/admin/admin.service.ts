@@ -496,6 +496,7 @@ export class AdminService {
       training_hours: dto.training_hours || 0,
       certificate_type: dto.certificate_type || 'OTHER',
       qr_code_url: qrCodeUrl,
+      partner_ids: dto.partner_ids || [],
     });
 
     await this.notifyUser(

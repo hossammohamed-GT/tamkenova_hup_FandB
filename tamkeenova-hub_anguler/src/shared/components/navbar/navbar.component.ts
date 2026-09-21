@@ -113,7 +113,7 @@ export class NavbarComponent {
   navLinks: NavLink[] = [
     { labelKey: 'nav.home', route: '/' },
     { labelKey: 'nav.programs', route: '/programs' },
-    { labelKey: 'nav.portal', route: '/portal' },
+    { labelKey: 'nav.portal', route: '/verify' },
     { labelKey: 'nav.consulting', route: '/consulting' },
     { labelKey: 'nav.team', route: '/team' },
     { labelKey: 'nav.gallery', route: '/gallery' },

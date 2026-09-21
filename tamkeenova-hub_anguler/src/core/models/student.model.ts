@@ -179,9 +179,11 @@ export interface StudentCertificate {
   id: string;
   verification_code: string;
   title: string;
+  certificate_type?: string | null;
   description: string | null;
   pdf_url: string | null;
   qr_code_url: string | null;
+  partner_ids?: string[] | null;
   issued_at: string;
   is_valid: boolean;
   training_hours: number | null;

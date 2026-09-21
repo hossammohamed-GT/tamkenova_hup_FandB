@@ -333,6 +333,7 @@ export class AdminRepository {
     description?: string | null;
     pdf_url?: string | null;
     qr_code_url?: string | null;
+    partner_ids?: string[];
     training_hours?: number;
     certificate_type?: string;
   }) {
@@ -346,6 +347,7 @@ export class AdminRepository {
         description: data.description || null,
         pdf_url: data.pdf_url || null,
         qr_code_url: data.qr_code_url || null,
+        partner_ids: data.partner_ids || [],
         training_hours: data.training_hours || 0,
         certificate_type: (data.certificate_type as any) || 'OTHER',
       },
