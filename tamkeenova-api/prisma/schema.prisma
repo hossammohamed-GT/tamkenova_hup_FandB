@@ -1,0 +1,598 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum booking_status {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+enum user_role {
+  STUDENT
+  TRAINER
+  CLIENT
+  EMPLOYEE
+  ADMIN
+  SUPER_ADMIN
+  VOLUNTEER
+}
+
+enum trainer_status {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum enrollment_status {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  SUSPENDED
+}
+
+enum consultation_status {
+  PENDING
+  APPROVED
+  REJECTED
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+}
+
+enum corporate_status {
+  PENDING
+  UNDER_REVIEW
+  ASSIGNED
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+enum task_status {
+  PENDING
+  IN_PROGRESS
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum task_priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum volunteer_status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum certificate_type {
+  TRAINING
+  VOLUNTEER
+  OTHER
+}
+
+
+model email_otps {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String   @db.Uuid
+  otp_code   String   @db.VarChar(255)
+  expires_at DateTime @db.Timestamptz(6)
+  is_used    Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_email_otp_user")
+
+  @@index([user_id], map: "idx_email_otps_user_id")
+}
+
+model notifications {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id        String    @db.Uuid
+  title          String    @db.VarChar(255)
+  message        String
+  is_read        Boolean?  @default(false)
+  type           String?   @db.VarChar(50)
+  reference_id   String?   @db.Uuid
+  reference_type String?   @db.VarChar(50)
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+  users          users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_notification_user")
+}
+
+model specializations {
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name_ar    String     @db.VarChar(255)
+  name_en    String     @db.VarChar(255)
+  created_at DateTime   @default(now()) @db.Timestamptz(6)
+  trainers   trainers[]
+
+  @@index([name_ar], map: "idx_specializations_name_ar")
+  @@index([name_en], map: "idx_specializations_name_en")
+}
+
+model trainer_availability {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trainer_id  String    @db.Uuid
+  day_of_week Int       @db.SmallInt
+  start_time  DateTime  @db.Time(6)
+  end_time    DateTime  @db.Time(6)
+  is_active   Boolean?  @default(true)
+  created_at  DateTime? @default(now()) @db.Timestamptz(6)
+  trainers    trainers  @relation(fields: [trainer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_availability_trainer")
+}
+
+model trainer_bookings {
+  id                       String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trainer_id               String         @db.Uuid
+  student_id               String         @db.Uuid
+  title                    String         @db.VarChar(255)
+  description              String?
+  booking_price            Decimal        @db.Decimal(10, 2)
+  discount_percentage      Decimal?       @default(0) @db.Decimal(5, 2)
+  final_price              Decimal        @db.Decimal(10, 2)
+  status                   booking_status @default(PENDING)
+  trainer_notes            String?
+  created_at               DateTime?      @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime?      @default(now()) @db.Timestamptz(6)
+  contact_phone            String?        @db.VarChar(30)
+  preferred_contact_method String?        @db.VarChar(20)
+  users                    users          @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_booking_student")
+  trainers                 trainers       @relation(fields: [trainer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_booking_trainer")
+}
+
+model trainer_reviews {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trainer_id String    @db.Uuid
+  student_id String    @db.Uuid
+  rating     Int
+  comment    String?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  users      users     @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_review_student")
+  trainers   trainers  @relation(fields: [trainer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_review_trainer")
+
+  @@unique([trainer_id, student_id], map: "unique_trainer_student_review")
+}
+
+model trainers {
+  id                                String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id                           String                 @unique @db.Uuid
+  slug                              String                 @unique @db.VarChar(255)
+  bio_ar                            String?                @db.VarChar(500)
+  bio_en                            String?                @db.VarChar(500)
+  description_ar                    String?
+  description_en                    String?
+  years_of_experience               Int?                   @default(0)
+  consultation_price                Decimal                @default(0) @db.Decimal(10, 2)
+  discount_percentage               Decimal                @default(0) @db.Decimal(5, 2)
+  average_rating                    Decimal                @default(0) @db.Decimal(3, 2)
+  ratings_count                     Int                    @default(0)
+  is_available                      Boolean                @default(true)
+  created_at                        DateTime               @default(now()) @db.Timestamptz(6)
+  updated_at                        DateTime               @default(now()) @db.Timestamptz(6)
+  trainer_status                    trainer_status         @default(PENDING)
+  rejection_reason                  String?
+  approved_at                       DateTime?              @db.Timestamptz(6)
+  approved_by                       String?                @db.Uuid
+  specialization_id                 String?                @db.Uuid
+  linkedin_url                      String?                @db.VarChar(500)
+  website_url                       String?                @db.VarChar(500)
+  facebook_url                      String?                @db.VarChar(500)
+  portfolio_url                     String?                @db.VarChar(500)
+  cover_letter                      String?
+  consultation_price_from           Decimal?               @default(0) @db.Decimal(10, 2)
+  consultation_price_to             Decimal?               @default(0) @db.Decimal(10, 2)
+  consultation_duration             Int?                   @default(60)
+  is_featured                       Boolean?               @default(false)
+  total_students                    Int?                   @default(0)
+
+  trainer_availability              trainer_availability[]
+  trainer_bookings                  trainer_bookings[]
+  trainer_certificates              trainer_certificates[]
+  trainer_documents                 trainer_documents[]
+  trainer_reviews                   trainer_reviews[]
+  consultations                     consultations[]
+  certificates                      certificates[]
+  training_programs                 training_programs[]
+  users_trainers_approved_byTousers users?                 @relation("trainers_approved_byTousers", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_trainer_approved_by")
+  specializations                   specializations?       @relation(fields: [specialization_id], references: [id], onUpdate: NoAction, map: "fk_trainers_specialization")
+  users                             users                  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_trainers_user")
+
+  @@index([is_available], map: "idx_trainers_available")
+  @@index([slug], map: "idx_trainers_slug")
+  @@index([user_id], map: "idx_trainers_user_id")
+}
+
+model users {
+  id                                   String                         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  full_name                            String                         @db.VarChar(255)
+  email                                String                         @unique @db.VarChar(255)
+  phone                                String?                        @unique @db.VarChar(30)
+  password                             String                         @db.VarChar(255)
+  role                                 user_role                      @default(STUDENT)
+  profile_image                        String?
+  email_verified                       Boolean                        @default(false)
+  is_active                            Boolean                        @default(true)
+  last_login                           DateTime?                      @db.Timestamptz(6)
+  created_at                           DateTime                       @default(now()) @db.Timestamptz(6)
+  updated_at                           DateTime                       @default(now()) @db.Timestamptz(6)
+  username                             String?                        @unique @db.VarChar(100)
+  failed_login_attempts                Int                            @default(0)
+  locked_until                         DateTime?                      @db.Timestamptz(6)
+
+  bio                                  String?                        @db.VarChar(500)
+  location                             String?                        @db.VarChar(255)
+  whatsapp                             String?                        @db.VarChar(30)
+  website_url                          String?                        @db.VarChar(500)
+  linkedin_url                         String?                        @db.VarChar(500)
+  total_training_hours                 Int?                           @default(0)
+
+  email_otps                           email_otps[]
+  notifications                        notifications[]
+  specialization_requests              specialization_requests[]
+  trainer_bookings                     trainer_bookings[]
+  trainer_reviews                      trainer_reviews[]
+  trainers_trainers_approved_byTousers trainers[]                     @relation("trainers_approved_byTousers")
+  trainers                             trainers?
+  student_enrollments                  student_enrollments[]
+  certificates                         certificates[]
+  consultations_student_idTousers      consultations[]                @relation("consultations_student_idTousers")
+  consultation_reviews                 consultation_reviews[]
+  corporate_requests_requester_id      corporate_requests[]           @relation("corporate_requests_requester_idTousers")
+  corporate_requests_assigned_to       corporate_requests[]           @relation("corporate_requests_assigned_toTousers")
+  student_skills                       student_skills[]
+  volunteers                           volunteers?
+  task_assignees                       task_assignees[]
+  task_comments                        task_comments[]
+  activity_logs                        activity_logs[]
+
+  @@index([is_active], map: "idx_users_active")
+  @@index([email], map: "idx_users_email")
+  @@index([role], map: "idx_users_role")
+  @@index([username], map: "idx_users_username")
+}
+
+model specialization_requests {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String    @db.Uuid
+  name_ar    String    @db.VarChar(255)
+  name_en    String?   @db.VarChar(255)
+  status     String?   @default("PENDING") @db.VarChar(50)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  users      users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_specialization_request_user")
+}
+
+model trainer_documents {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trainer_id String    @db.Uuid
+  file_name  String    @db.VarChar(255)
+  file_url   String
+  file_type  String    @db.VarChar(50)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  trainers   trainers  @relation(fields: [trainer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_trainer_document_trainer")
+
+  @@index([trainer_id], map: "idx_trainer_documents_trainer")
+}
+
+model training_programs {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trainer_id        String    @db.Uuid
+  title             String    @db.VarChar(255)
+  slug              String    @unique @db.VarChar(255)
+  image_url         String?
+  short_description String
+  description       String
+  price             Decimal   @db.Decimal(10, 2)
+  discount_price    Decimal?  @db.Decimal(10, 2)
+  duration_hours    Int?
+  level             String?   @default("BEGINNER") @db.VarChar(50)
+  is_active         Boolean?  @default(true)
+  created_at        DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime? @default(now()) @db.Timestamptz(6)
+  trainers          trainers  @relation(fields: [trainer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_training_program_trainer")
+
+  student_enrollments student_enrollments[]
+  certificates        certificates[]
+
+  @@index([slug], map: "idx_programs_slug")
+  @@index([trainer_id], map: "idx_programs_trainer")
+}
+
+model trainer_certificates {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trainer_id      String    @db.Uuid
+  title           String?   @db.VarChar(255)
+  certificate_url String
+  created_at      DateTime? @default(now()) @db.Timestamptz(6)
+  trainers        trainers  @relation(fields: [trainer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_trainer_certificate_trainer")
+}
+
+
+model student_enrollments {
+  id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  student_id     String            @db.Uuid
+  program_id     String            @db.Uuid
+  status         enrollment_status @default(ACTIVE)
+  enrolled_at    DateTime          @default(now()) @db.Timestamptz(6)
+  completed_at   DateTime?         @db.Timestamptz(6)
+  cancelled_at   DateTime?         @db.Timestamptz(6)
+  trainer_notes  String?
+  progress       Int?              @default(0)
+
+  users              users              @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_enrollment_student")
+  training_programs  training_programs  @relation(fields: [program_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_enrollment_program")
+  certificates       certificates[]
+
+  @@unique([student_id, program_id], map: "student_enrollments_student_program_unique")
+  @@index([student_id], map: "idx_enrollments_student")
+  @@index([program_id], map: "idx_enrollments_program")
+  @@index([status], map: "idx_enrollments_status")
+}
+
+model certificates {
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  student_id        String           @db.Uuid
+  trainer_id        String?          @db.Uuid
+  program_id        String?          @db.Uuid
+  enrollment_id     String?          @db.Uuid
+  verification_code String           @unique @db.VarChar(20)
+  title             String           @db.VarChar(255)
+  description       String?
+  pdf_url           String?
+  qr_code_url       String?
+  issued_at         DateTime         @default(now()) @db.Timestamptz(6)
+  is_valid          Boolean?         @default(true)
+  training_hours    Int?             @default(0)
+  certificate_type  certificate_type @default(TRAINING)
+
+  users              users                @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_certificate_student")
+  trainers           trainers?            @relation(fields: [trainer_id], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_certificate_trainer")
+  training_programs  training_programs?   @relation(fields: [program_id], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_certificate_program")
+  student_enrollments student_enrollments? @relation(fields: [enrollment_id], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_certificate_enrollment")
+
+  @@index([student_id], map: "idx_certificates_student")
+  @@index([trainer_id], map: "idx_certificates_trainer")
+  @@index([verification_code], map: "idx_certificates_verification")
+  @@index([program_id], map: "idx_certificates_program")
+}
+
+model consultations {
+  id                       String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  student_id               String               @db.Uuid
+  trainer_id               String               @db.Uuid
+  title                    String               @db.VarChar(255)
+  description              String
+  preferred_date           DateTime?            @db.Date
+  preferred_time           String?              @db.VarChar(20)
+  status                   consultation_status  @default(PENDING)
+  price                    Decimal?             @db.Decimal(10, 2)
+  trainer_notes            String?
+  student_notes            String?
+  scheduled_at             DateTime?            @db.Timestamptz(6)
+  completed_at             DateTime?            @db.Timestamptz(6)
+  contact_phone            String?              @db.VarChar(30)
+  preferred_contact_method String?              @db.VarChar(20)
+  rejection_reason         String?
+  created_at               DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime             @default(now()) @db.Timestamptz(6)
+
+  users                   users                @relation("consultations_student_idTousers", fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_consultation_student")
+  trainers                trainers             @relation(fields: [trainer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_consultation_trainer")
+  consultation_reviews    consultation_reviews[]
+
+  @@index([student_id], map: "idx_consultations_student")
+  @@index([trainer_id], map: "idx_consultations_trainer")
+  @@index([status], map: "idx_consultations_status")
+}
+
+model consultation_reviews {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  consultation_id String        @unique @db.Uuid
+  student_id      String        @db.Uuid
+  rating          Int
+  comment         String?
+  created_at      DateTime      @default(now()) @db.Timestamptz(6)
+
+  consultations   consultations @relation(fields: [consultation_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_consultation_review_consultation")
+  users           users         @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_consultation_review_student")
+
+  @@index([student_id], map: "idx_consultation_reviews_student")
+}
+
+model corporate_requests {
+  id                  String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  requester_id        String           @db.Uuid
+
+  contact_name        String           @db.VarChar(255)
+  contact_email       String           @db.VarChar(255)
+  contact_phone       String?          @db.VarChar(30)
+  contact_whatsapp    String?          @db.VarChar(30)
+
+  company_name        String           @db.VarChar(255)
+  sector              String?          @db.VarChar(255)
+  country             String?          @db.VarChar(100)
+  employees_count     Int?
+
+  service_type        String           @db.VarChar(100)
+  service_description String
+  expected_budget     String?          @db.VarChar(100)
+  project_duration    String?          @db.VarChar(100)
+
+  status              corporate_status @default(PENDING)
+  admin_notes         String?
+  assigned_to         String?          @db.Uuid
+  rejection_reason    String?
+
+  created_at          DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime         @default(now()) @db.Timestamptz(6)
+
+  users_corporate_requests_requester_idTousers  users                          @relation("corporate_requests_requester_idTousers", fields: [requester_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_corporate_requester")
+  users_corporate_requests_assigned_toTousers   users?                         @relation("corporate_requests_assigned_toTousers", fields: [assigned_to], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_corporate_assigned")
+  corporate_request_attachments                 corporate_request_attachments[]
+
+  @@index([requester_id], map: "idx_corporate_requests_requester")
+  @@index([status], map: "idx_corporate_requests_status")
+}
+
+model corporate_request_attachments {
+  id               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  request_id       String            @db.Uuid
+  file_name        String            @db.VarChar(255)
+  file_url         String
+  file_type        String            @db.VarChar(50)
+  created_at       DateTime          @default(now()) @db.Timestamptz(6)
+
+  corporate_requests corporate_requests @relation(fields: [request_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_attachment_request")
+
+  @@index([request_id], map: "idx_corporate_attachments_request")
+}
+
+model student_skills {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  student_id String   @db.Uuid
+  skill_name String   @db.VarChar(255)
+  source     String?  @db.VarChar(50)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  users      users    @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_skill_student")
+
+  @@unique([student_id, skill_name], map: "student_skills_student_skill_unique")
+  @@index([student_id], map: "idx_student_skills_student")
+}
+
+
+model volunteers {
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id           String           @unique @db.Uuid
+  volunteer_status  volunteer_status @default(PENDING)
+  rejection_reason  String?
+  approved_at       DateTime?        @db.Timestamptz(6)
+  approved_by       String?          @db.Uuid
+  bio               String?          @db.VarChar(500)
+  total_hours       Int              @default(0)
+  created_at        DateTime         @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime         @default(now()) @db.Timestamptz(6)
+
+  users            users             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_volunteers_user")
+
+  @@index([user_id], map: "idx_volunteers_user_id")
+  @@index([volunteer_status], map: "idx_volunteers_status")
+}
+
+
+model tasks {
+  id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_by      String         @db.Uuid
+  title           String         @db.VarChar(255)
+  description     String
+  priority        task_priority  @default(MEDIUM)
+  deadline        DateTime?      @db.Timestamptz(6)
+  required_score  Int?
+  estimated_hours Int?
+  created_at      DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime       @default(now()) @db.Timestamptz(6)
+
+  task_assignees  task_assignees[]
+  task_comments   task_comments[]
+
+  @@index([created_by], map: "idx_tasks_created_by")
+  @@index([deadline], map: "idx_tasks_deadline")
+}
+
+model task_assignees {
+  id                 String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  task_id            String      @db.Uuid
+  user_id            String      @db.Uuid
+  task_order         Int         @default(1)
+  status             task_status @default(PENDING)
+  score              Int?
+  hours_awarded      Int         @default(0)
+  started_at         DateTime?   @db.Timestamptz(6)
+  submitted_at       DateTime?   @db.Timestamptz(6)
+  approved_at        DateTime?   @db.Timestamptz(6)
+  rejected_count     Int         @default(0)
+  resubmission_count Int         @default(0)
+  assigned_at        DateTime    @default(now()) @db.Timestamptz(6)
+
+  tasks            tasks             @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_task_assignee_task")
+  users            users             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_task_assignee_user")
+  task_submissions task_submissions[]
+
+  @@unique([task_id, user_id], map: "task_assignees_task_user_unique")
+  @@index([task_id], map: "idx_task_assignees_task")
+  @@index([user_id], map: "idx_task_assignees_user")
+  @@index([status], map: "idx_task_assignees_status")
+}
+
+model task_submissions {
+  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  assignee_id  String      @unique @db.Uuid
+  content      String?
+  link_url     String?
+  status       task_status @default(SUBMITTED)
+  score        Int?
+  review_note  String?
+  submitted_at DateTime    @default(now()) @db.Timestamptz(6)
+  reviewed_at  DateTime?   @db.Timestamptz(6)
+  created_at   DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime    @default(now()) @db.Timestamptz(6)
+
+  task_assignees              task_assignees              @relation(fields: [assignee_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_submission_assignee")
+  task_submission_attachments task_submission_attachments[]
+
+  @@index([assignee_id], map: "idx_task_submissions_assignee")
+}
+
+model task_submission_attachments {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  submission_id String          @db.Uuid
+  file_name     String          @db.VarChar(255)
+  file_url      String
+  file_type     String          @db.VarChar(50)
+  file_size     Int             @default(0)
+  created_at    DateTime        @default(now()) @db.Timestamptz(6)
+
+  task_submissions task_submissions @relation(fields: [submission_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_submission_attachment")
+
+  @@index([submission_id], map: "idx_submission_attachments_submission")
+}
+
+model task_comments {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  task_id    String   @db.Uuid
+  author_id  String   @db.Uuid
+  body       String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  tasks tasks @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_task_comment_task")
+  users users @relation(fields: [author_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_task_comment_author")
+
+  @@index([task_id], map: "idx_task_comments_task")
+}
+
+
+model activity_logs {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String   @db.Uuid
+  action      String   @db.VarChar(100)
+  entity_type String?  @db.VarChar(50)
+  entity_id   String?  @db.Uuid
+  details     String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  users users @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_activity_user")
+
+  @@index([user_id], map: "idx_activity_logs_user")
+  @@index([created_at], map: "idx_activity_logs_created")
+}
