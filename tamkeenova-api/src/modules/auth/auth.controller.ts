@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, Query }  from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { RegisterVolunteerDto } from './dto/register-volunteer.dto';
@@ -32,6 +32,12 @@ export class AuthController {
     return this.authService.registerVolunteer(dto);
   }
 
+
+
+  @Get('availability')
+  async availability(@Query('email') email?: string, @Query('username') username?: string, @Query('phone') phone?: string) {
+    return this.authService.checkAvailability({ email, username, phone });
+  }
 
 
   // Handle verify email

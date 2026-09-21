@@ -36,6 +36,7 @@ export class VolunteerRegisterComponent {
     email: ['', [Validators.required, Validators.email]],
     phone: ['', [Validators.required, Validators.pattern(/^01[0125]\d{8}$/)]],
     password: ['', [Validators.required, Validators.minLength(8)]],
+    confirm_password: ['', [Validators.required, Validators.minLength(8)]],
     bio: [''],
   });
 
@@ -84,6 +85,7 @@ export class VolunteerRegisterComponent {
         email: raw.email,
         phone: raw.phone,
         password: raw.password,
+        confirm_password: raw.confirm_password,
         bio: raw.bio || undefined,
       })
       .subscribe({

@@ -7,6 +7,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { NotificationsService } from '../../../core/services/notifications.service';
 import { ConsultationService } from '../../../core/services/consultation.service';
 import { CorporateRequestService } from '../../../core/services/corporate-request.service';
+import { AdminService } from '../../../core/services/admin.service';
 import { AppNotification, Consultation, CorporateRequest } from '../../../core/models/student.model';
 import {
   notificationIcon,
@@ -36,6 +37,7 @@ export class NavbarComponent {
   private notificationsService = inject(NotificationsService);
   private consultationService = inject(ConsultationService);
   private corporateService = inject(CorporateRequestService);
+  private adminService = inject(AdminService);
   private translateService = inject(TranslateService);
 
   isScrolled = signal(false);
@@ -309,6 +311,29 @@ export class NavbarComponent {
       // endpoint — show the notification content itself instead of spinning.
       this.isLoadingDetail.set(false);
     }
+  }
+
+  goToProgramFromNotification(): void {
+    this.closeNotifDetail();
+    this.router.navigate(['/portal/admin/programs']);
+  }
+
+  approveProgramFromNotification(): void {
+    const id = this.selectedNotification()?.reference_id;
+    if (!id || !this.authService.isAdmin()) return;
+    this.adminService.approveProgram(id).subscribe({
+      next: () => this.closeNotifDetail(),
+      error: () => undefined,
+    });
+  }
+
+  rejectProgramFromNotification(): void {
+    const id = this.selectedNotification()?.reference_id;
+    if (!id || !this.authService.isAdmin()) return;
+    this.adminService.rejectProgram(id).subscribe({
+      next: () => this.closeNotifDetail(),
+      error: () => undefined,
+    });
   }
 
   closeNotifDetail(): void {

@@ -57,6 +57,7 @@ export class TrainerRegisterComponent {
     'email',
     'phone',
     'password',
+    'confirm_password',
     'specialization_id',
   ];
   private readonly step2Fields = [
@@ -82,6 +83,7 @@ export class TrainerRegisterComponent {
     email: ['', [Validators.required, Validators.email]],
     phone: ['', [Validators.required, Validators.pattern(/^01[0125]\d{8}$/)]],
     password: ['', [Validators.required, Validators.minLength(8)]],
+    confirm_password: ['', [Validators.required, Validators.minLength(8)]],
     specialization_id: ['', [Validators.required]],
 
     bio_ar: [''],
@@ -221,6 +223,24 @@ export class TrainerRegisterComponent {
     this.currentStep.update((s) => Math.max(s - 1, 1));
   }
 
+
+  checkAvailability(field: 'email' | 'username' | 'phone'): void {
+    const value = this.form.controls[field].value.trim();
+    if (!value || this.form.controls[field].invalid) return;
+    this.authService.checkAvailability({ [field]: value }).subscribe({
+      next: (res) => {
+        const available = res.data[`${field}_available` as keyof typeof res.data];
+        if (!available) {
+          const key = `errors.AUTH_${field.toUpperCase()}_EXISTS`;
+          this.serverFieldError.set({ field, key });
+        } else if (this.serverFieldError()?.field === field) {
+          this.serverFieldError.set(null);
+        }
+      },
+      error: () => undefined,
+    });
+  }
+
   submit(): void {
     this.step3Fields.forEach((f) => this.markTouched(f));
 
@@ -241,6 +261,7 @@ export class TrainerRegisterComponent {
       email: raw.email,
       phone: raw.phone,
       password: raw.password,
+      confirm_password: raw.confirm_password,
       role: 'TRAINER' as const,
       specialization_id: raw.specialization_id,
       bio_ar: raw.bio_ar || undefined,

@@ -383,6 +383,17 @@ export class AdminController {
   }
 
 
+  @Patch('programs/:id/approve')
+  approveProgram(@CurrentUser() admin: any, @Param('id') id: string) {
+    return this.adminService.approveProgram(admin.sub, id);
+  }
+
+  @Patch('programs/:id/reject')
+  rejectProgram(@CurrentUser() admin: any, @Param('id') id: string) {
+    return this.adminService.rejectProgram(admin.sub, id);
+  }
+
+
   // Handle hide program
   @Patch('programs/:id/hide')
   hideProgram(@CurrentUser() admin: any, @Param('id') id: string) {

@@ -27,6 +27,10 @@ export class AuthService {
 
   // Handle register
   async register(dto: RegisterDto) {
+    if (dto.password !== dto.confirm_password) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
     const emailExists = await this.authRepository.findUserByEmail(dto.email);
 
     if (emailExists) {
@@ -163,6 +167,10 @@ export class AuthService {
 
   // Handle register volunteer
   async registerVolunteer(dto: RegisterVolunteerDto) {
+    if (dto.password !== dto.confirm_password) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
     const emailExists = await this.authRepository.findUserByEmail(dto.email);
 
     if (emailExists) {
@@ -234,6 +242,16 @@ export class AuthService {
     };
   }
 
+
+
+  async checkAvailability(values: { email?: string; username?: string; phone?: string }) {
+    const [email, username, phone] = await Promise.all([
+      values.email ? this.authRepository.findUserByEmail(values.email) : null,
+      values.username ? this.authRepository.findUserByUsername(values.username) : null,
+      values.phone ? this.authRepository.findUserByPhone(values.phone) : null,
+    ]);
+    return { success: true, data: { email_available: !email, username_available: !username, phone_available: !phone } };
+  }
 
 
   // Handle verify email

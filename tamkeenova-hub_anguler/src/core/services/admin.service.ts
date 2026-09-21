@@ -233,6 +233,14 @@ export class AdminService {
     return this.unwrap<AdminProgram>(this.http.patch<any>(`${this.baseUrl}/programs/${id}`, payload));
   }
 
+  approveProgram(id: string): Observable<AdminProgram> {
+    return this.unwrap<AdminProgram>(this.http.patch<any>(`${this.baseUrl}/programs/${id}/approve`, {}));
+  }
+
+  rejectProgram(id: string): Observable<AdminProgram> {
+    return this.unwrap<AdminProgram>(this.http.patch<any>(`${this.baseUrl}/programs/${id}/reject`, {}));
+  }
+
   hideProgram(id: string): Observable<AdminProgram> {
     return this.unwrap<AdminProgram>(this.http.patch<any>(`${this.baseUrl}/programs/${id}/hide`, {}));
   }

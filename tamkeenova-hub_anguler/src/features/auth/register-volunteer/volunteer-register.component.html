@@ -135,6 +135,15 @@
             </div>
           </div>
 
+
+        <div class="field" [class.is-invalid]="isFieldInvalid('confirm_password')">
+          <label class="field-label" for="confirm_password">{{ 'auth.fields.confirm_password' | translate }}</label>
+          <input id="confirm_password" type="password" class="field-input" formControlName="confirm_password" (input)="markTouched('confirm_password')" autocomplete="new-password" />
+          <span class="field-hint" [class.is-error]="isFieldInvalid('confirm_password')">
+            @if (isFieldInvalid('confirm_password')) { {{ 'auth.errors.password_mismatch' | translate }} }
+          </span>
+        </div>
+
           <!-- -- Bio (optional) -- -->
           <div class="field">
             <label class="field-label" for="bio">
@@ -148,7 +157,7 @@
           </div>
 
           @if (errorMessage(); as message) {
-            <div class="form-error-banner">{{ message }}</div>
+            <div class="form-error-banner">{{ message | translate }}</div>
           }
 
           <button type="submit" class="submit-btn" [disabled]="isLoading()">

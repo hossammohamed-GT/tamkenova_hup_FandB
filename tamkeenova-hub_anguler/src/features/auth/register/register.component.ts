@@ -34,6 +34,7 @@ export class RegisterComponent {
     email: ['', [Validators.required, Validators.email]],
     phone: ['', [Validators.required, Validators.pattern(/^01[0125]\d{8}$/)]],
     password: ['', [Validators.required, Validators.minLength(8)]],
+    confirm_password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
   passwordScore = computed(() => passwordScore(this.passwordValue()));
@@ -92,6 +93,7 @@ export class RegisterComponent {
     const cleanPayload = {
       ...payload,
       username: payload.username || undefined,
+      confirm_password: payload.confirm_password,
       role: 'STUDENT' as const,
     };
 

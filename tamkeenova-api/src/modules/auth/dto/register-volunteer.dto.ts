@@ -20,8 +20,12 @@ export class RegisterVolunteerDto {
   @IsString()
   phone: string;
 
-  @MinLength(6)
+  @MinLength(8)
   password: string;
+
+  @IsString()
+  @MinLength(8)
+  confirm_password: string;
 
   @IsOptional()
   @IsString()

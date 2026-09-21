@@ -75,6 +75,7 @@
           <div class="field-input-wrap">
             <input id="username" type="text"
               class="field-input" formControlName="username"
+            (blur)="checkAvailability('username')"
               (input)="markTouched('username')"
               autocomplete="username" dir="ltr" />
             <i class="fa-solid fa-check field-status-icon is-valid"
@@ -100,6 +101,7 @@
           <div class="field-input-wrap">
             <input id="email" type="email"
               class="field-input" formControlName="email"
+            (blur)="checkAvailability('email')"
               (input)="markTouched('email')"
               autocomplete="email" dir="ltr" />
             <i class="fa-solid fa-check field-status-icon is-valid"
@@ -125,6 +127,7 @@
           <div class="field-input-wrap">
             <input id="phone" type="tel" class="field-input"
               formControlName="phone"
+            (blur)="checkAvailability('phone')"
               (input)="markTouched('phone')"
               placeholder="01xxxxxxxxx" autocomplete="tel"
               dir="ltr" />
@@ -225,6 +228,15 @@
         }
 
         <!-- -- Professional Information Step -- -->
+
+        <div class="field" [class.is-invalid]="isFieldInvalid('confirm_password')">
+          <label class="field-label" for="confirm_password">{{ 'auth.fields.confirm_password' | translate }}</label>
+          <input id="confirm_password" type="password" class="field-input" formControlName="confirm_password" (input)="markTouched('confirm_password')" autocomplete="new-password" />
+          <span class="field-hint" [class.is-error]="isFieldInvalid('confirm_password')">
+            @if (isFieldInvalid('confirm_password')) { {{ 'auth.errors.password_mismatch' | translate }} }
+          </span>
+        </div>
+
         @if (currentStep() === 2) {
 
         <div class="field">
