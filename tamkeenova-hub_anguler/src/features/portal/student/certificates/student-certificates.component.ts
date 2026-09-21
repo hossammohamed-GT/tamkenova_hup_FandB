@@ -40,16 +40,14 @@ export class StudentCertificatesComponent {
     const canvas = document.createElement('canvas'); canvas.width = 1800; canvas.height = 1273;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const navy = '#004265', gold = '#be8a3f', ink = '#101e27', paper = '#fcfaf4';
-    const isArabic = language === 'ar'; const title = (isArabic ? cert.title_ar : cert.title_en) || cert.title; const description = ((isArabic ? cert.description_ar : cert.description_en) || cert.description || '').slice(0, 145); const labels = isArabic ? { cert: 'شهادة إنجاز', presented: 'تشهد هذه الشهادة بأن', completed: 'أتم بنجاح', issued: 'تاريخ الإصدار', verify: 'امسح للتحقق' } : { cert: 'Certificate of Achievement', presented: 'This certificate is proudly presented to', completed: 'Has successfully completed', issued: 'Issued', verify: 'SCAN TO VERIFY' };
+    const isArabic = language === 'ar'; const isVolunteer = cert.certificate_type === 'VOLUNTEER'; const title = (isArabic ? cert.title_ar : cert.title_en) || cert.title; const description = ((isArabic ? cert.description_ar : cert.description_en) || cert.description || '').slice(0, 145); const labels = isArabic ? { cert: isVolunteer ? 'شهادة تطوع' : 'شهادة إتمام', presented: 'تشهد هذه الشهادة بأن', completed: isVolunteer ? 'ساهم بنجاح في العمل التطوعي' : 'أتم بنجاح', issued: 'تاريخ الإصدار', verify: 'امسح للتحقق' } : { cert: isVolunteer ? 'Certificate of Volunteering' : 'Certificate of Completion', presented: 'This certificate is proudly presented to', completed: isVolunteer ? 'Has successfully contributed as a volunteer' : 'Has successfully completed', issued: 'Issued', verify: 'SCAN TO VERIFY' };
     ctx.direction = isArabic ? 'rtl' : 'ltr';
-    ctx.fillStyle = navy; ctx.fillRect(0, 0, 1800, 1273);
-    // Architectural side bands and subtle pattern
-    ctx.fillStyle = '#003650'; ctx.fillRect(0, 0, 210, 1273); ctx.fillRect(1590, 0, 210, 1273);
-    ctx.strokeStyle = 'rgba(190,138,63,.22)'; ctx.lineWidth = 2;
-    for (let x = -900; x < 1800; x += 70) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 1273, 1273); ctx.stroke(); }
-    ctx.fillStyle = paper; ctx.fillRect(160, 90, 1480, 1093);
-    ctx.strokeStyle = gold; ctx.lineWidth = 7; ctx.strokeRect(185, 115, 1430, 1043);
-    ctx.strokeStyle = '#d8b777'; ctx.lineWidth = 2; ctx.strokeRect(207, 137, 1386, 999);
+    const backgroundPath = cert.certificate_type === 'VOLUNTEER' ? '/images/certificate-volunteer-bg.png' : '/images/certificate-program-bg.png';
+    try { ctx.drawImage(await this.loadImage(backgroundPath), 0, 0, 1800, 1273); } catch { ctx.fillStyle = paper; ctx.fillRect(0, 0, 1800, 1273); }
+    // A translucent security watermark is layered over the artwork and is intentionally difficult to erase cleanly.
+    ctx.save(); ctx.globalAlpha = 0.045; ctx.fillStyle = navy; ctx.font = 'bold 42px Arial'; ctx.rotate(-0.18);
+    for (let y = -300; y < 1500; y += 115) for (let x = -400; x < 2100; x += 430) ctx.fillText('TAMKEENOVA • VERIFIED • ' + cert.verification_code, x, y);
+    ctx.restore();
     // Corner ornaments
     ctx.strokeStyle = gold; ctx.lineWidth = 5;
     for (const [x, y, sx, sy] of [[207,137,1,1],[1593,137,-1,1],[207,1136,1,-1],[1593,1136,-1,-1]] as const) { ctx.beginPath(); ctx.moveTo(x, y + sy * 105); ctx.lineTo(x, y); ctx.lineTo(x + sx * 105, y); ctx.stroke(); ctx.beginPath(); ctx.arc(x + sx * 18, y + sy * 18, 10, 0, Math.PI * 2); ctx.stroke(); }
@@ -59,7 +57,7 @@ export class StudentCertificatesComponent {
     ctx.fillStyle = navy; ctx.font = 'bold 30px Arial'; ctx.fillText('TAMKEENOVA', 900, 292);
     ctx.fillStyle = gold; ctx.font = '18px Arial'; ctx.fillText('EMPOWERMENT  •  TRAINING  •  IMPACT', 900, 325);
     ctx.fillStyle = ink; ctx.font = 'bold 60px Georgia, serif'; ctx.fillText(labels.cert, 900, 445);
-    ctx.fillStyle = gold; ctx.font = 'bold 22px Arial'; ctx.fillText((cert.certificate_type || 'CERTIFICATE').toUpperCase(), 900, 495);
+    ctx.fillStyle = gold; ctx.font = 'bold 22px Arial'; ctx.fillText(labels.completed, 900, 495);
     ctx.fillStyle = '#69757a'; ctx.font = '25px Arial'; ctx.fillText(labels.presented, 900, 570);
     ctx.fillStyle = navy; ctx.font = 'bold 62px Georgia, serif'; ctx.fillText(cert.trainers?.users?.full_name || title, 900, 670);
     ctx.strokeStyle = gold; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(560, 700); ctx.lineTo(1240, 700); ctx.stroke();
