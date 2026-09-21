@@ -30,9 +30,10 @@
 }
 
 .animate-in {
-  opacity: 0;
-  transform: translateY(14px);
-  animation: portal-enter 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  /* Keep the final frame visible. Component styles may define a backwards-only animation. */
+  opacity: 1;
+  transform: translateY(0);
+  animation: portal-enter 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both !important;
 }
 
 @keyframes portal-enter {

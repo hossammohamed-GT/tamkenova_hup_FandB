@@ -142,3 +142,5 @@
 .btn-link {
   text-decoration: none;
 }
+
+.certificate-print{margin:1rem 0;padding:1.25rem;text-align:center;border:2px solid var(--color-primary);background:linear-gradient(135deg,#fffdf5,#f4fbf8);border-radius:10px}.certificate-brand{color:var(--color-primary);font-weight:800;letter-spacing:.18em}.certificate-kicker{margin-top:.6rem;color:var(--color-accent);font-size:.75rem;letter-spacing:.12em}.certificate-print h2{margin:.35rem 0;font-size:1.25rem}.certificate-recipient{font-size:1.35rem;font-weight:700;color:var(--color-primary);margin:.5rem}.certificate-meta{font-size:.75rem;color:var(--color-muted);margin-top:.8rem}.certificate-partners{display:flex;justify-content:center;gap:.8rem;margin-top:1rem}.certificate-partners img{width:52px;height:30px;object-fit:contain}.cert-actions{flex-wrap:wrap}@media print{body *{visibility:hidden}.print-target,.print-target *{visibility:visible}.print-target{position:absolute;left:0;top:0;width:100%;margin:0;padding:3rem;box-sizing:border-box}.print-target~*{display:none}}

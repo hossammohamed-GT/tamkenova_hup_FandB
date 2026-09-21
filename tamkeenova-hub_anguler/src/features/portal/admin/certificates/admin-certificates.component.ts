@@ -7,6 +7,8 @@ import { AdminService } from '../../../../core/services/admin.service';
 import { AdminCertificate, AdminUser, CertificateType } from '../../../../core/models/admin.model';
 import { AdminNavComponent } from '../admin-nav/admin-nav.component';
 import { apiErrorKey } from '../../../../core/utils/api-error';
+import { PartnersService } from '../../../../core/services/partners.service';
+import { StrategicPartner } from '../../../../core/models/partner.model';
 
 @Component({
   selector: 'app-admin-certificates',
@@ -18,6 +20,7 @@ import { apiErrorKey } from '../../../../core/utils/api-error';
 export class AdminCertificatesComponent implements OnInit {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
+  private partnersService = inject(PartnersService);
 
   readonly certificateTypes: CertificateType[] = ['TRAINING', 'VOLUNTEER', 'OTHER'];
 
@@ -37,6 +40,8 @@ export class AdminCertificatesComponent implements OnInit {
   userSearchTerm = signal('');
   isSearchingUsers = signal(false);
   selectedUser = signal<AdminUser | null>(null);
+  partners = signal<StrategicPartner[]>([]);
+  selectedPartnerIds = signal<string[]>([]);
 
   // -- Delete confirm --
   deleteTarget = signal<AdminCertificate | null>(null);
@@ -49,7 +54,11 @@ export class AdminCertificatesComponent implements OnInit {
 
   issueForm = this.fb.nonNullable.group({
     title: ['', Validators.required],
+    title_ar: [''],
+    title_en: [''],
     description: [''],
+    description_ar: [''],
+    description_en: [''],
     training_hours: this.fb.control<number | null>(null),
     certificate_type: this.fb.nonNullable.control<CertificateType>('TRAINING'),
   });
@@ -88,6 +97,7 @@ export class AdminCertificatesComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+    this.partnersService.listAll().subscribe({ next: (list) => this.partners.set(list ?? []), error: () => undefined });
   }
 
   // Silent re-fetch (no spinner) to reconcile with the server after mutations
@@ -121,6 +131,7 @@ export class AdminCertificatesComponent implements OnInit {
     this.selectedUser.set(null);
     this.userResults.set([]);
     this.userSearchTerm.set('');
+    this.selectedPartnerIds.set([]);
     this.formError.set(null);
     this.issueForm.reset({ certificate_type: 'TRAINING' });
     this.showIssueModal.set(true);
@@ -145,9 +156,14 @@ export class AdminCertificatesComponent implements OnInit {
         : null,
     );
     this.formError.set(null);
+    this.selectedPartnerIds.set(cert.partner_ids ?? []);
     this.issueForm.reset({
       title: cert.title,
+      title_ar: cert.title_ar ?? '',
+      title_en: cert.title_en ?? '',
       description: cert.description ?? '',
+      description_ar: cert.description_ar ?? '',
+      description_en: cert.description_en ?? '',
       training_hours: cert.training_hours ?? null,
       certificate_type: cert.certificate_type ?? 'OTHER',
     });
@@ -189,6 +205,10 @@ export class AdminCertificatesComponent implements OnInit {
     this.selectedUser.set(null);
   }
 
+  togglePartner(id: string): void {
+    this.selectedPartnerIds.update((ids) => ids.includes(id) ? ids.filter((value) => value !== id) : ids.length >= 6 ? ids : [...ids, id]);
+  }
+
   save(): void {
     if (this.issueForm.invalid) {
       this.issueForm.markAllAsTouched();
@@ -205,9 +225,14 @@ export class AdminCertificatesComponent implements OnInit {
       this.adminService
         .updateCertificate(cert.id, {
           title: raw.title,
+          title_ar: raw.title_ar || undefined,
+          title_en: raw.title_en || undefined,
           description: raw.description || undefined,
+          description_ar: raw.description_ar || undefined,
+          description_en: raw.description_en || undefined,
           training_hours: raw.training_hours ?? undefined,
           certificate_type: raw.certificate_type,
+          partner_ids: this.selectedPartnerIds(),
         })
         .subscribe({
           next: (updated) => {
@@ -240,9 +265,14 @@ export class AdminCertificatesComponent implements OnInit {
       .issueCertificate({
         user_id: user.id,
         title: raw.title,
+        title_ar: raw.title_ar || undefined,
+        title_en: raw.title_en || undefined,
         description: raw.description || undefined,
+        description_ar: raw.description_ar || undefined,
+        description_en: raw.description_en || undefined,
         training_hours: raw.training_hours ?? undefined,
         certificate_type: raw.certificate_type,
+        partner_ids: this.selectedPartnerIds(),
       })
       .subscribe({
         next: (created) => {

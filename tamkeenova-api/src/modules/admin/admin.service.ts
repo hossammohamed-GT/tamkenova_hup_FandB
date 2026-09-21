@@ -492,10 +492,15 @@ export class AdminService {
       program_id: dto.program_id || null,
       verification_code: verificationCode,
       title: dto.title,
+      title_ar: dto.title_ar || null,
+      title_en: dto.title_en || null,
       description: dto.description || null,
+      description_ar: dto.description_ar || null,
+      description_en: dto.description_en || null,
       training_hours: dto.training_hours || 0,
       certificate_type: dto.certificate_type || 'OTHER',
       qr_code_url: qrCodeUrl,
+      partner_ids: dto.partner_ids || [],
     });
 
     await this.notifyUser(
@@ -858,6 +863,15 @@ export class AdminService {
       message: isActive ? 'Program is now visible' : 'Program hidden',
       program: updated,
     };
+  }
+
+
+  async approveProgram(adminId: string, id: string) {
+    return this.setProgramVisibility(adminId, id, true);
+  }
+
+  async rejectProgram(adminId: string, id: string) {
+    return this.setProgramVisibility(adminId, id, false);
   }
 
 

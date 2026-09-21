@@ -348,9 +348,14 @@ model certificates {
   enrollment_id     String?          @db.Uuid
   verification_code String           @unique @db.VarChar(20)
   title             String           @db.VarChar(255)
+  title_ar          String?
+  title_en          String?
   description       String?
+  description_ar    String?
+  description_en    String?
   pdf_url           String?
   qr_code_url       String?
+  partner_ids       Json?
   issued_at         DateTime         @default(now()) @db.Timestamptz(6)
   is_valid          Boolean?         @default(true)
   training_hours    Int?             @default(0)
@@ -595,4 +600,17 @@ model activity_logs {
 
   @@index([user_id], map: "idx_activity_logs_user")
   @@index([created_at], map: "idx_activity_logs_created")
+}
+
+model strategic_partners {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name_ar       String   @db.VarChar(255)
+  name_en       String   @db.VarChar(255)
+  logo_url      String
+  website_url   String?
+  is_active     Boolean  @default(true)
+  display_order Int      @default(0)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+  @@index([is_active, display_order], map: "idx_strategic_partners_active_order")
 }

@@ -7,6 +7,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { NotificationsService } from '../../../core/services/notifications.service';
 import { ConsultationService } from '../../../core/services/consultation.service';
 import { CorporateRequestService } from '../../../core/services/corporate-request.service';
+import { AdminService } from '../../../core/services/admin.service';
 import { AppNotification, Consultation, CorporateRequest } from '../../../core/models/student.model';
 import {
   notificationIcon,
@@ -36,6 +37,7 @@ export class NavbarComponent {
   private notificationsService = inject(NotificationsService);
   private consultationService = inject(ConsultationService);
   private corporateService = inject(CorporateRequestService);
+  private adminService = inject(AdminService);
   private translateService = inject(TranslateService);
 
   isScrolled = signal(false);
@@ -111,7 +113,7 @@ export class NavbarComponent {
   navLinks: NavLink[] = [
     { labelKey: 'nav.home', route: '/' },
     { labelKey: 'nav.programs', route: '/programs' },
-    { labelKey: 'nav.portal', route: '/portal' },
+    { labelKey: 'nav.portal', route: '/verify' },
     { labelKey: 'nav.consulting', route: '/consulting' },
     { labelKey: 'nav.team', route: '/team' },
     { labelKey: 'nav.gallery', route: '/gallery' },
@@ -283,6 +285,11 @@ export class NavbarComponent {
 
     const refId = notif.reference_id;
     const refType = (notif.reference_type ?? notif.type ?? '').toUpperCase();
+    if (this.authService.isAdmin() && refType.includes('TRAINER')) {
+      this.closeNotifDetail();
+      this.router.navigate(['/portal/admin/trainers']);
+      return;
+    }
     if (!refId) {
       this.isLoadingDetail.set(false);
       return;
@@ -309,6 +316,29 @@ export class NavbarComponent {
       // endpoint — show the notification content itself instead of spinning.
       this.isLoadingDetail.set(false);
     }
+  }
+
+  goToProgramFromNotification(): void {
+    this.closeNotifDetail();
+    this.router.navigate(['/portal/admin/programs']);
+  }
+
+  approveProgramFromNotification(): void {
+    const id = this.selectedNotification()?.reference_id;
+    if (!id || !this.authService.isAdmin()) return;
+    this.adminService.approveProgram(id).subscribe({
+      next: () => this.closeNotifDetail(),
+      error: () => undefined,
+    });
+  }
+
+  rejectProgramFromNotification(): void {
+    const id = this.selectedNotification()?.reference_id;
+    if (!id || !this.authService.isAdmin()) return;
+    this.adminService.rejectProgram(id).subscribe({
+      next: () => this.closeNotifDetail(),
+      error: () => undefined,
+    });
   }
 
   closeNotifDetail(): void {

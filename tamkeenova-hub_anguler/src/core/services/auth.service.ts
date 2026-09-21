@@ -48,6 +48,10 @@ export class AuthService {
     return this.http.post<RegisterResponse>(`${this.baseUrl}/register/volunteer`, payload);
   }
 
+  checkAvailability(params: { email?: string; username?: string; phone?: string }) {
+    return this.http.get<{ success: boolean; data: { email_available: boolean; username_available: boolean; phone_available: boolean } }>(`${this.baseUrl}/availability`, { params });
+  }
+
   // -- Verify an Email Address --
   verifyEmail(payload: VerifyEmailRequest) {
     return this.http.post<ApiSuccessMessage>(`${this.baseUrl}/verify-email`, payload);

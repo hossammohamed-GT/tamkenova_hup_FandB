@@ -48,6 +48,11 @@ export class MailService {
       subject,
       html,
       text,
+      replyTo: this.configService.get('MAIL_USER'),
+      headers: {
+        'X-Auto-Response-Suppress': 'All',
+        'List-Unsubscribe': `<mailto:${this.configService.get('MAIL_USER')}?subject=unsubscribe>`,
+      },
     });
   }
 

@@ -103,12 +103,17 @@ export interface AdminCertificate {
   trainer_id: string | null;
   program_id: string | null;
   title: string;
+  title_ar?: string | null;
+  title_en?: string | null;
   description: string | null;
+  description_ar?: string | null;
+  description_en?: string | null;
   training_hours: number | null;
   certificate_type: CertificateType | null;
   certificate_url: string | null;
   verification_code: string;
   qr_code_url: string | null;
+  partner_ids?: string[] | null;
   is_valid: boolean;
   issued_at: string;
   created_at: string;
@@ -120,11 +125,16 @@ export interface AdminCertificate {
 export interface IssueCertificatePayload {
   user_id: string;
   title: string;
+  title_ar?: string;
+  title_en?: string;
   description?: string;
+  description_ar?: string;
+  description_en?: string;
   training_hours?: number;
   certificate_type?: CertificateType;
   trainer_id?: string;
   program_id?: string;
+  partner_ids?: string[];
 }
 
 export interface AdminCorporateRequest {
@@ -172,11 +182,14 @@ export interface SpecializationSuggestion {
 export interface AdminProgram {
   id: string;
   title: string;
+  title_ar?: string | null;
+  title_en?: string | null;
   description: string | null;
   price: string | number | null;
   duration_hours: number | null;
   level?: string | null;
   image_url: string | null;
+  is_active?: boolean;
   is_hidden?: boolean;
   is_published?: boolean;
   status?: string | null;

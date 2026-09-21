@@ -22,6 +22,7 @@ const RULES: ErrRule[] = [
 
   // -- Auth --
   { key: 'AUTH_EMAIL_EXISTS', msg: /Email already exists/i },
+  { key: 'AUTH_PASSWORD_MISMATCH', msg: /Passwords do not match/i },
   { key: 'AUTH_USERNAME_EXISTS', msg: /Username already exists/i },
   { key: 'AUTH_PHONE_EXISTS', msg: /Phone number already exists/i },
   { key: 'AUTH_SPECIALIZATION_NOT_FOUND', msg: /Specialization not found/i, path: /\/auth\// },

@@ -21,6 +21,8 @@ import { CorporateRequestsModule } from './modules/corporate-requests/corporate-
 import { VerificationModule } from './modules/verification/verification.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { PartnersModule } from './modules/partners/partners.module';
+import { LoggerModule } from './common/logger/logger.module';
 
 @Module({
   imports: [
@@ -45,6 +47,8 @@ import { TasksModule } from './modules/tasks/tasks.module';
 
     AdminModule,
     TasksModule,
+    PartnersModule,
+    LoggerModule,
   ],
   controllers: [AppController],
 })

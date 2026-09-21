@@ -1,6 +1,8 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { LoggerService } from './common/logger/logger.service';
 
 
 // Handle bootstrap
@@ -13,6 +15,8 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix('api');
+
+  app.useGlobalFilters(new GlobalExceptionFilter(app.get(LoggerService)));
 
   app.useGlobalPipes(
     new ValidationPipe({

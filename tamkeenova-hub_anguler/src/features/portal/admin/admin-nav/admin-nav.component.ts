@@ -31,6 +31,7 @@ export class AdminNavComponent {
     { labelKey: 'admin_nav.corporate', route: '/portal/admin/corporate', icon: 'fa-building', badge: 'corporate' },
     { labelKey: 'admin_nav.specializations', route: '/portal/admin/specializations', icon: 'fa-layer-group' },
     { labelKey: 'admin_nav.programs', route: '/portal/admin/programs', icon: 'fa-book-open' },
+    { labelKey: 'admin_nav.partners', route: '/portal/admin/partners', icon: 'fa-handshake' },
     { labelKey: 'admin_nav.tasks', route: '/portal/admin/tasks', icon: 'fa-list-check' },
   ];
 

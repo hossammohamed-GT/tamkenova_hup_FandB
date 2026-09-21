@@ -188,6 +188,10 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'partners',
+        loadComponent: () => import('../features/portal/admin/partners/admin-partners.component').then((m) => m.AdminPartnersComponent),
+      },
+      {
         path: 'programs',
         canActivate: [trainerStatusGuard],
         loadComponent: () =>
@@ -282,6 +286,10 @@ export const routes: Routes = [
           import('../features/portal/admin/specializations/admin-specializations.component').then(
             (m) => m.AdminSpecializationsComponent,
           ),
+      },
+      {
+        path: 'partners',
+        loadComponent: () => import('../features/portal/admin/partners/admin-partners.component').then((m) => m.AdminPartnersComponent),
       },
       {
         path: 'programs',

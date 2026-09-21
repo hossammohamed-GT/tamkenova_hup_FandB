@@ -3,7 +3,7 @@
     "tagline": "Empowerment & Training Platform",
     "home": "Home",
     "programs": "Programs",
-    "portal": "Trainee Portal",
+    "portal": "Verify Certificates",
     "consulting": "Consulting",
     "team": "Team",
     "gallery": "Gallery",
@@ -38,7 +38,7 @@
       "cta": "Explore Available Programs"
     },
     "partners": {
-      "label": "Strategic Partners & Accreditation"
+      "label": "Success partners and strategic accreditation"
     },
     "stats": {
       "trainees": "Trainees & Beneficiaries",
@@ -161,7 +161,7 @@
     },
     "tabs": {
       "b2b": "I represent a company or organization (B2B)",
-      "b2c": "I am a student or client (B2C) , individual consultation"
+      "b2c": "I am an individual or small client"
     },
     "form": {
       "field_label": "Service or consultation field",
@@ -187,8 +187,8 @@
       "required_error": "This field is required",
       "b2b_title": "Corporate Service Request (B2B)",
       "b2b_subtitle": "Fill in all the details so our team can help you in the best way",
-      "b2c_title": "Individual Consultation with a Trainer",
-      "b2c_subtitle": "Choose a trainer and set your consultation details",
+      "b2c_title": "Request a consultation for an individual or small client",
+      "b2c_subtitle": "Your request will be reviewed and handled by our admin team",
       "select_trainer": "Select trainer",
       "trainer_placeholder": "Search and select a trainer...",
       "consultation_title": "Consultation title",
@@ -303,6 +303,7 @@
       "email": "Email",
       "phone": "Phone Number",
       "password": "Password",
+      "confirm_password": "Confirm password",
       "otp": "Verification Code",
       "username": "Username"
     },
@@ -312,6 +313,7 @@
       "phone": "Please enter a valid Egyptian phone number",
       "password": "Password must be at least 8 characters",
       "password_required": "Password is required",
+      "password_mismatch": "Passwords do not match",
       "otp": "Please enter a valid code",
       "username": "Username is required (English letters and numbers only)",
       "generic": "Something went wrong. Please try again",
@@ -388,7 +390,7 @@
       "cover_letter_label": "Cover Letter",
       "linkedin_label": "LinkedIn URL",
       "facebook_label": "Facebook URL",
-      "website_label": "Personal Website",
+      "website_label": "CV",
       "portfolio_label": "Portfolio URL",
       "price_from_label": "Consultation Price From",
       "price_to_label": "Consultation Price To",
@@ -402,7 +404,11 @@
       "remove": "Remove",
       "back": "Back",
       "next": "Next",
-      "submit": "Submit Application"
+      "submit": "Submit Application",
+      "specialization_search": "Search specializations",
+      "request_specialization": "Request a new specialization",
+      "new_specialization_ar": "Specialization name in Arabic",
+      "new_specialization_en": "Specialization name in English"
     },
     "volunteer_register": {
       "eyebrow": "Volunteer with us",
@@ -812,7 +818,11 @@
     "verify": "Verify",
     "copy_code": "Copy Code",
     "program": "Program",
-    "trainer": "Trainer"
+    "trainer": "Trainer",
+    "certificate_of": "Certificate of Achievement",
+    "download_image": "Download certificate image",
+    "download_ar": "Download Arabic image",
+    "download_en": "Download English image"
   },
   "student_corporate": {
     "title": "Corporate Requests",
@@ -869,6 +879,9 @@
     "mark_read": "Mark as Read",
     "unread": "Unread",
     "view_all": "View All Notifications",
+    "approve_program": "Approve program",
+    "reject_program": "Reject program",
+    "view_program": "View program",
     "details_title": "Notification Details",
     "consultation_details": "Consultation Details",
     "corporate_details": "Corporate Request Details",
@@ -888,6 +901,8 @@
     "hours_ago": "{{count}} hours ago",
     "days_ago": "{{count}} days ago",
     "types": {
+      "program_submitted": "New program awaiting review",
+      "program_submitted_msg": "A trainer submitted a program for your review.",
       "new_trainer": "New trainer application",
       "new_trainer_msg": "A new trainer has applied and is awaiting admin review.",
       "trainer_approved": "Trainer approved",
@@ -911,7 +926,9 @@
       "account": "Account update",
       "account_msg": "There is an update on your account.",
       "update": "New notification",
-      "update_msg": "You have a new notification from Tamkeenova."
+      "update_msg": "You have a new notification from Tamkeenova.",
+      "specialization_request": "New specialization request",
+      "specialization_request_msg": "A trainer requested a new specialization."
     },
     "time": {
       "now": "just now",
@@ -988,7 +1005,8 @@
     "corporate": "Corporate Requests",
     "specializations": "Specializations",
     "programs": "Programs",
-    "tasks": "Tasks"
+    "tasks": "Tasks",
+    "partners": "Success partners"
   },
   "admin_dashboard": {
     "title": "Admin Dashboard",
@@ -1152,7 +1170,13 @@
     "delete_title": "Delete certificate",
     "delete_confirm": "Are you sure you want to delete the certificate",
     "no_user_found": "No user found with this name or email",
-    "min_chars_hint": "Type at least 2 characters to search"
+    "min_chars_hint": "Type at least 2 characters to search",
+    "partners": "Success partners on certificate",
+    "partners_hint": "Select the partner logos to show on this certificate.",
+    "title_ar": "Arabic title",
+    "title_en": "English title",
+    "description_ar": "Arabic description",
+    "description_en": "English description"
   },
   "admin_corporate": {
     "title": "Corporate Requests",
@@ -1469,10 +1493,27 @@
     "TASK_EMPTY_SUBMISSION": "Add text, a link, or at least one file.",
     "TASK_SUBMISSION_FAILED": "We couldn't save the submission. Please try again.",
     "TASK_NOT_ASSIGNED": "You aren't assigned to this task.",
-    "NOTIFICATION_NOT_FOUND": "This notification no longer exists."
+    "NOTIFICATION_NOT_FOUND": "This notification no longer exists.",
+    "AUTH_PASSWORD_MISMATCH": "Passwords do not match."
   },
   "trainer_consultations": {
     "update_error": "Could not update the consultation status, please retry",
     "status_updated": "Consultation status updated"
+  },
+  "admin_partners": {
+    "title": "Success partners and strategic accreditation",
+    "subtitle": "Our trusted partners and strategic accreditations",
+    "add": "Add partner",
+    "edit": "Edit partner",
+    "name_ar": "Name in Arabic",
+    "name_en": "Name in English",
+    "logo_url": "Logo URL",
+    "website_url": "Website URL",
+    "order": "Display order",
+    "active": "Active",
+    "inactive": "Hidden",
+    "hide": "Hide",
+    "show": "Show",
+    "load_error": "Could not load partners"
   }
 }

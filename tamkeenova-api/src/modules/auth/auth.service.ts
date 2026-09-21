@@ -27,6 +27,10 @@ export class AuthService {
 
   // Handle register
   async register(dto: RegisterDto) {
+    if (dto.password !== dto.confirm_password) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
     const emailExists = await this.authRepository.findUserByEmail(dto.email);
 
     if (emailExists) {
@@ -71,13 +75,23 @@ export class AuthService {
         }
 
         specializationId = specialization.id;
-      } else if (dto.specialization_name_ar && dto.specialization_name_en) {
-        const specialization = await this.authRepository.createSpecialization({
+      } else if (dto.specialization_name_ar) {
+        // A new specialization is reviewed by admins instead of being created immediately.
+        await this.authRepository.createSpecializationRequest({
+          user_id: user.id,
           name_ar: dto.specialization_name_ar,
-          name_en: dto.specialization_name_en,
+          name_en: dto.specialization_name_en || dto.specialization_name_ar,
         });
-
-        specializationId = specialization.id;
+        const admins = await this.authRepository.findFirstAdmin();
+        if (admins) {
+          await this.authRepository.createNotification({
+            user_id: admins.id,
+            title: 'New specialization request',
+            message: `${dto.full_name} requested the specialization ${dto.specialization_name_ar}`,
+            type: 'SPECIALIZATION_REQUEST',
+            reference_type: 'SPECIALIZATION_REQUEST',
+          });
+        }
       }
 
       const trainer = await this.authRepository.createTrainer({
@@ -130,10 +144,11 @@ export class AuthService {
 
         await this.authRepository.createNotification({
           user_id: admin.id,
-
           title: 'New Trainer Request',
-
           message: `${dto.full_name} submitted a trainer application`,
+          type: 'NEW_TRAINER_REQUEST',
+          reference_id: trainer.id,
+          reference_type: 'TRAINER',
         });
       }
     }
@@ -163,6 +178,10 @@ export class AuthService {
 
   // Handle register volunteer
   async registerVolunteer(dto: RegisterVolunteerDto) {
+    if (dto.password !== dto.confirm_password) {
+      throw new BadRequestException('Passwords do not match');
+    }
+
     const emailExists = await this.authRepository.findUserByEmail(dto.email);
 
     if (emailExists) {
@@ -234,6 +253,16 @@ export class AuthService {
     };
   }
 
+
+
+  async checkAvailability(values: { email?: string; username?: string; phone?: string }) {
+    const [email, username, phone] = await Promise.all([
+      values.email ? this.authRepository.findUserByEmail(values.email) : null,
+      values.username ? this.authRepository.findUserByUsername(values.username) : null,
+      values.phone ? this.authRepository.findUserByPhone(values.phone) : null,
+    ]);
+    return { success: true, data: { email_available: !email, username_available: !username, phone_available: !phone } };
+  }
 
 
   // Handle verify email

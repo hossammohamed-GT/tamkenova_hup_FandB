@@ -2,6 +2,8 @@ import {
   IsEnum,
   IsInt,
   IsOptional,
+  IsArray,
+  ArrayMaxSize,
   IsString,
   IsUUID,
   MaxLength,
@@ -22,6 +24,22 @@ export class IssueCertificateDto {
   description?: string;
 
   @IsOptional()
+  @IsString()
+  title_ar?: string;
+
+  @IsOptional()
+  @IsString()
+  title_en?: string;
+
+  @IsOptional()
+  @IsString()
+  description_ar?: string;
+
+  @IsOptional()
+  @IsString()
+  description_en?: string;
+
+  @IsOptional()
   @IsInt()
   @Min(0)
   training_hours?: number;
@@ -37,4 +55,10 @@ export class IssueCertificateDto {
   @IsOptional()
   @IsUUID()
   program_id?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(6)
+  @IsUUID('4', { each: true })
+  partner_ids?: string[];
 }
