@@ -144,10 +144,11 @@ export class AuthService {
 
         await this.authRepository.createNotification({
           user_id: admin.id,
-
           title: 'New Trainer Request',
-
           message: `${dto.full_name} submitted a trainer application`,
+          type: 'NEW_TRAINER_REQUEST',
+          reference_id: trainer.id,
+          reference_type: 'TRAINER',
         });
       }
     }

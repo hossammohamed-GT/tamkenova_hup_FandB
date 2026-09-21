@@ -285,6 +285,11 @@ export class NavbarComponent {
 
     const refId = notif.reference_id;
     const refType = (notif.reference_type ?? notif.type ?? '').toUpperCase();
+    if (this.authService.isAdmin() && refType.includes('TRAINER')) {
+      this.closeNotifDetail();
+      this.router.navigate(['/portal/admin/trainers']);
+      return;
+    }
     if (!refId) {
       this.isLoadingDetail.set(false);
       return;
