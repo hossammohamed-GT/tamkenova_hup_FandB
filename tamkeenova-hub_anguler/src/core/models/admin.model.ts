@@ -98,6 +98,10 @@ export interface AdminVolunteer {
 }
 
 export interface AdminCertificate {
+  student_id: string;
+  recipient_name?: string | null;
+  program_name?: string | null;
+  template_version?: string | null;
   id: string;
   user_id: string;
   trainer_id: string | null;
@@ -124,17 +128,11 @@ export interface AdminCertificate {
 
 export interface IssueCertificatePayload {
   user_id: string;
-  title: string;
-  title_ar?: string;
-  title_en?: string;
-  description?: string;
-  description_ar?: string;
-  description_en?: string;
-  training_hours?: number;
-  certificate_type?: CertificateType;
-  trainer_id?: string;
-  program_id?: string;
-  partner_ids?: string[];
+  certificate_type: 'TRAINING' | 'VOLUNTEER';
+  recipient_name: string;
+  program_name?: string | null;
+  training_hours: number;
+  issued_at: string;
 }
 
 export interface AdminCorporateRequest {

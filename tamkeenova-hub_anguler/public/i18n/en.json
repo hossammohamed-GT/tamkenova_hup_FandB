@@ -1131,7 +1131,7 @@
   },
   "admin_certificates": {
     "title": "Certificates Management",
-    "subtitle": "Issue certificates, upload PDFs and manage verification",
+    "subtitle": "Issue branded training and volunteer certificates from fixed artwork.",
     "issue": "Issue certificate",
     "issue_title": "Issue a new certificate",
     "edit_title": "Edit certificate",
@@ -1515,5 +1515,30 @@
     "hide": "Hide",
     "show": "Show",
     "load_error": "Could not load partners"
+  },
+  "certificate_studio": {
+    "TRAINING": "Training certificate",
+    "VOLUNTEER": "Volunteer certificate",
+    "bilingual": "Arabic + English · Signature artwork",
+    "intro": "Two signature designs. Choose a template, enter the recipient details, and issue a professionally composed certificate. All branding and fixed wording are built into the artwork.",
+    "choose": "01 / Choose your template",
+    "recipient_name": "Recipient name",
+    "program_name": "Program name",
+    "hours": "Number of hours",
+    "date": "Date of issue",
+    "snapshot": "The name is saved on this certificate, independently of future profile changes.",
+    "qr_hint": "A unique verification QR code is generated automatically when the certificate is issued. It cannot point to an arbitrary website.",
+    "preview": "02 / Certificate preview",
+    "rendering": "Preparing the artwork…",
+    "preview_hint": "Preview only. Empty fields show example values. The final QR code is assigned when you issue the certificate. Both languages are built into one design.",
+    "locked": "Artwork is locked: title, description, logo, decorative elements, institutional signature and labels.",
+    "download_pdf": "Download PDF",
+    "download_png": "Download PNG",
+    "legacy_badge": "Previous record · review required",
+    "legacy": "This historical certificate has no new template assigned. Confirm the recipient, template, program (training only), hours and date to convert it. Its verification code and validity will be preserved.",
+    "legacy_student": "This certificate predates the new artwork. Please contact an administrator to have it prepared with the new template. Verification remains available.",
+    "invalid": "Enter a recipient name (up to 120 characters), a program for training (up to 180 characters), whole hours from 1 to 100,000, and a valid date between 1900 and 2100.",
+    "render_error": "The certificate could not be prepared. Check your connection and try again. No incomplete document has been downloaded.",
+    "too_long": "The name or program is too wide for its reserved space. Please use a shorter official form; text is never cut off."
   }
 }

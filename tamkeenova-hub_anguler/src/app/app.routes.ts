@@ -67,6 +67,12 @@ export const routes: Routes = [
       import('../features/auth/login/login.component').then((m) => m.LoginComponent),
   },
 
+  // All authenticated recipients, including volunteers, can access their own records.
+  {
+    path: 'portal/certificates',
+    canActivate: [authGuard],
+    loadComponent: () => import('../features/portal/student/certificates/student-certificates.component').then(m => m.StudentCertificatesComponent),
+  },
   // -- Student Portal Routes --
   {
     path: 'portal',

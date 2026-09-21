@@ -4,9 +4,11 @@ import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { StudentService } from '../../../../core/services/student.service';
 import { StudentCertificate } from '../../../../core/models/student.model';
-import { PartnersService } from '../../../../core/services/partners.service';
-import { StrategicPartner } from '../../../../core/models/partner.model';
-import QRCode from 'qrcode';
+import { CertificateRenderer } from '../../../../core/certificates/certificate-renderer.service';
+import {
+  certificateValues,
+  TEMPLATE_VERSION,
+} from '../../../../core/certificates/certificate-template';
 
 @Component({
   selector: 'app-student-certificates',
@@ -17,97 +19,47 @@ import QRCode from 'qrcode';
 })
 export class StudentCertificatesComponent {
   private studentService = inject(StudentService);
-  private partnersService = inject(PartnersService);
-
+  private renderer = inject(CertificateRenderer);
+  readonly version = TEMPLATE_VERSION;
   isLoading = signal(true);
+  hasError = signal(false);
   certificates = signal<StudentCertificate[]>([]);
   copiedCode = signal<string | null>(null);
-  partners = signal<StrategicPartner[]>([]);
-
+  downloadingId = signal<string | null>(null);
+  downloadError = signal<string | null>(null);
   constructor() {
-    this.partnersService.listPublic().subscribe({ next: (list) => this.partners.set(list ?? []), error: () => undefined });
+    this.load();
+  }
+  load(): void {
+    this.isLoading.set(true);
+    this.hasError.set(false);
     this.studentService.getCertificates().subscribe({
       next: (res) => {
         this.certificates.set(res.data ?? []);
         this.isLoading.set(false);
       },
-      error: () => this.isLoading.set(false),
+      error: () => {
+        this.hasError.set(true);
+        this.isLoading.set(false);
+      },
     });
   }
-
-  async downloadCertificate(cert: StudentCertificate, language: 'ar' | 'en'): Promise<void> {
-    // A composed, high-resolution certificate artwork: navy identity, ivory paper and Tamkeenova gold.
-    const canvas = document.createElement('canvas'); canvas.width = 1800; canvas.height = 1273;
-    const ctx = canvas.getContext('2d'); if (!ctx) return;
-    const navy = '#004265', gold = '#be8a3f', ink = '#101e27', paper = '#fcfaf4';
-    const isArabic = language === 'ar'; const isVolunteer = cert.certificate_type === 'VOLUNTEER'; const title = (isArabic ? cert.title_ar : cert.title_en) || cert.title; const labels = isArabic ? { cert: isVolunteer ? 'شهادة تقدير' : 'شهادة إتمام', presented: 'تشهد هذه الشهادة بأن', completed: isVolunteer ? 'تقديرًا لمساهمته القيّمة في العمل التطوعي' : 'تقديرًا لإتمامه البرنامج التدريبي بنجاح', issued: 'تاريخ الإصدار', hours: 'ساعات التدريب', id: 'رقم الشهادة', verify: 'امسح للتحقق', partnership: 'بالشراكة مع', organization: 'تمكينوفا', tagline: 'التمكين • التدريب • الأثر' } : { cert: isVolunteer ? 'CERTIFICATE OF APPRECIATION' : 'CERTIFICATE OF COMPLETION', presented: 'This certificate is proudly presented to', completed: isVolunteer ? 'In recognition of valuable contribution to volunteer work' : 'In recognition of successful completion of the training program', issued: 'ISSUE DATE', hours: 'TRAINING HOURS', id: 'CERTIFICATE ID', verify: 'SCAN TO VERIFY', partnership: 'IN PARTNERSHIP WITH', organization: 'TAMKEENOVA', tagline: 'EMPOWERMENT  •  TRAINING  •  IMPACT' };
-    ctx.direction = isArabic ? 'rtl' : 'ltr';
-    const backgroundPath = cert.certificate_type === 'VOLUNTEER' ? '/images/certificate-volunteer-bg.png' : '/images/certificate-program-bg.png';
-    try { ctx.drawImage(await this.loadImage(backgroundPath), 0, 0, 1800, 1273); } catch { ctx.fillStyle = paper; ctx.fillRect(0, 0, 1800, 1273); }
-    // Corner ornaments
-    ctx.strokeStyle = gold; ctx.lineWidth = 5;
-    for (const [x, y, sx, sy] of [[207,137,1,1],[1593,137,-1,1],[207,1136,1,-1],[1593,1136,-1,-1]] as const) { ctx.beginPath(); ctx.moveTo(x, y + sy * 105); ctx.lineTo(x, y); ctx.lineTo(x + sx * 105, y); ctx.stroke(); ctx.beginPath(); ctx.arc(x + sx * 18, y + sy * 18, 10, 0, Math.PI * 2); ctx.stroke(); }
-    ctx.textAlign = 'center';
-    const drawFitted = (value: string, x: number, y: number, maxWidth: number, maxSize: number, fontFamily: string, color: string) => {
-      let size = maxSize; ctx.font = `bold ${size}px ${fontFamily}`;
-      while (size > 24 && ctx.measureText(value).width > maxWidth) { size -= 2; ctx.font = `bold ${size}px ${fontFamily}`; }
-      ctx.fillStyle = color; ctx.fillText(value, x, y);
-    };
-    // Brand mark + identity
-    try { const logo = await this.loadImage('/images/logo.svg'); ctx.drawImage(logo, 845, 155, 110, 110); } catch {}
-    ctx.fillStyle = navy; ctx.font = 'bold 30px Arial'; ctx.fillText(labels.organization, 900, 292);
-    ctx.fillStyle = gold; ctx.font = '18px Arial'; ctx.fillText(labels.tagline, 900, 325);
-    ctx.fillStyle = ink; ctx.font = 'bold 60px Georgia, serif'; ctx.fillText(labels.cert, 900, 445);
-    ctx.fillStyle = gold; ctx.font = 'bold 21px Arial'; ctx.fillText(isVolunteer ? (isArabic ? 'تقديرًا للعطاء والمشاركة المجتمعية' : 'VOLUNTEER RECOGNITION') : (isArabic ? 'برنامج تدريب وتطوير مهني' : 'PROFESSIONAL DEVELOPMENT PROGRAM'), 900, 495);
-    ctx.fillStyle = '#69757a'; ctx.font = '25px Arial'; ctx.fillText(labels.presented, 900, 570);
-    drawFitted(cert.users?.full_name || title, 900, 670, 1040, 62, 'Georgia, serif', navy);
-    ctx.strokeStyle = gold; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(560, 700); ctx.lineTo(1240, 700); ctx.stroke();
-    drawFitted(title, 900, 770, 980, 32, 'Arial', ink);
-    ctx.fillStyle = '#69757a'; ctx.font = '22px Arial';
-    ctx.fillText(labels.completed, 900, 820);
-    ctx.font = '20px Arial'; ctx.fillText(isArabic ? 'مع أطيب التمنيات بدوام النجاح والتقدم' : 'We wish continued success and achievement', 900, 855);
-    // Formal information blocks: only the certificate data is dynamic; all labels are part of the artwork.
-    ctx.strokeStyle = '#d8b777'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(280, 890); ctx.lineTo(1170, 890); ctx.stroke();
-    ctx.fillStyle = gold; ctx.font = 'bold 15px Arial'; ctx.fillText(labels.hours, 430, 925); ctx.fillText(labels.issued, 720, 925); ctx.fillText(labels.id, 1010, 925);
-    ctx.fillStyle = navy; ctx.font = 'bold 21px Arial'; ctx.fillText(`${cert.training_hours ?? 0} ${isArabic ? 'ساعة' : 'Hours'}`, 430, 955); ctx.fillText(new Date(cert.issued_at).toLocaleDateString(isArabic ? 'ar-EG' : 'en-GB'), 720, 955); ctx.fillText(cert.verification_code, 1010, 955);
-    ctx.fillStyle = '#69757a'; ctx.font = '15px Arial'; ctx.fillText(isArabic ? 'وثيقة رسمية قابلة للتحقق' : 'Officially verifiable certificate', 900, 985);
-    ctx.strokeStyle = gold; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(350, 1018); ctx.lineTo(650, 1018); ctx.moveTo(1050, 1018); ctx.lineTo(1350, 1018); ctx.stroke();
-    ctx.fillStyle = ink; ctx.font = 'italic 28px Georgia, serif'; ctx.fillText(isArabic ? 'إدارة تمكينوفا' : 'Tamkeenova Management', 500, 1005); ctx.fillText(isArabic ? 'ممثل الشركاء' : 'Partner Representative', 1200, 1005);
-    ctx.fillStyle = '#69757a'; ctx.font = '17px Arial'; ctx.fillText(isArabic ? 'الجهة المانحة' : 'Issuing Organization', 500, 1050); ctx.fillText(isArabic ? 'شركاء النجاح' : 'Success Partners', 1200, 1050);
-    ctx.strokeStyle = '#d8b777'; ctx.beginPath(); ctx.moveTo(430, 1090); ctx.lineTo(1370, 1090); ctx.stroke();
-    ctx.fillStyle = gold; ctx.font = '18px Arial'; ctx.fillText(labels.partnership, 775, 1120);
-    // QR area is deliberately on a white card for reliable scanning after download/printing.
-    ctx.fillStyle = '#ffffff'; ctx.fillRect(1330, 905, 205, 205); ctx.strokeStyle = gold; ctx.lineWidth = 3; ctx.strokeRect(1330, 905, 205, 205);
-    const verifyUrl = `${window.location.origin}/verify?code=${encodeURIComponent(cert.verification_code)}`;
-    const qr = await QRCode.toDataURL(verifyUrl, { width: 185, margin: 1, color: { dark: navy, light: '#ffffff' } }); ctx.drawImage(await this.loadImage(qr), 1340, 915, 185, 185);
-    ctx.fillStyle = '#69757a'; ctx.font = '16px Arial'; ctx.fillText(labels.verify, 1432, 1135);
-    const logos = (cert.partner_ids || []).map((id) => this.partnerLogo(id)).filter((url): url is string => !!url).slice(0, 6);
-    const partnerAreaCenter = 775; const partnerStart = partnerAreaCenter - ((logos.length * 125 - 30) / 2); for (let i = 0; i < logos.length; i++) { try { const logo = await this.loadImage(logos[i]); ctx.fillStyle = '#ffffff'; ctx.fillRect(partnerStart + i * 125 - 8, 1140, 111, 72); ctx.drawImage(logo, partnerStart + i * 125, 1148, 95, 55); } catch {} }
-    const link = document.createElement('a'); link.download = `tamkeenova-certificate-${cert.verification_code}-${language}.png`;
-    canvas.toBlob((blob) => { if (!blob) return; link.href = URL.createObjectURL(blob); link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000); }, 'image/png');
-  }
-
-  private async loadImage(src: string): Promise<HTMLImageElement> {
-    // Convert partner/logo resources to same-origin object URLs before drawing; otherwise
-    // the browser marks the canvas as tainted and blocks the PNG download.
-    const response = await fetch(src, { mode: 'cors' });
-    if (!response.ok) throw new Error(`Unable to load certificate image: ${response.status}`);
-    const objectUrl = URL.createObjectURL(await response.blob());
+  async downloadCertificate(cert: StudentCertificate, format: 'png' | 'pdf'): Promise<void> {
+    if (this.downloadingId() || !cert.is_valid) return;
+    this.downloadingId.set(cert.id);
+    this.downloadError.set(null);
     try {
-      return await new Promise<HTMLImageElement>((resolve, reject) => {
-        const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = objectUrl;
-      });
-    } finally { URL.revokeObjectURL(objectUrl); }
+      await this.renderer.download(certificateValues(cert), format);
+    } catch (error) {
+      this.downloadError.set(
+        error instanceof Error && error.message.startsWith('certificate_studio.')
+          ? error.message
+          : 'certificate_studio.render_error',
+      );
+    } finally {
+      this.downloadingId.set(null);
+    }
   }
-
-  printCertificate(id: string): void {
-    document.querySelectorAll(".certificate-print").forEach((el) => el.classList.remove("print-target"));
-    document.getElementById("certificate-" + id)?.classList.add("print-target");
-    window.print();
-  }
-
-  partnerLogo(id: string): string | null { return this.partners().find((partner) => partner.id === id)?.logo_url ?? null; }
-
   copyCode(code: string): void {
     navigator.clipboard?.writeText(code).then(
       () => {

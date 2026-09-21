@@ -176,6 +176,9 @@ export interface EnrollResponse {
 }
 
 export interface StudentCertificate {
+  recipient_name?: string | null;
+  program_name?: string | null;
+  template_version?: string | null;
   id: string;
   verification_code: string;
   title: string;

@@ -189,37 +189,29 @@ GET /api/admin/users/:id/activity
 
 ## 7. Admin — Certificates
 
-| Method | Endpoint | الوصف |
-|--------|----------|-------|
-| `GET` | `/api/admin/certificates` | سجل كل الشهادات |
-| `POST` | `/api/admin/certificates` | إصدار شهادة لأي مستخدم |
-| `POST` | `/api/admin/certificates/:id/pdf` | رفع PDF الشهادة (multipart `file`) |
-| `PATCH` | `/api/admin/certificates/:id` | تعديل شهادة |
-| `PATCH` | `/api/admin/certificates/:id/revoke` | إلغاء الشهادة (`is_valid=false`) |
-| `DELETE` | `/api/admin/certificates/:id` | حذف الشهادة |
+Rebuilt in version **2026.1**. See the [certificate studio contract and deployment guide](../../tamkeenova-hub_anguler/DOCS/CERTIFICATES.md). Apply `npm run db:certificates` before deploying.
 
-### Issue Certificate
-
-```
-POST /api/admin/certificates
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/admin/certificates` | List certificate records |
+| `POST` | `/api/admin/certificates` | Issue a training or volunteer certificate |
+| `PATCH` | `/api/admin/certificates/:id` | Edit only allowed dynamic values |
+| `PATCH` | `/api/admin/certificates/:id/revoke` | Revoke validity |
+| `DELETE` | `/api/admin/certificates/:id` | Delete record |
 
 ```json
 {
-  "user_id": "uuid",
-  "title": "شهادة تطوع",
-  "description": "إتمام 100 ساعة تطوع",
+  "user_id": "recipient-account-uuid",
+  "certificate_type": "VOLUNTEER",
+  "recipient_name": "ليلى أحمد",
   "training_hours": 100,
-  "certificate_type": "VOLUNTEER"
+  "issued_at": "2026-09-21"
 }
 ```
 
-**Side Effects:**
-- توليد `verification_code` (مثل `TAM-1A2B3C4D`).
-- توليد رابط صورة QR (بدون أي مكتبة server-side) يرمّز رابط التحقق العام وتخزينه في `qr_code_url`.
-- 🔔 إشعار + ✉️ إيميل لصاحب الشهادة.
+For `TRAINING`, `program_name` is required (up to 180 characters). Volunteers must not have a non-empty program. The name, hours and date are required on issue. PATCH validates partial changes against the saved record; account ownership is not editable.
 
-> `trainer_id` و `program_id` اختياريين دلوقتي — شهادة التطوع أو أي شهادة عامة مش محتاجة برنامج أو مدرب.
+The server assigns a random `TAM-` verification code and snapshots the name and template version. The frontend generates a local verification QR and exports matching PDF/PNG files from locked artwork. Custom titles, descriptions, partner logos, arbitrary QR URLs and the previous PDF upload endpoint are no longer supported. Historical records retain verification but require explicit admin review before new-artwork downloads.
 
 ---
 
@@ -500,7 +492,7 @@ Authorization: Volunteer
 
 الأدمن يصدر شهادة تطوع من:
 ```
-POST /api/admin/certificates   { "user_id": "volunteer-user-uuid", "title": "شهادة تطوع", "training_hours": 100, "certificate_type": "VOLUNTEER" }
+POST /api/admin/certificates   { "user_id": "volunteer-user-uuid", "recipient_name": "ليلى أحمد", "training_hours": 100, "issued_at": "2026-09-21", "certificate_type": "VOLUNTEER" }
 ```
 - شروط مقترحة: 100 ساعة → شهادة، 200 ساعة → شهادة أعلى (بتحددها الإدارة).
 - ساعات التطوع بتتحدث تلقائيًا لما الأدمن يعتمد مهمة.

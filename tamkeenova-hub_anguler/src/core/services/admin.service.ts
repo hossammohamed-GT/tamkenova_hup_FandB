@@ -148,17 +148,11 @@ export class AdminService {
   }
 
   issueCertificate(payload: IssueCertificatePayload): Observable<AdminCertificate> {
-    return this.unwrap<AdminCertificate>(this.http.post<any>(`${this.baseUrl}/certificates`, payload));
+    return this.http.post<any>(`${this.baseUrl}/certificates`, payload).pipe(map(res => res?.certificate ?? res?.data?.certificate ?? res?.data ?? res));
   }
 
-  uploadCertificatePdf(id: string, file: File): Observable<AdminCertificate> {
-    const fd = new FormData();
-    fd.append('file', file);
-    return this.unwrap<AdminCertificate>(this.http.post<any>(`${this.baseUrl}/certificates/${id}/pdf`, fd));
-  }
-
-  updateCertificate(id: string, payload: Partial<IssueCertificatePayload> & { is_valid?: boolean }): Observable<AdminCertificate> {
-    return this.unwrap<AdminCertificate>(this.http.patch<any>(`${this.baseUrl}/certificates/${id}`, payload));
+  updateCertificate(id: string, payload: Partial<Omit<IssueCertificatePayload, 'user_id'>>): Observable<AdminCertificate> {
+    return this.http.patch<any>(`${this.baseUrl}/certificates/${id}`, payload).pipe(map(res => res?.certificate ?? res?.data?.certificate ?? res?.data ?? res));
   }
 
   revokeCertificate(id: string): Observable<AdminCertificate> {

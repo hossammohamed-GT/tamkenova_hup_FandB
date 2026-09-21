@@ -555,6 +555,8 @@ Authorization: Required
 
 ## 5. Certificates
 
+> Certificate issuance and artwork were rebuilt in version 2026.1. See the [current certificate contract](../../tamkeenova-hub_anguler/DOCS/CERTIFICATES.md). Historical response examples below may have legacy fields; new records additionally contain `recipient_name`, `program_name`, `template_version` and `certificate_type`. PDF/PNG and verification QR images are generated locally from fixed artwork, not uploaded.
+
 ### 5.1 My Certificates
 
 ```

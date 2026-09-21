@@ -12,6 +12,20 @@
 
   <app-admin-nav />
 
+  <div class="template-gallery">
+    @for (template of templates; track template.type) {
+      <button class="template-card" type="button" (click)="openIssue(template.type)">
+        <img [src]="template.thumbnail" [alt]="'certificate_studio.' + template.type | translate" />
+        <span class="template-caption"
+          ><span
+            ><strong>{{ 'certificate_studio.' + template.type | translate }}</strong
+            ><small>{{ 'certificate_studio.bilingual' | translate }}</small></span
+          ><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i
+        ></span>
+      </button>
+    }
+  </div>
+  <p class="studio-intro">{{ 'certificate_studio.intro' | translate }}</p>
   <!-- -- Toolbar -- -->
   <div class="toolbar">
     <div class="toolbar-search">
@@ -65,6 +79,11 @@
               <td>
                 <div class="cert-title-cell">
                   <strong>{{ cert.title }}</strong>
+                  @if (cert.template_version !== version) {
+                    <small class="legacy-note">{{
+                      'certificate_studio.legacy_badge' | translate
+                    }}</small>
+                  }
                   @if (cert.issued_at) {
                     <small class="text-muted">{{ cert.issued_at | date: 'yyyy/MM/dd' }}</small>
                   }
@@ -80,7 +99,9 @@
                     }
                   </span>
                   <span class="table-user-main">
-                    <span class="table-user-name">{{ cert.users?.full_name ?? cert.user_id }}</span>
+                    <span class="table-user-name">{{
+                      cert.recipient_name ?? cert.users?.full_name ?? cert.student_id
+                    }}</span>
                   </span>
                 </div>
               </td>
@@ -95,40 +116,51 @@
               </td>
               <td class="table-muted">{{ cert.training_hours ?? '—' }}</td>
               <td>
-                <button type="button" class="code-chip" (click)="copyCode(cert.verification_code)" [title]="'common.copied' | translate">
+                <button
+                  type="button"
+                  class="code-chip"
+                  (click)="copyCode(cert.verification_code)"
+                  [title]="'common.copied' | translate"
+                >
                   <i class="fa-solid fa-barcode"></i>
                   {{ cert.verification_code }}
                 </button>
               </td>
               <td>
-                <span class="badge" [class.badge-approved]="cert.is_valid" [class.badge-rejected]="!cert.is_valid">
-                  {{ (cert.is_valid ? 'admin_certificates.valid' : 'admin_certificates.revoked_label') | translate }}
+                <span
+                  class="badge"
+                  [class.badge-approved]="cert.is_valid"
+                  [class.badge-rejected]="!cert.is_valid"
+                >
+                  {{
+                    (cert.is_valid
+                      ? 'admin_certificates.valid'
+                      : 'admin_certificates.revoked_label'
+                    ) | translate
+                  }}
                 </span>
               </td>
               <td>
                 <div class="cell-actions">
+                  @if (cert.template_version === version && cert.is_valid) {
+                    <button
+                      type="button"
+                      class="btn-sm btn-outline-sm"
+                      (click)="download(cert)"
+                      [disabled]="!!downloadingId()"
+                    >
+                      <i class="fa-solid fa-file-pdf"></i>
+                      {{ 'certificate_studio.download_pdf' | translate }}
+                    </button>
+                  }
                   <button
                     type="button"
                     class="btn-sm btn-outline-sm"
-                    (click)="triggerPdfInput(cert.id)"
-                    [disabled]="uploadingId() === cert.id"
+                    (click)="openEdit(cert)"
+                    [attr.aria-label]="'admin_certificates.edit_title' | translate"
                   >
-                    @if (uploadingId() === cert.id) {
-                      <span class="loader-spinner-sm"></span>
-                    } @else {
-                      <i class="fa-solid fa-file-pdf"></i>
-                    }
-                    {{ 'admin_certificates.upload_pdf' | translate }}
-                  </button>
-                  <input
-                    hidden
-                    type="file"
-                    accept="application/pdf"
-                    [id]="'cert-pdf-input-' + cert.id"
-                    (change)="onPdfSelected($event, cert)"
-                  />
-                  <button type="button" class="btn-sm btn-outline-sm" (click)="openEdit(cert)">
-                    <i class="fa-solid fa-pen"></i>
+                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                    {{ 'common.edit' | translate }}
                   </button>
                   @if (cert.is_valid) {
                     <button type="button" class="btn-sm btn-danger-sm" (click)="revoke(cert)">
@@ -136,7 +168,12 @@
                       {{ 'admin_certificates.revoke' | translate }}
                     </button>
                   }
-                  <button type="button" class="btn-sm btn-danger-sm" (click)="askDelete(cert)">
+                  <button
+                    type="button"
+                    class="btn-sm btn-danger-sm"
+                    (click)="askDelete(cert)"
+                    [attr.aria-label]="'common.delete' | translate"
+                  >
                     <i class="fa-solid fa-trash"></i>
                   </button>
                 </div>
@@ -151,125 +188,218 @@
   <!-- -- Issue / Edit Modal -- -->
   @if (showIssueModal()) {
     <div class="modal-backdrop" (click)="closeIssue()">
-      <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
+      <div
+        class="modal-card surface chamfer-sm certificate-studio"
+        certificateDialog
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="certificate-dialog-title"
+        (keydown.escape)="closeIssue()"
+        (click)="$event.stopPropagation()"
+      >
         <div class="modal-head">
-          <h3>
-            {{ (editTarget() ? 'admin_certificates.edit_title' : 'admin_certificates.issue_title') | translate }}
+          <h3 id="certificate-dialog-title">
+            {{
+              (editTarget() ? 'admin_certificates.edit_title' : 'admin_certificates.issue_title')
+                | translate
+            }}
           </h3>
-          <button type="button" class="icon-btn" (click)="closeIssue()">
-            <i class="fa-solid fa-xmark"></i>
+          <button
+            type="button"
+            class="icon-btn"
+            (click)="closeIssue()"
+            [disabled]="isSaving()"
+            [attr.aria-label]="'common.cancel' | translate"
+          >
+            <span aria-hidden="true">×</span>
           </button>
         </div>
 
-        <form [formGroup]="issueForm" (ngSubmit)="save()">
-          <!-- -- User picker (only when issuing) -- -->
-          @if (!editTarget()) {
-            <div class="field">
-              <label class="field-label">{{ 'admin_certificates.recipient' | translate }}</label>
-              @if (selectedUser(); as user) {
-                <div class="picked-user">
-                  <span class="table-avatar">{{ initials(user.full_name) }}</span>
-                  <span class="picked-user-info">
-                    <strong>{{ user.full_name }}</strong>
-                    <small class="text-muted">{{ user.email }}</small>
-                  </span>
-                  <button type="button" class="icon-btn icon-btn-danger" (click)="clearUser()">
-                    <i class="fa-solid fa-xmark"></i>
-                  </button>
-                </div>
-              } @else {
-                <div class="user-picker">
-                  <input
-                    type="text"
-                    class="field-input"
-                    [placeholder]="'admin_certificates.search_user' | translate"
-                    (input)="searchUsers($any($event.target).value)"
-                  />
-                  @if (isSearchingUsers()) {
-                    <div class="user-picker-loading"><span class="loader-spinner-sm"></span></div>
-                  }
-                  @if (userSearchTerm().length === 1) {
-                    <div class="user-picker-hint">
-                      <i class="fa-solid fa-keyboard"></i>
-                      {{ 'admin_certificates.min_chars_hint' | translate }}
-                    </div>
-                  } @else if (userSearchTerm().length >= 2 && userResults().length === 0 && !isSearchingUsers()) {
-                    <div class="user-picker-empty">
-                      <i class="fa-solid fa-user-slash"></i>
-                      {{ 'admin_certificates.no_user_found' | translate }}
-                    </div>
-                  }
-                  @if (userResults().length > 0) {
-                    <ul class="user-picker-list">
-                      @for (user of userResults(); track user.id) {
-                        <li>
-                          <button type="button" class="user-picker-item" (click)="pickUser(user)">
-                            <span class="table-avatar">{{ initials(user.full_name) }}</span>
-                            <span class="picker-item-text">
-                              <strong>{{ user.full_name }}</strong>
-                              <small class="text-muted">{{ 'status.user_role.' + user.role | translate }} · {{ user.email }}</small>
-                            </span>
-                          </button>
-                        </li>
-                      }
-                    </ul>
-                  }
-                </div>
+        <form [formGroup]="issueForm" (ngSubmit)="save()" class="studio-layout">
+          <div class="studio-fields">
+            <fieldset class="template-switcher" [disabled]="isSaving()">
+              <legend>{{ 'certificate_studio.choose' | translate }}</legend>
+              @for (template of templates; track template.type) {
+                <button
+                  type="button"
+                  [class.active]="issueForm.controls.certificate_type.value === template.type"
+                  [attr.aria-pressed]="issueForm.controls.certificate_type.value === template.type"
+                  (click)="selectTemplate(template.type)"
+                >
+                  {{ 'certificate_studio.' + template.type | translate }}
+                </button>
               }
-            </div>
-          }
+            </fieldset>
+            @if (editTarget() && editTarget()?.template_version !== version) {
+              <p class="legacy-note">{{ 'certificate_studio.legacy' | translate }}</p>
+            }
 
-          <div class="field">
-            <label class="field-label">{{ 'admin_certificates.partners' | translate }}</label>
-            <div class="partner-checkboxes">
-              @for (partner of partners(); track partner.id) {
-                <label class="partner-checkbox">
-                  <input type="checkbox" [checked]="selectedPartnerIds().includes(partner.id)" (change)="togglePartner(partner.id)" />
-                  <img [src]="partner.logo_url" [alt]="partner.name_en" />
-                  <span>{{ partner.name_ar }}</span>
-                </label>
-              }
-            </div>
-            <small class="field-hint">{{ 'admin_certificates.partners_hint' | translate }}</small>
-          </div>
-
-          <div class="field bilingual-fields">
-            <label class="field-label">{{ 'admin_certificates.title_ar' | translate }}</label>
-            <input id="cert-title-ar" class="field-input" formControlName="title_ar" dir="rtl" placeholder="عنوان الشهادة أو البرنامج" />
-            <label class="field-label">{{ 'admin_certificates.title_en' | translate }}</label>
-            <input id="cert-title-en" class="field-input" formControlName="title_en" dir="ltr" placeholder="Certificate or program title" />
-          </div>
-          <div class="field">
-            <label class="field-label" for="cert-title">{{ 'admin_certificates.f_title' | translate }}</label>
-            <input id="cert-title" type="text" class="field-input" formControlName="title" />
-          </div>
-
-
-          <div class="form-grid">
-            <div class="field">
-              <label class="field-label" for="cert-hours">{{ 'admin_certificates.f_hours' | translate }}</label>
-              <input id="cert-hours" type="number" min="0" class="field-input" formControlName="training_hours" />
-            </div>
-
-            <div class="field">
-              <label class="field-label" for="cert-type">{{ 'admin_certificates.f_type' | translate }}</label>
-              <select id="cert-type" class="field-input" formControlName="certificate_type">
-                @for (type of certificateTypes; track type) {
-                  <option [ngValue]="type">{{ 'status.certificate_type.' + type | translate }}</option>
+            <!-- -- User picker (only when issuing) -- -->
+            @if (!editTarget()) {
+              <div class="field">
+                <label class="field-label">{{ 'admin_certificates.recipient' | translate }}</label>
+                @if (selectedUser(); as user) {
+                  <div class="picked-user">
+                    <span class="table-avatar">{{ initials(user.full_name) }}</span>
+                    <span class="picked-user-info">
+                      <strong>{{ user.full_name }}</strong>
+                      <small class="text-muted">{{ user.email }}</small>
+                    </span>
+                    <button
+                      type="button"
+                      class="icon-btn icon-btn-danger"
+                      (click)="clearUser()"
+                      [attr.aria-label]="'common.cancel' | translate"
+                    >
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  </div>
+                } @else {
+                  <div class="user-picker">
+                    <input
+                      type="text"
+                      class="field-input"
+                      [placeholder]="'admin_certificates.search_user' | translate"
+                      (input)="searchUsers($any($event.target).value)"
+                    />
+                    @if (isSearchingUsers()) {
+                      <div class="user-picker-loading"><span class="loader-spinner-sm"></span></div>
+                    }
+                    @if (userSearchTerm().length === 1) {
+                      <div class="user-picker-hint">
+                        <i class="fa-solid fa-keyboard"></i>
+                        {{ 'admin_certificates.min_chars_hint' | translate }}
+                      </div>
+                    } @else if (
+                      userSearchTerm().length >= 2 &&
+                      userResults().length === 0 &&
+                      !isSearchingUsers()
+                    ) {
+                      <div class="user-picker-empty">
+                        <i class="fa-solid fa-user-slash"></i>
+                        {{ 'admin_certificates.no_user_found' | translate }}
+                      </div>
+                    }
+                    @if (userResults().length > 0) {
+                      <ul class="user-picker-list">
+                        @for (user of userResults(); track user.id) {
+                          <li>
+                            <button type="button" class="user-picker-item" (click)="pickUser(user)">
+                              <span class="table-avatar">{{ initials(user.full_name) }}</span>
+                              <span class="picker-item-text">
+                                <strong>{{ user.full_name }}</strong>
+                                <small class="text-muted"
+                                  >{{ 'status.user_role.' + user.role | translate }} ·
+                                  {{ user.email }}</small
+                                >
+                              </span>
+                            </button>
+                          </li>
+                        }
+                      </ul>
+                    }
+                  </div>
                 }
-              </select>
+              </div>
+            }
+
+            <div class="field">
+              <label class="field-label" for="cert-recipient">{{
+                'certificate_studio.recipient_name' | translate
+              }}</label>
+              <input
+                id="cert-recipient"
+                class="field-input"
+                formControlName="recipient_name"
+                maxlength="120"
+                dir="auto"
+                required
+              />
+              <small class="field-hint">{{ 'certificate_studio.snapshot' | translate }}</small>
             </div>
+            @if (issueForm.controls.certificate_type.value === 'TRAINING') {
+              <div class="field">
+                <label class="field-label" for="cert-program">{{
+                  'certificate_studio.program_name' | translate
+                }}</label>
+                <input
+                  id="cert-program"
+                  class="field-input"
+                  formControlName="program_name"
+                  maxlength="180"
+                  dir="auto"
+                  required
+                />
+              </div>
+            }
+            <div class="form-grid">
+              <div class="field">
+                <label class="field-label" for="cert-hours">{{
+                  'certificate_studio.hours' | translate
+                }}</label>
+                <input
+                  id="cert-hours"
+                  type="number"
+                  min="1"
+                  max="100000"
+                  step="1"
+                  class="field-input"
+                  formControlName="training_hours"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label class="field-label" for="cert-date">{{
+                  'certificate_studio.date' | translate
+                }}</label>
+                <input
+                  id="cert-date"
+                  type="date"
+                  min="1900-01-01"
+                  max="2100-12-31"
+                  class="field-input"
+                  formControlName="issued_at"
+                  required
+                />
+              </div>
+            </div>
+            <p class="field-hint">
+              <i class="fa-solid fa-qrcode" aria-hidden="true"></i>
+              {{ 'certificate_studio.qr_hint' | translate }}
+            </p>
+            @if (formError(); as error) {
+              <div class="form-error-banner" role="alert">{{ error | translate }}</div>
+            }
           </div>
-
-          @if (formError(); as error) {
-            <div class="form-error-banner">{{ error | translate }}</div>
-          }
-
-          <div class="form-actions">
+          <aside class="studio-preview" aria-live="polite">
+            <div class="preview-heading">
+              <strong>{{ 'certificate_studio.preview' | translate }}</strong
+              ><span>A4 · 300 DPI</span>
+            </div>
+            @if (previewBusy()) {
+              <p class="field-hint">{{ 'certificate_studio.rendering' | translate }}</p>
+            }
+            @if (preview(); as image) {
+              <img [src]="image" [alt]="'certificate_studio.preview' | translate" />
+            }
+            @if (previewError(); as error) {
+              <p class="form-error-banner" role="alert">{{ error | translate }}</p>
+            }
+            <p>{{ 'certificate_studio.preview_hint' | translate }}</p>
+            <div class="locked-artwork">
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              {{ 'certificate_studio.locked' | translate }}
+            </div>
+          </aside>
+          <div class="form-actions studio-actions">
             <button type="button" class="btn-sm btn-outline-sm" (click)="closeIssue()">
               {{ 'common.cancel' | translate }}
             </button>
-            <button type="submit" class="btn-sm btn-primary-sm" [disabled]="isSaving()">
+            <button
+              type="submit"
+              class="btn-sm btn-primary-sm"
+              [disabled]="isSaving() || previewBusy() || !!previewError()"
+            >
               @if (isSaving()) {
                 <span class="loader-spinner-sm"></span>
               }
@@ -288,7 +418,7 @@
         <div class="modal-head">
           <h3>{{ 'admin_certificates.delete_title' | translate }}</h3>
           <button type="button" class="icon-btn" (click)="closeDelete()">
-            <i class="fa-solid fa-xmark"></i>
+            <span aria-hidden="true">×</span>
           </button>
         </div>
         <p class="confirm-text">
@@ -299,7 +429,12 @@
           <button type="button" class="btn-sm btn-outline-sm" (click)="closeDelete()">
             {{ 'common.cancel' | translate }}
           </button>
-          <button type="button" class="btn-sm btn-danger-sm" [disabled]="isDeleting()" (click)="confirmDelete()">
+          <button
+            type="button"
+            class="btn-sm btn-danger-sm"
+            [disabled]="isDeleting()"
+            (click)="confirmDelete()"
+          >
             @if (isDeleting()) {
               <span class="loader-spinner-sm"></span>
             }
@@ -312,7 +447,11 @@
 
   @if (toast(); as t) {
     <div class="staff-toast" [class.staff-toast-error]="t.error">
-      <i class="fa-solid" [class.fa-circle-check]="!t.error" [class.fa-circle-exclamation]="t.error"></i>
+      <i
+        class="fa-solid"
+        [class.fa-circle-check]="!t.error"
+        [class.fa-circle-exclamation]="t.error"
+      ></i>
       {{ t.key | translate }}
     </div>
   }

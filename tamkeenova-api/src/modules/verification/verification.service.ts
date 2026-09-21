@@ -25,24 +25,30 @@ export class VerificationService {
         id: certificate.id,
         verification_code: certificate.verification_code,
         title: certificate.title,
+        certificate_type: certificate.certificate_type,
+        template_version: certificate.template_version,
+        recipient_name: certificate.recipient_name,
+        program_name: certificate.program_name,
         description: certificate.description,
         issued_at: certificate.issued_at,
         training_hours: certificate.training_hours,
         pdf_url: certificate.pdf_url,
         qr_code_url: certificate.qr_code_url,
         holder: {
-          name: certificate.users.full_name,
+          name: certificate.recipient_name ?? certificate.users.full_name,
           username: certificate.users.username,
           image: certificate.users.profile_image,
         },
-        program: certificate.training_programs
+        program: certificate.template_version
+          ? (certificate.program_name ? { title: certificate.program_name, duration_hours: certificate.training_hours, level: null } : null)
+          : certificate.training_programs
           ? {
               title: certificate.training_programs.title,
               duration_hours: certificate.training_programs.duration_hours,
               level: certificate.training_programs.level,
             }
           : null,
-        trainer: certificate.trainers
+        trainer: !certificate.template_version && certificate.trainers
           ? {
               name: certificate.trainers.users.full_name,
               image: certificate.trainers.users.profile_image,
