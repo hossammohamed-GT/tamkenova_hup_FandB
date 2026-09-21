@@ -36,16 +36,42 @@ export class StudentCertificatesComponent {
   }
 
   async downloadCertificate(cert: StudentCertificate): Promise<void> {
-    const canvas = document.createElement('canvas'); canvas.width = 1600; canvas.height = 1100;
+    // A composed, high-resolution certificate artwork: navy identity, ivory paper and Tamkeenova gold.
+    const canvas = document.createElement('canvas'); canvas.width = 1800; canvas.height = 1273;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
-    const bg = ctx.createLinearGradient(0, 0, 1600, 1100); bg.addColorStop(0, '#fffdf5'); bg.addColorStop(1, '#eef9f4');
-    ctx.fillStyle = bg; ctx.fillRect(0, 0, 1600, 1100); ctx.strokeStyle = '#138a70'; ctx.lineWidth = 18; ctx.strokeRect(36, 36, 1528, 1028); ctx.strokeStyle = '#d59b2b'; ctx.lineWidth = 3; ctx.strokeRect(62, 62, 1476, 976);
-    ctx.textAlign = 'center'; ctx.fillStyle = '#138a70'; ctx.font = 'bold 42px Arial'; ctx.fillText('TAMKEENOVA', 800, 145); ctx.fillStyle = '#b17b18'; ctx.font = '24px Arial'; ctx.fillText((cert.certificate_type || 'CERTIFICATE').toUpperCase(), 800, 205);
-    ctx.fillStyle = '#173f3b'; ctx.font = 'bold 54px Arial'; ctx.fillText('Certificate of Achievement', 800, 300); ctx.font = '28px Arial'; ctx.fillStyle = '#526460'; ctx.fillText('This certificate is proudly presented to', 800, 370);
-    ctx.fillStyle = '#138a70'; ctx.font = 'bold 58px Arial'; ctx.fillText(cert.trainers?.users?.full_name || cert.title, 800, 465); ctx.fillStyle = '#173f3b'; ctx.font = 'bold 34px Arial'; ctx.fillText(cert.title, 800, 555); ctx.font = '24px Arial'; ctx.fillStyle = '#526460';
-    const description = (cert.description || '').slice(0, 120); if (description) ctx.fillText(description, 800, 610); ctx.fillText(`Issued: ${new Date(cert.issued_at).toLocaleDateString()}   •   Code: ${cert.verification_code}`, 800, 690);
-    const verifyUrl = `${window.location.origin}/verify?code=${encodeURIComponent(cert.verification_code)}`; const qr = await QRCode.toDataURL(verifyUrl, { width: 190, margin: 1, color: { dark: '#173f3b', light: '#ffffff' } }); const qrImage = await this.loadImage(qr); ctx.drawImage(qrImage, 1280, 790, 190, 190); ctx.font = '18px Arial'; ctx.fillText('Scan to verify', 1375, 1010);
-    const logos = (cert.partner_ids || []).map((id) => this.partnerLogo(id)).filter((url): url is string => !!url).slice(0, 6); for (let i = 0; i < logos.length; i++) { try { const logo = await this.loadImage(logos[i]); ctx.drawImage(logo, 180 + i * 125, 850, 95, 58); } catch {} }
+    const navy = '#004265', gold = '#be8a3f', ink = '#101e27', paper = '#fcfaf4';
+    ctx.fillStyle = navy; ctx.fillRect(0, 0, 1800, 1273);
+    // Architectural side bands and subtle pattern
+    ctx.fillStyle = '#003650'; ctx.fillRect(0, 0, 210, 1273); ctx.fillRect(1590, 0, 210, 1273);
+    ctx.strokeStyle = 'rgba(190,138,63,.22)'; ctx.lineWidth = 2;
+    for (let x = -900; x < 1800; x += 70) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 1273, 1273); ctx.stroke(); }
+    ctx.fillStyle = paper; ctx.fillRect(160, 90, 1480, 1093);
+    ctx.strokeStyle = gold; ctx.lineWidth = 7; ctx.strokeRect(185, 115, 1430, 1043);
+    ctx.strokeStyle = '#d8b777'; ctx.lineWidth = 2; ctx.strokeRect(207, 137, 1386, 999);
+    // Corner ornaments
+    ctx.strokeStyle = gold; ctx.lineWidth = 5;
+    for (const [x, y, sx, sy] of [[207,137,1,1],[1593,137,-1,1],[207,1136,1,-1],[1593,1136,-1,-1]] as const) { ctx.beginPath(); ctx.moveTo(x, y + sy * 105); ctx.lineTo(x, y); ctx.lineTo(x + sx * 105, y); ctx.stroke(); ctx.beginPath(); ctx.arc(x + sx * 18, y + sy * 18, 10, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.textAlign = 'center';
+    // Brand mark + identity
+    try { const logo = await this.loadImage('/images/logo.svg'); ctx.drawImage(logo, 805, 155, 110, 110); } catch {}
+    ctx.fillStyle = navy; ctx.font = 'bold 30px Arial'; ctx.fillText('TAMKEENOVA', 900, 292);
+    ctx.fillStyle = gold; ctx.font = '18px Arial'; ctx.fillText('EMPOWERMENT  •  TRAINING  •  IMPACT', 900, 325);
+    ctx.fillStyle = ink; ctx.font = 'bold 60px Georgia, serif'; ctx.fillText('Certificate of Achievement', 900, 445);
+    ctx.fillStyle = gold; ctx.font = 'bold 22px Arial'; ctx.fillText((cert.certificate_type || 'CERTIFICATE').toUpperCase(), 900, 495);
+    ctx.fillStyle = '#69757a'; ctx.font = '25px Arial'; ctx.fillText('This certificate is proudly presented to', 900, 570);
+    ctx.fillStyle = navy; ctx.font = 'bold 62px Georgia, serif'; ctx.fillText(cert.trainers?.users?.full_name || cert.title, 900, 670);
+    ctx.strokeStyle = gold; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(560, 700); ctx.lineTo(1240, 700); ctx.stroke();
+    ctx.fillStyle = ink; ctx.font = 'bold 32px Arial'; ctx.fillText(cert.title, 900, 770);
+    ctx.fillStyle = '#69757a'; ctx.font = '22px Arial';
+    const description = (cert.description || '').slice(0, 145); if (description) ctx.fillText(description, 900, 820);
+    ctx.font = '20px Arial'; ctx.fillText(`Issued ${new Date(cert.issued_at).toLocaleDateString()}   |   Verification code: ${cert.verification_code}`, 900, 875);
+    // QR area is deliberately on a white card for reliable scanning after download/printing.
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(1330, 905, 205, 205); ctx.strokeStyle = gold; ctx.lineWidth = 3; ctx.strokeRect(1330, 905, 205, 205);
+    const verifyUrl = `${window.location.origin}/verify?code=${encodeURIComponent(cert.verification_code)}`;
+    const qr = await QRCode.toDataURL(verifyUrl, { width: 185, margin: 1, color: { dark: navy, light: '#ffffff' } }); ctx.drawImage(await this.loadImage(qr), 1340, 915, 185, 185);
+    ctx.fillStyle = '#69757a'; ctx.font = '16px Arial'; ctx.fillText('SCAN TO VERIFY', 1432, 1135);
+    const logos = (cert.partner_ids || []).map((id) => this.partnerLogo(id)).filter((url): url is string => !!url).slice(0, 6);
+    for (let i = 0; i < logos.length; i++) { try { ctx.drawImage(await this.loadImage(logos[i]), 300 + i * 125, 990, 95, 55); } catch {} }
     const link = document.createElement('a'); link.download = `tamkeenova-certificate-${cert.verification_code}.png`; link.href = canvas.toDataURL('image/png'); link.click();
   }
 
