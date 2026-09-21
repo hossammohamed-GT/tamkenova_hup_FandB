@@ -48,6 +48,11 @@ export class StudentCertificatesComponent {
     ctx.strokeStyle = gold; ctx.lineWidth = 5;
     for (const [x, y, sx, sy] of [[207,137,1,1],[1593,137,-1,1],[207,1136,1,-1],[1593,1136,-1,-1]] as const) { ctx.beginPath(); ctx.moveTo(x, y + sy * 105); ctx.lineTo(x, y); ctx.lineTo(x + sx * 105, y); ctx.stroke(); ctx.beginPath(); ctx.arc(x + sx * 18, y + sy * 18, 10, 0, Math.PI * 2); ctx.stroke(); }
     ctx.textAlign = 'center';
+    const drawFitted = (value: string, x: number, y: number, maxWidth: number, maxSize: number, fontFamily: string, color: string) => {
+      let size = maxSize; ctx.font = `bold ${size}px ${fontFamily}`;
+      while (size > 24 && ctx.measureText(value).width > maxWidth) { size -= 2; ctx.font = `bold ${size}px ${fontFamily}`; }
+      ctx.fillStyle = color; ctx.fillText(value, x, y);
+    };
     // Brand mark + identity
     try { const logo = await this.loadImage('/images/logo.svg'); ctx.drawImage(logo, 845, 155, 110, 110); } catch {}
     ctx.fillStyle = navy; ctx.font = 'bold 30px Arial'; ctx.fillText(labels.organization, 900, 292);
@@ -55,9 +60,9 @@ export class StudentCertificatesComponent {
     ctx.fillStyle = ink; ctx.font = 'bold 60px Georgia, serif'; ctx.fillText(labels.cert, 900, 445);
     ctx.fillStyle = gold; ctx.font = 'bold 21px Arial'; ctx.fillText(isVolunteer ? (isArabic ? 'تقديرًا للعطاء والمشاركة المجتمعية' : 'VOLUNTEER RECOGNITION') : (isArabic ? 'برنامج تدريب وتطوير مهني' : 'PROFESSIONAL DEVELOPMENT PROGRAM'), 900, 495);
     ctx.fillStyle = '#69757a'; ctx.font = '25px Arial'; ctx.fillText(labels.presented, 900, 570);
-    ctx.fillStyle = navy; ctx.font = 'bold 62px Georgia, serif'; ctx.fillText(cert.users?.full_name || title, 900, 670);
+    drawFitted(cert.users?.full_name || title, 900, 670, 1040, 62, 'Georgia, serif', navy);
     ctx.strokeStyle = gold; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(560, 700); ctx.lineTo(1240, 700); ctx.stroke();
-    ctx.fillStyle = ink; ctx.font = 'bold 32px Arial'; ctx.fillText(title, 900, 770);
+    drawFitted(title, 900, 770, 980, 32, 'Arial', ink);
     ctx.fillStyle = '#69757a'; ctx.font = '22px Arial';
     ctx.fillText(labels.completed, 900, 820);
     ctx.font = '20px Arial'; ctx.fillText(isArabic ? 'مع أطيب التمنيات بدوام النجاح والتقدم' : 'We wish continued success and achievement', 900, 855);
@@ -70,14 +75,14 @@ export class StudentCertificatesComponent {
     ctx.fillStyle = ink; ctx.font = 'italic 28px Georgia, serif'; ctx.fillText(isArabic ? 'إدارة تمكينوفا' : 'Tamkeenova Management', 500, 1005); ctx.fillText(isArabic ? 'ممثل الشركاء' : 'Partner Representative', 1200, 1005);
     ctx.fillStyle = '#69757a'; ctx.font = '17px Arial'; ctx.fillText(isArabic ? 'الجهة المانحة' : 'Issuing Organization', 500, 1050); ctx.fillText(isArabic ? 'شركاء النجاح' : 'Success Partners', 1200, 1050);
     ctx.strokeStyle = '#d8b777'; ctx.beginPath(); ctx.moveTo(430, 1090); ctx.lineTo(1370, 1090); ctx.stroke();
-    ctx.fillStyle = gold; ctx.font = '18px Arial'; ctx.fillText(labels.partnership, 900, 1120);
+    ctx.fillStyle = gold; ctx.font = '18px Arial'; ctx.fillText(labels.partnership, 775, 1120);
     // QR area is deliberately on a white card for reliable scanning after download/printing.
     ctx.fillStyle = '#ffffff'; ctx.fillRect(1330, 905, 205, 205); ctx.strokeStyle = gold; ctx.lineWidth = 3; ctx.strokeRect(1330, 905, 205, 205);
     const verifyUrl = `${window.location.origin}/verify?code=${encodeURIComponent(cert.verification_code)}`;
     const qr = await QRCode.toDataURL(verifyUrl, { width: 185, margin: 1, color: { dark: navy, light: '#ffffff' } }); ctx.drawImage(await this.loadImage(qr), 1340, 915, 185, 185);
     ctx.fillStyle = '#69757a'; ctx.font = '16px Arial'; ctx.fillText(labels.verify, 1432, 1135);
     const logos = (cert.partner_ids || []).map((id) => this.partnerLogo(id)).filter((url): url is string => !!url).slice(0, 6);
-    const partnerStart = 900 - ((logos.length * 125 - 30) / 2); for (let i = 0; i < logos.length; i++) { try { const logo = await this.loadImage(logos[i]); ctx.fillStyle = '#ffffff'; ctx.fillRect(partnerStart + i * 125 - 8, 1140, 111, 72); ctx.drawImage(logo, partnerStart + i * 125, 1148, 95, 55); } catch {} }
+    const partnerAreaCenter = 775; const partnerStart = partnerAreaCenter - ((logos.length * 125 - 30) / 2); for (let i = 0; i < logos.length; i++) { try { const logo = await this.loadImage(logos[i]); ctx.fillStyle = '#ffffff'; ctx.fillRect(partnerStart + i * 125 - 8, 1140, 111, 72); ctx.drawImage(logo, partnerStart + i * 125, 1148, 95, 55); } catch {} }
     const link = document.createElement('a'); link.download = `tamkeenova-certificate-${cert.verification_code}-${language}.png`;
     canvas.toBlob((blob) => { if (!blob) return; link.href = URL.createObjectURL(blob); link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000); }, 'image/png');
   }
