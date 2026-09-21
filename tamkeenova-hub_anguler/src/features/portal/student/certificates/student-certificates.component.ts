@@ -25,7 +25,7 @@ export class StudentCertificatesComponent {
   partners = signal<StrategicPartner[]>([]);
 
   constructor() {
-    this.partnersService.listAll().subscribe({ next: (list) => this.partners.set(list ?? []), error: () => undefined });
+    this.partnersService.listPublic().subscribe({ next: (list) => this.partners.set(list ?? []), error: () => undefined });
     this.studentService.getCertificates().subscribe({
       next: (res) => {
         this.certificates.set(res.data ?? []);
@@ -44,10 +44,6 @@ export class StudentCertificatesComponent {
     ctx.direction = isArabic ? 'rtl' : 'ltr';
     const backgroundPath = cert.certificate_type === 'VOLUNTEER' ? '/images/certificate-volunteer-bg.png' : '/images/certificate-program-bg.png';
     try { ctx.drawImage(await this.loadImage(backgroundPath), 0, 0, 1800, 1273); } catch { ctx.fillStyle = paper; ctx.fillRect(0, 0, 1800, 1273); }
-    // A translucent security watermark is layered over the artwork and is intentionally difficult to erase cleanly.
-    ctx.save(); ctx.globalAlpha = 0.045; ctx.fillStyle = navy; ctx.font = 'bold 42px Arial'; ctx.rotate(-0.18);
-    for (let y = -300; y < 1500; y += 115) for (let x = -400; x < 2100; x += 430) ctx.fillText('TAMKEENOVA • VERIFIED • ' + cert.verification_code, x, y);
-    ctx.restore();
     // Corner ornaments
     ctx.strokeStyle = gold; ctx.lineWidth = 5;
     for (const [x, y, sx, sy] of [[207,137,1,1],[1593,137,-1,1],[207,1136,1,-1],[1593,1136,-1,-1]] as const) { ctx.beginPath(); ctx.moveTo(x, y + sy * 105); ctx.lineTo(x, y); ctx.lineTo(x + sx * 105, y); ctx.stroke(); ctx.beginPath(); ctx.arc(x + sx * 18, y + sy * 18, 10, 0, Math.PI * 2); ctx.stroke(); }
@@ -75,7 +71,7 @@ export class StudentCertificatesComponent {
     const link = document.createElement('a'); link.download = `tamkeenova-certificate-${cert.verification_code}-${language}.png`; link.href = canvas.toDataURL('image/png'); link.click();
   }
 
-  private loadImage(src: string): Promise<HTMLImageElement> { return new Promise((resolve, reject) => { const image = new Image(); image.crossOrigin = 'anonymous'; image.onload = () => resolve(image); image.onerror = reject; image.src = src; }); }
+  private loadImage(src: string): Promise<HTMLImageElement> { return new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src; }); }
 
   printCertificate(id: string): void {
     document.querySelectorAll(".certificate-print").forEach((el) => el.classList.remove("print-target"));
