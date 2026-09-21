@@ -40,7 +40,7 @@ export class StudentCertificatesComponent {
     const canvas = document.createElement('canvas'); canvas.width = 1800; canvas.height = 1273;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const navy = '#004265', gold = '#be8a3f', ink = '#101e27', paper = '#fcfaf4';
-    const isArabic = language === 'ar'; const isVolunteer = cert.certificate_type === 'VOLUNTEER'; const title = (isArabic ? cert.title_ar : cert.title_en) || cert.title; const description = ((isArabic ? cert.description_ar : cert.description_en) || cert.description || '').slice(0, 145); const labels = isArabic ? { cert: isVolunteer ? 'شهادة تطوع' : 'شهادة إتمام', presented: 'تشهد هذه الشهادة بأن', completed: isVolunteer ? 'ساهم بنجاح في العمل التطوعي' : 'أتم بنجاح', issued: 'تاريخ الإصدار', verify: 'امسح للتحقق' } : { cert: isVolunteer ? 'Certificate of Volunteering' : 'Certificate of Completion', presented: 'This certificate is proudly presented to', completed: isVolunteer ? 'Has successfully contributed as a volunteer' : 'Has successfully completed', issued: 'Issued', verify: 'SCAN TO VERIFY' };
+    const isArabic = language === 'ar'; const isVolunteer = cert.certificate_type === 'VOLUNTEER'; const title = (isArabic ? cert.title_ar : cert.title_en) || cert.title; const labels = isArabic ? { cert: isVolunteer ? 'شهادة تطوع' : 'شهادة إتمام', presented: 'تشهد هذه الشهادة بأن', completed: isVolunteer ? 'ساهم بنجاح في العمل التطوعي' : 'أتم بنجاح', issued: 'تاريخ الإصدار', verify: 'امسح للتحقق' } : { cert: isVolunteer ? 'Certificate of Volunteering' : 'Certificate of Completion', presented: 'This certificate is proudly presented to', completed: isVolunteer ? 'Has successfully contributed as a volunteer' : 'Has successfully completed', issued: 'Issued', verify: 'SCAN TO VERIFY' };
     ctx.direction = isArabic ? 'rtl' : 'ltr';
     const backgroundPath = cert.certificate_type === 'VOLUNTEER' ? '/images/certificate-volunteer-bg.png' : '/images/certificate-program-bg.png';
     try { ctx.drawImage(await this.loadImage(backgroundPath), 0, 0, 1800, 1273); } catch { ctx.fillStyle = paper; ctx.fillRect(0, 0, 1800, 1273); }
@@ -59,11 +59,11 @@ export class StudentCertificatesComponent {
     ctx.fillStyle = ink; ctx.font = 'bold 60px Georgia, serif'; ctx.fillText(labels.cert, 900, 445);
     ctx.fillStyle = gold; ctx.font = 'bold 22px Arial'; ctx.fillText(labels.completed, 900, 495);
     ctx.fillStyle = '#69757a'; ctx.font = '25px Arial'; ctx.fillText(labels.presented, 900, 570);
-    ctx.fillStyle = navy; ctx.font = 'bold 62px Georgia, serif'; ctx.fillText(cert.trainers?.users?.full_name || title, 900, 670);
+    ctx.fillStyle = navy; ctx.font = 'bold 62px Georgia, serif'; ctx.fillText(cert.users?.full_name || title, 900, 670);
     ctx.strokeStyle = gold; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(560, 700); ctx.lineTo(1240, 700); ctx.stroke();
     ctx.fillStyle = ink; ctx.font = 'bold 32px Arial'; ctx.fillText(title, 900, 770);
     ctx.fillStyle = '#69757a'; ctx.font = '22px Arial';
-    if (description) ctx.fillText(description, 900, 820);
+    ctx.fillText(isArabic ? (isVolunteer ? 'تقديرًا لمساهمته القيّمة في خدمة المجتمع' : 'تقديرًا لإتمامه البرنامج التدريبي بنجاح') : (isVolunteer ? 'In recognition of valuable contribution to the community' : 'In recognition of successful completion of the training program'), 900, 820);
     ctx.font = '20px Arial'; ctx.fillText(`${labels.issued} ${new Date(cert.issued_at).toLocaleDateString()}   |   Verification code: ${cert.verification_code}`, 900, 875);
     // QR area is deliberately on a white card for reliable scanning after download/printing.
     ctx.fillStyle = '#ffffff'; ctx.fillRect(1330, 905, 205, 205); ctx.strokeStyle = gold; ctx.lineWidth = 3; ctx.strokeRect(1330, 905, 205, 205);

@@ -191,6 +191,7 @@ export interface StudentCertificate {
   issued_at: string;
   is_valid: boolean;
   training_hours: number | null;
+  users?: { full_name: string } | null;
   training_programs: { id: string; title: string; slug: string } | null;
   trainers: { id: string; slug: string; users: { full_name: string } } | null;
 }
