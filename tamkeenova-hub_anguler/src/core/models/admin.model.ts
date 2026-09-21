@@ -177,6 +177,7 @@ export interface AdminProgram {
   duration_hours: number | null;
   level?: string | null;
   image_url: string | null;
+  is_active?: boolean;
   is_hidden?: boolean;
   is_published?: boolean;
   status?: string | null;
