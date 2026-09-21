@@ -59,15 +59,21 @@ export class StudentCertificatesComponent {
     ctx.strokeStyle = gold; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(560, 700); ctx.lineTo(1240, 700); ctx.stroke();
     ctx.fillStyle = ink; ctx.font = 'bold 32px Arial'; ctx.fillText(title, 900, 770);
     ctx.fillStyle = '#69757a'; ctx.font = '22px Arial';
-    ctx.fillText(isArabic ? (isVolunteer ? 'تقديرًا لمساهمته القيّمة في خدمة المجتمع' : 'تقديرًا لإتمامه البرنامج التدريبي بنجاح') : (isVolunteer ? 'In recognition of valuable contribution to the community' : 'In recognition of successful completion of the training program'), 900, 820);
-    ctx.font = '20px Arial'; ctx.fillText(`${labels.issued} ${new Date(cert.issued_at).toLocaleDateString()}   |   Verification code: ${cert.verification_code}`, 900, 875);
+    ctx.fillText(isArabic ? (isVolunteer ? 'تقديرًا لمساهمته القيّمة في خدمة المجتمع والعمل التطوعي' : 'تقديرًا لإتمامه البرنامج التدريبي بنجاح') : (isVolunteer ? 'In recognition of valuable contribution to the community and volunteer work' : 'In recognition of successful completion of the training program'), 900, 820);
+    ctx.font = '20px Arial'; ctx.fillText(isArabic ? 'نتمنى له دوام النجاح والتقدم' : 'We wish continued success and achievement', 900, 855);
+    ctx.font = '20px Arial'; ctx.fillText(`${labels.issued} ${new Date(cert.issued_at).toLocaleDateString()}   |   Verification code: ${cert.verification_code}`, 900, 895);
+    ctx.strokeStyle = gold; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(350, 1018); ctx.lineTo(650, 1018); ctx.moveTo(1050, 1018); ctx.lineTo(1350, 1018); ctx.stroke();
+    ctx.fillStyle = ink; ctx.font = 'italic 28px Georgia, serif'; ctx.fillText(isArabic ? 'إدارة تمكينوفا' : 'Tamkeenova Management', 500, 1005); ctx.fillText(isArabic ? 'ممثل الشركاء' : 'Partner Representative', 1200, 1005);
+    ctx.fillStyle = '#69757a'; ctx.font = '17px Arial'; ctx.fillText(isArabic ? 'الجهة المانحة' : 'Issuing Organization', 500, 1050); ctx.fillText(isArabic ? 'شركاء النجاح' : 'Success Partners', 1200, 1050);
+    ctx.strokeStyle = '#d8b777'; ctx.beginPath(); ctx.moveTo(430, 1090); ctx.lineTo(1370, 1090); ctx.stroke();
+    ctx.fillStyle = gold; ctx.font = '18px Arial'; ctx.fillText(isArabic ? 'بالشراكة مع' : 'IN PARTNERSHIP WITH', 900, 1120);
     // QR area is deliberately on a white card for reliable scanning after download/printing.
     ctx.fillStyle = '#ffffff'; ctx.fillRect(1330, 905, 205, 205); ctx.strokeStyle = gold; ctx.lineWidth = 3; ctx.strokeRect(1330, 905, 205, 205);
     const verifyUrl = `${window.location.origin}/verify?code=${encodeURIComponent(cert.verification_code)}`;
     const qr = await QRCode.toDataURL(verifyUrl, { width: 185, margin: 1, color: { dark: navy, light: '#ffffff' } }); ctx.drawImage(await this.loadImage(qr), 1340, 915, 185, 185);
     ctx.fillStyle = '#69757a'; ctx.font = '16px Arial'; ctx.fillText(labels.verify, 1432, 1135);
     const logos = (cert.partner_ids || []).map((id) => this.partnerLogo(id)).filter((url): url is string => !!url).slice(0, 6);
-    const partnerStart = 900 - ((logos.length * 125 - 30) / 2); for (let i = 0; i < logos.length; i++) { try { const logo = await this.loadImage(logos[i]); ctx.fillStyle = '#ffffff'; ctx.fillRect(partnerStart + i * 125 - 8, 982, 111, 72); ctx.drawImage(logo, partnerStart + i * 125, 990, 95, 55); } catch {} }
+    const partnerStart = 900 - ((logos.length * 125 - 30) / 2); for (let i = 0; i < logos.length; i++) { try { const logo = await this.loadImage(logos[i]); ctx.fillStyle = '#ffffff'; ctx.fillRect(partnerStart + i * 125 - 8, 1140, 111, 72); ctx.drawImage(logo, partnerStart + i * 125, 1148, 95, 55); } catch {} }
     const link = document.createElement('a'); link.download = `tamkeenova-certificate-${cert.verification_code}-${language}.png`;
     canvas.toBlob((blob) => { if (!blob) return; link.href = URL.createObjectURL(blob); link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000); }, 'image/png');
   }
