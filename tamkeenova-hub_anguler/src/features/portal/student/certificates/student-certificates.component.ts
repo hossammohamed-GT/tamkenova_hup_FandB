@@ -40,7 +40,7 @@ export class StudentCertificatesComponent {
     const canvas = document.createElement('canvas'); canvas.width = 1800; canvas.height = 1273;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const navy = '#004265', gold = '#be8a3f', ink = '#101e27', paper = '#fcfaf4';
-    const isArabic = language === 'ar'; const isVolunteer = cert.certificate_type === 'VOLUNTEER'; const title = (isArabic ? cert.title_ar : cert.title_en) || cert.title; const labels = isArabic ? { cert: isVolunteer ? 'شهادة تطوع' : 'شهادة إتمام', presented: 'تشهد هذه الشهادة بأن', completed: isVolunteer ? 'ساهم بنجاح في العمل التطوعي' : 'أتم بنجاح', issued: 'تاريخ الإصدار', verify: 'امسح للتحقق' } : { cert: isVolunteer ? 'Certificate of Volunteering' : 'Certificate of Completion', presented: 'This certificate is proudly presented to', completed: isVolunteer ? 'Has successfully contributed as a volunteer' : 'Has successfully completed', issued: 'Issued', verify: 'SCAN TO VERIFY' };
+    const isArabic = language === 'ar'; const isVolunteer = cert.certificate_type === 'VOLUNTEER'; const title = (isArabic ? cert.title_ar : cert.title_en) || cert.title; const labels = isArabic ? { cert: isVolunteer ? 'شهادة تقدير' : 'شهادة إتمام', presented: 'تشهد هذه الشهادة بأن', completed: isVolunteer ? 'تقديرًا لمساهمته القيّمة في العمل التطوعي' : 'تقديرًا لإتمامه البرنامج التدريبي بنجاح', issued: 'تاريخ الإصدار', hours: 'ساعات التدريب', id: 'رقم الشهادة', verify: 'امسح للتحقق', partnership: 'بالشراكة مع', organization: 'تمكينوفا', tagline: 'التمكين • التدريب • الأثر' } : { cert: isVolunteer ? 'CERTIFICATE OF APPRECIATION' : 'CERTIFICATE OF COMPLETION', presented: 'This certificate is proudly presented to', completed: isVolunteer ? 'In recognition of valuable contribution to volunteer work' : 'In recognition of successful completion of the training program', issued: 'ISSUE DATE', hours: 'TRAINING HOURS', id: 'CERTIFICATE ID', verify: 'SCAN TO VERIFY', partnership: 'IN PARTNERSHIP WITH', organization: 'TAMKEENOVA', tagline: 'EMPOWERMENT  •  TRAINING  •  IMPACT' };
     ctx.direction = isArabic ? 'rtl' : 'ltr';
     const backgroundPath = cert.certificate_type === 'VOLUNTEER' ? '/images/certificate-volunteer-bg.png' : '/images/certificate-program-bg.png';
     try { ctx.drawImage(await this.loadImage(backgroundPath), 0, 0, 1800, 1273); } catch { ctx.fillStyle = paper; ctx.fillRect(0, 0, 1800, 1273); }
@@ -50,23 +50,27 @@ export class StudentCertificatesComponent {
     ctx.textAlign = 'center';
     // Brand mark + identity
     try { const logo = await this.loadImage('/images/logo.svg'); ctx.drawImage(logo, 845, 155, 110, 110); } catch {}
-    ctx.fillStyle = navy; ctx.font = 'bold 30px Arial'; ctx.fillText('TAMKEENOVA', 900, 292);
-    ctx.fillStyle = gold; ctx.font = '18px Arial'; ctx.fillText('EMPOWERMENT  •  TRAINING  •  IMPACT', 900, 325);
+    ctx.fillStyle = navy; ctx.font = 'bold 30px Arial'; ctx.fillText(labels.organization, 900, 292);
+    ctx.fillStyle = gold; ctx.font = '18px Arial'; ctx.fillText(labels.tagline, 900, 325);
     ctx.fillStyle = ink; ctx.font = 'bold 60px Georgia, serif'; ctx.fillText(labels.cert, 900, 445);
-    ctx.fillStyle = gold; ctx.font = 'bold 22px Arial'; ctx.fillText(labels.completed, 900, 495);
+    ctx.fillStyle = gold; ctx.font = 'bold 21px Arial'; ctx.fillText(isVolunteer ? (isArabic ? 'تقديرًا للعطاء والمشاركة المجتمعية' : 'VOLUNTEER RECOGNITION') : (isArabic ? 'برنامج تدريب وتطوير مهني' : 'PROFESSIONAL DEVELOPMENT PROGRAM'), 900, 495);
     ctx.fillStyle = '#69757a'; ctx.font = '25px Arial'; ctx.fillText(labels.presented, 900, 570);
     ctx.fillStyle = navy; ctx.font = 'bold 62px Georgia, serif'; ctx.fillText(cert.users?.full_name || title, 900, 670);
     ctx.strokeStyle = gold; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(560, 700); ctx.lineTo(1240, 700); ctx.stroke();
     ctx.fillStyle = ink; ctx.font = 'bold 32px Arial'; ctx.fillText(title, 900, 770);
     ctx.fillStyle = '#69757a'; ctx.font = '22px Arial';
-    ctx.fillText(isArabic ? (isVolunteer ? 'تقديرًا لمساهمته القيّمة في خدمة المجتمع والعمل التطوعي' : 'تقديرًا لإتمامه البرنامج التدريبي بنجاح') : (isVolunteer ? 'In recognition of valuable contribution to the community and volunteer work' : 'In recognition of successful completion of the training program'), 900, 820);
-    ctx.font = '20px Arial'; ctx.fillText(isArabic ? 'نتمنى له دوام النجاح والتقدم' : 'We wish continued success and achievement', 900, 855);
-    ctx.font = '20px Arial'; ctx.fillText(`${labels.issued} ${new Date(cert.issued_at).toLocaleDateString()}   |   Verification code: ${cert.verification_code}`, 900, 895);
+    ctx.fillText(labels.completed, 900, 820);
+    ctx.font = '20px Arial'; ctx.fillText(isArabic ? 'مع أطيب التمنيات بدوام النجاح والتقدم' : 'We wish continued success and achievement', 900, 855);
+    // Formal information blocks: only the certificate data is dynamic; all labels are part of the artwork.
+    ctx.strokeStyle = '#d8b777'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(280, 890); ctx.lineTo(1170, 890); ctx.stroke();
+    ctx.fillStyle = gold; ctx.font = 'bold 15px Arial'; ctx.fillText(labels.hours, 430, 925); ctx.fillText(labels.issued, 720, 925); ctx.fillText(labels.id, 1010, 925);
+    ctx.fillStyle = navy; ctx.font = 'bold 21px Arial'; ctx.fillText(`${cert.training_hours ?? 0} ${isArabic ? 'ساعة' : 'Hours'}`, 430, 955); ctx.fillText(new Date(cert.issued_at).toLocaleDateString(isArabic ? 'ar-EG' : 'en-GB'), 720, 955); ctx.fillText(cert.verification_code, 1010, 955);
+    ctx.fillStyle = '#69757a'; ctx.font = '15px Arial'; ctx.fillText(isArabic ? 'وثيقة رسمية قابلة للتحقق' : 'Officially verifiable certificate', 900, 985);
     ctx.strokeStyle = gold; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(350, 1018); ctx.lineTo(650, 1018); ctx.moveTo(1050, 1018); ctx.lineTo(1350, 1018); ctx.stroke();
     ctx.fillStyle = ink; ctx.font = 'italic 28px Georgia, serif'; ctx.fillText(isArabic ? 'إدارة تمكينوفا' : 'Tamkeenova Management', 500, 1005); ctx.fillText(isArabic ? 'ممثل الشركاء' : 'Partner Representative', 1200, 1005);
     ctx.fillStyle = '#69757a'; ctx.font = '17px Arial'; ctx.fillText(isArabic ? 'الجهة المانحة' : 'Issuing Organization', 500, 1050); ctx.fillText(isArabic ? 'شركاء النجاح' : 'Success Partners', 1200, 1050);
     ctx.strokeStyle = '#d8b777'; ctx.beginPath(); ctx.moveTo(430, 1090); ctx.lineTo(1370, 1090); ctx.stroke();
-    ctx.fillStyle = gold; ctx.font = '18px Arial'; ctx.fillText(isArabic ? 'بالشراكة مع' : 'IN PARTNERSHIP WITH', 900, 1120);
+    ctx.fillStyle = gold; ctx.font = '18px Arial'; ctx.fillText(labels.partnership, 900, 1120);
     // QR area is deliberately on a white card for reliable scanning after download/printing.
     ctx.fillStyle = '#ffffff'; ctx.fillRect(1330, 905, 205, 205); ctx.strokeStyle = gold; ctx.lineWidth = 3; ctx.strokeRect(1330, 905, 205, 205);
     const verifyUrl = `${window.location.origin}/verify?code=${encodeURIComponent(cert.verification_code)}`;
