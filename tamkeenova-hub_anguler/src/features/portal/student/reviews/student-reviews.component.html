@@ -1,0 +1,136 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'student_reviews.title' | translate }}</h1>
+      <p class="text-muted">{{ 'student_reviews.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="empty-state"><div class="loader-spinner"></div></div>
+  } @else if (reviews().length === 0) {
+    <div class="empty-state surface">
+      <i class="fa-solid fa-star"></i>
+      <p>{{ 'student_reviews.empty' | translate }}</p>
+    </div>
+  } @else {
+    <div class="item-list">
+      @for (r of reviews(); track r.id) {
+        <article class="review-card surface chamfer-sm animate-in">
+          <div class="review-trainer">
+            @if (r.trainers?.users?.profile_image) {
+              <img [src]="r.trainers!.users!.profile_image!" [alt]="r.trainers!.users!.full_name" />
+            } @else {
+              <div class="review-avatar-fallback"><i class="fa-solid fa-user"></i></div>
+            }
+            <div>
+              <h3 class="review-trainer-name">{{ r.trainers?.users?.full_name ?? '' }}</h3>
+              <span class="review-date text-muted">
+                <i class="fa-regular fa-calendar"></i> {{ r.created_at | date: 'yyyy/MM/dd' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="review-stars">
+            @for (n of [1, 2, 3, 4, 5]; track n) {
+              <i class="fa-solid fa-star" [class.is-on]="n <= r.rating"></i>
+            }
+          </div>
+
+          <p class="review-comment">
+            {{ r.comment || ('student_reviews.no_comment' | translate) }}
+          </p>
+
+          <div class="review-actions">
+            @if (r.trainers?.slug) {
+              <a [routerLink]="['/team', r.trainers!.slug]" class="btn-outline btn-sm btn-link">
+                {{ 'student_trainers.view_profile' | translate }}
+              </a>
+            }
+            <button type="button" class="btn-outline btn-sm" (click)="openEdit(r)">
+              <i class="fa-solid fa-pen"></i>
+              {{ 'student_reviews.edit' | translate }}
+            </button>
+            <button type="button" class="btn-danger-outline btn-sm" (click)="askDelete(r)">
+              <i class="fa-solid fa-trash"></i>
+              {{ 'student_reviews.delete' | translate }}
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  <!-- -- Edit Modal -- -->
+  @if (editTarget(); as t) {
+    <div class="modal-backdrop" (click)="closeEdit()">
+      <div class="modal-card modal-card-sm surface chamfer-sm" (click)="$event.stopPropagation()">
+        <h3>{{ 'student_reviews.edit' | translate }}</h3>
+        <p class="text-muted review-sub">{{ t.trainers?.users?.full_name ?? '' }}</p>
+
+        <div class="stars-row" role="radiogroup" aria-label="rating">
+          @for (n of [1, 2, 3, 4, 5]; track n) {
+            <button
+              type="button"
+              class="star-btn"
+              [class.is-active]="n <= editRating()"
+              (click)="setRating(n)"
+            >
+              <i class="fa-solid fa-star"></i>
+            </button>
+          }
+        </div>
+
+        <textarea
+          class="field-input field-textarea"
+          rows="3"
+          [placeholder]="'student_reviews.comment_placeholder' | translate"
+          [(ngModel)]="editComment"
+        ></textarea>
+
+        <div class="form-actions form-actions-center">
+          <button type="button" class="btn-outline" (click)="closeEdit()">
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button type="button" class="btn-primary btn-submit" (click)="saveEdit()" [disabled]="isSaving()">
+            @if (isSaving()) {
+              <div class="loader-spinner-sm"></div>
+            } @else {
+              {{ 'common.save' | translate }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- -- Delete Confirm Modal -- -->
+  @if (deleteTarget()) {
+    <div class="modal-backdrop" (click)="closeDelete()">
+      <div class="modal-card modal-card-sm surface chamfer-sm" (click)="$event.stopPropagation()">
+        <div class="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h3>{{ 'student_reviews.delete_confirm_title' | translate }}</h3>
+        <p class="text-muted">{{ 'student_reviews.delete_confirm_text' | translate }}</p>
+        <div class="form-actions form-actions-center">
+          <button type="button" class="btn-outline" (click)="closeDelete()">
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button type="button" class="btn-danger" (click)="confirmDelete()" [disabled]="isDeleting()">
+            @if (isDeleting()) {
+              <div class="loader-spinner-sm"></div>
+            } @else {
+              {{ 'common.confirm' | translate }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (toastMessage()) {
+    <div class="toast toast-success animate-in">
+      <i class="fa-solid fa-circle-check"></i>
+      {{ toastMessage() | translate }}
+    </div>
+  }
+</section>

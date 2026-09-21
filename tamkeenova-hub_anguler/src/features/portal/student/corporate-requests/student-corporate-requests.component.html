@@ -1,0 +1,268 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'student_corporate.title' | translate }}</h1>
+      <p class="text-muted">{{ 'student_corporate.subtitle' | translate }}</p>
+    </div>
+    <button type="button" class="btn-accent header-cta" (click)="openForm()">
+      <i class="fa-solid fa-plus"></i>
+      {{ 'student_corporate.new_request' | translate }}
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="empty-state"><div class="loader-spinner"></div></div>
+  } @else {
+    <div class="filter-pills">
+      @for (s of statuses; track s) {
+        <button
+          type="button"
+          class="filter-pill"
+          [class.is-active]="activeFilter() === s"
+          (click)="setFilter(s)"
+        >
+          {{ s === 'ALL' ? ('common.all' | translate) : ('status.corporate.' + s | translate) }}
+        </button>
+      }
+    </div>
+
+    @if (filtered().length === 0) {
+      <div class="empty-state surface">
+        <i class="fa-solid fa-building"></i>
+        <p>{{ 'student_corporate.empty' | translate }}</p>
+        <button type="button" class="btn-accent empty-cta" (click)="openForm()">
+          {{ 'student_corporate.new_request' | translate }}
+        </button>
+      </div>
+    } @else {
+      <div class="item-list">
+        @for (r of filtered(); track r.id) {
+          <article class="corp-card surface chamfer-sm animate-in">
+            <div class="corp-main">
+              <div class="corp-title-row">
+                <h3 class="corp-title">{{ r.company_name }}</h3>
+                <span class="badge" [class]="badgeClass(r.status)">
+                  {{ 'status.corporate.' + r.status | translate }}
+                </span>
+              </div>
+              <p class="corp-desc">{{ r.service_description | slice: 0 : 140 }}{{ r.service_description.length > 140 ? '…' : '' }}</p>
+              <div class="corp-meta text-muted">
+                <span><i class="fa-solid fa-tag"></i> {{ 'student_corporate.service_types.' + r.service_type | translate }}</span>
+                <span><i class="fa-regular fa-calendar"></i> {{ r.created_at | date: 'yyyy/MM/dd' }}</span>
+                @if (r.corporate_request_attachments.length > 0) {
+                  <span><i class="fa-solid fa-paperclip"></i> {{ r.corporate_request_attachments.length }}</span>
+                }
+              </div>
+            </div>
+            <div class="corp-actions">
+              <button type="button" class="btn-outline btn-sm" (click)="openDetails(r)">
+                {{ 'student_corporate.details' | translate }}
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  }
+
+  <!-- -- New Request Modal -- -->
+  @if (showForm()) {
+    <div class="modal-backdrop" (click)="closeForm()">
+      <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ 'student_corporate.new_request' | translate }}</h3>
+          <button type="button" class="icon-btn" (click)="closeForm()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label class="field-label">{{ 'student_corporate.fields.company_name' | translate }} *</label>
+              <input type="text" class="field-input" formControlName="company_name" />
+              @if (form.controls.company_name.touched && form.controls.company_name.invalid) {
+                <span class="field-hint is-error">{{ 'common.required_error' | translate }}</span>
+              }
+            </div>
+            <div class="field">
+              <label class="field-label">{{ 'student_corporate.fields.service_type' | translate }} *</label>
+              <select class="field-input" formControlName="service_type">
+                @for (t of serviceTypes; track t) {
+                  <option [value]="t">{{ 'student_corporate.service_types.' + t | translate }}</option>
+                }
+              </select>
+            </div>
+            <div class="field field-full">
+              <label class="field-label">{{ 'student_corporate.fields.service_description' | translate }} *</label>
+              <textarea class="field-input field-textarea" rows="3" formControlName="service_description"></textarea>
+              @if (form.controls.service_description.touched && form.controls.service_description.invalid) {
+                <span class="field-hint is-error">{{ 'common.required_error' | translate }}</span>
+              }
+            </div>
+            <div class="field">
+              <label class="field-label">{{ 'student_corporate.fields.contact_name' | translate }} *</label>
+              <input type="text" class="field-input" formControlName="contact_name" />
+            </div>
+            <div class="field">
+              <label class="field-label">{{ 'student_corporate.fields.contact_email' | translate }} *</label>
+              <input type="email" class="field-input" formControlName="contact_email" dir="ltr" />
+            </div>
+            <div class="field">
+              <label class="field-label">{{ 'student_corporate.fields.contact_phone' | translate }}</label>
+              <input type="tel" class="field-input" formControlName="contact_phone" dir="ltr" />
+            </div>
+            <div class="field">
+              <label class="field-label">{{ 'student_corporate.fields.contact_whatsapp' | translate }}</label>
+              <input type="tel" class="field-input" formControlName="contact_whatsapp" dir="ltr" />
+            </div>
+            <div class="field">
+              <label class="field-label">{{ 'student_corporate.fields.sector' | translate }}</label>
+              <input type="text" class="field-input" formControlName="sector" />
+            </div>
+            <div class="field">
+              <label class="field-label">{{ 'student_corporate.fields.country' | translate }}</label>
+              <input type="text" class="field-input" formControlName="country" />
+            </div>
+            <div class="field">
+              <label class="field-label">{{ 'student_corporate.fields.employees_count' | translate }}</label>
+              <input type="number" min="1" class="field-input" formControlName="employees_count" dir="ltr" />
+            </div>
+            <div class="field">
+              <label class="field-label">{{ 'student_corporate.fields.project_duration' | translate }}</label>
+              <input type="text" class="field-input" formControlName="project_duration" />
+            </div>
+            <div class="field field-full">
+              <label class="field-label">{{ 'student_corporate.fields.expected_budget' | translate }}</label>
+              <input type="text" class="field-input" formControlName="expected_budget" />
+            </div>
+          </div>
+
+          @if (formError()) {
+            <div class="form-error-banner" style="margin-top: 1rem">{{ formError() | translate }}</div>
+          }
+
+          <div class="form-actions">
+            <button type="button" class="btn-outline" (click)="closeForm()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button type="submit" class="btn-accent btn-submit" [disabled]="isSubmitting()">
+              @if (isSubmitting()) {
+                <div class="loader-spinner-sm"></div>
+              } @else {
+                <i class="fa-solid fa-paper-plane"></i>
+                {{ 'student_consultations.submit' | translate }}
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- -- Details Modal -- -->
+  @if (selected(); as d) {
+    <div class="modal-backdrop" (click)="closeDetails()">
+      <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ 'student_corporate.details' | translate }}</h3>
+          <button type="button" class="icon-btn" (click)="closeDetails()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        @if (loadingDetails()) {
+          <div class="empty-state"><div class="loader-spinner"></div></div>
+        } @else {
+          <h4 class="modal-title">{{ d.company_name }}</h4>
+          <span class="badge" [class]="badgeClass(d.status)">
+            {{ 'status.corporate.' + d.status | translate }}
+          </span>
+          <p class="modal-desc">{{ d.service_description }}</p>
+
+          <div class="detail-rows">
+            <div class="detail-row">
+              <span class="text-muted">{{ 'student_corporate.fields.service_type' | translate }}</span>
+              <strong>{{ 'student_corporate.service_types.' + d.service_type | translate }}</strong>
+            </div>
+            <div class="detail-row">
+              <span class="text-muted">{{ 'student_corporate.fields.contact_name' | translate }}</span>
+              <strong>{{ d.contact_name }}</strong>
+            </div>
+            <div class="detail-row">
+              <span class="text-muted">{{ 'student_corporate.fields.contact_email' | translate }}</span>
+              <strong dir="ltr">{{ d.contact_email }}</strong>
+            </div>
+            @if (d.sector) {
+              <div class="detail-row">
+                <span class="text-muted">{{ 'student_corporate.fields.sector' | translate }}</span>
+                <strong>{{ d.sector }}</strong>
+              </div>
+            }
+            @if (d.expected_budget) {
+              <div class="detail-row">
+                <span class="text-muted">{{ 'student_corporate.fields.expected_budget' | translate }}</span>
+                <strong>{{ d.expected_budget }}</strong>
+              </div>
+            }
+            @if (d.project_duration) {
+              <div class="detail-row">
+                <span class="text-muted">{{ 'student_corporate.fields.project_duration' | translate }}</span>
+                <strong>{{ d.project_duration }}</strong>
+              </div>
+            }
+            @if (d.admin_notes) {
+              <div class="detail-row detail-col">
+                <span class="text-muted">{{ 'student_corporate.admin_notes' | translate }}</span>
+                <p>{{ d.admin_notes }}</p>
+              </div>
+            }
+            @if (d.rejection_reason) {
+              <div class="detail-row detail-col">
+                <span class="text-muted">{{ 'student_corporate.rejection_reason' | translate }}</span>
+                <p class="text-danger">{{ d.rejection_reason }}</p>
+              </div>
+            }
+          </div>
+
+          <!-- -- Attachments -- -->
+          <h4 class="attach-title">{{ 'student_corporate.attachments' | translate }}</h4>
+          @if (d.corporate_request_attachments.length === 0) {
+            <p class="text-muted attach-empty">—</p>
+          } @else {
+            <div class="attach-list">
+              @for (a of d.corporate_request_attachments; track a.id) {
+                <a [href]="a.file_url" target="_blank" rel="noopener" class="attach-item">
+                  <i class="fa-solid fa-file-lines"></i>
+                  <span>{{ a.file_name }}</span>
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+              }
+            </div>
+          }
+
+          <input type="file" id="corp-attachment-input" hidden (change)="onAttachmentSelected($event)" />
+          <button type="button" class="btn-outline btn-upload" (click)="triggerAttachmentInput()" [disabled]="isUploading()">
+            @if (isUploading()) {
+              <div class="loader-spinner-sm"></div>
+            } @else {
+              <i class="fa-solid fa-paperclip"></i>
+              {{ 'student_corporate.upload_attachment' | translate }}
+            }
+          </button>
+          <span class="field-hint">{{ 'student_corporate.upload_hint' | translate }}</span>
+          @if (uploadError()) {
+            <div class="form-error-banner" style="margin-top: 0.6rem">{{ uploadError() | translate }}</div>
+          }
+        }
+      </div>
+    </div>
+  }
+
+  @if (toastMessage()) {
+    <div class="toast toast-success animate-in">
+      <i class="fa-solid fa-circle-check"></i>
+      {{ toastMessage() | translate }}
+    </div>
+  }
+</section>

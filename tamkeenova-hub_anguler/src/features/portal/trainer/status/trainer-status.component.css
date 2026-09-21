@@ -1,0 +1,180 @@
+.status-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-card {
+  width: 100%;
+  max-width: 560px;
+  padding: 3rem 2.25rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.status-icon {
+  width: 84px;
+  height: 84px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 2.2rem;
+  margin-bottom: 0.4rem;
+}
+
+.status-icon.is-pending {
+  background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  color: var(--color-accent);
+  animation: pulse-soft 2.4s ease-in-out infinite;
+}
+.status-icon.is-rejected,
+.status-icon.is-error {
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  color: var(--color-danger);
+}
+.status-icon.is-approved {
+  background: color-mix(in srgb, var(--color-success) 14%, transparent);
+  color: var(--color-success);
+}
+
+@keyframes pulse-soft {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 30%, transparent); }
+  50% { box-shadow: 0 0 0 14px transparent; }
+}
+
+.status-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.status-text {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  max-width: 420px;
+}
+
+/* -- Application Timeline -- */
+.status-timeline {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  margin: 1.25rem 0 0.5rem;
+  position: relative;
+}
+.status-timeline::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  inset-inline: 40px;
+  height: 2px;
+  background: var(--color-border);
+  z-index: 0;
+}
+.status-timeline li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  position: relative;
+  z-index: 1;
+}
+.tl-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  background: var(--color-surface-alt);
+  border: 2px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+.tl-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+li.is-done .tl-dot {
+  background: var(--color-success);
+  border-color: var(--color-success);
+  color: #fff;
+}
+li.is-current .tl-dot {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+li.is-done .tl-label,
+li.is-current .tl-label {
+  color: var(--color-text);
+}
+
+/* -- Rejection Notice -- */
+.rejection-box {
+  width: 100%;
+  text-align: start;
+  padding: 1rem 1.15rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 35%, transparent);
+  border-inline-start: 4px solid var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 6%, transparent);
+  margin-top: 0.5rem;
+}
+.rejection-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-danger);
+  margin-bottom: 0.4rem;
+}
+.rejection-reason {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--color-text);
+}
+
+/* -- Status Actions -- */
+.status-actions {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1rem;
+}
+.status-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 46px;
+  padding-inline: 1.3rem;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+.status-logout {
+  margin-top: 1.5rem;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.status-logout:hover {
+  color: var(--color-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-icon.is-pending { animation: none; }
+}

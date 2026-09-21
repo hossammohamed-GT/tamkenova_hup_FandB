@@ -1,0 +1,41 @@
+<section class="auth-page">
+  <div class="auth-card surface chamfer-sm">
+
+    <h1 class="auth-title">{{ 'auth.otp.title' | translate }}</h1>
+    <p class="auth-subtitle text-muted">
+      {{ 'auth.otp.subtitle' | translate }} <strong>{{ email }}</strong>
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
+
+      <div class="form-group">
+        <label>{{ 'auth.fields.otp' | translate }}</label>
+        <input type="text" class="input otp-input" formControlName="otp" maxlength="6" />
+        @if (form.controls.otp.touched && form.controls.otp.invalid) {
+          <span class="field-error">{{ 'auth.errors.otp' | translate }}</span>
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <p class="form-error text-danger">{{ errorMessage() | translate }}</p>
+      }
+      @if (infoMessage()) {
+        <p class="form-error text-success">{{ infoMessage() | translate }}</p>
+      }
+
+      <button type="submit" class="btn-primary auth-submit" [disabled]="isLoading()">
+        @if (isLoading()) {
+          <i class="fa-solid fa-spinner fa-spin"></i>
+        } @else {
+          {{ 'auth.otp.submit' | translate }}
+        }
+      </button>
+
+    </form>
+
+    <button type="button" class="resend-btn" (click)="resendOtp()" [disabled]="isResending()">
+      {{ 'auth.otp.resend' | translate }}
+    </button>
+
+  </div>
+</section>

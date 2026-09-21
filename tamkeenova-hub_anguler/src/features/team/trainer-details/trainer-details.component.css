@@ -1,0 +1,564 @@
+/* ==========================================================================
+   Trainer Details — component styles
+   Built on the global design tokens (--color-primary, --color-accent, etc.)
+   ========================================================================== */
+
+/* ---------- Skeleton / loading state ---------- */
+.trainer-details-skeleton {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.skeleton-hero {
+  height: 280px;
+  border-radius: var(--radius-lg);
+}
+
+.skeleton-stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+.skeleton-box {
+  height: 92px;
+  border-radius: var(--radius-md);
+}
+
+.skeleton-card {
+  height: 140px;
+  border-radius: var(--radius-md);
+}
+
+.shimmer {
+  background: linear-gradient(
+    100deg,
+    var(--color-surface-alt) 30%,
+    var(--color-surface) 50%,
+    var(--color-surface-alt) 70%
+  );
+  background-size: 250% 100%;
+  animation: shimmer-sweep 1.8s ease-in-out infinite;
+}
+
+@keyframes shimmer-sweep {
+  0% {
+    background-position: 150% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .skeleton-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---------- Not found state ---------- */
+.trainer-not-found {
+  max-width: 480px;
+  margin: 80px auto;
+  padding: 48px 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.trainer-not-found i {
+  font-size: 40px;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.trainer-not-found h2 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.trainer-not-found p {
+  color: var(--color-text-muted);
+  line-height: 1.7;
+  max-width: 340px;
+}
+
+.not-found-btn {
+  margin-top: 14px;
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+}
+
+/* ---------- Page shell ---------- */
+.trainer-details {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 28px 20px 80px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 24px;
+  transition: color var(--transition-fast), gap var(--transition-fast);
+}
+
+.back-link i {
+  font-size: 12px;
+  transition: transform var(--transition-fast);
+}
+
+.back-link:hover {
+  color: var(--color-accent);
+}
+
+.back-link:hover i {
+  transform: translateX(-3px);
+}
+
+html[dir='rtl'] .back-link:hover i {
+  transform: translateX(3px);
+}
+
+/* ---------- Hero ---------- */
+.trainer-hero {
+  position: relative;
+  padding: 56px 32px 44px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+.trainer-hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 20%, color-mix(in srgb, var(--color-accent) 20%, transparent), transparent 55%),
+    linear-gradient(155deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 78%, black) 100%);
+  z-index: 0;
+}
+
+.trainer-hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  max-width: 480px;
+}
+
+.trainer-hero-avatar-wrap {
+  position: relative;
+  width: 108px;
+  height: 108px;
+  margin-bottom: 18px;
+}
+
+.trainer-hero-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid color-mix(in srgb, #fff 22%, transparent);
+  box-shadow: var(--shadow-lg);
+}
+
+.trainer-hero-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  font-weight: 700;
+  color: #fff;
+  background: color-mix(in srgb, var(--color-accent) 55%, var(--color-primary) 45%);
+  border: 3px solid color-mix(in srgb, #fff 22%, transparent);
+  box-shadow: var(--shadow-lg);
+}
+
+.hero-availability-dot {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-success);
+  border: 3px solid var(--color-primary);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-success) 60%, transparent);
+  animation: pulse-ring 2.2s ease-out infinite;
+}
+
+html[dir='rtl'] .hero-availability-dot {
+  right: auto;
+  left: 6px;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-success) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 9px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+.trainer-hero-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+}
+
+.trainer-hero-spec {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-accent);
+  letter-spacing: 0.01em;
+}
+
+.trainer-hero-rating {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  color: #fff;
+}
+
+.rating-value {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.rating-count {
+  font-size: 13px;
+  color: color-mix(in srgb, #fff 65%, transparent);
+}
+
+.hero-book-btn {
+  margin-top: 22px;
+  padding: 13px 30px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.hero-book-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+
+.hero-book-btn:active {
+  transform: translateY(0);
+}
+
+/* ---------- Stats grid ---------- */
+.trainer-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.stat-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 10px;
+  text-align: center;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.stat-box:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+}
+
+.stat-box i {
+  font-size: 16px;
+  color: var(--color-accent);
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-size: 19px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+@media (max-width: 720px) {
+  .trainer-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ---------- Body layout ---------- */
+.trainer-details-body {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  margin-top: 28px;
+  align-items: start;
+}
+
+.trainer-details-main {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.trainer-details-side {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: sticky;
+  top: 24px;
+}
+
+@media (max-width: 860px) {
+  .trainer-details-body {
+    grid-template-columns: 1fr;
+  }
+
+  .trainer-details-side {
+    position: static;
+  }
+}
+
+/* ---------- Detail cards ---------- */
+.detail-card {
+  padding: 24px;
+  transition: box-shadow var(--transition-fast);
+}
+
+.detail-card:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.detail-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.detail-card-title i {
+  color: var(--color-accent);
+  font-size: 14px;
+}
+
+.detail-card-text {
+  color: var(--color-text-muted);
+  line-height: 1.8;
+  font-size: 14.5px;
+}
+
+.empty-text {
+  color: var(--color-text-muted);
+  font-size: 13.5px;
+  font-style: italic;
+}
+
+/* Certificates */
+.certificates-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.certificate-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  font-size: 13px;
+  font-weight: 600;
+  transition: transform var(--transition-fast), border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.certificate-chip i {
+  color: var(--color-accent);
+  font-size: 12px;
+}
+
+.certificate-chip:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface-alt));
+}
+
+/* Programs preview */
+.programs-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.program-preview-card {
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  transition: transform var(--transition-fast), border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.program-preview-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-accent);
+}
+
+.program-preview-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* ---------- Sidebar: price card ---------- */
+.price-card {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 3px solid var(--color-accent);
+}
+
+.price-card-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.price-card-value {
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.price-card-currency {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.price-card-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--color-text-muted);
+}
+
+.price-card-btn {
+  margin-top: 6px;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  width: 100%;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.price-card-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+/* ---------- Sidebar: socials card ---------- */
+.socials-card {
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.socials-card-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.socials-list {
+  display: flex;
+  gap: 10px;
+}
+
+.social-link {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 15px;
+  transition: transform var(--transition-fast), background-color var(--transition-fast),
+    color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.social-link:hover {
+  transform: translateY(-3px);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .shimmer,
+  .hero-availability-dot {
+    animation: none;
+  }
+
+  .back-link:hover i,
+  .hero-book-btn:hover,
+  .stat-box:hover,
+  .certificate-chip:hover,
+  .program-preview-card:hover,
+  .price-card-btn:hover,
+  .social-link:hover {
+    transform: none;
+  }
+}

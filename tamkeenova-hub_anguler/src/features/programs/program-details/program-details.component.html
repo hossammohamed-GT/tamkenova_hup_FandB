@@ -1,0 +1,150 @@
+<section class="details-page">
+  @if (isLoading()) {
+    <div class="details-loader">
+      <div class="loader-spinner"></div>
+      <p>{{ 'loader.loading' | translate }}</p>
+    </div>
+  } @else if (notFound() || !program()) {
+    <div class="not-found surface chamfer-sm">
+      <i class="fa-solid fa-book-open"></i>
+      <h2>{{ 'program_details.not_found_title' | translate }}</h2>
+      <p class="text-muted">{{ 'program_details.not_found_text' | translate }}</p>
+      <a routerLink="/programs" class="btn-accent not-found-cta">
+        {{ 'program_details.back' | translate }}
+      </a>
+    </div>
+  } @else if (program(); as p) {
+    <a routerLink="/programs" class="back-link">
+      <i class="fa-solid fa-arrow-right rtl-flip"></i>
+      {{ 'program_details.back' | translate }}
+    </a>
+
+    <div class="details-grid">
+      <!-- -- Main Column -- -->
+      <div class="details-main">
+        <div class="details-cover surface chamfer-sm">
+          @if (p.image_url) {
+            <img [src]="p.image_url" [alt]="p.title" />
+          } @else {
+            <div class="details-cover-placeholder">
+              <i class="fa-solid fa-book"></i>
+            </div>
+          }
+          @if (discountPercent() > 0) {
+            <span class="discount-badge">-{{ discountPercent() }}%</span>
+          }
+        </div>
+
+        <div class="details-meta-row">
+          <span class="meta-chip">
+            <i class="fa-solid fa-signal"></i>
+            {{ levelLabelKey(p.level) | translate }}
+          </span>
+          @if (p.duration_hours) {
+            <span class="meta-chip">
+              <i class="fa-regular fa-clock"></i>
+              {{ p.duration_hours }} {{ 'programs.hours_unit' | translate }}
+            </span>
+          }
+          <span class="meta-chip">
+            <i class="fa-solid fa-users"></i>
+            {{ p.enrolled_count }} {{ 'program_details.enrolled' | translate }}
+          </span>
+        </div>
+
+        <h1 class="details-title">{{ p.title }}</h1>
+        @if (p.short_description) {
+          <p class="details-short">{{ p.short_description }}</p>
+        }
+
+        <div class="details-section surface chamfer-sm">
+          <h2>{{ 'program_details.about' | translate }}</h2>
+          <p class="details-desc">{{ p.description || p.short_description || '—' }}</p>
+        </div>
+
+        @if (p.trainers) {
+          <div class="details-section surface chamfer-sm trainer-strip">
+            <div class="trainer-info">
+              @if (p.trainers.users.profile_image) {
+                <img [src]="p.trainers.users.profile_image" [alt]="p.trainers.users.full_name" />
+              } @else {
+                <div class="trainer-avatar-fallback"><i class="fa-solid fa-user"></i></div>
+              }
+              <div>
+                <span class="trainer-label">{{ 'program_details.trainer' | translate }}</span>
+                <h3>{{ p.trainers.users.full_name }}</h3>
+                @if (p.trainers.average_rating) {
+                  <span class="trainer-rating">
+                    <i class="fa-solid fa-star"></i>
+                    {{ p.trainers.average_rating | number: '1.1-1' }}
+                  </span>
+                }
+              </div>
+            </div>
+            <a [routerLink]="['/team', p.trainers.slug]" class="btn-outline btn-sm btn-link">
+              {{ 'program_details.view_trainer' | translate }}
+            </a>
+          </div>
+        }
+      </div>
+
+      <!-- -- Side Column -- -->
+      <aside class="details-side">
+        <div class="enroll-card surface chamfer-sm">
+          <div class="price-row">
+            @if (p.discount_price) {
+              <span class="price-old">{{ p.price }} {{ 'common.currency' | translate }}</span>
+              <span class="price-new">{{ p.discount_price }} {{ 'common.currency' | translate }}</span>
+            } @else {
+              <span class="price-new">{{ p.price }} {{ 'common.currency' | translate }}</span>
+            }
+          </div>
+
+          @if (enrollSuccess()) {
+            <div class="success-banner">
+              <i class="fa-solid fa-circle-check"></i>
+              {{ 'program_details.enroll_success' | translate }}
+            </div>
+            <button type="button" class="btn-primary enroll-btn" (click)="goToEnrollments()">
+              {{ 'student_dashboard.cards.enrollments' | translate }}
+            </button>
+          } @else if (!isLoggedIn()) {
+            <p class="enroll-hint text-muted">{{ 'program_details.login_to_enroll' | translate }}</p>
+            <a routerLink="/login" class="btn-accent enroll-btn btn-link">
+              {{ 'nav.login' | translate }}
+            </a>
+          } @else if (!isStudent()) {
+            <p class="enroll-hint text-muted">{{ 'program_details.login_to_enroll' | translate }}</p>
+          } @else if (!p.is_active) {
+            <div class="form-error-banner">{{ 'program_details.unavailable' | translate }}</div>
+          } @else {
+            <button type="button" class="btn-accent enroll-btn" (click)="enroll()" [disabled]="isEnrolling()">
+              @if (isEnrolling()) {
+                <div class="loader-spinner-sm"></div>
+                {{ 'program_details.enrolling' | translate }}
+              } @else {
+                <i class="fa-solid fa-ticket"></i>
+                {{ 'program_details.enroll_now' | translate }}
+              }
+            </button>
+          }
+
+          @if (enrollError()) {
+            <div class="form-error-banner" style="margin-top: 0.75rem">{{ enrollError() | translate }}</div>
+          }
+
+          <div class="enroll-facts">
+            <div class="enroll-fact">
+              <i class="fa-solid fa-certificate"></i>
+              <span>{{ 'student_certificates.title' | translate }}</span>
+            </div>
+            <div class="enroll-fact">
+              <i class="fa-solid fa-shield-halved"></i>
+              <span>{{ 'consultingPage.perks.confidential.title' | translate }}</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  }
+</section>

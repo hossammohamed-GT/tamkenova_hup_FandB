@@ -1,0 +1,74 @@
+<section class="trainers-section">
+  <!-- Section Header -->
+  <div class="section-header animate-in">
+    <span class="section-eyebrow">
+      <i class="fa-solid fa-users"></i>
+      {{ 'home.team.label' | translate }}
+    </span>
+    <h2 class="section-title">{{ 'home.team.title' |
+      translate }}</h2>
+    <p class="section-subtitle">{{ 'home.team.subtitle' |
+      translate }}</p>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="trainers-grid">
+    @for (i of [1,2,3,4,5,6]; track i) {
+    <div
+      class="trainer-card-skeleton surface chamfer-sm animate-in"
+      [style.animation-delay]="(i * 0.08) + 's'">
+      <div class="skeleton-avatar shimmer"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line shimmer"
+          style="width: 80%"></div>
+        <div class="skeleton-line shimmer"
+          style="width: 60%"></div>
+        <div class="skeleton-line shimmer"
+          style="width: 40%"></div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Trainers Grid -->
+  @else if (featuredTrainers().length > 0) {
+  <div class="trainers-grid">
+    @for (trainer of featuredTrainers(); track trainer.id;
+    let i = $index) {
+    <div class="trainer-item animate-in"
+      [style.animation-delay]="(i * 0.06) + 's'">
+      <app-trainer-card [trainer]="trainer"
+        [index]="i" (book)="onBook($event)"></app-trainer-card>
+    </div>
+    }
+  </div>
+
+  <!-- View All CTA -->
+  <div class="view-all-wrapper animate-in"
+    [style.animation-delay]="(featuredTrainers().length * 0.06 + 0.3) + 's'">
+    <a routerLink="/team" class="view-all-btn">
+      <i class="fa-solid fa-arrow-right"></i>
+      {{ 'home.team.link' | translate }}
+      <span class="view-all-count">
+        <i class="fa-solid fa-users"></i>
+        {{ allTrainersCount() }}
+      </span>
+    </a>
+  </div>
+  }
+
+  <!-- Empty State -->
+  @else {
+  <div class="empty-state surface chamfer-sm animate-in">
+    <div class="empty-icon">
+      <i class="fa-solid fa-users"></i>
+    </div>
+    <h3 class="empty-title">{{ 'home.team.empty_title' |
+      translate }}</h3>
+    <p class="empty-text">{{ 'home.team.empty_text' |
+      translate }}</p>
+  </div>
+  }
+</section>

@@ -1,0 +1,45 @@
+<aside class="auth-visual chamfer-lg">
+  <div class="auth-visual-glow"></div>
+
+  <div class="auth-visual-top">
+    <img src="/images/logo.svg" alt="TamkeeNova"
+      class="auth-visual-mark">
+    <span class="auth-visual-brand">Tamkee<span
+        class="auth-visual-brand-accent">Nova</span></span>
+  </div>
+
+  <div class="auth-visual-body">
+    <h2 class="auth-visual-title">
+      {{ (mode === 'register' ? 'auth.visual.register_title'
+      : 'auth.visual.login_title') | translate }}
+    </h2>
+    <p class="auth-visual-subtitle">
+      {{ (mode === 'register' ?
+      'auth.visual.register_subtitle' :
+      'auth.visual.login_subtitle') | translate }}
+    </p>
+  </div>
+
+  <div class="auth-visual-path-wrap">
+    <svg class="auth-visual-path-svg" viewBox="0 0 360 120"
+      fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path #pathLine class="auth-visual-path-line"
+        d="M20,100 C90,100 90,30 150,30 C210,30 210,90 270,90 C310,90 310,50 340,20" />
+    </svg>
+
+    <div class="auth-visual-nodes">
+      @for (node of nodes; track node.key; let i = $index) {
+      <div class="auth-visual-node" [style.--i]="i">
+        <span class="auth-visual-node-dot"><i
+            class="fa-solid" [class]="node.icon"></i></span>
+        <span class="auth-visual-node-label">{{
+          'auth.visual.steps.' + node.key | translate
+          }}</span>
+      </div>
+      }
+    </div>
+  </div>
+
+  <p class="auth-visual-quote">{{ 'auth.visual.quote' |
+    translate }}</p>
+</aside>

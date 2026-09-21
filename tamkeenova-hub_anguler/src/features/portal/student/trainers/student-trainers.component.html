@@ -1,0 +1,122 @@
+<section class="portal-page student-trainers-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'student_trainers.title' | translate }}</h1>
+      <p class="text-muted">{{ 'student_trainers.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar surface glass-filter-bar">
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" class="field-input search-input" [placeholder]="'student_trainers.search_placeholder' | translate"
+        [ngModel]="search()" (ngModelChange)="onSearchChange($event)" />
+    </div>
+
+    <select class="field-input filter-select" [ngModel]="specializationId()" (ngModelChange)="onSpecChange($event)">
+      <option value="">{{ 'programs.filter.all_categories' | translate }}</option>
+      @for (s of specializations(); track s.id) {
+      <option [value]="s.id">{{ isArabic ? s.name_ar : s.name_en }}</option>
+      }
+    </select>
+
+    <select class="field-input filter-select" [ngModel]="minRating()" (ngModelChange)="onRatingChange($event)">
+      <option [value]="0">{{ 'student_trainers.any_rating' | translate }}</option>
+      <option [value]="3">3+ ★</option>
+      <option [value]="4">4+ ★</option>
+      <option [value]="4.5">4.5+ ★</option>
+    </select>
+  </div>
+
+  @if (isLoading()) {
+  <div class="empty-state">
+    <div class="loader-spinner"></div>
+  </div>
+  } @else if (trainers().length === 0) {
+  <div class="empty-state surface glass-empty">
+    <i class="fa-solid fa-chalkboard-user"></i>
+    <p>{{ 'student_trainers.empty' | translate }}</p>
+  </div>
+  } @else {
+  <div class="trainers-grid">
+    @for (t of trainers(); track t.id) {
+    <article class="trainer-card surface chamfer-sm animate-in glass-trainer-card" [style.--i]="$index * 0.06 + 's'">
+      <a [routerLink]="['/team', t.slug]" class="trainer-top">
+        @if (t.users.profile_image) {
+        <img [src]="t.users.profile_image" [alt]="t.users.full_name" class="trainer-avatar" />
+        } @else {
+        <div class="trainer-avatar trainer-avatar-fallback">
+          <i class="fa-solid fa-user"></i>
+        </div>
+        }
+        <div class="trainer-identity">
+          <h3>{{ t.users.full_name }}</h3>
+          @if (specName(t)) {
+          <span class="trainer-spec">{{ specName(t) }}</span>
+          }
+        </div>
+      </a>
+
+      @if (bioOf(t)) {
+      <p class="trainer-bio">{{ bioOf(t) | slice: 0 : 110 }}{{ bioOf(t).length > 110 ? '…' : '' }}</p>
+      }
+
+      <!-- Interactive Rating Stars -->
+      <div class="trainer-rating-interactive" (mouseleave)="onStarLeave(t.id)">
+        <div class="rating-stars">
+          @for (star of [1,2,3,4,5]; track star) {
+          <button type="button" class="star-btn" [class.is-active]="star <= displayRating(t)"
+            [class.is-hovered]="(hoverRatings()[t.id] ?? 0) >= star" [class.is-user]=" (userRatings()[t.id] ?? 0) >= star"
+            (mouseenter)="onStarEnter(t.id, star)" (click)="rateTrainer(t, star, $event)"
+            [disabled]="ratingLoading()[t.id]">
+            <i class="fa-solid fa-star"></i>
+            <span class="star-glow"></span>
+          </button>
+          }
+        </div>
+        <div class="rating-info">
+          <span class="rating-value">{{ displayRating(t) | number:'1.1-1' }}</span>
+          <small>({{ t.ratings_count }})</small>
+          @if (ratingLoading()[t.id]) {
+          <i class="fa-solid fa-spinner fa-spin rating-spin"></i>
+          }
+          @if (ratingSuccess()[t.id]) {
+          <span class="rating-success-msg"><i class="fa-solid fa-check"></i> {{ 'student_trainers.rating_success' | translate }}</span>
+          }
+        </div>
+        @if (ratingErrors()[t.id]) {
+        <span class="rating-error-msg">{{ ratingErrors()[t.id]! | translate }}</span>
+        }
+      </div>
+
+      <div class="trainer-stats">
+        <span><i class="fa-solid fa-users"></i> {{ t.total_students }} {{ 'student_trainers.students' | translate }}</span>
+        <span><i class="fa-solid fa-briefcase"></i> {{ t.years_of_experience }} {{ 'student_trainers.years_exp' | translate }}</span>
+      </div>
+
+      <div class="trainer-actions">
+        <a [routerLink]="['/team', t.slug]" class="btn-outline btn-sm btn-link">
+          {{ 'student_trainers.view_profile' | translate }}
+        </a>
+        <button type="button" class="btn-accent btn-sm" (click)="bookConsultation(t, $event)">
+          {{ 'student_trainers.book' | translate }}
+        </button>
+      </div>
+    </article>
+    }
+  </div>
+
+  @if (totalPages() > 1) {
+  <div class="pagination">
+    <button type="button" class="icon-btn" (click)="goToPage(page() - 1)" [disabled]="page() === 1">
+      <i class="fa-solid fa-chevron-right rtl-flip"></i>
+    </button>
+    <span class="page-info">{{ page() }} / {{ totalPages() }}</span>
+    <button type="button" class="icon-btn" (click)="goToPage(page() + 1)" [disabled]="page() === totalPages()">
+      <i class="fa-solid fa-chevron-left rtl-flip"></i>
+    </button>
+  </div>
+  }
+  }
+</section>

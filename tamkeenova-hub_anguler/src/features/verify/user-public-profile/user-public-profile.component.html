@@ -1,0 +1,142 @@
+<section class="public-page">
+  @if (isLoading()) {
+    <div class="public-loader">
+      <div class="loader-spinner"></div>
+      <p>{{ 'loader.loading' | translate }}</p>
+    </div>
+  } @else if (notFound() || !data()) {
+    <div class="not-found surface chamfer-sm">
+      <i class="fa-solid fa-user-slash"></i>
+      <h2>{{ 'verify.user_not_found' | translate }}</h2>
+      <a routerLink="/" class="btn-accent not-found-cta">{{ 'notfound.cta_home' | translate }}</a>
+    </div>
+  } @else if (data(); as d) {
+    <!-- -- Header Card -- -->
+    <div class="public-hero surface chamfer-sm">
+      <div class="public-hero-bg"></div>
+      <div class="public-hero-content">
+        @if (d.user.image) {
+          <img [src]="d.user.image" [alt]="d.user.name" class="public-avatar" />
+        } @else {
+          <div class="public-avatar public-avatar-fallback">
+            <i class="fa-solid fa-user"></i>
+          </div>
+        }
+        <div class="public-identity">
+          <h1>{{ d.user.name }}</h1>
+          @if (d.user.username) {
+            <span class="public-username" dir="ltr">&#64;{{ d.user.username }}</span>
+          }
+          @if (d.user.bio) {
+            <p class="public-bio">{{ d.user.bio }}</p>
+          }
+          <div class="public-meta text-muted">
+            @if (d.user.location) {
+              <span><i class="fa-solid fa-location-dot"></i> {{ d.user.location }}</span>
+            }
+            <span><i class="fa-regular fa-calendar"></i> {{ 'verify.member_since' | translate }} {{ d.user.member_since | date: 'yyyy/MM' }}</span>
+          </div>
+        </div>
+        <div class="public-stats">
+          <div class="public-stat">
+            <strong>{{ d.stats.total_completed_programs }}</strong>
+            <span>{{ 'verify.completed_programs' | translate }}</span>
+          </div>
+          <div class="public-stat">
+            <strong>{{ d.stats.total_certificates }}</strong>
+            <span>{{ 'verify.certificates' | translate }}</span>
+          </div>
+          <div class="public-stat">
+            <strong>{{ d.stats.total_training_hours }}</strong>
+            <span>{{ 'verify.training_hours' | translate }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="public-grid">
+      <!-- -- Certificates -- -->
+      <div class="public-section surface chamfer-sm">
+        <h2><i class="fa-solid fa-certificate"></i> {{ 'verify.certificates' | translate }}</h2>
+        @if (d.certificates.length === 0) {
+          <p class="text-muted empty-hint">—</p>
+        } @else {
+          <div class="public-list">
+            @for (c of d.certificates; track c.id) {
+              <div class="public-item">
+                <div>
+                  <h3>{{ c.title }}</h3>
+                  <span class="text-muted item-sub">
+                    {{ c.program?.title ?? '' }}
+                    @if (c.trainer) {
+                      • {{ c.trainer.name }}
+                    }
+                  </span>
+                </div>
+                <div class="item-side">
+                  <code dir="ltr">{{ c.verification_code }}</code>
+                  <a [routerLink]="['/verify']" [queryParams]="{ code: c.verification_code }" class="item-link">
+                    {{ 'student_certificates.verify' | translate }}
+                  </a>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- -- Completed Programs -- -->
+      <div class="public-section surface chamfer-sm">
+        <h2><i class="fa-solid fa-book-open"></i> {{ 'verify.completed_programs' | translate }}</h2>
+        @if (d.completed_programs.length === 0) {
+          <p class="text-muted empty-hint">—</p>
+        } @else {
+          <div class="public-list">
+            @for (p of d.completed_programs; track p.id) {
+              <div class="public-item">
+                <div>
+                  <h3>{{ p.program?.title ?? '' }}</h3>
+                  @if (p.trainer) {
+                    <span class="text-muted item-sub">{{ p.trainer.name }}</span>
+                  }
+                </div>
+                <span class="text-muted item-sub">{{ p.completed_at | date: 'yyyy/MM/dd' }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- -- Skills -- -->
+    @if (d.skills.length > 0) {
+      <div class="public-section surface chamfer-sm">
+        <h2><i class="fa-solid fa-lightbulb"></i> {{ 'verify.skills' | translate }}</h2>
+        <div class="skills-list">
+          @for (s of d.skills; track s.name) {
+            <span class="skill-chip"><i class="fa-solid fa-check"></i>{{ s.name }}</span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- -- Trainers -- -->
+    @if (d.trainers.length > 0) {
+      <div class="public-section surface chamfer-sm">
+        <h2><i class="fa-solid fa-chalkboard-user"></i> {{ 'nav.team' | translate }}</h2>
+        <div class="trainers-row">
+          @for (t of d.trainers; track t.id) {
+            <a [routerLink]="['/team', t.slug]" class="mini-trainer">
+              @if (t.image) {
+                <img [src]="t.image" [alt]="t.name" />
+              } @else {
+                <div class="mini-avatar"><i class="fa-solid fa-user"></i></div>
+              }
+              <span>{{ t.name }}</span>
+            </a>
+          }
+        </div>
+      </div>
+    }
+  }
+</section>

@@ -1,0 +1,176 @@
+<section class="portal-page notifications-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'notifications.title' | translate }}</h1>
+      <p class="text-muted">{{ 'notifications.subtitle' | translate }}</p>
+    </div>
+    @if (unreadCount() > 0) {
+      <button type="button" class="btn-outline btn-mark-all glass-btn" (click)="markAllAsRead()" [disabled]="isMarkingAll()">
+        <i class="fa-solid fa-check-double"></i>
+        {{ 'notifications.mark_all_read' | translate }} ({{ unreadCount() }})
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="empty-state"><div class="loader-spinner"></div></div>
+  } @else if (notifications().length === 0) {
+    <div class="empty-state surface glass-empty">
+      <i class="fa-solid fa-bell-slash"></i>
+      <p>{{ 'notifications.empty' | translate }}</p>
+    </div>
+  } @else {
+    <div class="filter-pills glass-pills">
+      <button type="button" class="filter-pill" [class.is-active]="!showUnreadOnly()" (click)="toggleUnreadOnly()" [disabled]="!showUnreadOnly()">
+        {{ 'common.all' | translate }}
+      </button>
+      <button type="button" class="filter-pill" [class.is-active]="showUnreadOnly()" (click)="toggleUnreadOnly()" [disabled]="showUnreadOnly()">
+        {{ 'notifications.unread' | translate }} ({{ unreadCount() }})
+      </button>
+    </div>
+
+    @if (filtered().length === 0) {
+      <div class="empty-state surface glass-empty">
+        <i class="fa-solid fa-check-double"></i>
+        <p>{{ 'notifications.empty' | translate }}</p>
+      </div>
+    } @else {
+      <div class="notif-list">
+        @for (n of filtered(); track n.id) {
+          <article class="notif-card surface chamfer-sm animate-in glass-notif-card" [class.is-unread]="!n.is_read" (click)="openDetails(n)">
+            <div class="notif-icon" [class]="toneFor(n.type)">
+              <i class="fa-solid" [class]="iconFor(n.type)"></i>
+            </div>
+            <div class="notif-main">
+              <div class="notif-top">
+                <h3 class="notif-title">{{ titleFor(n) }}</h3>
+                <div class="notif-top-actions">
+                  @if (!n.is_read) {
+                    <span class="notif-dot" [attr.title]="'notifications.unread' | translate"></span>
+                  }
+                  <span class="notif-view-hint"><i class="fa-solid fa-eye"></i></span>
+                </div>
+              </div>
+              <p class="notif-message">{{ messageFor(n) }}</p>
+              <span class="notif-date text-muted">
+                <i class="fa-regular fa-clock"></i>
+                {{ n.created_at | date: 'yyyy/MM/dd HH:mm' }}
+              </span>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  }
+
+  <!-- Full Details Modal Glass -->
+  @if (showDetailModal()) {
+  <div class="modal-backdrop glass-backdrop" (click)="closeDetails()">
+    <div class="modal-card surface chamfer-sm glass-modal" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-bell"></i> {{ 'notifications.details_title' | translate }}</h3>
+        <button type="button" class="icon-btn" (click)="closeDetails()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      @if (isLoadingDetail()) {
+      <div class="empty-state"><div class="loader-spinner"></div><p>{{ 'notifications.loading_details' | translate }}</p></div>
+      } @else {
+        @if (selectedNotification(); as sn) {
+        <div class="notif-detail-original">
+          <div class="notif-detail-original-icon" [class]="toneFor(sn.type)">
+            <i class="fa-solid" [class]="iconFor(sn.type)"></i>
+          </div>
+          <div>
+            <span class="notif-detail-type" [class]="toneFor(sn.type)">{{ typeKeyFor(sn.type) | translate }}</span>
+            <h4>{{ titleFor(sn) }}</h4>
+            <p class="text-muted">{{ messageFor(sn) }}</p>
+            <span class="notif-detail-date"><i class="fa-regular fa-clock"></i> {{ sn.created_at | date:'yyyy/MM/dd HH:mm' }}</span>
+          </div>
+        </div>
+        }
+
+        @if (notificationDetail(); as detail) {
+          @if (isConsultationDetail(detail)) {
+          <div class="notif-detail-section">
+            <h4><i class="fa-solid fa-comments"></i> {{ 'notifications.consultation_details' | translate }}</h4>
+            <div class="detail-rows">
+              <div class="detail-row">
+                <span class="text-muted">العنوان</span>
+                <strong>{{ detail.title }}</strong>
+              </div>
+              @if (detail.description) {
+              <div class="detail-row detail-col">
+                <span class="text-muted">الوصف</span>
+                <p>{{ detail.description }}</p>
+              </div>
+              }
+              <div class="detail-row">
+                <span class="text-muted">الحالة</span>
+                <span class="badge" [class.badge-pending]="detail.status==='PENDING'" [class.badge-approved]="detail.status==='APPROVED' || detail.status==='SCHEDULED' || detail.status==='COMPLETED'" [class.badge-rejected]="detail.status==='REJECTED' || detail.status==='CANCELLED'">{{ 'status.consultation.' + detail.status | translate }}</span>
+              </div>
+              @if (detail.scheduled_at) {
+              <div class="detail-row">
+                <span class="text-muted">الموعد</span>
+                <strong>{{ detail.scheduled_at | date:'yyyy/MM/dd HH:mm' }}</strong>
+              </div>
+              }
+              @if (detail.trainer_notes) {
+              <div class="detail-row detail-col">
+                <span class="text-muted">ملاحظات المدرب</span>
+                <p>{{ detail.trainer_notes }}</p>
+              </div>
+              }
+              @if (detail.users) {
+              <div class="detail-person">
+                <h5><i class="fa-solid fa-user"></i> {{ 'notifications.student_info' | translate }}</h5>
+                <div class="person-card">
+                  @if (detail.users.profile_image) { <img [src]="detail.users.profile_image" [alt]="detail.users.full_name" /> }
+                  @else { <div class="person-fallback"><i class="fa-solid fa-user"></i></div> }
+                  <div>
+                    <strong>{{ detail.users.full_name }}</strong>
+                    <span dir="ltr" class="text-muted">{{ detail.users.email }}</span>
+                    @if (detail.users.phone) { <span dir="ltr" class="text-muted">{{ detail.users.phone }}</span> }
+                  </div>
+                </div>
+              </div>
+              }
+              @if (detail.trainers) {
+              <div class="detail-person">
+                <h5><i class="fa-solid fa-chalkboard-user"></i> {{ 'notifications.trainer_info' | translate }}</h5>
+                <div class="person-card">
+                  @if (detail.trainers.users.profile_image) { <img [src]="detail.trainers.users.profile_image" [alt]="detail.trainers.users.full_name" /> }
+                  @else { <div class="person-fallback"><i class="fa-solid fa-user"></i></div> }
+                  <div>
+                    <strong>{{ detail.trainers.users.full_name }}</strong>
+                    @if (detail.trainers.specializations) { <span class="text-muted">{{ detail.trainers.specializations.name_ar }}</span> }
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+          } @else if (isCorporateDetail(detail)) {
+          <div class="notif-detail-section">
+            <h4><i class="fa-solid fa-building"></i> {{ 'notifications.corporate_details' | translate }}</h4>
+            <div class="detail-rows">
+              <div class="detail-row"><span class="text-muted">الشركة</span><strong>{{ detail.company_name }}</strong></div>
+              <div class="detail-row"><span class="text-muted">نوع الخدمة</span><strong>{{ detail.service_type }}</strong></div>
+              <div class="detail-row detail-col"><span class="text-muted">الوصف</span><p>{{ detail.service_description }}</p></div>
+              <div class="detail-row"><span class="text-muted">المسؤول</span><strong>{{ detail.contact_name }}</strong></div>
+              <div class="detail-row"><span class="text-muted">البريد</span><strong dir="ltr">{{ detail.contact_email }}</strong></div>
+              @if (detail.contact_phone) { <div class="detail-row"><span class="text-muted">الهاتف</span><strong dir="ltr">{{ detail.contact_phone }}</strong></div> }
+            </div>
+          </div>
+          }
+        } @else {
+        <div class="notif-detail-empty">
+          <i class="fa-solid fa-circle-info"></i>
+          <p>{{ 'notifications.no_details' | translate }}</p>
+          <p class="text-muted">{{ selectedNotification()?.message }}</p>
+        </div>
+        }
+      }
+    </div>
+  </div>
+  }
+</section>

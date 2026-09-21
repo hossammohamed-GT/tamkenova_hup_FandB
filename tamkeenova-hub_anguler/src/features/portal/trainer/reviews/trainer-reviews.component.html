@@ -1,0 +1,88 @@
+<section class="portal-page">
+
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'trainer_reviews.title' | translate }}</h1>
+      <p class="text-muted">{{ 'trainer_reviews.subtitle' |
+        translate }}</p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+  <div class="empty-state"><i
+      class="fa-solid fa-spinner fa-spin"></i></div>
+  }
+
+  @else if (errorMessage()) {
+  <div class="form-error-banner">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{
+    errorMessage() | translate }}
+  </div>
+  }
+
+  @else if (reviews().length === 0) {
+  <div class="empty-state surface chamfer-sm">
+    <i class="fa-regular fa-star"></i>
+    <p>{{ 'trainer_reviews.empty' | translate }}</p>
+  </div>
+  }
+
+  @else {
+  <!-- -- Review Overview -- -->
+  <div class="reviews-overview">
+    <div class="reviews-score surface chamfer-sm">
+      <span class="reviews-score-value">{{ average() |
+        number: '1.1-1' }}</span>
+      <div class="stars" dir="ltr">
+        @for (i of starRange; track i) {
+        <i class="fa-star"
+          [class.fa-solid]="i <= average() + 0.5"
+          [class.fa-regular]="i > average() + 0.5"></i>
+        }
+      </div>
+      <span class="reviews-score-count text-muted">
+        {{ 'trainer_reviews.based_on' | translate: { count:
+        reviews().length } }}
+      </span>
+    </div>
+
+    <div class="reviews-dist surface chamfer-sm">
+      @for (d of distribution(); track d.star) {
+      <div class="dist-row">
+        <span class="dist-star">{{ d.star }} <i
+            class="fa-solid fa-star"></i></span>
+        <div class="dist-bar"><span class="dist-fill"
+            [style.width.%]="d.pct"></span></div>
+        <span class="dist-count text-muted">{{ d.count
+          }}</span>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- -- Review List -- -->
+  <div class="reviews-list">
+    @for (r of sorted(); track $index) {
+    <article class="review-card surface">
+      <div class="review-head">
+        <div class="stars" dir="ltr">
+          @for (i of starRange; track i) {
+          <i class="fa-star"
+            [class.fa-solid]="i <= r.rating"
+            [class.fa-regular]="i > r.rating"></i>
+          }
+        </div>
+        <time class="review-date text-muted">{{ r.created_at
+          | date: 'mediumDate' }}</time>
+      </div>
+      @if (r.comment) {
+      <p class="review-comment">{{ r.comment }}</p>
+      } @else {
+      <p class="review-comment text-muted">{{
+        'trainer_reviews.no_comment' | translate }}</p>
+      }
+    </article>
+    }
+  </div>
+  }
+</section>

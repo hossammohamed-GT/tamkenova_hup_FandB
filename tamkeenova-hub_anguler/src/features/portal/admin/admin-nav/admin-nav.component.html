@@ -1,0 +1,16 @@
+<nav class="staff-nav" aria-label="Admin sections">
+  @for (link of links; track link.route) {
+    <a
+      class="staff-nav-item"
+      [routerLink]="link.route"
+      routerLinkActive="is-active"
+      [routerLinkActiveOptions]="{ exact: !!link.exact }"
+    >
+      <i class="fa-solid" [class]="link.icon" aria-hidden="true"></i>
+      <span>{{ link.labelKey | translate }}</span>
+      @if (badgeCount(link.badge) > 0) {
+        <span class="staff-nav-badge">{{ badgeCount(link.badge) }}</span>
+      }
+    </a>
+  }
+</nav>

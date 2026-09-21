@@ -1,0 +1,565 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'admin_tasks.title' | translate }}</h1>
+      <p class="text-muted">{{ 'admin_tasks.subtitle' | translate }}</p>
+    </div>
+    <button type="button" class="btn-hero" (click)="openCreate()">
+      <span class="btn-hero-icon"><i class="fa-solid fa-plus"></i></span>
+      {{ 'admin_tasks.create' | translate }}
+    </button>
+  </div>
+
+  <app-admin-nav />
+
+  <!-- -- Status Filters -- -->
+  <div class="filter-pills staff-fade">
+    @for (f of statusFilters; track f) {
+      <button
+        type="button"
+        class="filter-pill"
+        [class.is-active]="activeFilter() === f"
+        (click)="setFilter(f)"
+      >
+        @if (f === 'SUBMITTED' && submittedCount() > 0 && activeFilter() !== f) {
+          <span class="pill-count">{{ submittedCount() }}</span>
+        }
+        {{ f === 'ALL' ? ('common.all' | translate) : ('status.task.' + f | translate) }}
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="staff-empty"><div class="loader-spinner"></div></div>
+  } @else if (hasError()) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ 'admin_tasks.load_error' | translate }}</p>
+      <button type="button" class="btn-primary-sm btn-sm" (click)="load()">
+        {{ 'common.retry' | translate }}
+      </button>
+    </div>
+  } @else if (filtered().length === 0) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-list-check"></i>
+      <p>{{ 'admin_tasks.empty' | translate }}</p>
+    </div>
+  } @else {
+    <div class="task-grid">
+      @for (task of filtered(); track task.id) {
+        <article class="task-card surface staff-fade">
+          <div class="task-card-top">
+            <span class="badge" [class]="priorityBadge(task.priority)">
+              {{ 'status.task_priority.' + task.priority | translate }}
+            </span>
+            <span class="task-deadline" [class]="deadlineClass(task.deadline)">
+              <i class="fa-regular fa-calendar"></i>
+              {{ task.deadline | date: 'yyyy/MM/dd' }}
+            </span>
+          </div>
+
+          <h3 class="task-title">{{ task.title }}</h3>
+          @if (task.description) {
+            <p class="task-desc text-muted">{{ task.description }}</p>
+          }
+
+          <div class="task-meta">
+            <span class="task-meta-item" title="{{ 'admin_tasks.f_required_score' | translate }}">
+              <i class="fa-solid fa-bullseye"></i>
+              {{ task.required_score ?? '—' }}
+            </span>
+            <span class="task-meta-item" title="{{ 'admin_tasks.f_estimated_hours' | translate }}">
+              <i class="fa-regular fa-clock"></i>
+              {{ task.estimated_hours ?? '—' }} {{ 'common.hours_unit' | translate }}
+            </span>
+            <span class="task-meta-item" title="{{ 'admin_tasks.assignees' | translate }}">
+              <i class="fa-solid fa-user-group"></i>
+              {{ task.task_assignees?.length ?? 0 }}
+            </span>
+          </div>
+
+          <!-- -- Assignee status summary -- -->
+          @if ((task.task_assignees?.length ?? 0) > 0) {
+            <div class="assignee-strip">
+              @for (assignee of task.task_assignees!.slice(0, 4); track assignee.id) {
+                <span class="assignee-dot" [class]="statusBadge(assignee.status)">
+                  {{ 'status.task.' + assignee.status | translate }}
+                </span>
+              }
+              @if ((task.task_assignees?.length ?? 0) > 4) {
+                <span class="assignee-dot badge-neutral">+{{ task.task_assignees!.length - 4 }}</span>
+              }
+            </div>
+          }
+
+          <div class="task-card-actions">
+            <button type="button" class="btn-sm btn-primary-sm" (click)="openDetails(task)">
+              <i class="fa-solid fa-folder-open"></i>
+              {{ 'admin_tasks.manage' | translate }}
+            </button>
+            <button type="button" class="btn-sm btn-outline-sm" (click)="openEdit(task)">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button type="button" class="btn-sm btn-danger-sm" (click)="askDelete(task)">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  <!-- ================= Create / Edit Task Modal ================= -->
+  @if (showTaskForm()) {
+    <div class="modal-backdrop" (click)="closeTaskForm()">
+      <div class="modal-card surface chamfer-sm modal-wide" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>
+            {{ (editTask() ? 'admin_tasks.edit_title' : 'admin_tasks.create_title') | translate }}
+          </h3>
+          <button type="button" class="icon-btn" (click)="closeTaskForm()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <form [formGroup]="taskForm" (ngSubmit)="saveTask()">
+          <div class="field">
+            <label class="field-label" for="task-title">{{ 'admin_tasks.f_title' | translate }}</label>
+            <input id="task-title" type="text" class="field-input" formControlName="title" />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="task-desc">{{ 'admin_tasks.f_description' | translate }}</label>
+            <textarea id="task-desc" class="field-input field-textarea" formControlName="description" rows="3"></textarea>
+          </div>
+
+          <div class="form-grid form-grid-3">
+            <div class="field">
+              <label class="field-label" for="task-priority">{{ 'admin_tasks.f_priority' | translate }}</label>
+              <select id="task-priority" class="field-input" formControlName="priority">
+                @for (priority of priorities; track priority) {
+                  <option [value]="priority">{{ 'status.task_priority.' + priority | translate }}</option>
+                }
+              </select>
+            </div>
+            <div class="field">
+              <label class="field-label" for="task-deadline">{{ 'admin_tasks.f_deadline' | translate }}</label>
+              <input id="task-deadline" type="datetime-local" class="field-input" formControlName="deadline" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="task-score">{{ 'admin_tasks.f_required_score' | translate }}</label>
+              <input id="task-score" type="number" min="0" max="100" class="field-input" formControlName="required_score" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="task-hours">{{ 'admin_tasks.f_estimated_hours' | translate }}</label>
+              <input id="task-hours" type="number" min="0" class="field-input" formControlName="estimated_hours" />
+            </div>
+          </div>
+
+          <!-- -- Assignees (create only) -- -->
+          @if (!editTask()) {
+            <div class="field">
+              <label class="field-label">{{ 'admin_tasks.add_assignees' | translate }}</label>
+              <div class="user-picker">
+                <input
+                  type="text"
+                  class="field-input"
+                  [placeholder]="'admin_tasks.search_member' | translate"
+                  (input)="searchMembers($any($event.target).value)"
+                />
+                @if (isSearchingMembers()) {
+                  <div class="user-picker-loading"><span class="loader-spinner-sm"></span></div>
+                }
+                @if (memberSearchTerm().length === 1) {
+                  <div class="user-picker-hint">
+                    <i class="fa-solid fa-keyboard"></i>
+                    {{ 'admin_tasks.min_chars_hint' | translate }}
+                  </div>
+                } @else if (memberSearchTerm().length >= 2 && memberResults().length === 0 && !isSearchingMembers()) {
+                  <div class="user-picker-empty">
+                    <i class="fa-solid fa-user-slash"></i>
+                    {{ 'admin_tasks.no_member_found' | translate }}
+                  </div>
+                }
+                @if (memberResults().length > 0) {
+                  <ul class="user-picker-list">
+                    @for (user of memberResults(); track user.id) {
+                      <li>
+                        <button type="button" class="user-picker-item" (click)="pickMember(user)">
+                          <span class="table-avatar">{{ user.full_name.charAt(0) }}</span>
+                          <span class="picker-item-text">
+                            <strong>{{ user.full_name }}</strong>
+                            <small class="text-muted">{{ 'status.user_role.' + user.role | translate }}</small>
+                          </span>
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+
+              @if (pickedUsers().length > 0) {
+                <div class="picked-list">
+                  @for (picked of pickedUsers(); track picked.user.id) {
+                    <span class="picked-chip">
+                      <i class="fa-solid fa-user"></i>
+                      {{ picked.user.full_name }}
+                      <em>#{{ picked.order }}</em>
+                      <button
+                        type="button"
+                        class="picked-remove"
+                        (click)="removePicked(picked.user.id)"
+                        [attr.aria-label]="'common.delete' | translate"
+                      >
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </span>
+                  }
+                </div>
+              }
+              <span class="field-hint text-muted">{{ 'admin_tasks.order_hint' | translate }}</span>
+            </div>
+          }
+
+          @if (taskFormError(); as error) {
+            <div class="form-error-banner">{{ error | translate }}</div>
+          }
+
+          <div class="form-actions">
+            <button type="button" class="btn-sm btn-outline-sm" (click)="closeTaskForm()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button type="submit" class="btn-sm btn-primary-sm" [disabled]="isSavingTask()">
+              @if (isSavingTask()) {
+                <span class="loader-spinner-sm"></span>
+              }
+              {{ 'common.save' | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- ================= Delete Confirm ================= -->
+  @if (deleteTarget(); as target) {
+    <div class="modal-backdrop" (click)="closeDelete()">
+      <div class="modal-card surface chamfer-sm modal-narrow" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ 'admin_tasks.delete_title' | translate }}</h3>
+          <button type="button" class="icon-btn" (click)="closeDelete()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p class="confirm-text">
+          {{ 'admin_tasks.delete_confirm' | translate }}
+          <strong>{{ target.title }}</strong>
+        </p>
+        <div class="form-actions">
+          <button type="button" class="btn-sm btn-outline-sm" (click)="closeDelete()">
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button type="button" class="btn-sm btn-danger-sm" [disabled]="isDeleting()" (click)="confirmDelete()">
+            @if (isDeleting()) {
+              <span class="loader-spinner-sm"></span>
+            }
+            {{ 'common.delete' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ================= Task Details Modal ================= -->
+  @if (details(); as d) {
+    <div class="modal-backdrop" (click)="closeDetails()">
+      <div class="modal-card surface chamfer-sm modal-wide" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ d.title }}</h3>
+          <button type="button" class="icon-btn" (click)="closeDetails()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="staff-detail-grid">
+          <div class="staff-detail-item">
+            <span class="staff-detail-label">{{ 'admin_tasks.f_priority' | translate }}</span>
+            <span class="badge" [class]="priorityBadge(d.priority)">
+              {{ 'status.task_priority.' + d.priority | translate }}
+            </span>
+          </div>
+          <div class="staff-detail-item">
+            <span class="staff-detail-label">{{ 'admin_tasks.f_deadline' | translate }}</span>
+            <span class="staff-detail-value">{{ d.deadline | date: 'yyyy/MM/dd HH:mm' }}</span>
+          </div>
+          <div class="staff-detail-item">
+            <span class="staff-detail-label">{{ 'admin_tasks.f_required_score' | translate }}</span>
+            <span class="staff-detail-value">{{ d.required_score ?? '—' }}</span>
+          </div>
+          <div class="staff-detail-item">
+            <span class="staff-detail-label">{{ 'admin_tasks.f_estimated_hours' | translate }}</span>
+            <span class="staff-detail-value">{{ d.estimated_hours ?? '—' }}</span>
+          </div>
+        </div>
+
+        @if (d.description) {
+          <p class="desc-text">{{ d.description }}</p>
+        }
+
+        <!-- -- Assignees -- -->
+        <h4 class="detail-subtitle">
+          {{ 'admin_tasks.assignees' | translate }} ({{ assigneeRows().length }})
+        </h4>
+
+        @if (isLoadingDetails()) {
+          <div class="staff-empty"><span class="loader-spinner"></span></div>
+        } @else if (detailsLoadError() && assigneeRows().length === 0) {
+          <div class="staff-empty staff-empty-sm">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <p>{{ 'admin_tasks.submissions_error' | translate }}</p>
+            <button type="button" class="btn-sm btn-outline-sm" (click)="retryDetails()">
+              <i class="fa-solid fa-rotate-right"></i>
+              {{ 'common.retry' | translate }}
+            </button>
+          </div>
+        } @else if (assigneeRows().length === 0) {
+          <div class="staff-empty staff-empty-sm">
+            <i class="fa-solid fa-user-group"></i>
+            <p>{{ 'admin_tasks.no_assignees' | translate }}</p>
+          </div>
+        } @else {
+          <div class="review-list">
+            @for (row of assigneeRows(); track row.assignee.id) {
+              <div class="review-card">
+                <div class="review-head">
+                  <div class="table-user">
+                    <span class="table-avatar">
+                      @if (row.user?.profile_image) {
+                        <img [src]="row.user!.profile_image!" [alt]="row.user?.full_name" />
+                      } @else {
+                        {{ (row.user?.full_name ?? '?').charAt(0) }}
+                      }
+                    </span>
+                    <span class="table-user-main">
+                      <span class="table-user-name">
+                        {{ row.user?.full_name ?? row.assignee.user_id }}
+                        <em class="order-tag">#{{ row.assignee.task_order }}</em>
+                      </span>
+                      @if (row.user) {
+                        <span class="table-user-mail">{{ 'status.user_role.' + row.user.role | translate }}</span>
+                      }
+                    </span>
+                  </div>
+                  <span class="badge" [class]="statusBadge(row.assignee.status)">
+                    {{ 'status.task.' + row.assignee.status | translate }}
+                  </span>
+                </div>
+
+                @if (submissionOf(row.assignee); as sub) {
+                  <div class="submission-box">
+                    @if (sub.content) {
+                      <p class="submission-text">{{ sub.content }}</p>
+                    }
+                    @if (sub.link_url) {
+                      <a class="file-chip" [href]="sub.link_url" target="_blank" rel="noopener">
+                        <i class="fa-solid fa-link"></i>
+                        {{ 'admin_tasks.open_link' | translate }}
+                      </a>
+                    }
+                    @if (filesOf(sub).length > 0) {
+                      <div class="attachments-row">
+                        @for (file of filesOf(sub); track file.id) {
+                          <a class="file-chip" [href]="file.url" target="_blank" rel="noopener">
+                            <i class="fa-solid fa-paperclip"></i>
+                            {{ file.name || ('admin_tasks.attachment' | translate) }}
+                          </a>
+                        }
+                      </div>
+                    }
+                    <small class="text-muted submitted-at">
+                      {{ 'my_tasks.submitted_at' | translate }} {{ sub.submitted_at | date: 'yyyy/MM/dd HH:mm' }}
+                    </small>
+                  </div>
+                } @else if (submissionsLoading()) {
+                  <div class="submission-box skeleton-box" aria-hidden="true">
+                    <span class="skeleton-line w-70"></span>
+                    <span class="skeleton-line w-40"></span>
+                  </div>
+                }
+
+                @if (scoreOf(row.assignee) !== null) {
+                  <div class="score-row">
+                    <i class="fa-solid fa-star"></i>
+                    {{ 'my_tasks.score' | translate }}: <strong>{{ scoreOf(row.assignee) }}</strong>/100
+                  </div>
+                }
+
+                @if (noteOf(row.assignee); as note) {
+                  <p class="review-note">
+                    <i class="fa-solid fa-comment-dots"></i>
+                    {{ note }}
+                  </p>
+                }
+
+                <div class="cell-actions review-actions">
+                  @if (row.assignee.status === 'SUBMITTED') {
+                    <button type="button" class="btn-sm btn-primary-sm" (click)="openReview(row)">
+                      <i class="fa-solid fa-clipboard-check"></i>
+                      {{ 'admin_tasks.review' | translate }}
+                    </button>
+                  }
+                  <button
+                    type="button"
+                    class="btn-sm btn-danger-sm"
+                    [disabled]="busyId() === row.assignee.id"
+                    (click)="removeAssignee(row)"
+                  >
+                    <i class="fa-solid fa-user-minus"></i>
+                    {{ 'admin_tasks.remove_assignee' | translate }}
+                  </button>
+                </div>
+
+                <!-- -- Inline review form -- -->
+                @if (reviewTarget()?.id === row.assignee.id) {
+                  <div class="review-form" [formGroup]="reviewForm">
+                    <div class="form-grid form-grid-2">
+                      <div class="field">
+                        <label class="field-label" for="review-score">{{ 'my_tasks.score' | translate }}</label>
+                        <input id="review-score" type="number" min="0" max="100" class="field-input" formControlName="score" />
+                      </div>
+                      <div class="field">
+                        <label class="field-label" for="review-note">{{ 'admin_tasks.f_note' | translate }}</label>
+                        <input id="review-note" type="text" class="field-input" formControlName="note" />
+                      </div>
+                    </div>
+                    @if (d.required_score) {
+                      <span class="field-hint text-muted">
+                        {{ 'admin_tasks.required_score_hint' | translate }} {{ d.required_score }}
+                      </span>
+                    }
+                    <div class="form-actions">
+                      <button type="button" class="btn-sm btn-outline-sm" (click)="closeReview()">
+                        {{ 'common.cancel' | translate }}
+                      </button>
+                      <button type="button" class="btn-sm btn-danger-sm" [disabled]="isReviewing()" (click)="submitReview('REJECT')">
+                        {{ 'admin_tasks.reject' | translate }}
+                      </button>
+                      <button type="button" class="btn-sm btn-success-sm" [disabled]="isReviewing()" (click)="submitReview('APPROVE')">
+                        @if (isReviewing()) {
+                          <span class="loader-spinner-sm"></span>
+                        }
+                        {{ 'admin_tasks.approve' | translate }}
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- -- Add assignee -- -->
+        <h4 class="detail-subtitle">{{ 'admin_tasks.add_assignee' | translate }}</h4>
+        <div class="add-assignee-row">
+          <input
+            type="number"
+            class="field-input order-input"
+            min="1"
+            [formControl]="newAssigneeOrder"
+            [title]="'admin_tasks.f_order' | translate"
+          />
+          <div class="user-picker user-picker-grow">
+            <input
+              type="text"
+              class="field-input"
+              [placeholder]="'admin_tasks.search_member' | translate"
+              (input)="searchDetailMembers($any($event.target).value)"
+            />
+            @if (detailMemberSearchTerm().length === 1) {
+              <div class="user-picker-hint">
+                <i class="fa-solid fa-keyboard"></i>
+                {{ 'admin_tasks.min_chars_hint' | translate }}
+              </div>
+            } @else if (detailMemberSearchTerm().length >= 2 && detailMemberResults().length === 0 && !isAddingAssignee()) {
+              <div class="user-picker-empty">
+                <i class="fa-solid fa-user-slash"></i>
+                {{ 'admin_tasks.no_member_found' | translate }}
+              </div>
+            }
+            @if (detailMemberResults().length > 0) {
+              <ul class="user-picker-list">
+                @for (user of detailMemberResults(); track user.id) {
+                  <li>
+                    <button type="button" class="user-picker-item" (click)="addAssignee(user)" [disabled]="isAddingAssignee()">
+                      <span class="table-avatar">{{ user.full_name.charAt(0) }}</span>
+                      <span class="picker-item-text">
+                        <strong>{{ user.full_name }}</strong>
+                        <small class="text-muted">{{ 'status.user_role.' + user.role | translate }}</small>
+                      </span>
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+        </div>
+
+        <!-- -- Comments -- -->
+        <h4 class="detail-subtitle">{{ 'my_tasks.comments' | translate }} ({{ comments().length }})</h4>
+
+        @if (isLoadingComments()) {
+          <div class="comment-list" aria-hidden="true">
+            @for (n of [0, 1]; track n) {
+              <div class="comment-item">
+                <span class="table-avatar skeleton-circle"></span>
+                <div class="comment-bubble">
+                  <span class="skeleton-line w-30"></span>
+                  <span class="skeleton-line" [class.w-80]="n === 0" [class.w-55]="n === 1"></span>
+                </div>
+              </div>
+            }
+          </div>
+        } @else if (comments().length === 0) {
+          <p class="text-muted no-comments">{{ 'admin_tasks.no_comments' | translate }}</p>
+        } @else {
+          <div class="comment-list">
+            @for (comment of comments(); track comment.id) {
+              <div class="comment-item">
+                <span class="table-avatar">
+                  {{ (comment.users?.full_name ?? '?').charAt(0) }}
+                </span>
+                <div class="comment-bubble">
+                  <span class="comment-author">{{ comment.users?.full_name ?? comment.user_id }}</span>
+                  <p class="comment-body">{{ comment.body }}</p>
+                  <span class="comment-date">{{ comment.created_at | date: 'yyyy/MM/dd HH:mm' }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <form [formGroup]="commentForm" (ngSubmit)="sendComment()" class="comment-form">
+          <input
+            type="text"
+            class="field-input"
+            formControlName="body"
+            [placeholder]="'my_tasks.add_comment' | translate"
+          />
+          <button type="submit" class="btn-sm btn-primary-sm" [disabled]="isSendingComment()">
+            @if (isSendingComment()) {
+              <span class="loader-spinner-sm"></span>
+            }
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (toast(); as t) {
+    <div class="staff-toast" [class.staff-toast-error]="t.error">
+      <i class="fa-solid" [class.fa-circle-check]="!t.error" [class.fa-circle-exclamation]="t.error"></i>
+      {{ t.key | translate }}
+    </div>
+  }
+</section>

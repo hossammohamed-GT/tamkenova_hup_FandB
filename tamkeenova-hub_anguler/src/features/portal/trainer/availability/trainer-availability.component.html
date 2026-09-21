@@ -1,0 +1,186 @@
+<section class="portal-page">
+
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'trainer_availability.title' | translate }}
+      </h1>
+      <p class="text-muted">{{
+        'trainer_availability.subtitle' | translate }}</p>
+    </div>
+    @if (!showForm()) {
+    <button type="button" class="btn-primary btn-add"
+      (click)="openCreate()">
+      <i class="fa-solid fa-plus"></i> {{
+      'trainer_availability.add' | translate }}
+    </button>
+    }
+  </div>
+
+  <!-- -- Availability Summary -- -->
+  @if (!isLoading() && slots().length > 0) {
+  <div class="avail-summary">
+    <div class="avail-summary-item surface">
+      <span class="avail-summary-value">{{ slots().length
+        }}</span>
+      <span class="avail-summary-label">{{
+        'trainer_availability.total_slots' | translate
+        }}</span>
+    </div>
+    <div class="avail-summary-item surface">
+      <span class="avail-summary-value">{{ grouped().length
+        }}</span>
+      <span class="avail-summary-label">{{
+        'trainer_availability.active_days' | translate
+        }}</span>
+    </div>
+    <div class="avail-summary-item surface">
+      <span class="avail-summary-value">{{ totalHours() |
+        number: '1.0-1' }}</span>
+      <span class="avail-summary-label">{{
+        'trainer_availability.weekly_hours' | translate
+        }}</span>
+    </div>
+  </div>
+  }
+
+  <!-- -- Availability Form -- -->
+  @if (showForm()) {
+  <form [formGroup]="form" (ngSubmit)="save()"
+    class="portal-card surface chamfer-sm avail-form"
+    novalidate>
+    <h2 class="portal-section-title">
+      {{ (editing() ? 'trainer_availability.edit_title' :
+      'trainer_availability.create_title') | translate }}
+    </h2>
+
+    <div class="avail-form-grid">
+      <div class="field">
+        <label class="field-label" for="a_day">{{
+          'trainer_availability.fields.day' | translate
+          }}</label>
+        <select id="a_day" class="field-input"
+          formControlName="day_of_week">
+          @for (d of days; track d) {
+          <option [ngValue]="d">{{ 'days.' + dayKeys[d] |
+            translate }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="a_start">{{
+          'trainer_availability.fields.start' | translate
+          }}</label>
+        <input id="a_start" type="time" class="field-input"
+          formControlName="start_time" dir="ltr" />
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="a_end">{{
+          'trainer_availability.fields.end' | translate
+          }}</label>
+        <input id="a_end" type="time" class="field-input"
+          formControlName="end_time" dir="ltr" />
+      </div>
+    </div>
+
+    @if (form.hasError('timeRange') && form.touched) {
+    <span class="field-hint is-error">{{
+      'trainer_availability.errors.time_range' | translate
+      }}</span>
+    }
+    @if (formError()) {
+    <div class="form-error-banner">{{ formError() |
+      translate }}</div>
+    }
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary btn-add"
+        [disabled]="isSaving()">
+        @if (isSaving()) {
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        } @else {
+        {{ (editing() ? 'trainer_availability.save' :
+        'trainer_availability.create') | translate }}
+        }
+      </button>
+      <button type="button" class="btn-outline"
+        (click)="cancel()" [disabled]="isSaving()">
+        {{ 'trainer_programs.cancel' | translate }}
+      </button>
+    </div>
+  </form>
+  }
+
+  <!-- -- Availability List -- -->
+  @if (isLoading()) {
+  <div class="empty-state"><i
+      class="fa-solid fa-spinner fa-spin"></i></div>
+  }
+
+  @else if (errorMessage()) {
+  <div class="form-error-banner">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{
+    errorMessage() | translate }}
+  </div>
+  }
+
+  @else if (slots().length === 0 && !showForm()) {
+  <div class="empty-state surface chamfer-sm">
+    <i class="fa-solid fa-calendar-plus"></i>
+    <p>{{ 'trainer_availability.empty' | translate }}</p>
+    <button type="button" class="btn-primary btn-add"
+      (click)="openCreate()">
+      <i class="fa-solid fa-plus"></i> {{
+      'trainer_availability.add_first' | translate }}
+    </button>
+  </div>
+  }
+
+  @else {
+  <div class="days-grid">
+    @for (g of grouped(); track g.day) {
+    <div class="day-card surface">
+      <div class="day-card-head">
+        <h3>{{ 'days.' + g.key | translate }}</h3>
+        <button type="button" class="icon-btn"
+          (click)="openCreate(g.day)"
+          [attr.aria-label]="'trainer_availability.add' | translate">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+
+      <ul class="slot-list">
+        @for (s of g.slots; track s.id) {
+        <li class="slot-item"
+          [class.is-deleting]="deletingId() === s.id">
+          <span class="slot-time" dir="ltr">
+            <i class="fa-regular fa-clock"></i>
+            {{ fmt(s.start_time) }} — {{ fmt(s.end_time) }}
+          </span>
+          <span class="slot-actions">
+            <button type="button" class="icon-btn"
+              (click)="openEdit(s)"
+              [attr.aria-label]="'trainer_programs.edit' | translate">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button type="button"
+              class="icon-btn icon-btn-danger"
+              (click)="remove(s)"
+              [disabled]="deletingId() === s.id"
+              [attr.aria-label]="'trainer_programs.delete' | translate">
+              @if (deletingId() === s.id) {
+              <i class="fa-solid fa-spinner fa-spin"></i>
+              } @else {
+              <i class="fa-solid fa-trash"></i>
+              }
+            </button>
+          </span>
+        </li>
+        }
+      </ul>
+    </div>
+    }
+  </div>
+  }
+</section>

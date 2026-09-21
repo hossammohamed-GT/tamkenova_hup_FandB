@@ -1,0 +1,276 @@
+<section class="dashboard-page stable-dashboard">
+  <!-- Loader فقط عند التحميل الأولي وقبل hasLoaded -->
+  @if (isLoading() && !hasLoaded()) {
+  <div class="dashboard-loader stable-loader">
+    <div class="loader-spinner"></div>
+    <p>{{ 'loader.loading' | translate }}</p>
+  </div>
+  }
+
+  <!-- المحتوى ثابت دائما - لا يختفي أبدا -->
+  <div class="dashboard-content-stable" [class.is-loading]="isLoading() && hasLoaded()">
+
+    <!-- Hero Section Glass - always visible stable -->
+    <div class="dashboard-hero chamfer-sm glass-hero stable-hero">
+      <div class="dashboard-hero-bg"></div>
+      <div class="dashboard-hero-content">
+        <div class="dashboard-hero-avatar">
+          @if (currentUser()?.profile_image) {
+          <img [src]="currentUser()!.profile_image!" [alt]="currentUser()?.full_name" />
+          } @else {
+          <div class="dashboard-hero-avatar-placeholder">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          }
+          <div class="dashboard-hero-avatar-badge">
+            <i class="fa-solid fa-chalkboard-user"></i>
+          </div>
+        </div>
+        <div class="dashboard-hero-info">
+          <span class="dashboard-hero-greeting">{{ 'dashboard.welcome' | translate }}</span>
+          <h1 class="dashboard-hero-name">{{ currentUser()?.full_name || 'المدرب' }}</h1>
+          <p class="dashboard-hero-subtitle">{{ 'dashboard.trainer_subtitle' | translate }}</p>
+        </div>
+        <div class="dashboard-hero-stats glass-stats stable-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-value">{{ displayStats().programs_count }}</span>
+            <span class="hero-stat-label">{{ 'trainer_dashboard.programs_count' | translate }}</span>
+          </div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">{{ displayStats().reviews_count }}</span>
+            <span class="hero-stat-label">{{ 'trainer_dashboard.reviews_count' | translate }}</span>
+          </div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">{{ displayStats().average_rating | number: '1.1-1' }}<i class="fa-solid fa-star"></i></span>
+            <span class="hero-stat-label">{{ 'trainer_dashboard.average_rating' | translate }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Completion Premium - تصميم مبهر مع سهم ونسبة -->
+    <div class="profile-completion-card premium-completion-card stable-card" [class.is-complete]="profileCompletion() >= 100">
+      <div class="premium-bg">
+        <div class="premium-orb orb-1"></div>
+        <div class="premium-orb orb-2"></div>
+        <div class="premium-grid"></div>
+      </div>
+
+      <div class="premium-content">
+        <div class="premium-visual">
+          <div class="circular-wrapper">
+            <svg class="progress-ring" viewBox="0 0 120 120">
+              <defs>
+                <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="var(--color-primary)" />
+                  <stop offset="100%" stop-color="var(--color-accent)" />
+                </linearGradient>
+                <filter id="glow">
+                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                  <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                  </feMerge>
+                </filter>
+              </defs>
+              <circle class="progress-ring-bg" cx="60" cy="60" r="54" />
+              <circle class="progress-ring-fill" cx="60" cy="60" r="54"
+                [attr.stroke-dasharray]="circumference"
+                [attr.stroke-dashoffset]="progressOffset()"
+                [class.is-complete]="profileCompletion() >= 100" />
+              <!-- نقطة متحركة تشير للنسبة -->
+              <g class="progress-dot-group" [style.transform]="'rotate(' + (profileCompletion()*3.6 - 90) + 'deg)'" [style.transform-origin]="'60px 60px'">
+                <circle class="progress-dot" cx="60" cy="6" r="5" />
+              </g>
+            </svg>
+
+            <div class="progress-center">
+              <div class="progress-arrow-wrapper" [class.is-complete]="profileCompletion() >= 100">
+                <i class="fa-solid fa-arrow-trend-up progress-arrow-icon"></i>
+              </div>
+              <span class="progress-percent">{{ profileCompletion() }}%</span>
+              <span class="progress-label">
+                @if (profileCompletion() >= 100) { مكتمل }
+                @else { مكتمل }
+              </span>
+              @if (profileCompletion() >= 100) {
+                <span class="progress-check"><i class="fa-solid fa-circle-check"></i></span>
+              }
+            </div>
+          </div>
+
+          <div class="premium-badge">
+            <i class="fa-solid fa-sparkles"></i>
+            <span>
+              @if (profileCompletion() >= 100) { بروفايل متميز }
+              @else { {{ 6 - completionSteps().filter(s=>s.done).length }} خطوات متبقية }
+            </span>
+          </div>
+        </div>
+
+        <div class="premium-details">
+          <div class="premium-header">
+            <h3>
+              @if (profileCompletion() >= 100) {
+                <i class="fa-solid fa-crown" style="color: var(--color-accent)"></i> بروفايلك مكتمل 100% — مبهر!
+              } @else {
+                <i class="fa-solid fa-rocket" style="color: var(--color-primary)"></i> {{ 'trainer_dashboard.complete_profile' | translate }}
+              }
+            </h3>
+            <p class="text-muted">
+              @if (profileCompletion() >= 100) {
+                أنت الآن جاهز لاستقبال الطلاب والكلاينت — بروفايلك يظهر في المقدمة
+              } @else {
+                {{ 'trainer_dashboard.complete_profile_desc' | translate }}
+              }
+            </p>
+          </div>
+
+          <div class="completion-steps-premium">
+            @for (step of completionSteps(); track step.key) {
+              <a [routerLink]="step.route" class="step-item" [class.is-done]="step.done" [class.is-pending]="!step.done">
+                <div class="step-icon">
+                  <i class="fa-solid" [class]="step.icon"></i>
+                  @if (step.done) { <span class="step-check"><i class="fa-solid fa-check"></i></span> }
+                  @else { <span class="step-arrow"><i class="fa-solid fa-arrow-left"></i></span> }
+                </div>
+                <div class="step-info">
+                  <span class="step-label">{{ step.label }}</span>
+                  @if (step.count !== undefined) {
+                    <span class="step-count">{{ step.count }}{{ step.key === 'rating' ? ' /5' : '' }}</span>
+                  }
+                </div>
+                @if (!step.done) {
+                  <span class="step-cta"><i class="fa-solid fa-plus"></i></span>
+                }
+              </a>
+            }
+          </div>
+
+          <div class="premium-footer">
+            <div class="completion-bar-premium">
+              <div class="completion-fill-premium" [style.width.%]="profileCompletion()">
+                <span class="fill-shimmer"></span>
+              </div>
+            </div>
+            <span class="completion-hint"><i class="fa-solid fa-lightbulb"></i> كلما أكملت بروفايلك، زاد ظهورك للطلاب</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions - ثابت دائما -->
+    <div class="quick-actions-section stable-section">
+      <h2 class="section-title">{{ 'trainer_dashboard.quick_actions' | translate }}</h2>
+      <div class="quick-actions-grid">
+        @for (action of quickActions; track action.route) {
+        <a [routerLink]="action.route" class="quick-action-card surface chamfer-sm glass-action stable-action" [attr.data-color]="action.color">
+          <div class="quick-action-icon">
+            <i class="fa-solid" [class]="action.icon"></i>
+          </div>
+          <span class="quick-action-label">{{ action.labelKey | translate }}</span>
+          <i class="quick-action-arrow fa-solid fa-arrow-left rtl-flip"></i>
+        </a>
+        }
+      </div>
+    </div>
+
+    <!-- Dashboard Sections - ثابت دائما مع fallback -->
+    <div class="dashboard-sections stable-section">
+      <h2 class="section-title">{{ 'trainer_dashboard.overview' | translate }}</h2>
+      <div class="sections-grid">
+        <a routerLink="/portal/trainer/consultations" class="section-card surface chamfer-sm glass-section-card stable-card">
+          <div class="section-card-header">
+            <div class="section-card-icon" style="--icon-color: var(--color-primary)">
+              <i class="fa-solid fa-comments"></i>
+            </div>
+            <div class="section-card-count"><i class="fa-solid fa-inbox"></i></div>
+          </div>
+          <div class="section-card-body">
+            <h3 class="section-card-title">إدارة الاستشارات</h3>
+            <p class="section-card-desc text-muted">تابع طلبات الطلاب أو الكلاينت وقم بالرد عليها — تفاصيل كاملة لكل طلب</p>
+          </div>
+          <div class="section-card-footer">
+            <span>إدارة الاستشارات</span>
+            <i class="fa-solid fa-arrow-left rtl-flip"></i>
+          </div>
+        </a>
+
+        <a routerLink="/portal/trainer/programs" class="section-card surface chamfer-sm glass-section-card stable-card">
+          <div class="section-card-header">
+            <div class="section-card-icon" style="--icon-color: var(--color-primary)">
+              <i class="fa-solid fa-book"></i>
+            </div>
+            <div class="section-card-count">{{ displayStats().programs_count }}</div>
+          </div>
+          <div class="section-card-body">
+            <h3 class="section-card-title">{{ 'trainer_dashboard.programs_link' | translate }}</h3>
+            <p class="section-card-desc text-muted">{{ 'trainer_dashboard.programs_desc' | translate }}</p>
+          </div>
+          <div class="section-card-footer">
+            <span>{{ 'trainer_dashboard.view_all' | translate }}</span>
+            <i class="fa-solid fa-arrow-left rtl-flip"></i>
+          </div>
+        </a>
+
+        <a routerLink="/portal/trainer/availability" class="section-card surface chamfer-sm glass-section-card stable-card">
+          <div class="section-card-header">
+            <div class="section-card-icon" style="--icon-color: var(--color-accent)">
+              <i class="fa-solid fa-calendar-days"></i>
+            </div>
+            <div class="section-card-count">{{ displayStats().availability_count }}</div>
+          </div>
+          <div class="section-card-body">
+            <h3 class="section-card-title">{{ 'trainer_dashboard.availability_link' | translate }}</h3>
+            <p class="section-card-desc text-muted">{{ 'trainer_dashboard.availability_desc' | translate }}</p>
+          </div>
+          <div class="section-card-footer">
+            <span>{{ 'trainer_dashboard.manage' | translate }}</span>
+            <i class="fa-solid fa-arrow-left rtl-flip"></i>
+          </div>
+        </a>
+
+        <a routerLink="/portal/trainer/reviews" class="section-card surface chamfer-sm glass-section-card stable-card">
+          <div class="section-card-header">
+            <div class="section-card-icon" style="--icon-color: var(--color-success)">
+              <i class="fa-solid fa-star"></i>
+            </div>
+            <div class="section-card-count">
+              {{ displayStats().average_rating | number: '1.1-1' }}
+              <span class="section-card-count-small">/5</span>
+            </div>
+          </div>
+          <div class="section-card-body">
+            <h3 class="section-card-title">{{ 'trainer_dashboard.reviews_link' | translate }}</h3>
+            <p class="section-card-desc text-muted">
+              {{ 'trainer_dashboard.reviews_desc' | translate: { count: displayStats().reviews_count } }}
+            </p>
+          </div>
+          <div class="section-card-footer">
+            <span>{{ 'trainer_dashboard.view_all' | translate }}</span>
+            <i class="fa-solid fa-arrow-left rtl-flip"></i>
+          </div>
+        </a>
+
+        <a routerLink="/portal/trainer/profile" class="section-card surface chamfer-sm glass-section-card stable-card">
+          <div class="section-card-header">
+            <div class="section-card-icon" style="--icon-color: var(--color-text)">
+              <i class="fa-solid fa-user-pen"></i>
+            </div>
+          </div>
+          <div class="section-card-body">
+            <h3 class="section-card-title">{{ 'nav.my_profile' | translate }}</h3>
+            <p class="section-card-desc text-muted">{{ 'trainer_dashboard.profile_desc' | translate }}</p>
+          </div>
+          <div class="section-card-footer">
+            <span>{{ 'trainer_dashboard.edit' | translate }}</span>
+            <i class="fa-solid fa-arrow-left rtl-flip"></i>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>

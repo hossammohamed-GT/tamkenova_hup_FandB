@@ -1,0 +1,74 @@
+<div class="assistant-root">
+  <div class="assistant-backdrop" [class.is-visible]="state() === 'open'" (click)="onBackdropClick()"></div>
+
+  <div class="spark-layer" #sparkLayer aria-hidden="true"></div>
+
+  <div
+    #shell
+    class="assistant-shell"
+    [class.state-closed]="state() === 'closed'"
+    [class.state-flying]="state() === 'flying'"
+    [class.state-open]="state() === 'open'"
+    [class.state-closing]="state() === 'closing'"
+  >
+    <button
+      type="button"
+      class="trigger"
+      (click)="onTriggerClick()"
+      [attr.aria-label]="'assistant.open' | translate"
+      [attr.aria-hidden]="state() !== 'closed'"
+      [attr.tabindex]="state() === 'closed' ? 0 : -1"
+    >
+      <span class="trigger-ring"></span>
+      <img #triggerMark src="/images/logo.svg" alt="" class="trigger-mark" />
+    </button>
+
+    <div class="panel-content">
+      <header class="panel-header">
+        <div class="panel-header-brand">
+          <span class="panel-avatar chamfer-sm">
+            <img src="/images/logo.svg" alt="" class="panel-avatar-mark" />
+          </span>
+          <div class="panel-header-text">
+            <span class="panel-title">{{ 'assistant.name' | translate }}</span>
+            <span class="panel-badge">{{ 'assistant.badge' | translate }}</span>
+          </div>
+        </div>
+        <button type="button" class="panel-close" (click)="onClose()" [attr.aria-label]="'assistant.close' | translate">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </header>
+
+      <div class="panel-messages" #messagesList>
+        @for (msg of chat.messages(); track msg.id) {
+          @if (msg.text) {
+            <div class="message" [class.message-user]="msg.role === 'user'" [class.message-assistant]="msg.role === 'assistant'">
+              {{ msg.text }}
+            </div>
+          }
+        }
+
+        @if (chat.isTyping()) {
+          <div class="message message-assistant message-typing">
+            <span></span><span></span><span></span>
+          </div>
+        }
+      </div>
+
+      <form class="panel-input" (ngSubmit)="onSend()">
+        <textarea
+          #input
+          rows="1"
+          [(ngModel)]="draft"
+          name="draft"
+          (input)="autoResize()"
+          (keydown)="onKeydown($event)"
+          [placeholder]="'assistant.placeholder' | translate"
+        ></textarea>
+        <button type="submit" class="panel-send" [disabled]="!draft.trim()" [attr.aria-label]="'assistant.send' | translate">
+          <i class="fa-solid fa-paper-plane rtl-flip"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

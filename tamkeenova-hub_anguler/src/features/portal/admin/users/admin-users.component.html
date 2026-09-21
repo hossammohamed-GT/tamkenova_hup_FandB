@@ -1,0 +1,271 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'admin_users.title' | translate }}</h1>
+      <p class="text-muted">{{ 'admin_users.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <app-admin-nav />
+
+  <!-- -- Toolbar -- -->
+  <div class="toolbar">
+    <div class="toolbar-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input
+        type="text"
+        class="field-input"
+        [placeholder]="'admin_users.search_placeholder' | translate"
+        [ngModel]="search()"
+        (ngModelChange)="onSearchInput($event)"
+      />
+    </div>
+
+    <select
+      class="toolbar-select"
+      [ngModel]="activeFilter()"
+      (ngModelChange)="setActiveFilter($event)"
+      [aria-label]="'admin_users.filter_active' | translate"
+    >
+      <option value="ALL">{{ 'admin_users.all_states' | translate }}</option>
+      <option [ngValue]="true">{{ 'admin_users.active' | translate }}</option>
+      <option [ngValue]="false">{{ 'admin_users.inactive' | translate }}</option>
+    </select>
+  </div>
+
+  <!-- -- Role pills -- -->
+  <div class="filter-pills staff-fade">
+    @for (role of roleFilters; track role) {
+      <button
+        type="button"
+        class="filter-pill"
+        [class.is-active]="roleFilter() === role"
+        (click)="setRoleFilter(role)"
+      >
+        {{ role === 'ALL' ? ('common.all' | translate) : ('status.user_role.' + role | translate) }}
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="staff-empty"><div class="loader-spinner"></div></div>
+  } @else if (hasError()) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ 'admin_users.load_error' | translate }}</p>
+      <button type="button" class="btn-primary-sm btn-sm" (click)="load()">
+        {{ 'common.retry' | translate }}
+      </button>
+    </div>
+  } @else if (users().length === 0) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-users-slash"></i>
+      <p>{{ 'admin_users.empty' | translate }}</p>
+    </div>
+  } @else {
+    <div class="table-wrap staff-fade">
+      <table class="staff-table">
+        <thead>
+          <tr>
+            <th>{{ 'admin_users.col_user' | translate }}</th>
+            <th>{{ 'admin_users.col_role' | translate }}</th>
+            <th>{{ 'admin_users.col_status' | translate }}</th>
+            <th>{{ 'admin_users.col_verified' | translate }}</th>
+            <th>{{ 'admin_users.col_joined' | translate }}</th>
+            <th>{{ 'admin_users.col_actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users(); track user.id) {
+            <tr>
+              <td [attr.data-label]="'admin_users.col_user' | translate">
+                <div class="table-user">
+                  <span class="table-avatar">
+                    @if (user.profile_image) {
+                      <img [src]="user.profile_image" [alt]="user.full_name" />
+                    } @else {
+                      {{ initials(user.full_name) }}
+                    }
+                  </span>
+                  <span class="table-user-main">
+                    <span class="table-user-name">{{ user.full_name }}</span>
+                    <span class="table-user-mail">{{ user.email }}</span>
+                  </span>
+                </div>
+              </td>
+              <td [attr.data-label]="'admin_users.col_role' | translate">
+                <span class="badge" [class]="roleBadgeClass(user.role)">
+                  {{ 'status.user_role.' + user.role | translate }}
+                </span>
+              </td>
+              <td [attr.data-label]="'admin_users.col_status' | translate">
+                <span class="badge" [class.badge-approved]="user.is_active" [class.badge-rejected]="!user.is_active">
+                  {{ (user.is_active ? 'admin_users.active' : 'admin_users.inactive') | translate }}
+                </span>
+              </td>
+              <td [attr.data-label]="'admin_users.col_verified' | translate">
+                <i
+                  class="fa-solid verify-icon"
+                  [class.fa-circle-check]="user.email_verified"
+                  [class.fa-circle-xmark]="!user.email_verified"
+                  [class.is-ok]="user.email_verified"
+                  [class.is-no]="!user.email_verified"
+                ></i>
+              </td>
+              <td [attr.data-label]="'admin_users.col_joined' | translate" class="table-muted">{{ user.created_at | date: 'yyyy/MM/dd' }}</td>
+              <td [attr.data-label]="'admin_users.col_actions' | translate">
+                <div class="cell-actions">
+                  <button
+                    type="button"
+                    class="btn-sm btn-outline-sm"
+                    (click)="openRoleModal(user)"
+                  >
+                    <i class="fa-solid fa-user-pen"></i>
+                    {{ 'admin_users.change_role' | translate }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-sm"
+                    [class.btn-danger-sm]="user.is_active"
+                    [class.btn-success-sm]="!user.is_active"
+                    (click)="toggleActive(user)"
+                  >
+                    {{ (user.is_active ? 'admin_users.deactivate' : 'admin_users.activate') | translate }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-sm btn-outline-sm"
+                    (click)="openActivity(user)"
+                    [attr.aria-label]="'admin_users.activity' | translate"
+                  >
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- -- Pagination -- -->
+    @if (totalPages() > 1) {
+      <div class="pagination">
+        <button type="button" class="page-btn" [disabled]="page() === 1" (click)="goToPage(page() - 1)">
+          <i class="fa-solid fa-chevron-start rtl-flip"></i>
+        </button>
+        @for (p of pages(); track p) {
+          <button type="button" class="page-btn" [class.is-active]="p === page()" (click)="goToPage(p)">
+            {{ p }}
+          </button>
+        }
+        <button
+          type="button"
+          class="page-btn"
+          [disabled]="page() === totalPages()"
+          (click)="goToPage(page() + 1)"
+        >
+          <i class="fa-solid fa-chevron-end rtl-flip"></i>
+        </button>
+        <span class="page-info">{{ 'admin_users.total_label' | translate }} {{ total() }}</span>
+      </div>
+    }
+  }
+
+  <!-- -- Role Change Modal -- -->
+  @if (roleTarget(); as target) {
+    <div class="modal-backdrop" (click)="closeRoleModal()">
+      <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ 'admin_users.change_role_title' | translate }} — {{ target.full_name }}</h3>
+          <button type="button" class="icon-btn" (click)="closeRoleModal()" [attr.aria-label]="'common.close' | translate">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="role-options">
+          @for (role of roleFilters.slice(1); track role) {
+            <button
+              type="button"
+              class="role-option"
+              [class.is-selected]="selectedRole() === role"
+              (click)="pickRole(role)"
+            >
+              <span class="role-option-radio">
+                @if (selectedRole() === role) {
+                  <i class="fa-solid fa-check"></i>
+                }
+              </span>
+              <span class="role-option-text">
+                <strong>{{ 'status.user_role.' + role | translate }}</strong>
+                <small class="text-muted">{{ 'admin_users.role_hint.' + role | translate }}</small>
+              </span>
+            </button>
+          }
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-sm btn-outline-sm" (click)="closeRoleModal()">
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button
+            type="button"
+            class="btn-sm btn-primary-sm"
+            [disabled]="isChangingRole() || selectedRole() === target.role"
+            (click)="confirmRoleChange()"
+          >
+            @if (isChangingRole()) {
+              <span class="loader-spinner-sm"></span>
+            }
+            {{ 'common.confirm' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- -- Activity Modal -- -->
+  @if (activityTarget(); as target) {
+    <div class="modal-backdrop" (click)="closeActivity()">
+      <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ 'admin_users.activity_title' | translate }} — {{ target.full_name }}</h3>
+          <button type="button" class="icon-btn" (click)="closeActivity()" [attr.aria-label]="'common.close' | translate">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        @if (isLoadingActivity()) {
+          <div class="staff-empty"><div class="loader-spinner"></div></div>
+        } @else if (activityLogs().length === 0) {
+          <div class="staff-empty">
+            <i class="fa-solid fa-inbox"></i>
+            <p>{{ 'admin_users.no_activity' | translate }}</p>
+          </div>
+        } @else {
+          <ul class="activity-list">
+            @for (log of activityLogs(); track log.id) {
+              <li class="activity-item">
+                <span class="activity-dot"></span>
+                <div class="activity-body">
+                  <strong>{{ log.action }}</strong>
+                  @if (log.entity_type) {
+                    <small class="text-muted"> — {{ log.entity_type }}</small>
+                  }
+                  <span class="activity-date">{{ log.created_at | date: 'yyyy/MM/dd HH:mm' }}</span>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+    </div>
+  }
+
+  @if (toastKey(); as key) {
+    <div class="staff-toast">
+      <i class="fa-solid fa-circle-check"></i>
+      {{ key | translate }}
+    </div>
+  }
+</section>

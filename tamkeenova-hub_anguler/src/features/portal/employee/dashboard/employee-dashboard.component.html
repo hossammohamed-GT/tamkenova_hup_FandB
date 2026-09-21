@@ -1,0 +1,103 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'employee_dashboard.title' | translate }}</h1>
+      <p class="text-muted">
+        {{ 'dashboard.welcome' | translate }} {{ currentUser()?.full_name }} — {{ 'employee_dashboard.subtitle' | translate }}
+      </p>
+    </div>
+  </div>
+
+  <!-- -- Employee Sub Nav -- -->
+  <nav class="staff-nav">
+    <a class="staff-nav-item is-active" routerLink="/portal/employee">
+      <i class="fa-solid fa-gauge-high"></i>
+      <span>{{ 'employee_dashboard.nav_dashboard' | translate }}</span>
+    </a>
+    <a class="staff-nav-item" routerLink="/portal/employee/tasks">
+      <i class="fa-solid fa-list-check"></i>
+      <span>{{ 'my_tasks.title' | translate }}</span>
+    </a>
+    <a class="staff-nav-item" routerLink="/portal/employee/notifications">
+      <i class="fa-solid fa-bell"></i>
+      <span>{{ 'notifications.title' | translate }}</span>
+    </a>
+  </nav>
+
+  @if (isLoading()) {
+    <div class="staff-empty"><div class="loader-spinner"></div></div>
+  } @else if (hasError()) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ 'employee_dashboard.load_error' | translate }}</p>
+      <button type="button" class="btn-primary-sm btn-sm" (click)="load()">
+        {{ 'common.retry' | translate }}
+      </button>
+    </div>
+  } @else {
+    <div class="dash-layout">
+      <!-- -- Stats -- -->
+      <div class="stats-grid">
+        @for (card of cards(); track card.labelKey) {
+          <a [routerLink]="card.route" class="stat-card staff-fade" [style.--stat-color]="card.color">
+            <span class="stat-icon"><i class="fa-solid" [class]="card.icon"></i></span>
+            <span class="stat-text">
+              <span class="stat-value">{{ card.value }}</span>
+              <span class="stat-label">{{ card.labelKey | translate }}</span>
+            </span>
+          </a>
+        }
+      </div>
+
+      <!-- -- Completion gauge -- -->
+      <div class="gauge-card surface staff-fade">
+        <h3 class="gauge-title">{{ 'employee_dashboard.completion' | translate }}</h3>
+        <div class="gauge-wrap">
+          <svg width="130" height="130" viewBox="0 0 120 120" role="img" [attr.aria-label]="displayStats().average_completion">
+            <circle class="gauge-ring-track" cx="60" cy="60" r="52" fill="none" stroke-width="10" />
+            <circle
+              class="gauge-ring"
+              cx="60"
+              cy="60"
+              r="52"
+              fill="none"
+              stroke="var(--color-primary)"
+              stroke-width="10"
+              stroke-linecap="round"
+              [attr.stroke-dasharray]="circumference"
+              [attr.stroke-dashoffset]="progressOffset()"
+              transform="rotate(-90 60 60)"
+            />
+          </svg>
+          <span class="gauge-value">{{ displayStats().average_completion ?? 0 }}%</span>
+        </div>
+        <p class="gauge-hint text-muted">{{ 'employee_dashboard.completion_hint' | translate }}</p>
+      </div>
+    </div>
+
+    <!-- -- Quick actions -- -->
+    <div class="quick-row">
+      <a routerLink="/portal/employee/tasks" class="quick-card surface staff-fade">
+        <span class="quick-icon" style="--stat-color: var(--color-primary)">
+          <i class="fa-solid fa-list-check"></i>
+        </span>
+        <span class="quick-text">
+          <strong>{{ 'employee_dashboard.go_tasks' | translate }}</strong>
+          <small class="text-muted">{{ 'employee_dashboard.go_tasks_hint' | translate }}</small>
+        </span>
+        <i class="fa-solid fa-arrow-left rtl-flip quick-arrow"></i>
+      </a>
+
+      <a routerLink="/portal/employee/notifications" class="quick-card surface staff-fade">
+        <span class="quick-icon" style="--stat-color: var(--color-accent)">
+          <i class="fa-solid fa-bell"></i>
+        </span>
+        <span class="quick-text">
+          <strong>{{ 'notifications.title' | translate }}</strong>
+          <small class="text-muted">{{ 'notifications.subtitle' | translate }}</small>
+        </span>
+        <i class="fa-solid fa-arrow-left rtl-flip quick-arrow"></i>
+      </a>
+    </div>
+  }
+</section>

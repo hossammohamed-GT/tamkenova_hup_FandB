@@ -1,0 +1,12 @@
+<div class="star-rating" [attr.aria-label]="rating() + ' / 5'">
+  @for (state of stars(); track $index) {
+    <i
+      [class]="
+        state === 'full' ? 'fa-solid fa-star' :
+        state === 'half' ? 'fa-solid fa-star-half-stroke' :
+        'fa-regular fa-star'
+      "
+    ></i>
+  }
+  <span class="star-rating-value">{{ rating() }}</span>
+</div>

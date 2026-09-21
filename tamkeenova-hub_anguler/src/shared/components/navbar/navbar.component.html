@@ -1,0 +1,416 @@
+<header class="navbar" [class.is-scrolled]="isScrolled()">
+  <div class="navbar-inner">
+
+    <!-- Brand Logo -->
+    <a routerLink="/" class="navbar-brand" (click)="closeMobileMenu()">
+      <img src="/images/logo.svg" alt="TamkeeNova" class="brand-mark">
+      <span class="brand-word">
+        <span class="brand-word-main">
+          Tamkee<span class="brand-word-accent">Nova</span>
+        </span>
+        <span class="brand-word-sub">
+          {{ 'nav.tagline' | translate }}
+        </span>
+      </span>
+    </a>
+
+    <!-- Desktop Navigation -->
+    <nav class="navbar-links" aria-label="Main navigation">
+      @for (link of navLinks; track link.route) {
+      <a [routerLink]="link.route" routerLinkActive="is-active"
+        [routerLinkActiveOptions]="{ exact: link.route === '/' }" class="navbar-link">
+        {{ link.labelKey | translate }}
+      </a>
+      }
+    </nav>
+
+    <!-- Desktop Actions -->
+    <div class="navbar-actions">
+
+      <button type="button" class="control-btn desktop-only" (click)="toggleLanguage()"
+        [attr.aria-label]="'nav.toggle_lang' | translate">
+        <i class="fa-solid fa-globe"></i>
+        <span class="control-btn-label">{{ isArabic() ? 'EN' : 'AR' }}</span>
+      </button>
+
+      <button type="button" class="control-btn control-btn-icon desktop-only" (click)="toggleTheme()"
+        [attr.aria-label]="'nav.toggle_theme' | translate">
+        <i class="fa-solid" [class.fa-moon]="!isDark()" [class.fa-sun]="isDark()"></i>
+      </button>
+
+      @if (!isLoggedIn()) {
+      <a routerLink="/login" class="control-btn desktop-only">
+        {{ 'nav.login' | translate }}
+      </a>
+      <a routerLink="/register" class="btn-accent navbar-cta chamfer-sm desktop-only">
+        {{ 'nav.register' | translate }}
+      </a>
+      }
+
+      @if (isLoggedIn()) {
+      <!-- Notifications Bell with Glass Dropdown -->
+      <div class="notif-dropdown-wrapper desktop-only" (mouseenter)="onNotifMouseEnter()"
+        (mouseleave)="onNotifMouseLeave()">
+        <button type="button" class="control-btn control-btn-icon notif-btn" (click)="goToNotifications()"
+          [attr.aria-label]="'notifications.title' | translate">
+          <i class="fa-solid fa-bell"></i>
+          @if (unreadCount() > 0) {
+          <span class="notif-badge">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
+          }
+        </button>
+
+        <!-- Glassmorphic Dropdown -->
+        <div class="notif-glass-dropdown" [class.is-open]="isNotifDropdownOpen()" (mouseenter)="onDropdownMouseEnter()"
+          (mouseleave)="onDropdownMouseLeave()">
+          <div class="notif-glass-header">
+            <h4>{{ 'nav.notifications_dropdown_title' | translate }}</h4>
+            @if (unreadCount() > 0) {
+            <span class="notif-glass-count">{{ unreadCount() }}</span>
+            }
+          </div>
+
+          @if (isLoadingNotifications()) {
+          <div class="notif-glass-loading">
+            <div class="loader-spinner-sm"></div>
+            <span>{{ 'loader.loading' | translate }}</span>
+          </div>
+          } @else if (recentNotifications().length === 0) {
+          <div class="notif-glass-empty">
+            <i class="fa-solid fa-bell-slash"></i>
+            <p>{{ 'notifications.dropdown_empty' | translate }}</p>
+          </div>
+          } @else {
+          <div class="notif-glass-list">
+            @for (n of recentNotifications(); track n.id) {
+            <article class="notif-glass-item" [class.is-unread]="!n.is_read" (click)="openNotificationDetail(n, $event)">
+              <div class="notif-glass-icon" [class]="toneFor(n.type)">
+                <i class="fa-solid" [class]="iconFor(n.type)"></i>
+              </div>
+              <div class="notif-glass-main">
+                <div class="notif-glass-top">
+                  <span class="notif-glass-title">{{ titleFor(n) }}</span>
+                  @if (!n.is_read) { <span class="notif-glass-dot"></span> }
+                </div>
+                <p class="notif-glass-msg">{{ (messageFor(n) || '') | slice:0:70 }}{{ (messageFor(n) || '').length > 70 ? '…' : '' }}</p>
+                <span class="notif-glass-time"><i class="fa-regular fa-clock"></i> {{ timeAgo(n.created_at) }}</span>
+              </div>
+            </article>
+            }
+          </div>
+          }
+
+          <div class="notif-glass-footer">
+            <button type="button" class="notif-glass-view-all" (click)="goToNotifications()">
+              {{ 'nav.notifications_view_all' | translate }}
+              <i class="fa-solid fa-arrow-left rtl-flip"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="user-menu desktop-only">
+        <button type="button" class="user-avatar-btn" (click)="toggleUserMenu()"
+          [attr.aria-expanded]="isUserMenuOpen()" [attr.aria-label]="'nav.account' | translate">
+          @if (userAvatar()) {
+          <img [src]="userAvatar()!" [alt]="currentUser()?.full_name" class="user-avatar-img" />
+          } @else {
+          <span class="user-avatar">{{ userInitials() }}</span>
+          }
+          <i class="fa-solid fa-chevron-down user-caret" [class.is-open]="isUserMenuOpen()"></i>
+        </button>
+
+        <div class="user-dropdown surface chamfer-sm" [class.is-open]="isUserMenuOpen()">
+          <div class="user-dropdown-header">
+            @if (userAvatar()) {
+            <img [src]="userAvatar()!" [alt]="currentUser()?.full_name" class="user-avatar-img user-avatar-img-lg" />
+            } @else {
+            <span class="user-avatar user-avatar-lg">{{ userInitials() }}</span>
+            }
+            <div class="user-info">
+              <span class="user-name">{{ currentUser()?.full_name }}</span>
+              <span class="user-email text-muted">{{ currentUser()?.email }}</span>
+              <span class="user-role-badge">{{ roleLabel() | translate }}</span>
+            </div>
+          </div>
+          <div class="user-dropdown-divider"></div>
+          @if (!isAdminRole()) {
+          <a [routerLink]="profileRoute()" class="user-dropdown-link" (click)="closeUserMenu()">
+            <i class="fa-solid fa-user"></i>
+            {{ 'nav.my_profile' | translate }}
+          </a>
+          }
+          <a [routerLink]="dashboardRoute()" class="user-dropdown-link" (click)="closeUserMenu()">
+            <i class="fa-solid fa-gauge"></i>
+            {{ 'nav.dashboard' | translate }}
+          </a>
+          <a [routerLink]="notificationsRoute()" class="user-dropdown-link" (click)="closeUserMenu()">
+            <i class="fa-solid fa-bell"></i>
+            {{ 'notifications.title' | translate }}
+            @if (unreadCount() > 0) {
+            <span class="notif-badge-inline">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
+            }
+          </a>
+          <div class="user-dropdown-divider"></div>
+          <button type="button" class="user-dropdown-link user-dropdown-logout" (click)="logout()">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            {{ 'nav.logout' | translate }}
+          </button>
+        </div>
+      </div>
+      }
+
+      <button type="button" class="menu-toggle" (click)="toggleMobileMenu()"
+        [attr.aria-label]="'nav.toggle_menu' | translate" [attr.aria-expanded]="isMobileMenuOpen()">
+        <i class="fa-solid" [class.fa-bars]="!isMobileMenuOpen()" [class.fa-xmark]="isMobileMenuOpen()"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Navigation Panel -->
+  <div class="mobile-panel chamfer-lg" [class.is-open]="isMobileMenuOpen()">
+    <nav class="mobile-links" aria-label="Mobile navigation">
+      @for (link of navLinks; track link.route) {
+      <a [routerLink]="link.route" routerLinkActive="is-active"
+        [routerLinkActiveOptions]="{ exact: link.route === '/' }" class="mobile-link" (click)="closeMobileMenu()">
+        {{ link.labelKey | translate }}
+        <i class="fa-solid fa-arrow-left mobile-link-icon rtl-flip"></i>
+      </a>
+      }
+    </nav>
+
+    <div class="mobile-panel-footer">
+      @if (!isLoggedIn()) {
+      <a routerLink="/login" class="control-btn control-btn-block" (click)="closeMobileMenu()">
+        {{ 'nav.login' | translate }}
+      </a>
+      <a routerLink="/register" class="btn-accent control-btn control-btn-block" (click)="closeMobileMenu()">
+        {{ 'nav.register' | translate }}
+      </a>
+      }
+
+      @if (isLoggedIn()) {
+      <div class="mobile-user-card">
+        @if (userAvatar()) {
+        <img [src]="userAvatar()!" [alt]="currentUser()?.full_name" class="user-avatar-img user-avatar-img-lg" />
+        } @else {
+        <span class="user-avatar user-avatar-lg">{{ userInitials() }}</span>
+        }
+        <div class="user-info">
+          <span class="user-name">{{ currentUser()?.full_name }}</span>
+          <span class="user-email text-muted">{{ currentUser()?.email }}</span>
+          <span class="user-role-badge">{{ roleLabel() | translate }}</span>
+        </div>
+      </div>
+
+      @if (!isAdminRole()) {
+      <a [routerLink]="profileRoute()" class="control-btn control-btn-block" (click)="closeMobileMenu()">
+        <i class="fa-solid fa-user"></i>
+        <span class="control-btn-label">{{ 'nav.my_profile' | translate }}</span>
+      </a>
+      }
+      <a [routerLink]="dashboardRoute()" class="control-btn control-btn-block" (click)="closeMobileMenu()">
+        <i class="fa-solid fa-gauge"></i>
+        <span class="control-btn-label">{{ 'nav.dashboard' | translate }}</span>
+      </a>
+      <a [routerLink]="notificationsRoute()" class="control-btn control-btn-block" (click)="closeMobileMenu()">
+        <i class="fa-solid fa-bell"></i>
+        <span class="control-btn-label">{{ 'notifications.title' | translate }}</span>
+        @if (unreadCount() > 0) {
+        <span class="notif-badge-inline">{{ unreadCount() > 9 ? '9+' : unreadCount() }}</span>
+        }
+      </a>
+      }
+
+      <button type="button" class="control-btn control-btn-block" (click)="toggleLanguage()">
+        <i class="fa-solid fa-globe"></i>
+        <span class="control-btn-label">{{ isArabic() ? 'English' : 'العربية' }}</span>
+      </button>
+
+      <button type="button" class="control-btn control-btn-block" (click)="toggleTheme()">
+        <i class="fa-solid" [class.fa-moon]="!isDark()" [class.fa-sun]="isDark()"></i>
+        <span class="control-btn-label">
+          {{ isDark() ? ('nav.light_mode' | translate) : ('nav.dark_mode' | translate) }}
+        </span>
+      </button>
+
+      @if (isLoggedIn()) {
+      <button type="button" class="control-btn control-btn-block text-danger" (click)="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        <span class="control-btn-label">{{ 'nav.logout' | translate }}</span>
+      </button>
+      }
+    </div>
+  </div>
+
+</header>
+
+<div class="mobile-backdrop" [class.is-open]="isMobileMenuOpen()" (click)="closeMobileMenu()"></div>
+
+<!-- Notification Full Details Modal (Glass) -->
+@if (showNotifDetailModal()) {
+<div class="notif-detail-backdrop" (click)="closeNotifDetail()">
+  <div class="notif-detail-modal notif-detail-glass chamfer-sm" (click)="$event.stopPropagation()">
+    <div class="notif-detail-header">
+      <h3><i class="fa-solid fa-bell"></i> {{ 'notifications.details_title' | translate }}</h3>
+      <button type="button" class="icon-btn" (click)="closeNotifDetail()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    @if (isLoadingDetail()) {
+    <div class="notif-detail-loading">
+      <div class="loader-spinner"></div>
+      <p>{{ 'notifications.loading_details' | translate }}</p>
+    </div>
+    } @else {
+    @if (selectedNotification(); as sn) {
+    <div class="notif-detail-original">
+      <div class="notif-detail-original-icon" [class]="toneFor(sn.type)">
+        <i class="fa-solid" [class]="iconFor(sn.type)"></i>
+      </div>
+      <div>
+        <span class="notif-detail-type" [class]="toneFor(sn.type)">{{ typeKeyFor(sn.type) | translate }}</span>
+        <h4>{{ titleFor(sn) }}</h4>
+        <p class="text-muted">{{ messageFor(sn) }}</p>
+        <span class="notif-detail-date"><i class="fa-regular fa-clock"></i> {{ sn.created_at | date:'yyyy/MM/dd HH:mm' }}</span>
+      </div>
+    </div>
+    }
+
+    @if (notificationDetail(); as detail) {
+    @if (isConsultationDetail(detail)) {
+    <div class="notif-detail-section">
+      <h4><i class="fa-solid fa-comments"></i> {{ 'notifications.consultation_details' | translate }}</h4>
+      <div class="notif-detail-grid">
+        <div class="notif-detail-row">
+          <span class="text-muted">{{ 'student_consultations.fields.title' | translate }}</span>
+          <strong>{{ detail.title }}</strong>
+        </div>
+        @if (detail.description) {
+        <div class="notif-detail-row detail-col">
+          <span class="text-muted">{{ 'student_consultations.fields.description' | translate }}</span>
+          <p>{{ detail.description }}</p>
+        </div>
+        }
+        <div class="notif-detail-row">
+          <span class="text-muted">{{ 'status.consultation.' + detail.status | translate }}</span>
+          <span class="badge" [class.badge-pending]="detail.status==='PENDING'" [class.badge-approved]="detail.status==='APPROVED' || detail.status==='SCHEDULED' || detail.status==='COMPLETED'" [class.badge-rejected]="detail.status==='REJECTED' || detail.status==='CANCELLED'">{{ 'status.consultation.' + detail.status | translate }}</span>
+        </div>
+        @if (detail.preferred_date) {
+        <div class="notif-detail-row">
+          <span class="text-muted">{{ 'student_consultations.fields.preferred_date' | translate }}</span>
+          <strong>{{ detail.preferred_date | date:'yyyy/MM/dd' }} @if(detail.preferred_time){ {{detail.preferred_time}} }</strong>
+        </div>
+        }
+        @if (detail.scheduled_at) {
+        <div class="notif-detail-row">
+          <span class="text-muted">{{ 'student_consultations.scheduled_at' | translate }}</span>
+          <strong>{{ detail.scheduled_at | date:'yyyy/MM/dd HH:mm' }}</strong>
+        </div>
+        }
+        @if (detail.trainer_notes) {
+        <div class="notif-detail-row detail-col">
+          <span class="text-muted">{{ 'student_consultations.trainer_notes' | translate }}</span>
+          <p>{{ detail.trainer_notes }}</p>
+        </div>
+        }
+        @if (detail.users) {
+        <div class="notif-detail-section-inner">
+          <h5><i class="fa-solid fa-user"></i> {{ 'notifications.student_info' | translate }}</h5>
+          <div class="notif-person-card">
+            @if (detail.users.profile_image) {
+            <img [src]="detail.users.profile_image" [alt]="detail.users.full_name" class="notif-person-avatar" />
+            } @else {
+            <div class="notif-person-avatar-fallback"><i class="fa-solid fa-user"></i></div>
+            }
+            <div>
+              <strong>{{ detail.users.full_name }}</strong>
+              <span class="text-muted" dir="ltr">{{ detail.users.email }}</span>
+              @if (detail.users.phone) { <span class="text-muted" dir="ltr">{{ detail.users.phone }}</span> }
+              @if (detail.users.whatsapp) { <span class="text-muted" dir="ltr">WA: {{ detail.users.whatsapp }}</span> }
+            </div>
+          </div>
+        </div>
+        }
+        @if (detail.trainers) {
+        <div class="notif-detail-section-inner">
+          <h5><i class="fa-solid fa-chalkboard-user"></i> {{ 'notifications.trainer_info' | translate }}</h5>
+          <div class="notif-person-card">
+            @if (detail.trainers.users.profile_image) {
+            <img [src]="detail.trainers.users.profile_image" [alt]="detail.trainers.users.full_name" class="notif-person-avatar" />
+            } @else {
+            <div class="notif-person-avatar-fallback"><i class="fa-solid fa-user"></i></div>
+            }
+            <div>
+              <strong>{{ detail.trainers.users.full_name }}</strong>
+              @if (detail.trainers.specializations) { <span class="text-muted">{{ detail.trainers.specializations.name_ar }}</span> }
+            </div>
+          </div>
+        </div>
+        }
+        <div class="notif-detail-actions">
+          <button type="button" class="btn-accent" (click)="goToConsultationDetail()">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> {{ 'notifications.go_to_consultation' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+    } @else if (isCorporateDetail(detail)) {
+    <div class="notif-detail-section">
+      <h4><i class="fa-solid fa-building"></i> {{ 'notifications.corporate_details' | translate }}</h4>
+      <div class="notif-detail-grid">
+        <div class="notif-detail-row">
+          <span class="text-muted">{{ 'student_corporate.fields.company_name' | translate }}</span>
+          <strong>{{ detail.company_name }}</strong>
+        </div>
+        <div class="notif-detail-row">
+          <span class="text-muted">{{ 'student_corporate.fields.service_type' | translate }}</span>
+          <strong>{{ detail.service_type }}</strong>
+        </div>
+        <div class="notif-detail-row detail-col">
+          <span class="text-muted">{{ 'student_corporate.fields.service_description' | translate }}</span>
+          <p>{{ detail.service_description }}</p>
+        </div>
+        <div class="notif-detail-row">
+          <span class="text-muted">{{ 'student_corporate.fields.contact_name' | translate }}</span>
+          <strong>{{ detail.contact_name }}</strong>
+        </div>
+        <div class="notif-detail-row">
+          <span class="text-muted">{{ 'student_corporate.fields.contact_email' | translate }}</span>
+          <strong dir="ltr">{{ detail.contact_email }}</strong>
+        </div>
+        @if (detail.contact_phone) {
+        <div class="notif-detail-row">
+          <span class="text-muted">{{ 'student_corporate.fields.contact_phone' | translate }}</span>
+          <strong dir="ltr">{{ detail.contact_phone }}</strong>
+        </div>
+        }
+        @if (detail.sector) {
+        <div class="notif-detail-row">
+          <span class="text-muted">{{ 'student_corporate.fields.sector' | translate }}</span>
+          <strong>{{ detail.sector }}</strong>
+        </div>
+        }
+        @if (detail.expected_budget) {
+        <div class="notif-detail-row">
+          <span class="text-muted">{{ 'student_corporate.fields.expected_budget' | translate }}</span>
+          <strong>{{ detail.expected_budget }}</strong>
+        </div>
+        }
+        <div class="notif-detail-actions">
+          <button type="button" class="btn-accent" (click)="goToCorporateDetail()">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> {{ 'notifications.go_to_corporate' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+    } @else {
+    <div class="notif-detail-empty">
+      <i class="fa-solid fa-circle-info"></i>
+      <p>{{ 'notifications.no_details' | translate }}</p>
+      <p class="text-muted">{{ selectedNotification()?.message }}</p>
+    </div>
+    }
+    }
+  </div>
+</div>
+}

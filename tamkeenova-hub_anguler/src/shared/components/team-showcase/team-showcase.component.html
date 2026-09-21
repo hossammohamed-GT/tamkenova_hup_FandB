@@ -1,0 +1,64 @@
+<div class="team-showcase">
+  @for (slot of slots(); track $index) {
+  <div class="team-card-wrapper">
+    <div class="team-card-track">
+
+      <!-- Current Trainer -->
+      <div
+        class="team-card surface chamfer-sm team-card-current"
+        [class.slide-out]="slot.sliding"
+        [class.no-transition]="slot.resetting">
+        <div class="team-card-avatar">
+          @if (getTrainerAvatar(slot.currentTrainer)) {
+          <img
+            [src]="getTrainerAvatar(slot.currentTrainer)!"
+            [alt]="getTrainerName(slot.currentTrainer)" />
+          } @else {
+          <div class="team-card-avatar-placeholder">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          }
+        </div>
+
+        <div class="team-card-content">
+          <h3 class="team-card-name">{{
+            getTrainerName(slot.currentTrainer) }}</h3>
+          <p class="team-card-specialization">{{
+            getTrainerSpecialization(slot.currentTrainer) }}
+          </p>
+          <app-star-rating
+            [rating]="getTrainerRating(slot.currentTrainer)"></app-star-rating>
+        </div>
+      </div>
+
+      <!-- Next Trainer -->
+      <div
+        class="team-card surface chamfer-sm team-card-next"
+        [class.slide-in]="slot.sliding"
+        [class.no-transition]="slot.resetting">
+        <div class="team-card-avatar">
+          @if (getTrainerAvatar(slot.nextTrainer)) {
+          <img [src]="getTrainerAvatar(slot.nextTrainer)!"
+            [alt]="getTrainerName(slot.nextTrainer)" />
+          } @else {
+          <div class="team-card-avatar-placeholder">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          }
+        </div>
+
+        <div class="team-card-content">
+          <h3 class="team-card-name">{{
+            getTrainerName(slot.nextTrainer) }}</h3>
+          <p class="team-card-specialization">{{
+            getTrainerSpecialization(slot.nextTrainer) }}
+          </p>
+          <app-star-rating
+            [rating]="getTrainerRating(slot.nextTrainer)"></app-star-rating>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  }
+</div>

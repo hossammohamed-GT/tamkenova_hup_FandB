@@ -1,0 +1,277 @@
+<section class="portal-page">
+
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'trainer_programs.title' | translate }}</h1>
+      <p class="text-muted">{{ 'trainer_programs.subtitle' |
+        translate }}</p>
+    </div>
+    <button type="button" class="btn-primary btn-add"
+      (click)="openCreate()">
+      <i class="fa-solid fa-plus"></i> {{
+      'trainer_programs.add' | translate }}
+    </button>
+  </div>
+
+  @if (isLoading()) {
+  <div class="empty-state"><i
+      class="fa-solid fa-spinner fa-spin"></i></div>
+  }
+
+  @else if (errorMessage()) {
+  <div class="form-error-banner">
+    <i class="fa-solid fa-triangle-exclamation"></i> {{
+    errorMessage() | translate }}
+  </div>
+  }
+
+  @else if (programs().length === 0) {
+  <div class="empty-state surface chamfer-sm">
+    <i class="fa-solid fa-book-open"></i>
+    <p>{{ 'trainer_programs.empty' | translate }}</p>
+    <button type="button" class="btn-primary btn-add"
+      (click)="openCreate()">
+      <i class="fa-solid fa-plus"></i> {{
+      'trainer_programs.add_first' | translate }}
+    </button>
+  </div>
+  }
+
+  @else {
+  <div class="programs-grid">
+    @for (p of programs(); track p.id) {
+    <article class="program-card surface">
+      <div class="program-card-media">
+        @if (p.image_url) {
+        <img [src]="p.image_url" [alt]="p.title"
+          loading="lazy" />
+        } @else {
+        <div class="program-card-placeholder"><i
+            class="fa-solid fa-image"></i></div>
+        }
+        <span class="badge badge-level">{{ levelKey(p.level)
+          | translate }}</span>
+      </div>
+
+      <div class="program-card-body">
+        <h3 class="program-card-title">{{ p.title }}</h3>
+        @if (p.short_description) {
+        <p class="program-card-desc text-muted">{{
+          p.short_description }}</p>
+        }
+
+        <div class="program-card-meta">
+          <span class="program-price">
+            @if (p.discount_price) {
+            <s class="text-muted">{{ p.price }}</s>
+            <strong>{{ p.discount_price }}</strong>
+            } @else {
+            <strong>{{ p.price }}</strong>
+            }
+            <small>{{ 'trainer_programs.currency' |
+              translate }}</small>
+          </span>
+
+          @if (p.duration_hours) {
+          <span class="program-duration">
+            <i class="fa-regular fa-clock"></i>
+            {{ p.duration_hours }} {{ 'programs.hours_unit'
+            | translate }}
+          </span>
+          }
+        </div>
+      </div>
+
+      <div class="program-card-actions">
+        <button type="button" class="icon-btn"
+          (click)="openEdit(p)"
+          [attr.aria-label]="'trainer_programs.edit' | translate">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+        <button type="button"
+          class="icon-btn icon-btn-danger"
+          (click)="askDelete(p.id)"
+          [attr.aria-label]="'trainer_programs.delete' | translate">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </article>
+    }
+  </div>
+  }
+
+  <!-- -- Program Create and Edit Modal -- -->
+  @if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-card surface" role="dialog"
+      aria-modal="true" (click)="$event.stopPropagation()">
+
+      <div class="modal-head">
+        <h2>{{ (editing() ? 'trainer_programs.edit_title' :
+          'trainer_programs.create_title') | translate }}
+        </h2>
+        <button type="button" class="icon-btn"
+          (click)="closeModal()"
+          [attr.aria-label]="'booking.close' | translate">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="save()"
+        novalidate>
+        <div class="form-grid">
+
+          <div class="field field-full">
+            <label class="field-label" for="p_title">{{
+              'trainer_programs.fields.title' | translate }}
+              *</label>
+            <input id="p_title" type="text"
+              class="field-input" formControlName="title" />
+            @if (isInvalid('title')) {
+            <span class="field-hint is-error">{{
+              'trainer_programs.errors.title' | translate
+              }}</span>
+            }
+          </div>
+
+          <div class="field field-full">
+            <label class="field-label" for="p_image">{{
+              'trainer_programs.fields.image_url' |
+              translate }}</label>
+            <input id="p_image" type="url"
+              class="field-input"
+              formControlName="image_url" dir="ltr"
+              placeholder="https://..." />
+            @if (isInvalid('image_url')) {
+            <span class="field-hint is-error">{{
+              'auth.errors.url' | translate }}</span>
+            }
+          </div>
+
+          <div class="field field-full">
+            <label class="field-label" for="p_short">{{
+              'trainer_programs.fields.short_description' |
+              translate }}</label>
+            <input id="p_short" type="text"
+              class="field-input"
+              formControlName="short_description"
+              maxlength="160" />
+            <span class="field-hint text-muted">{{
+              form.controls.short_description.value.length
+              }}/160</span>
+          </div>
+
+          <div class="field field-full">
+            <label class="field-label" for="p_desc">{{
+              'trainer_programs.fields.description' |
+              translate }}</label>
+            <textarea id="p_desc"
+              class="field-input field-textarea"
+              formControlName="description"
+              rows="4"></textarea>
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="p_price">{{
+              'trainer_programs.fields.price' | translate }}
+              *</label>
+            <input id="p_price" type="number" min="0"
+              class="field-input" formControlName="price"
+              dir="ltr" />
+            @if (isInvalid('price')) {
+            <span class="field-hint is-error">{{
+              'trainer_programs.errors.price' | translate
+              }}</span>
+            }
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="p_discount">{{
+              'trainer_programs.fields.discount_price' |
+              translate }}</label>
+            <input id="p_discount" type="number" min="0"
+              class="field-input"
+              formControlName="discount_price" dir="ltr" />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="p_hours">{{
+              'trainer_programs.fields.duration_hours' |
+              translate }}</label>
+            <input id="p_hours" type="number" min="1"
+              class="field-input"
+              formControlName="duration_hours" dir="ltr" />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="p_level">{{
+              'trainer_programs.fields.level' | translate }}
+              *</label>
+            <select id="p_level" class="field-input"
+              formControlName="level">
+              @for (lvl of levels; track lvl) {
+              <option [value]="lvl">{{ levelKey(lvl) |
+                translate }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        @if (formError()) {
+        <div class="form-error-banner">{{ formError() |
+          translate }}</div>
+        }
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary btn-add"
+            [disabled]="isSaving()">
+            @if (isSaving()) {
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            } @else {
+            {{ (editing() ? 'trainer_programs.save' :
+            'trainer_programs.create') | translate }}
+            }
+          </button>
+          <button type="button" class="btn-outline"
+            (click)="closeModal()" [disabled]="isSaving()">
+            {{ 'trainer_programs.cancel' | translate }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  }
+
+  <!-- -- Program Deletion Confirmation -- -->
+  @if (confirmDeleteId()) {
+  <div class="modal-backdrop" (click)="cancelDelete()">
+    <div class="modal-card surface confirm-card"
+      role="alertdialog" aria-modal="true"
+      (click)="$event.stopPropagation()">
+      <div class="confirm-icon"><i
+          class="fa-solid fa-trash"></i></div>
+      <h2>{{ 'trainer_programs.delete_confirm_title' |
+        translate }}</h2>
+      <p class="text-muted">{{
+        'trainer_programs.delete_confirm_text' | translate
+        }}</p>
+      <div class="form-actions confirm-actions">
+        <button type="button" class="btn-danger"
+          (click)="confirmDelete()"
+          [disabled]="isDeleting()">
+          @if (isDeleting()) {
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          } @else {
+          {{ 'trainer_programs.delete' | translate }}
+          }
+        </button>
+        <button type="button" class="btn-outline"
+          (click)="cancelDelete()"
+          [disabled]="isDeleting()">
+          {{ 'trainer_programs.cancel' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</section>

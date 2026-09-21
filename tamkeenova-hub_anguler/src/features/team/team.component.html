@@ -1,0 +1,60 @@
+<section class="team-page">
+  <div class="team-header">
+    <span class="team-eyebrow">
+      <i class="fa-solid fa-users"></i>
+      {{ 'team.header.eyebrow' | translate }}
+    </span>
+    <h1 class="team-title">{{ 'team.header.title' |
+      translate }}</h1>
+    <p class="team-subtitle">{{ 'team.header.subtitle' |
+      translate }}</p>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="team-grid">
+    @for (i of [1,2,3,4,5,6,7,8]; track i) {
+    <div
+      class="trainer-card-skeleton surface chamfer-sm animate-in"
+      [style.animation-delay]="(i * 0.05) + 's'">
+      <div class="skeleton-avatar shimmer"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line shimmer"
+          style="width: 80%"></div>
+        <div class="skeleton-line shimmer"
+          style="width: 60%"></div>
+        <div class="skeleton-line shimmer"
+          style="width: 40%"></div>
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Trainers Grid -->
+  @else if (trainers().length > 0) {
+  <div class="team-grid">
+    @for (trainer of trainers(); track trainer.id; let i =
+    $index) {
+    <div class="animate-in"
+      [style.animation-delay]="(i * 0.04) + 's'">
+      <app-trainer-card [trainer]="trainer"
+        [index]="i" (book)="onBook($event)"></app-trainer-card>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Empty State -->
+  @else {
+  <div class="empty-state surface chamfer-sm animate-in">
+    <div class="empty-icon">
+      <i class="fa-solid fa-users"></i>
+    </div>
+    <h3 class="empty-title">{{ 'team.empty_title' |
+      translate }}</h3>
+    <p class="empty-text">{{ 'team.empty_text' | translate
+      }}</p>
+  </div>
+  }
+</section>

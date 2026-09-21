@@ -1,0 +1,353 @@
+<app-page-header eyebrowKey="consultingPage.header.eyebrow" titleKey="consultingPage.header.title"
+  subtitleKey="consultingPage.header.subtitle"></app-page-header>
+
+@if (!isLoggedIn()) {
+<section class="account-notice glass-notice stable-notice">
+  <div class="account-notice-inner surface chamfer-sm">
+    <span class="account-notice-icon"><i class="fa-solid fa-circle-info"></i></span>
+    <p class="account-notice-text">{{ 'consultingPage.account_notice.text' | translate }}</p>
+    <a routerLink="/register" class="btn-accent account-notice-cta">
+      {{ 'consultingPage.account_notice.cta' | translate }}
+    </a>
+  </div>
+</section>
+} @else {
+<section class="account-notice glass-notice stable-notice is-logged">
+  <div class="account-notice-inner surface chamfer-sm logged-notice">
+    <span class="account-notice-icon success-icon"><i class="fa-solid fa-circle-check"></i></span>
+    <p class="account-notice-text">مرحباً {{ currentUser()?.full_name }}! يمكنك الآن تقديم طلبات الاستشارات والخدمات المؤسسية مباشرة</p>
+    @if (isStudent()) {
+      <span class="badge badge-approved"><i class="fa-solid fa-user-graduate"></i> حساب طالب / كلاينت فعال</span>
+    } @else {
+      <span class="badge badge-pending"><i class="fa-solid fa-chalkboard-user"></i> حساب مدرب</span>
+    }
+  </div>
+</section>
+}
+
+<section class="consulting-main">
+
+  <div class="consulting-form-card surface chamfer-sm glass-form-card">
+
+    <!-- Audience Toggle Glass -->
+    @if (!submitted()) {
+    <div class="audience-toggle glass-toggle" [class.is-b2c]="audience() === 'b2c'">
+      <span class="audience-toggle-pill"></span>
+      <button type="button" [class.is-active]="audience() === 'b2b'" (click)="setAudience('b2b')">
+        <i class="fa-solid fa-building"></i>
+        {{ 'consultingPage.tabs.b2b' | translate }}
+      </button>
+      <button type="button" [class.is-active]="audience() === 'b2c'" (click)="setAudience('b2c')">
+        <i class="fa-solid fa-user-graduate"></i>
+        {{ 'consultingPage.tabs.b2c' | translate }}
+      </button>
+    </div>
+    }
+
+    @if (!submitted()) {
+
+    <!-- B2B Full Corporate Form -->
+    @if (audience() === 'b2b') {
+    <div class="form-header">
+      <h3><i class="fa-solid fa-building"></i> {{ 'consultingPage.form.b2b_title' | translate }}</h3>
+      <p class="text-muted">{{ 'consultingPage.form.b2b_subtitle' | translate }}</p>
+    </div>
+
+    <form class="consulting-form b2b-form" (ngSubmit)="submit()" novalidate>
+      <div class="form-grid">
+        <div class="form-field" [class.has-error]="touched() && !b2b.company_name()">
+          <label>{{ 'consultingPage.form.company_name' | translate }} <span class="required-mark">*</span></label>
+          <input type="text" class="form-control" [ngModel]="b2b.company_name()" (ngModelChange)="b2b.company_name.set($event)"
+            name="company_name" [placeholder]="'consultingPage.form.name_placeholder' | translate" />
+          @if (touched() && !b2b.company_name()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
+        </div>
+
+        <div class="form-field">
+          <label>{{ 'consultingPage.form.service_type' | translate }} *</label>
+          <select class="form-control" [ngModel]="b2b.service_type()" (ngModelChange)="b2b.service_type.set($event)" name="service_type">
+            @for (t of serviceTypes; track t) {
+            <option [value]="t">{{ 'student_corporate.service_types.' + t | translate }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-field" [class.has-error]="touched() && !b2b.contact_name()">
+          <label>{{ 'consultingPage.form.contact_name' | translate }} *</label>
+          <input type="text" class="form-control" [ngModel]="b2b.contact_name()" (ngModelChange)="b2b.contact_name.set($event)"
+            name="contact_name" />
+          @if (touched() && !b2b.contact_name()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
+        </div>
+
+        <div class="form-field" [class.has-error]="touched() && !b2b.contact_email()">
+          <label>{{ 'consultingPage.form.contact_email' | translate }} *</label>
+          <input type="email" class="form-control" dir="ltr" [ngModel]="b2b.contact_email()" (ngModelChange)="b2b.contact_email.set($event)"
+            name="contact_email" />
+          @if (touched() && !b2b.contact_email()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
+        </div>
+
+        <div class="form-field">
+          <label>{{ 'student_corporate.fields.contact_phone' | translate }}</label>
+          <input type="tel" dir="ltr" class="form-control" [ngModel]="b2b.contact_phone()" (ngModelChange)="b2b.contact_phone.set($event)"
+            name="contact_phone" [placeholder]="'consultingPage.form.phone_placeholder' | translate" />
+        </div>
+
+        <div class="form-field">
+          <label>{{ 'student_corporate.fields.contact_whatsapp' | translate }}</label>
+          <input type="tel" dir="ltr" class="form-control" [ngModel]="b2b.contact_whatsapp()" (ngModelChange)="b2b.contact_whatsapp.set($event)"
+            name="contact_whatsapp" />
+        </div>
+
+        <div class="form-field">
+          <label>{{ 'consultingPage.form.sector' | translate }}</label>
+          <input type="text" class="form-control" [ngModel]="b2b.sector()" (ngModelChange)="b2b.sector.set($event)" name="sector" />
+        </div>
+
+        <div class="form-field">
+          <label>{{ 'consultingPage.form.country' | translate }}</label>
+          <input type="text" class="form-control" [ngModel]="b2b.country()" (ngModelChange)="b2b.country.set($event)" name="country" />
+        </div>
+
+        <div class="form-field">
+          <label>{{ 'consultingPage.form.employees_count' | translate }}</label>
+          <input type="number" min="1" dir="ltr" class="form-control" [ngModel]="b2b.employees_count()" (ngModelChange)="b2b.employees_count.set($any($event) ? +$any($event) : null)" name="employees_count" />
+        </div>
+
+        <div class="form-field">
+          <label>{{ 'consultingPage.form.project_duration' | translate }}</label>
+          <input type="text" class="form-control" [ngModel]="b2b.project_duration()" (ngModelChange)="b2b.project_duration.set($event)" name="project_duration" />
+        </div>
+
+        <div class="form-field">
+          <label>{{ 'consultingPage.form.expected_budget' | translate }}</label>
+          <input type="text" class="form-control" [ngModel]="b2b.expected_budget()" (ngModelChange)="b2b.expected_budget.set($event)" name="expected_budget" />
+        </div>
+
+        <div class="form-field field-full" [class.has-error]="touched() && !b2b.service_description()">
+          <label>{{ 'consultingPage.form.service_desc' | translate }} *</label>
+          <textarea class="form-control" rows="5" [ngModel]="b2b.service_description()" (ngModelChange)="b2b.service_description.set($event)"
+            name="service_description" [placeholder]="'consultingPage.form.details_placeholder' | translate"></textarea>
+          @if (touched() && !b2b.service_description()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
+        </div>
+      </div>
+
+      @if (submitError()) {
+      <div class="submit-error"><i class="fa-solid fa-triangle-exclamation"></i> {{ submitError()! | translate }}</div>
+      }
+
+      <button type="submit" class="btn-primary btn-submit glass-submit" [disabled]="submitting()">
+        @if (submitting()) {
+        <span class="spinner"></span>
+        <span>{{ 'consultingPage.form.submitting' | translate }}</span>
+        } @else {
+        <span>{{ 'consultingPage.form.submit' | translate }}</span>
+        <i class="fa-solid fa-paper-plane rtl-flip"></i>
+        }
+      </button>
+      <p class="upload-hint text-muted"><i class="fa-solid fa-paperclip"></i> {{ 'consultingPage.form.upload_attachment' | translate }}</p>
+    </form>
+    }
+
+    <!-- B2C Consultation Form -->
+    @if (audience() === 'b2c') {
+    <div class="form-header">
+      <h3><i class="fa-solid fa-user-graduate"></i> {{ 'consultingPage.form.b2c_title' | translate }}</h3>
+      <p class="text-muted">{{ 'consultingPage.form.b2c_subtitle' | translate }}</p>
+    </div>
+
+    <form class="consulting-form b2c-form" (ngSubmit)="submit()" novalidate>
+      <!-- Trainer Selector -->
+      <div class="form-field" [class.has-error]="touched() && !b2c.trainer_id()">
+        <label>{{ 'consultingPage.form.select_trainer' | translate }} *</label>
+        <div class="trainer-selector">
+          <div class="trainer-search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" class="form-control" [placeholder]="'consultingPage.form.trainer_placeholder' | translate"
+              [ngModel]="b2c.trainer_search()" (ngModelChange)="b2c.trainer_search.set($event)" name="trainer_search" />
+          </div>
+          @if (b2c.trainer_search() || !b2c.trainer_id()) {
+          <div class="trainer-dropdown surface">
+            @for (tr of filteredTrainers(); track tr.id) {
+            <button type="button" class="trainer-option" [class.is-selected]="b2c.trainer_id() === tr.id" (click)="selectTrainer(tr)">
+              @if (tr.users.profile_image) {
+              <img [src]="tr.users.profile_image" [alt]="tr.users.full_name" />
+              } @else {
+              <div class="trainer-option-fallback"><i class="fa-solid fa-user"></i></div>
+              }
+              <div>
+                <strong>{{ tr.users.full_name }}</strong>
+                @if (tr.specializations) { <span class="text-muted">{{ isArabic ? tr.specializations.name_ar : tr.specializations.name_en }}</span> }
+              </div>
+              @if (tr.average_rating) {
+              <span class="trainer-option-rating"><i class="fa-solid fa-star"></i> {{ tr.average_rating | number:'1.1-1' }}</span>
+              }
+            </button>
+            }
+          </div>
+          }
+          @if (selectedTrainer(); as st) {
+          <div class="selected-trainer-card">
+            @if (st.users.profile_image) { <img [src]="st.users.profile_image" [alt]="st.users.full_name" /> }
+            <span>{{ st.users.full_name }}</span>
+            <button type="button" class="icon-btn-sm" (click)="b2c.trainer_id.set(''); b2c.trainer_search.set('')"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          }
+        </div>
+        @if (touched() && !b2c.trainer_id()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
+      </div>
+
+      <div class="form-grid">
+        <div class="form-field field-full" [class.has-error]="touched() && !b2c.title()">
+          <label>{{ 'consultingPage.form.consultation_title' | translate }} *</label>
+          <input type="text" class="form-control" [ngModel]="b2c.title()" (ngModelChange)="b2c.title.set($event)" name="b2c_title"
+            [placeholder]="'booking.title_placeholder' | translate" />
+          @if (touched() && !b2c.title()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
+        </div>
+
+        <div class="form-field field-full" [class.has-error]="touched() && !b2c.description()">
+          <label>{{ 'consultingPage.form.consultation_desc' | translate }} *</label>
+          <textarea class="form-control" rows="4" [ngModel]="b2c.description()" (ngModelChange)="b2c.description.set($event)"
+            name="b2c_description" [placeholder]="'booking.topic_placeholder' | translate"></textarea>
+          @if (touched() && !b2c.description()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
+        </div>
+
+        <div class="form-field">
+          <label>{{ 'consultingPage.form.preferred_date' | translate }}</label>
+          <input type="date" class="form-control" [ngModel]="b2c.preferred_date()" (ngModelChange)="b2c.preferred_date.set($event)" name="preferred_date" />
+        </div>
+
+        <div class="form-field">
+          <label>{{ 'consultingPage.form.preferred_time' | translate }}</label>
+          <input type="time" class="form-control" dir="ltr" [ngModel]="b2c.preferred_time()" (ngModelChange)="b2c.preferred_time.set($event)" name="preferred_time" />
+        </div>
+
+        <div class="form-field">
+          <label>{{ 'consultingPage.form.contact_phone' | translate }}</label>
+          <input type="tel" dir="ltr" class="form-control" [ngModel]="b2c.contact_phone()" (ngModelChange)="b2c.contact_phone.set($event)" name="b2c_phone" />
+        </div>
+
+        <div class="form-field">
+          <label>{{ 'consultingPage.form.contact_method' | translate }}</label>
+          <div class="contact-method-toggle">
+            <button type="button" [class.is-active]="b2c.contact_method() === 'whatsapp'" (click)="b2c.contact_method.set('whatsapp')">
+              <i class="fa-brands fa-whatsapp"></i> {{ 'consultingPage.form.whatsapp' | translate }}
+            </button>
+            <button type="button" [class.is-active]="b2c.contact_method() === 'phone'" (click)="b2c.contact_method.set('phone')">
+              <i class="fa-solid fa-phone"></i> {{ 'consultingPage.form.phone' | translate }}
+            </button>
+            <button type="button" [class.is-active]="b2c.contact_method() === 'email'" (click)="b2c.contact_method.set('email')">
+              <i class="fa-solid fa-envelope"></i> {{ 'consultingPage.form.email' | translate }}
+            </button>
+          </div>
+        </div>
+
+        <div class="form-field field-full">
+          <label>{{ 'consultingPage.form.student_notes' | translate }}</label>
+          <textarea class="form-control" rows="2" [ngModel]="b2c.student_notes()" (ngModelChange)="b2c.student_notes.set($event)" name="student_notes"></textarea>
+        </div>
+      </div>
+
+      @if (submitError()) {
+      <div class="submit-error"><i class="fa-solid fa-triangle-exclamation"></i> {{ submitError()! | translate }}</div>
+      }
+
+      <button type="submit" class="btn-primary btn-submit glass-submit" [disabled]="submitting()">
+        @if (submitting()) {
+        <span class="spinner"></span>
+        <span>{{ 'consultingPage.form.submitting' | translate }}</span>
+        } @else {
+        <span>{{ 'consultingPage.form.submit' | translate }}</span>
+        <i class="fa-solid fa-paper-plane rtl-flip"></i>
+        }
+      </button>
+    </form>
+    }
+
+    } @else {
+    <!-- Success State -->
+    <div class="success-state">
+      <svg class="success-check" viewBox="0 0 80 80">
+        <circle class="success-check-circle" cx="40" cy="40" r="36" />
+        <path class="success-check-mark" d="M24 42 L35 53 L57 29" />
+      </svg>
+      <h3 class="success-title">{{ 'consultingPage.success.title' | translate }}</h3>
+      <p class="success-text">{{ 'consultingPage.success.text' | translate }}</p>
+
+      @if (audience() === 'b2b' && submittedRequestId()) {
+      <div class="attachment-upload-section glass-attachment">
+        <h4><i class="fa-solid fa-paperclip"></i> {{ 'student_corporate.attachments' | translate }}</h4>
+        <p class="text-muted">{{ 'student_corporate.upload_hint' | translate }}</p>
+        <input type="file" id="consulting-attachment-input" hidden (change)="onAttachmentSelected($event)" />
+        <button type="button" class="btn-outline" (click)="triggerAttachmentInput()" [disabled]="isUploading()">
+          @if (isUploading()) { <div class="loader-spinner-sm"></div> }
+          @else { <i class="fa-solid fa-cloud-arrow-up"></i> {{ 'student_corporate.upload_attachment' | translate }} }
+        </button>
+        @if (uploadSuccess()) {
+        <span class="upload-success"><i class="fa-solid fa-check"></i> {{ 'student_corporate.upload_success' | translate }}</span>
+        }
+      </div>
+      }
+
+      <div class="success-actions">
+        @if (audience() === 'b2b') {
+        <button type="button" class="btn-primary" (click)="goToMyRequests()">
+          <i class="fa-solid fa-building"></i> {{ 'consultingPage.form.view_my_requests' | translate }}
+        </button>
+        } @else {
+        <button type="button" class="btn-primary" (click)="goToMyConsultations()">
+          <i class="fa-solid fa-comments"></i> {{ 'consultingPage.form.view_my_consultations' | translate }}
+        </button>
+        }
+        <button type="button" class="btn-accent" (click)="resetForm()">
+          {{ 'consultingPage.success.cta' | translate }}
+        </button>
+      </div>
+    </div>
+    }
+
+  </div>
+
+  <aside class="consulting-perks glass-perks">
+    <h2 class="perks-title display">{{ 'consultingPage.perks.title' | translate }}</h2>
+
+    <div class="perk-item glass-perk-item">
+      <span class="perk-icon"><i class="fa-solid fa-bolt"></i></span>
+      <div>
+        <h3 class="perk-title">{{ 'consultingPage.perks.response.title' | translate }}</h3>
+        <p class="perk-desc">{{ 'consultingPage.perks.response.desc' | translate }}</p>
+      </div>
+    </div>
+
+    <div class="perk-item glass-perk-item">
+      <span class="perk-icon"><i class="fa-solid fa-lock"></i></span>
+      <div>
+        <h3 class="perk-title">{{ 'consultingPage.perks.confidential.title' | translate }}</h3>
+        <p class="perk-desc">{{ 'consultingPage.perks.confidential.desc' | translate }}</p>
+      </div>
+    </div>
+
+    <div class="perk-item glass-perk-item">
+      <span class="perk-icon"><i class="fa-solid fa-user-tie"></i></span>
+      <div>
+        <h3 class="perk-title">{{ 'consultingPage.perks.experts.title' | translate }}</h3>
+        <p class="perk-desc">{{ 'consultingPage.perks.experts.desc' | translate }}</p>
+      </div>
+    </div>
+
+    <div class="perks-extra glass-perks-extra">
+      <div class="perks-stat">
+        <span class="perks-stat-value">24h</span>
+        <span class="perks-stat-label">{{ 'consultingPage.perks.response.title' | translate }}</span>
+      </div>
+      <div class="perks-stat-divider"></div>
+      <div class="perks-stat">
+        <span class="perks-stat-value">100%</span>
+        <span class="perks-stat-label">{{ 'consultingPage.perks.confidential.title' | translate }}</span>
+      </div>
+      <div class="perks-stat-divider"></div>
+      <div class="perks-stat">
+        <span class="perks-stat-value"><i class="fa-solid fa-star"></i> 4.9</span>
+        <span class="perks-stat-label">{{ 'trainer_dashboard.average_rating' | translate }}</span>
+      </div>
+    </div>
+  </aside>
+</section>

@@ -1,0 +1,176 @@
+<div class="auth-page">
+  <section class="auth-visual-col">
+    <app-auth-visual-panel mode="register" />
+  </section>
+
+  <section class="auth-form-col">
+    <div class="auth-card auth-card-wide volunteer-card">
+
+      <span class="volunteer-eyebrow">
+        <i class="fa-solid fa-hand-holding-heart"></i>
+        {{ 'auth.volunteer_register.eyebrow' | translate }}
+      </span>
+      <h1 class="auth-title">{{ 'auth.volunteer_register.title' | translate }}</h1>
+      <p class="auth-subtitle text-muted">{{ 'auth.volunteer_register.subtitle' | translate }}</p>
+
+      @if (successMessage(); as message) {
+        <div class="volunteer-success">
+          <i class="fa-solid fa-circle-check"></i>
+          {{ message | translate }}
+        </div>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form" novalidate>
+
+          <!-- -- Full Name -- -->
+          <div class="field"
+            [class.is-valid]="isFieldValid('full_name')"
+            [class.is-invalid]="isFieldInvalid('full_name')">
+            <label class="field-label" for="full_name">{{ 'auth.fields.full_name' | translate }}</label>
+            <input
+              id="full_name" type="text" class="field-input"
+              formControlName="full_name"
+              (input)="markTouched('full_name')"
+              autocomplete="name" />
+            <span class="field-hint" [class.is-error]="isFieldInvalid('full_name')">
+              @if (isFieldInvalid('full_name')) {
+                {{ 'auth.errors.full_name' | translate }}
+              }
+            </span>
+          </div>
+
+          <!-- -- Username (optional) -- -->
+          <div class="field"
+            [class.is-valid]="isFieldValid('username')"
+            [class.is-invalid]="isFieldInvalid('username')">
+            <label class="field-label" for="username">
+              {{ 'auth.fields.username' | translate }}
+              <small class="text-muted">({{ 'common.optional' | translate }})</small>
+            </label>
+            <input
+              id="username" type="text" class="field-input"
+              formControlName="username"
+              (input)="markTouched('username')"
+              autocomplete="username" />
+            <span class="field-hint" [class.is-error]="isFieldInvalid('username')">
+              @if (isFieldInvalid('username')) {
+                {{ 'auth.errors.username' | translate }}
+              }
+            </span>
+          </div>
+
+          <!-- -- Email -- -->
+          <div class="field"
+            [class.is-valid]="isFieldValid('email')"
+            [class.is-invalid]="isFieldInvalid('email')">
+            <label class="field-label" for="email">{{ 'auth.fields.email' | translate }}</label>
+            <input
+              id="email" type="email" class="field-input"
+              formControlName="email"
+              (input)="markTouched('email')"
+              autocomplete="email" />
+            <span class="field-hint" [class.is-error]="isFieldInvalid('email')">
+              @if (isFieldInvalid('email')) {
+                {{ 'auth.errors.email' | translate }}
+              }
+            </span>
+          </div>
+
+          <!-- -- Phone -- -->
+          <div class="field"
+            [class.is-valid]="isFieldValid('phone')"
+            [class.is-invalid]="isFieldInvalid('phone')">
+            <label class="field-label" for="phone">{{ 'auth.fields.phone' | translate }}</label>
+            <input
+              id="phone" type="tel" class="field-input" dir="ltr"
+              formControlName="phone"
+              (input)="markTouched('phone')"
+              autocomplete="tel" />
+            <span class="field-hint" [class.is-error]="isFieldInvalid('phone')">
+              @if (isFieldInvalid('phone')) {
+                {{ 'auth.errors.phone' | translate }}
+              }
+            </span>
+          </div>
+
+          <!-- -- Password -- -->
+          <div class="field"
+            [class.is-valid]="isFieldValid('password')"
+            [class.is-invalid]="isFieldInvalid('password')">
+            <label class="field-label" for="password">{{ 'auth.fields.password' | translate }}</label>
+            <div class="password-wrap">
+              <input
+                id="password"
+                [type]="showPassword() ? 'text' : 'password'"
+                class="field-input"
+                formControlName="password"
+                (input)="markTouched('password'); passwordValue.set($any($event.target).value)"
+                autocomplete="new-password" />
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="showPassword.set(!showPassword())"
+                [attr.aria-label]="(showPassword() ? 'auth.fields.hide_password' : 'auth.fields.show_password') | translate">
+                <i class="fa-solid" [class.fa-eye]="!showPassword()" [class.fa-eye-slash]="showPassword()"></i>
+              </button>
+            </div>
+
+            <div class="password-strength" aria-hidden="true">
+              <div class="strength-track">
+                <div
+                  class="strength-fill"
+                  [class.is-weak]="strengthLevel() === 'weak'"
+                  [class.is-fair]="strengthLevel() === 'fair'"
+                  [class.is-strong]="strengthLevel() === 'strong'"
+                  [style.width.%]="(passwordScore() / 5) * 100">
+                </div>
+              </div>
+              <ul class="requirements-list">
+                @for (requirement of passwordRequirements; track requirement.labelKey) {
+                  <li [class.is-met]="isRequirementMet(requirement.test)">
+                    <i class="fa-solid" [class.fa-check]="isRequirementMet(requirement.test)"></i>
+                    {{ requirement.labelKey | translate }}
+                  </li>
+                }
+              </ul>
+            </div>
+          </div>
+
+          <!-- -- Bio (optional) -- -->
+          <div class="field">
+            <label class="field-label" for="bio">
+              {{ 'auth.volunteer_register.bio' | translate }}
+              <small class="text-muted">({{ 'common.optional' | translate }})</small>
+            </label>
+            <textarea
+              id="bio" class="field-input field-textarea"
+              formControlName="bio" rows="3"
+              [placeholder]="'auth.volunteer_register.bio_placeholder' | translate"></textarea>
+          </div>
+
+          @if (errorMessage(); as message) {
+            <div class="form-error-banner">{{ message }}</div>
+          }
+
+          <button type="submit" class="submit-btn" [disabled]="isLoading()">
+            @if (isLoading()) {
+              <span class="loader-spinner-sm"></span>
+            } @else {
+              <i class="fa-solid fa-hand-holding-heart"></i>
+            }
+            {{ 'auth.volunteer_register.submit' | translate }}
+          </button>
+
+          <p class="review-note text-muted">
+            <i class="fa-solid fa-circle-info"></i>
+            {{ 'auth.volunteer_register.review_note' | translate }}
+          </p>
+        </form>
+      }
+
+      <div class="auth-alt-links">
+        <span>{{ 'auth.register.have_account' | translate }}</span>
+        <a routerLink="/login">{{ 'auth.login.title' | translate }}</a>
+      </div>
+    </div>
+  </section>
+</div>

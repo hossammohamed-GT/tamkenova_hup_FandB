@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Smooth Coverflow</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#000;
+    overflow:hidden;
+    height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.carousel{
+    position:relative;
+    width:1400px;
+    height:600px;
+}
+
+.card{
+
+    position:absolute;
+
+    width:420px;
+    height:520px;
+
+    border-radius:40px;
+    overflow:hidden;
+
+    left:50%;
+    top:50%;
+
+    transform-origin:center center;
+
+    box-shadow:
+    0 30px 80px rgba(0,0,0,.4);
+
+    will-change:transform;
+}
+
+.card img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+</style>
+</head>
+<body>
+
+<div class="carousel">
+
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200">
+    </div>
+
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1511497584788-876760111969?w=1200">
+    </div>
+
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200">
+    </div>
+
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1200">
+    </div>
+
+    <div class="card">
+        <img src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1200">
+    </div>
+
+</div>
+
+<script>
+
+const cards = document.querySelectorAll(".card");
+
+const positions = [
+    {
+        x:-500,
+        scale:.65,
+        opacity:.45,
+        z:1
+    },
+    {
+        x:0,
+        scale:1,
+        opacity:1,
+        z:10
+    },
+    {
+        x:500,
+        scale:.65,
+        opacity:.45,
+        z:1
+    }
+];
+
+let progress = 0;
+let speed = 0.008;
+
+function lerp(a,b,t){
+    return a + (b-a)*t;
+}
+
+function render(){
+
+    progress += speed;
+
+    if(progress >= 1){
+
+        progress = 0;
+
+        const last =
+        positions.pop();
+
+        positions.unshift(last);
+    }
+
+    cards.forEach((card,index)=>{
+
+        let currentPos =
+        positions[index % 3];
+
+        let nextPos =
+        positions[(index+1)%3];
+
+        let x =
+        lerp(
+            currentPos.x,
+            nextPos.x,
+            progress
+        );
+
+        let scale =
+        lerp(
+            currentPos.scale,
+            nextPos.scale,
+            progress
+        );
+
+        let opacity =
+        lerp(
+            currentPos.opacity,
+            nextPos.opacity,
+            progress
+        );
+
+        let rotate =
+        x * -0.03;
+
+        card.style.zIndex =
+        Math.round(
+            lerp(
+                currentPos.z,
+                nextPos.z,
+                progress
+            )
+        );
+
+        card.style.opacity =
+        opacity;
+
+        card.style.transform =
+        `
+        translate(
+        calc(-50% + ${x}px),
+        -50%)
+        scale(${scale})
+        rotateY(${rotate}deg)
+        `;
+    });
+
+    requestAnimationFrame(render);
+}
+
+render();
+
+</script>
+
+</body>
+</html>

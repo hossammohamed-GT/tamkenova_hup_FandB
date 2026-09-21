@@ -1,0 +1,138 @@
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 46px;
+  padding-inline: 1.3rem;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.btn-add:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.empty-state p {
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+}
+
+/* -- Availability Summary -- */
+.avail-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.avail-summary-item {
+  padding: 1.1rem;
+  text-align: center;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.avail-summary-value {
+  font-family: var(--font-numeric);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.avail-summary-label {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+/* -- Availability Form -- */
+.avail-form-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .avail-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+select.field-input {
+  cursor: pointer;
+  appearance: auto;
+}
+
+/* -- Availability Day Grid -- */
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.1rem;
+}
+
+.day-card {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.day-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.1rem;
+  background: var(--color-surface-alt);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.day-card-head h3 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.slot-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.slot-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1.1rem;
+  border-bottom: 1px solid var(--color-border);
+  transition: opacity var(--transition-fast);
+}
+
+.slot-item:last-child {
+  border-bottom: none;
+}
+
+.slot-item.is-deleting {
+  opacity: 0.5;
+}
+
+.slot-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-numeric);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.slot-time i {
+  color: var(--color-accent);
+}
+
+.slot-actions {
+  display: flex;
+  gap: 0.4rem;
+}

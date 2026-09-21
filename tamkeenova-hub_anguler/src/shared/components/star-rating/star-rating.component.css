@@ -1,0 +1,22 @@
+:host { display: inline-block; }
+
+.star-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.85rem;
+}
+
+.star-rating i {
+  color: var(--color-accent);
+}
+
+.star-rating i.fa-regular {
+  color: var(--color-border);
+}
+
+.star-rating-value {
+  margin-inline-start: 0.35rem;
+  font-weight: 700;
+  font-size: 0.8rem;
+}

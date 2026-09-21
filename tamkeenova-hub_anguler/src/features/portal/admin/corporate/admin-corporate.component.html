@@ -1,0 +1,239 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'admin_corporate.title' | translate }}</h1>
+      <p class="text-muted">{{ 'admin_corporate.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <app-admin-nav />
+
+  <!-- -- Status Filters -- -->
+  <div class="filter-pills staff-fade">
+    @for (f of filters; track f) {
+      <button
+        type="button"
+        class="filter-pill"
+        [class.is-active]="activeFilter() === f"
+        (click)="setFilter(f)"
+      >
+        @if (f === 'PENDING' && pendingCount() > 0 && activeFilter() !== f) {
+          <span class="pill-count">{{ pendingCount() }}</span>
+        }
+        {{ f === 'ALL' ? ('common.all' | translate) : ('status.corporate.' + f | translate) }}
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="staff-empty"><div class="loader-spinner"></div></div>
+  } @else if (hasError()) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ 'admin_corporate.load_error' | translate }}</p>
+      <button type="button" class="btn-primary-sm btn-sm" (click)="load()">
+        {{ 'common.retry' | translate }}
+      </button>
+    </div>
+  } @else if (filtered().length === 0) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-building"></i>
+      <p>{{ 'admin_corporate.empty' | translate }}</p>
+    </div>
+  } @else {
+    <div class="table-wrap staff-fade">
+      <table class="staff-table">
+        <thead>
+          <tr>
+            <th>{{ 'admin_corporate.col_company' | translate }}</th>
+            <th>{{ 'admin_corporate.col_contact' | translate }}</th>
+            <th>{{ 'admin_corporate.col_service' | translate }}</th>
+            <th>{{ 'admin_corporate.col_budget' | translate }}</th>
+            <th>{{ 'admin_corporate.col_status' | translate }}</th>
+            <th>{{ 'admin_corporate.col_created' | translate }}</th>
+            <th>{{ 'admin_corporate.col_actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (request of filtered(); track request.id) {
+            <tr>
+              <td [attr.data-label]="'admin_corporate.col_company' | translate">
+                <div class="corp-cell">
+                  <span class="corp-logo">{{ request.company_name.charAt(0) }}</span>
+                  <span class="corp-info">
+                    <strong>{{ request.company_name }}</strong>
+                    <small class="text-muted">{{ request.sector ?? '' }} @if (request.employees_count) { · {{ request.employees_count }} }</small>
+                  </span>
+                </div>
+              </td>
+              <td [attr.data-label]="'admin_corporate.col_contact' | translate">
+                <div class="table-user-main">
+                  <span class="table-user-name">{{ request.contact_name }}</span>
+                  <span class="table-user-mail">{{ request.contact_email }}</span>
+                </div>
+              </td>
+              <td [attr.data-label]="'admin_corporate.col_service' | translate">
+                <span class="badge badge-info">{{ 'admin_corporate.service.' + request.service_type | translate }}</span>
+              </td>
+              <td [attr.data-label]="'admin_corporate.col_budget' | translate" class="table-muted">{{ request.expected_budget ?? '—' }}</td>
+              <td [attr.data-label]="'admin_corporate.col_status' | translate">
+                <span class="badge" [class]="statusBadge(request.status ?? 'PENDING')">
+                  {{ 'status.corporate.' + (request.status ?? 'PENDING') | translate }}
+                </span>
+              </td>
+              <td [attr.data-label]="'admin_corporate.col_created' | translate" class="table-muted">{{ request.created_at | date: 'yyyy/MM/dd' }}</td>
+              <td [attr.data-label]="'admin_corporate.col_actions' | translate">
+                <button type="button" class="btn-sm btn-primary-sm" (click)="openDetails(request)">
+                  <i class="fa-solid fa-folder-open"></i>
+                  {{ 'common.view' | translate }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- -- Details Modal -- -->
+  @if (details(); as d) {
+    <div class="modal-backdrop" (click)="closeDetails()">
+      <div class="modal-card surface chamfer-sm modal-wide" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ d.company_name }}</h3>
+          <button type="button" class="icon-btn" (click)="closeDetails()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        @if (isLoadingDetails()) {
+          <div class="staff-empty"><div class="loader-spinner"></div></div>
+        } @else {
+          <div class="staff-detail-grid">
+            <div class="staff-detail-item">
+              <span class="staff-detail-label">{{ 'admin_corporate.f_contact_name' | translate }}</span>
+              <span class="staff-detail-value">{{ d.contact_name }}</span>
+            </div>
+            <div class="staff-detail-item">
+              <span class="staff-detail-label">{{ 'admin_corporate.f_email' | translate }}</span>
+              <span class="staff-detail-value">{{ d.contact_email }}</span>
+            </div>
+            <div class="staff-detail-item">
+              <span class="staff-detail-label">{{ 'admin_corporate.f_phone' | translate }}</span>
+              <span class="staff-detail-value">{{ d.contact_phone ?? d.contact_whatsapp ?? '—' }}</span>
+            </div>
+            <div class="staff-detail-item">
+              <span class="staff-detail-label">{{ 'admin_corporate.f_country' | translate }}</span>
+              <span class="staff-detail-value">{{ d.country ?? '—' }}</span>
+            </div>
+            <div class="staff-detail-item">
+              <span class="staff-detail-label">{{ 'admin_corporate.f_duration' | translate }}</span>
+              <span class="staff-detail-value">{{ d.project_duration ?? '—' }}</span>
+            </div>
+            <div class="staff-detail-item">
+              <span class="staff-detail-label">{{ 'admin_corporate.col_status' | translate }}</span>
+              <span class="badge" [class]="statusBadge(d.status ?? 'PENDING')">
+                {{ 'status.corporate.' + (d.status ?? 'PENDING') | translate }}
+              </span>
+            </div>
+          </div>
+
+          <h4 class="detail-subtitle">{{ 'admin_corporate.f_description' | translate }}</h4>
+          <p class="desc-text">{{ d.service_description }}</p>
+
+          @if ((d.corporate_request_attachments?.length ?? 0) > 0) {
+            <h4 class="detail-subtitle">{{ 'admin_corporate.attachments' | translate }}</h4>
+            <div class="attachments-row">
+              @for (file of d.corporate_request_attachments; track file.id) {
+                <a class="file-chip" [href]="file.file_url" target="_blank" rel="noopener">
+                  <i class="fa-solid fa-paperclip"></i>
+                  {{ file.file_name ?? ('admin_corporate.attachment' | translate) }}
+                </a>
+              }
+            </div>
+          }
+
+          <h4 class="detail-subtitle">{{ 'admin_corporate.update_status' | translate }}</h4>
+
+          <div class="action-pills">
+            @for (a of filters.slice(1); track a) {
+              <button
+                type="button"
+                class="filter-pill"
+                [class.is-active]="actionForm.getRawValue().action === a"
+                (click)="setAction(a)"
+              >
+                {{ 'status.corporate.' + a | translate }}
+              </button>
+            }
+          </div>
+
+          <form [formGroup]="actionForm" (ngSubmit)="submitAction()">
+            @if (actionForm.getRawValue().action === 'ASSIGNED') {
+              <div class="field">
+                <label class="field-label">{{ 'admin_corporate.assign_to' | translate }}</label>
+                @if (isLoadingEmployees()) {
+                  <div class="staff-empty staff-empty-sm"><span class="loader-spinner-sm"></span></div>
+                } @else {
+                  <div class="employee-grid">
+                    @for (employee of employees(); track employee.id) {
+                      <button
+                        type="button"
+                        class="employee-card"
+                        [class.is-selected]="selectedEmployee()?.id === employee.id"
+                        (click)="pickEmployee(employee)"
+                      >
+                        <span class="table-avatar">{{ employee.full_name.charAt(0) }}</span>
+                        <span class="employee-name">{{ employee.full_name }}</span>
+                        @if (selectedEmployee()?.id === employee.id) {
+                          <i class="fa-solid fa-circle-check employee-check"></i>
+                        }
+                      </button>
+                    }
+                  </div>
+                  @if (employees().length === 0) {
+                    <div class="user-picker-empty">
+                      <i class="fa-solid fa-user-slash"></i>
+                      {{ 'admin_corporate.no_employees' | translate }}
+                    </div>
+                  }
+                }
+              </div>
+            }
+
+            <div class="field">
+              <label class="field-label" for="corp-notes">{{ 'admin_corporate.f_notes' | translate }}</label>
+              <textarea id="corp-notes" class="field-input field-textarea" formControlName="admin_notes" rows="2"></textarea>
+            </div>
+
+            @if (actionForm.getRawValue().action === 'REJECTED') {
+              <div class="field">
+                <label class="field-label" for="corp-reason">{{ 'admin_corporate.f_reject_reason' | translate }}</label>
+                <textarea id="corp-reason" class="field-input field-textarea" formControlName="reason" rows="2"></textarea>
+              </div>
+            }
+
+            <div class="form-actions">
+              <button type="button" class="btn-sm btn-outline-sm" (click)="closeDetails()">
+                {{ 'common.close' | translate }}
+              </button>
+              <button type="submit" class="btn-sm btn-primary-sm" [disabled]="isUpdating()">
+                @if (isUpdating()) {
+                  <span class="loader-spinner-sm"></span>
+                }
+                {{ 'admin_corporate.apply' | translate }}
+              </button>
+            </div>
+          </form>
+        }
+      </div>
+    </div>
+  }
+
+  @if (toast(); as t) {
+    <div class="staff-toast" [class.staff-toast-error]="t.error">
+      <i class="fa-solid" [class.fa-circle-check]="!t.error" [class.fa-circle-exclamation]="t.error"></i>
+      {{ t.key | translate }}
+    </div>
+  }
+</section>

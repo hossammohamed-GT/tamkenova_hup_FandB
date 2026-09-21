@@ -1,0 +1,191 @@
+@if (isOpen()) {
+  <div class="booking-backdrop" (click)="onBackdropClick($event)">
+    <div class="booking-modal surface chamfer-sm">
+      <button
+        type="button"
+        class="booking-close"
+        (click)="close()"
+        [attr.aria-label]="'booking.close' | translate"
+      >
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      @if (!submitted()) {
+        <div class="booking-trainer-preview">
+          @if (trainerAvatar()) {
+            <div
+              class="booking-trainer-avatar"
+              [style.background-image]="'url(' + trainerAvatar() + ')'"
+            ></div>
+          } @else {
+            <div class="booking-trainer-avatar booking-trainer-avatar-fallback">
+              <i class="fa-solid fa-user"></i>
+            </div>
+          }
+          <div>
+            <span class="booking-eyebrow">{{ 'booking.eyebrow' | translate }}</span>
+            <h3 class="booking-trainer-name">{{ trainerName() }}</h3>
+            @if (trainerSpec()) {
+              <p class="booking-trainer-spec">{{ trainerSpec() }}</p>
+            }
+          </div>
+        </div>
+
+        @if (!isLoggedIn()) {
+          <!-- -- Guest Gate -- -->
+          <div class="booking-gate">
+            <i class="fa-solid fa-circle-user"></i>
+            <p>{{ 'booking.login_required' | translate }}</p>
+            <button type="button" class="btn-accent btn-submit" (click)="goToLogin()">
+              {{ 'booking.login_cta' | translate }}
+            </button>
+          </div>
+        } @else if (!isStudent()) {
+          <!-- -- Non-student Notice -- -->
+          <div class="booking-gate">
+            <i class="fa-solid fa-circle-info"></i>
+            <p>{{ 'booking.trainer_notice' | translate }}</p>
+          </div>
+        } @else {
+          <form class="booking-form" (ngSubmit)="submit()">
+            <div class="form-field" [class.has-error]="touched() && !title()">
+              <label for="bookingTitle">
+                {{ 'booking.title_label' | translate }} <span class="required-mark">*</span>
+              </label>
+              <input
+                id="bookingTitle"
+                type="text"
+                class="form-control"
+                [ngModel]="title()"
+                (ngModelChange)="title.set($event)"
+                name="bookingTitle"
+                [placeholder]="'booking.title_placeholder' | translate"
+              />
+              @if (touched() && !title()) {
+                <span class="field-error">{{ 'booking.required_error' | translate }}</span>
+              }
+            </div>
+
+            <div class="form-field" [class.has-error]="touched() && !topic()">
+              <label for="bookingTopic">
+                {{ 'booking.topic_label' | translate }} <span class="required-mark">*</span>
+              </label>
+              <textarea
+                id="bookingTopic"
+                class="form-control"
+                rows="3"
+                [ngModel]="topic()"
+                (ngModelChange)="topic.set($event)"
+                name="bookingTopic"
+                [placeholder]="'booking.topic_placeholder' | translate"
+              ></textarea>
+              @if (touched() && !topic()) {
+                <span class="field-error">{{ 'booking.required_error' | translate }}</span>
+              }
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label for="bookingDate">{{ 'booking.date_label' | translate }}</label>
+                <input
+                  id="bookingDate"
+                  type="date"
+                  class="form-control"
+                  [ngModel]="preferredDate()"
+                  (ngModelChange)="preferredDate.set($event)"
+                  name="bookingDate"
+                />
+              </div>
+              <div class="form-field">
+                <label for="bookingTime">{{ 'booking.time_label' | translate }}</label>
+                <input
+                  id="bookingTime"
+                  type="time"
+                  class="form-control"
+                  [ngModel]="preferredTime()"
+                  (ngModelChange)="preferredTime.set($event)"
+                  name="bookingTime"
+                />
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="bookingPhone">{{ 'booking.phone_label' | translate }}</label>
+              <input
+                id="bookingPhone"
+                type="tel"
+                dir="ltr"
+                class="form-control form-control-ltr"
+                [ngModel]="phone()"
+                (ngModelChange)="phone.set($event)"
+                name="bookingPhone"
+                [placeholder]="'booking.phone_placeholder' | translate"
+              />
+            </div>
+
+            <div class="form-field">
+              <label>{{ 'booking.contact_method_label' | translate }}</label>
+              <div class="contact-method-group">
+                <button
+                  type="button"
+                  [class.is-active]="contactMethod() === 'whatsapp'"
+                  (click)="setContactMethod('whatsapp')"
+                >
+                  <i class="fa-brands fa-whatsapp"></i>
+                  {{ 'booking.method_whatsapp' | translate }}
+                </button>
+                <button
+                  type="button"
+                  [class.is-active]="contactMethod() === 'phone'"
+                  (click)="setContactMethod('phone')"
+                >
+                  <i class="fa-solid fa-phone"></i>
+                  {{ 'booking.method_phone' | translate }}
+                </button>
+                <button
+                  type="button"
+                  [class.is-active]="contactMethod() === 'email'"
+                  (click)="setContactMethod('email')"
+                >
+                  <i class="fa-solid fa-envelope"></i>
+                  {{ 'booking.method_email' | translate }}
+                </button>
+              </div>
+            </div>
+
+            @if (submitError()) {
+              <div class="booking-error">{{ submitError() | translate }}</div>
+            }
+
+            <button type="submit" class="btn-primary btn-submit" [disabled]="submitting()">
+              @if (submitting()) {
+                <span class="spinner"></span>
+                <span>{{ 'booking.submitting' | translate }}</span>
+              } @else {
+                <span>{{ 'booking.submit' | translate }}</span>
+                <i class="fa-solid fa-paper-plane rtl-flip"></i>
+              }
+            </button>
+          </form>
+        }
+      } @else {
+        <div class="success-state">
+          <svg class="success-check" viewBox="0 0 80 80">
+            <circle class="success-check-circle" cx="40" cy="40" r="36" />
+            <path class="success-check-mark" d="M24 42 L35 53 L57 29" />
+          </svg>
+          <h3 class="success-title">{{ 'booking.success_title' | translate }}</h3>
+          <p class="success-text">{{ 'booking.success_text' | translate }}</p>
+          <div class="success-actions">
+            <button type="button" class="btn-accent" (click)="goToConsultations()">
+              {{ 'booking.view_my_consultations' | translate }}
+            </button>
+            <button type="button" class="btn-ghost" (click)="close()">
+              {{ 'booking.success_cta' | translate }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

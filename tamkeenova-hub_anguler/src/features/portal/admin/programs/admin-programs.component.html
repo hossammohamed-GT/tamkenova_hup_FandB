@@ -1,0 +1,221 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'admin_programs.title' | translate }}</h1>
+      <p class="text-muted">{{ 'admin_programs.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <app-admin-nav />
+
+  <!-- -- Toolbar -- -->
+  <div class="toolbar">
+    <div class="toolbar-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input
+        type="text"
+        class="field-input"
+        [placeholder]="'admin_programs.search_placeholder' | translate"
+        [ngModel]="search()"
+        (ngModelChange)="onSearch($event)"
+      />
+    </div>
+    <button type="button" class="btn-sm btn-outline-sm" (click)="load()" [disabled]="isLoading()">
+      <i class="fa-solid" [class.fa-spin]="isLoading()">&#xf2f1;</i>
+      {{ 'common.retry' | translate }}
+    </button>
+  </div>
+
+  <div class="filter-pills staff-fade">
+    @for (option of visibilityOptions; track option) {
+      <button
+        type="button"
+        class="filter-pill"
+        [class.is-active]="visibilityFilter() === option"
+        (click)="setVisibility(option)"
+      >
+        {{ 'admin_programs.visibility.' + option | translate }}
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="staff-empty"><div class="loader-spinner"></div></div>
+  } @else if (hasError()) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ 'admin_programs.load_error' | translate }}</p>
+      <button type="button" class="btn-primary-sm btn-sm" (click)="load()">
+        {{ 'common.retry' | translate }}
+      </button>
+    </div>
+  } @else if (filtered().length === 0) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-book-open"></i>
+      <p>{{ 'admin_programs.empty' | translate }}</p>
+    </div>
+  } @else {
+    <div class="table-wrap staff-fade">
+      <table class="staff-table">
+        <thead>
+          <tr>
+            <th>{{ 'admin_programs.col_program' | translate }}</th>
+            <th>{{ 'admin_programs.col_trainer' | translate }}</th>
+            <th>{{ 'admin_programs.col_price' | translate }}</th>
+            <th>{{ 'admin_programs.col_hours' | translate }}</th>
+            <th>{{ 'admin_programs.col_rating' | translate }}</th>
+            <th>{{ 'admin_programs.col_visibility' | translate }}</th>
+            <th>{{ 'admin_programs.col_actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (program of filtered(); track program.id) {
+            <tr>
+              <td [attr.data-label]="'admin_programs.col_program' | translate">
+                <div class="program-cell">
+                  @if (program.image_url) {
+                    <img class="program-thumb" [src]="program.image_url" [alt]="program.title" loading="lazy" />
+                  } @else {
+                    <span class="program-thumb program-thumb-placeholder">
+                      <i class="fa-solid fa-book"></i>
+                    </span>
+                  }
+                  <div class="program-info">
+                    <strong>{{ program.title }}</strong>
+                    @if (program.specializations) {
+                      <small class="text-muted">{{ program.specializations.name_ar }}</small>
+                    }
+                  </div>
+                </div>
+              </td>
+              <td [attr.data-label]="'admin_programs.col_trainer' | translate" class="table-muted">{{ program.trainers?.users?.full_name ?? '—' }}</td>
+              <td [attr.data-label]="'admin_programs.col_price' | translate">
+                @if (program.price !== null && program.price !== undefined) {
+                  <span class="price-chip">{{ program.price }} {{ 'common.currency' | translate }}</span>
+                } @else {
+                  <span class="badge badge-approved">{{ 'admin_programs.free' | translate }}</span>
+                }
+              </td>
+              <td [attr.data-label]="'admin_programs.col_hours' | translate" class="table-muted">{{ program.duration_hours ?? '—' }}</td>
+              <td [attr.data-label]="'admin_programs.col_rating' | translate">
+                <span class="rating-chip">
+                  <i class="fa-solid fa-star"></i>
+                  {{ ratingDisplay(program) }}
+                </span>
+              </td>
+              <td [attr.data-label]="'admin_programs.col_visibility' | translate">
+                <span class="badge" [class.badge-approved]="isVisible(program)" [class.badge-neutral]="!isVisible(program)">
+                  {{ (isVisible(program) ? 'admin_programs.visible' : 'admin_programs.hidden_label') | translate }}
+                </span>
+              </td>
+              <td [attr.data-label]="'admin_programs.col_actions' | translate">
+                <div class="cell-actions">
+                  <button
+                    type="button"
+                    class="btn-sm btn-outline-sm"
+                    [disabled]="busyId() === program.id"
+                    (click)="toggleVisibility(program)"
+                  >
+                    <i class="fa-solid" [class.fa-eye-slash]="isVisible(program)" [class.fa-eye]="!isVisible(program)"></i>
+                    {{ (isVisible(program) ? 'admin_programs.hide' : 'admin_programs.show') | translate }}
+                  </button>
+                  <button type="button" class="btn-sm btn-outline-sm" (click)="openEdit(program)">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button type="button" class="btn-sm btn-danger-sm" (click)="askDelete(program)">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- -- Edit Modal -- -->
+  @if (editTarget(); as target) {
+    <div class="modal-backdrop" (click)="closeEdit()">
+      <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ 'admin_programs.edit_title' | translate }}</h3>
+          <button type="button" class="icon-btn" (click)="closeEdit()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="save()">
+          <div class="field">
+            <label class="field-label" for="program-title">{{ 'admin_programs.f_title' | translate }}</label>
+            <input id="program-title" type="text" class="field-input" formControlName="title" />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="program-desc">{{ 'admin_programs.f_description' | translate }}</label>
+            <textarea id="program-desc" class="field-input field-textarea" formControlName="description" rows="3"></textarea>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label class="field-label" for="program-price">{{ 'admin_programs.f_price' | translate }}</label>
+              <input id="program-price" type="number" min="0" class="field-input" formControlName="price" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="program-hours">{{ 'admin_programs.f_hours' | translate }}</label>
+              <input id="program-hours" type="number" min="0" class="field-input" formControlName="duration_hours" />
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-sm btn-outline-sm" (click)="closeEdit()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button type="submit" class="btn-sm btn-primary-sm" [disabled]="isSaving()">
+              @if (isSaving()) {
+                <span class="loader-spinner-sm"></span>
+              }
+              {{ 'common.save' | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- -- Delete Confirm -- -->
+  @if (deleteTarget(); as target) {
+    <div class="modal-backdrop" (click)="closeDelete()">
+      <div class="modal-card surface chamfer-sm modal-narrow" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ 'admin_programs.delete_title' | translate }}</h3>
+          <button type="button" class="icon-btn" (click)="closeDelete()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p class="confirm-text">
+          {{ 'admin_programs.delete_confirm' | translate }}
+          <strong>{{ target.title }}</strong>
+        </p>
+        <div class="form-actions">
+          <button type="button" class="btn-sm btn-outline-sm" (click)="closeDelete()">
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button type="button" class="btn-sm btn-danger-sm" [disabled]="isDeleting()" (click)="confirmDelete()">
+            @if (isDeleting()) {
+              <span class="loader-spinner-sm"></span>
+            }
+            {{ 'common.delete' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (toast(); as t) {
+    <div class="staff-toast" [class.staff-toast-error]="t.error">
+      <i class="fa-solid" [class.fa-circle-check]="!t.error" [class.fa-circle-exclamation]="t.error"></i>
+      {{ t.key | translate }}
+    </div>
+  }
+</section>

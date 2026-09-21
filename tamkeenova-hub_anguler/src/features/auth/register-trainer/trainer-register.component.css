@@ -1,0 +1,247 @@
+.auth-card-wide {
+  max-width: 560px;
+}
+
+/* -- Step Indicator -- */
+.step-indicator {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 1.75rem;
+}
+
+.step-indicator-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  position: relative;
+}
+
+.step-indicator-item::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  inset-inline-start: calc(50% + 22px);
+  width: calc(100% - 28px);
+  height: 2px;
+  background: var(--color-border);
+  z-index: 0;
+}
+
+.step-indicator-item:last-child::after {
+  display: none;
+}
+
+.step-indicator-item.is-done::after {
+  background: var(--color-success);
+}
+
+.step-indicator-dot {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+}
+
+.step-indicator-item.is-active .step-indicator-dot {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.step-indicator-item.is-done .step-indicator-dot {
+  border-color: var(--color-success);
+  background: var(--color-success);
+  color: #fff;
+}
+
+.step-indicator-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.step-indicator-item.is-active .step-indicator-label {
+  color: var(--color-text);
+}
+
+/* -- Specialization Options -- */
+.spec-loading {
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spec-loading i {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spec-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.spec-chip {
+  padding: 0.5rem 0.9rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast);
+}
+
+.spec-chip:hover {
+  border-color: var(--color-primary);
+}
+
+.spec-chip.is-active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* -- Text Areas -- */
+.field-textarea {
+  height: auto;
+  padding-block: 0.7rem;
+  padding-inline-end: 1rem;
+  resize: vertical;
+  min-height: 64px;
+  line-height: 1.5;
+}
+
+/* -- Pricing Fields -- */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.7rem;
+}
+
+@media (max-width: 640px) {
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* -- Dynamic Document Lists -- */
+.dynamic-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.dynamic-list-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dynamic-list-row-doc {
+  display: grid;
+  grid-template-columns: 1fr 1fr 100px auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .dynamic-list-row-doc {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dynamic-list-remove {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-danger);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.dynamic-list-remove:hover {
+  border-color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+}
+
+.dynamic-list-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.65rem;
+  padding: 0.55rem 0.9rem;
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--color-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.dynamic-list-add:hover {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 5%, transparent);
+}
+
+/* -- Step Navigation -- */
+.step-nav {
+  display: flex;
+  gap: 0.7rem;
+  margin-top: 0.5rem;
+}
+
+.step-nav-next {
+  flex: 1;
+}
+
+.btn-step-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 48px;
+  padding-inline: 1.1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-step-back:hover {
+  border-color: var(--color-primary);
+}

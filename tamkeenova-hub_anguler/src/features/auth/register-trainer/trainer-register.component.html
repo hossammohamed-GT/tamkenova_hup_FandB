@@ -1,0 +1,503 @@
+<div class="auth-page">
+  <section class="auth-visual-col">
+    <app-auth-visual-panel mode="register" />
+  </section>
+
+  <section class="auth-form-col">
+    <div class="auth-card auth-card-wide">
+
+      <span class="auth-eyebrow">{{
+        'auth.trainer_register.eyebrow' | translate
+        }}</span>
+      <h1 class="auth-title">{{
+        'auth.trainer_register.title' | translate }}</h1>
+      <p class="auth-subtitle text-muted">{{
+        'auth.trainer_register.subtitle' | translate }}</p>
+
+      <!-- -- Registration Step Indicator -- -->
+      <div class="step-indicator">
+        @for (i of [1, 2, 3]; track i) {
+        <div class="step-indicator-item"
+          [class.is-active]="currentStep() === i"
+          [class.is-done]="currentStep() > i">
+          <span class="step-indicator-dot">
+            @if (currentStep() > i) {
+            <i class="fa-solid fa-check"></i>
+            } @else {
+            {{ i }}
+            }
+          </span>
+          <span class="step-indicator-label">{{
+            'auth.trainer_register.steps.' + (i === 1 ?
+            'account' : i === 2 ? 'profile' : 'links') |
+            translate }}</span>
+        </div>
+        }
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()"
+        class="auth-form" novalidate>
+
+        <!-- -- Personal Information Step -- -->
+        @if (currentStep() === 1) {
+
+        <div class="field"
+          [class.is-valid]="isFieldValid('full_name')"
+          [class.is-invalid]="isFieldInvalid('full_name')">
+          <label class="field-label" for="full_name">{{
+            'auth.fields.full_name' | translate }}</label>
+          <div class="field-input-wrap">
+            <input id="full_name" type="text"
+              class="field-input"
+              formControlName="full_name"
+              (input)="markTouched('full_name')"
+              autocomplete="name" />
+            <i class="fa-solid fa-check field-status-icon is-valid"
+              [class.is-visible]="isFieldValid('full_name')"></i>
+            <i class="fa-solid fa-xmark field-status-icon is-invalid"
+              [class.is-visible]="isFieldInvalid('full_name')"></i>
+          </div>
+          <span class="field-hint"
+            [class.is-error]="isFieldInvalid('full_name')">
+            @if (isFieldInvalid('full_name')) { {{
+            'auth.errors.full_name' | translate }} }
+          </span>
+        </div>
+
+        <div class="field"
+          [class.is-valid]="isFieldValid('username')"
+          [class.is-invalid]="isFieldInvalid('username')">
+          <label class="field-label" for="username">
+            {{ 'auth.fields.username' | translate }}
+            <span class="text-muted">({{ 'auth.optional' |
+              translate }})</span>
+          </label>
+          <div class="field-input-wrap">
+            <input id="username" type="text"
+              class="field-input" formControlName="username"
+              (input)="markTouched('username')"
+              autocomplete="username" dir="ltr" />
+            <i class="fa-solid fa-check field-status-icon is-valid"
+              [class.is-visible]="isFieldValid('username')"></i>
+            <i class="fa-solid fa-xmark field-status-icon is-invalid"
+              [class.is-visible]="isFieldInvalid('username')"></i>
+          </div>
+          <span class="field-hint"
+            [class.is-error]="isFieldInvalid('username')">
+            @if (isFieldInvalid('username')) {
+              {{ 'auth.errors.username' | translate }}
+            } @else if (serverFieldError()?.field === 'username') {
+              {{ serverFieldError()!.key | translate }}
+            }
+          </span>
+        </div>
+
+        <div class="field"
+          [class.is-valid]="isFieldValid('email')"
+          [class.is-invalid]="isFieldInvalid('email')">
+          <label class="field-label" for="email">{{
+            'auth.fields.email' | translate }}</label>
+          <div class="field-input-wrap">
+            <input id="email" type="email"
+              class="field-input" formControlName="email"
+              (input)="markTouched('email')"
+              autocomplete="email" dir="ltr" />
+            <i class="fa-solid fa-check field-status-icon is-valid"
+              [class.is-visible]="isFieldValid('email')"></i>
+            <i class="fa-solid fa-xmark field-status-icon is-invalid"
+              [class.is-visible]="isFieldInvalid('email')"></i>
+          </div>
+          <span class="field-hint"
+            [class.is-error]="isFieldInvalid('email')">
+            @if (isFieldInvalid('email')) {
+              {{ 'auth.errors.email' | translate }}
+            } @else if (serverFieldError()?.field === 'email') {
+              {{ serverFieldError()!.key | translate }}
+            }
+          </span>
+        </div>
+
+        <div class="field"
+          [class.is-valid]="isFieldValid('phone')"
+          [class.is-invalid]="isFieldInvalid('phone')">
+          <label class="field-label" for="phone">{{
+            'auth.fields.phone' | translate }}</label>
+          <div class="field-input-wrap">
+            <input id="phone" type="tel" class="field-input"
+              formControlName="phone"
+              (input)="markTouched('phone')"
+              placeholder="01xxxxxxxxx" autocomplete="tel"
+              dir="ltr" />
+            <i class="fa-solid fa-check field-status-icon is-valid"
+              [class.is-visible]="isFieldValid('phone')"></i>
+            <i class="fa-solid fa-xmark field-status-icon is-invalid"
+              [class.is-visible]="isFieldInvalid('phone')"></i>
+          </div>
+          <span class="field-hint"
+            [class.is-error]="isFieldInvalid('phone')">
+            @if (isFieldInvalid('phone')) {
+              {{ 'auth.errors.phone' | translate }}
+            } @else if (serverFieldError()?.field === 'phone') {
+              {{ serverFieldError()!.key | translate }}
+            }
+          </span>
+        </div>
+
+        <div class="field"
+          [class.is-valid]="isFieldValid('password')"
+          [class.is-invalid]="isFieldInvalid('password')">
+          <label class="field-label" for="password">{{
+            'auth.fields.password' | translate }}</label>
+          <div class="field-input-wrap">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              id="password" class="field-input"
+              formControlName="password"
+              (input)="onPasswordInput($any($event.target).value)"
+              autocomplete="new-password" />
+            <button type="button"
+              class="field-toggle-visibility"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="'auth.toggle_password' | translate">
+              <i class="fa-solid"
+                [class.fa-eye]="!showPassword()"
+                [class.fa-eye-slash]="showPassword()"></i>
+            </button>
+          </div>
+
+          @if (isTouched('password')) {
+          <div class="password-meter">
+            @for (i of [0, 1, 2, 3]; track i) {
+            <span class="password-meter-bar"
+              [attr.data-level]="strengthLevel()"
+              [class.is-filled]="passwordScore() > i"></span>
+            }
+          </div>
+          <div class="password-requirements">
+            @for (req of passwordRequirements; track
+            req.key) {
+            <span class="password-requirement"
+              [class.is-met]="isRequirementMet(req.test)">
+              <i class="fa-solid"
+                [class.fa-circle-check]="isRequirementMet(req.test)"
+                [class.fa-circle]="!isRequirementMet(req.test)"></i>
+              {{ req.labelKey | translate }}
+            </span>
+            }
+          </div>
+          }
+        </div>
+
+        <div class="field">
+          <span class="field-label">{{
+            'auth.trainer_register.specialization_label' |
+            translate }}</span>
+
+          @if (specializationsLoading()) {
+          <p class="text-muted spec-loading"><i
+              class="fa-solid fa-spinner"></i> {{
+            'loader.loading' | translate }}</p>
+          } @else if (specializationsError()) {
+          <p class="field-hint is-error">{{
+            'auth.errors.generic' | translate }}</p>
+          } @else {
+          <div class="spec-grid">
+            @for (spec of specializations(); track spec.id)
+            {
+            <button type="button" class="spec-chip"
+              [class.is-active]="form.controls.specialization_id.value === spec.id"
+              (click)="selectSpecialization(spec.id)">
+              {{ spec.name_ar }}
+            </button>
+            }
+          </div>
+          <span class="field-hint">{{
+            'auth.trainer_register.specialization_not_found'
+            | translate }}</span>
+          }
+
+          <span class="field-hint"
+            [class.is-error]="isFieldInvalid('specialization_id')">
+            @if (isFieldInvalid('specialization_id')) { {{
+            'auth.errors.specialization' | translate }} }
+          </span>
+        </div>
+        }
+
+        <!-- -- Professional Information Step -- -->
+        @if (currentStep() === 2) {
+
+        <div class="field">
+          <label class="field-label" for="bio_ar">{{
+            'auth.trainer_register.bio_ar_label' | translate
+            }}</label>
+          <textarea id="bio_ar"
+            class="field-input field-textarea"
+            formControlName="bio_ar" rows="2"></textarea>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="bio_en">{{
+            'auth.trainer_register.bio_en_label' | translate
+            }}</label>
+          <textarea id="bio_en"
+            class="field-input field-textarea"
+            formControlName="bio_en" rows="2"
+            dir="ltr"></textarea>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="description_ar">{{
+            'auth.trainer_register.description_ar_label' |
+            translate }}</label>
+          <textarea id="description_ar"
+            class="field-input field-textarea"
+            formControlName="description_ar"
+            rows="3"></textarea>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="description_en">{{
+            'auth.trainer_register.description_en_label' |
+            translate }}</label>
+          <textarea id="description_en"
+            class="field-input field-textarea"
+            formControlName="description_en" rows="3"
+            dir="ltr"></textarea>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="cover_letter">{{
+            'auth.trainer_register.cover_letter_label' |
+            translate }}</label>
+          <textarea id="cover_letter"
+            class="field-input field-textarea"
+            formControlName="cover_letter"
+            rows="3"></textarea>
+        </div>
+        }
+
+        <!-- -- Supporting Documents Step -- -->
+        @if (currentStep() === 3) {
+
+        <div class="field"
+          [class.is-invalid]="isFieldInvalid('linkedin_url')">
+          <label class="field-label" for="linkedin_url">{{
+            'auth.trainer_register.linkedin_label' |
+            translate }}</label>
+          <input id="linkedin_url" type="url"
+            class="field-input"
+            formControlName="linkedin_url"
+            (input)="markTouched('linkedin_url')" dir="ltr"
+            placeholder="https://linkedin.com/in/..." />
+          <span class="field-hint"
+            [class.is-error]="isFieldInvalid('linkedin_url')">
+            @if (isFieldInvalid('linkedin_url')) { {{
+            'auth.errors.url' | translate }} }
+          </span>
+        </div>
+
+        <div class="field"
+          [class.is-invalid]="isFieldInvalid('facebook_url')">
+          <label class="field-label" for="facebook_url">{{
+            'auth.trainer_register.facebook_label' |
+            translate }}</label>
+          <input id="facebook_url" type="url"
+            class="field-input"
+            formControlName="facebook_url"
+            (input)="markTouched('facebook_url')" dir="ltr"
+            placeholder="https://facebook.com/..." />
+          <span class="field-hint"
+            [class.is-error]="isFieldInvalid('facebook_url')">
+            @if (isFieldInvalid('facebook_url')) { {{
+            'auth.errors.url' | translate }} }
+          </span>
+        </div>
+
+        <div class="field"
+          [class.is-invalid]="isFieldInvalid('website_url')">
+          <label class="field-label" for="website_url">{{
+            'auth.trainer_register.website_label' |
+            translate }}</label>
+          <input id="website_url" type="url"
+            class="field-input"
+            formControlName="website_url"
+            (input)="markTouched('website_url')" dir="ltr"
+            placeholder="https://..." />
+          <span class="field-hint"
+            [class.is-error]="isFieldInvalid('website_url')">
+            @if (isFieldInvalid('website_url')) { {{
+            'auth.errors.url' | translate }} }
+          </span>
+        </div>
+
+        <div class="field"
+          [class.is-invalid]="isFieldInvalid('portfolio_url')">
+          <label class="field-label" for="portfolio_url">{{
+            'auth.trainer_register.portfolio_label' |
+            translate }}</label>
+          <input id="portfolio_url" type="url"
+            class="field-input"
+            formControlName="portfolio_url"
+            (input)="markTouched('portfolio_url')" dir="ltr"
+            placeholder="https://behance.net/..." />
+          <span class="field-hint"
+            [class.is-error]="isFieldInvalid('portfolio_url')">
+            @if (isFieldInvalid('portfolio_url')) { {{
+            'auth.errors.url' | translate }} }
+          </span>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="price_from">{{
+              'auth.trainer_register.price_from_label' |
+              translate }}</label>
+            <input id="price_from" type="number" min="0"
+              class="field-input"
+              formControlName="consultation_price_from"
+              dir="ltr" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="price_to">{{
+              'auth.trainer_register.price_to_label' |
+              translate }}</label>
+            <input id="price_to" type="number" min="0"
+              class="field-input"
+              formControlName="consultation_price_to"
+              dir="ltr" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="duration">{{
+              'auth.trainer_register.duration_label' |
+              translate }}</label>
+            <input id="duration" type="number" min="0"
+              class="field-input"
+              formControlName="consultation_duration"
+              dir="ltr" />
+          </div>
+        </div>
+
+        <!-- -- Certificate Entries -- -->
+        <div class="field">
+          <span class="field-label">{{
+            'auth.trainer_register.certificates_label' |
+            translate }}</span>
+
+          <div class="dynamic-list" [formGroup]="form">
+            @for (ctrl of certificateUrls.controls; track
+            $index) {
+            <div class="dynamic-list-row">
+              <input type="url" class="field-input"
+                [formControl]="ctrl" dir="ltr"
+                placeholder="https://drive.google.com/..." />
+              <button type="button"
+                class="dynamic-list-remove"
+                (click)="removeCertificate($index)"
+                [attr.aria-label]="'auth.trainer_register.remove' | translate">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+            }
+          </div>
+
+          <button type="button" class="dynamic-list-add"
+            (click)="addCertificate()">
+            <i class="fa-solid fa-plus"></i>
+            {{ 'auth.trainer_register.add_certificate' |
+            translate }}
+          </button>
+        </div>
+
+        <!-- -- Document Entries -- -->
+        <div class="field">
+          <span class="field-label">{{
+            'auth.trainer_register.documents_label' |
+            translate }}</span>
+
+          <div class="dynamic-list">
+            @for (group of documents.controls; track $index)
+            {
+            <div
+              class="dynamic-list-row dynamic-list-row-doc"
+              [formGroup]="group">
+              <input type="text" class="field-input"
+                formControlName="file_name"
+                [placeholder]="'auth.trainer_register.file_name_label' | translate" />
+              <input type="url" class="field-input"
+                formControlName="file_url" dir="ltr"
+                [placeholder]="'auth.trainer_register.file_url_label' | translate" />
+              <select class="field-input"
+                formControlName="file_type">
+                <option value="CV">CV</option>
+                <option value="CERTIFICATE">Certificate
+                </option>
+                <option value="OTHER">Other</option>
+              </select>
+              <button type="button"
+                class="dynamic-list-remove"
+                (click)="removeDocument($index)"
+                [attr.aria-label]="'auth.trainer_register.remove' | translate">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+            }
+          </div>
+
+          <button type="button" class="dynamic-list-add"
+            (click)="addDocument()">
+            <i class="fa-solid fa-plus"></i>
+            {{ 'auth.trainer_register.add_document' |
+            translate }}
+          </button>
+        </div>
+        }
+
+        @if (errorMessage()) {
+        <div class="form-error-banner">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>{{ errorMessage() | translate }}</span>
+        </div>
+        }
+
+        <!-- -- Step Navigation -- -->
+        <div class="step-nav">
+          @if (currentStep() > 1) {
+          <button type="button" class="btn-step-back"
+            (click)="goBack()">
+            <i class="fa-solid fa-arrow-right rtl-flip"></i>
+            {{ 'auth.trainer_register.back' | translate }}
+          </button>
+          }
+
+          @if (currentStep() < totalSteps) { <button
+            type="button"
+            class="btn-primary auth-submit step-nav-next"
+            (click)="goNext()">
+            {{ 'auth.trainer_register.next' | translate }}
+            </button>
+            } @else {
+            <button type="submit"
+              class="btn-primary auth-submit step-nav-next"
+              [disabled]="isLoading()">
+              @if (isLoading()) {
+              <i class="fa-solid fa-spinner"></i>
+              } @else {
+              {{ 'auth.trainer_register.submit' | translate
+              }}
+              }
+            </button>
+            }
+        </div>
+
+      </form>
+
+      <p class="auth-switch text-muted">
+        {{ 'auth.register.have_account' | translate }}
+        <a routerLink="/login">{{ 'auth.login.title' |
+          translate }}</a>
+      </p>
+
+    </div>
+  </section>
+</div>

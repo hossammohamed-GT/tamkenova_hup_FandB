@@ -1,0 +1,201 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'admin_specializations.title' | translate }}</h1>
+      <p class="text-muted">{{ 'admin_specializations.subtitle' | translate }}</p>
+    </div>
+    <button type="button" class="btn-hero" (click)="openCreate()">
+      <span class="btn-hero-icon"><i class="fa-solid fa-plus"></i></span>
+      {{ 'admin_specializations.add' | translate }}
+    </button>
+  </div>
+
+  <app-admin-nav />
+
+  <!-- -- Tabs -- -->
+  <div class="subtabs staff-fade">
+    <button
+      type="button"
+      class="subtab"
+      [class.is-active]="activeTab() === 'requests'"
+      (click)="setTab('requests')"
+    >
+      <i class="fa-solid fa-inbox"></i>
+      {{ 'admin_specializations.tab_requests' | translate }}
+      @if (requests().length > 0) {
+        <span class="subtab-count">{{ requests().length }}</span>
+      }
+    </button>
+    <button
+      type="button"
+      class="subtab"
+      [class.is-active]="activeTab() === 'list'"
+      (click)="setTab('list')"
+    >
+      <i class="fa-solid fa-layer-group"></i>
+      {{ 'admin_specializations.tab_list' | translate }}
+    </button>
+  </div>
+
+  <!-- -- Requests Tab -- -->
+  @if (activeTab() === 'requests') {
+    @if (isLoadingRequests()) {
+      <div class="staff-empty"><div class="loader-spinner"></div></div>
+    } @else if (requests().length === 0) {
+      <div class="staff-empty">
+        <i class="fa-solid fa-inbox"></i>
+        <p>{{ 'admin_specializations.no_requests' | translate }}</p>
+      </div>
+    } @else {
+      <ul class="spec-request-list staff-fade">
+        @for (request of requests(); track request.id) {
+          <li class="spec-request-card surface">
+            <div class="spec-request-main">
+              <span class="spec-request-icon">
+                <i class="fa-solid fa-lightbulb"></i>
+              </span>
+              <div class="spec-request-info">
+                <strong dir="rtl">{{ request.name_ar }}</strong>
+                <small dir="ltr" class="text-muted">{{ request.name_en }}</small>
+                @if (request.users) {
+                  <small class="text-muted">
+                    <i class="fa-solid fa-user"></i>
+                    {{ request.users.full_name }}
+                  </small>
+                }
+              </div>
+            </div>
+            <div class="cell-actions">
+              <button
+                type="button"
+                class="btn-sm btn-success-sm"
+                [disabled]="busyRequestId() === request.id"
+                (click)="decideRequest(request, true)"
+              >
+                <i class="fa-solid fa-check"></i>
+                {{ 'admin_specializations.approve' | translate }}
+              </button>
+              <button
+                type="button"
+                class="btn-sm btn-danger-sm"
+                [disabled]="busyRequestId() === request.id"
+                (click)="decideRequest(request, false)"
+              >
+                <i class="fa-solid fa-xmark"></i>
+                {{ 'admin_specializations.reject' | translate }}
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+
+  <!-- -- List Tab -- -->
+  @if (activeTab() === 'list') {
+    @if (isLoadingList()) {
+      <div class="staff-empty"><div class="loader-spinner"></div></div>
+    } @else if (specializations().length === 0) {
+      <div class="staff-empty">
+        <i class="fa-solid fa-layer-group"></i>
+        <p>{{ 'admin_specializations.empty' | translate }}</p>
+      </div>
+    } @else {
+      <div class="spec-grid staff-fade">
+        @for (spec of specializations(); track spec.id) {
+          <div class="spec-card surface">
+            <div class="spec-card-body">
+              <strong dir="rtl">{{ spec.name_ar }}</strong>
+              <small dir="ltr" class="text-muted">{{ spec.name_en }}</small>
+            </div>
+            <div class="cell-actions">
+              <button type="button" class="icon-btn" (click)="openEdit(spec)" [attr.aria-label]="'common.edit' | translate">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button type="button" class="icon-btn icon-btn-danger" (click)="askDelete(spec)" [attr.aria-label]="'common.delete' | translate">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- -- Create / Edit Modal -- -->
+  @if (showForm()) {
+    <div class="modal-backdrop" (click)="closeForm()">
+      <div class="modal-card surface chamfer-sm modal-narrow" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>
+            {{ (editTarget() ? 'admin_specializations.edit_title' : 'admin_specializations.add_title') | translate }}
+          </h3>
+          <button type="button" class="icon-btn" (click)="closeForm()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="save()">
+          <div class="field">
+            <label class="field-label" for="spec-ar">{{ 'admin_specializations.name_ar' | translate }}</label>
+            <input id="spec-ar" type="text" class="field-input" formControlName="name_ar" dir="rtl" />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="spec-en">{{ 'admin_specializations.name_en' | translate }}</label>
+            <input id="spec-en" type="text" class="field-input" formControlName="name_en" dir="ltr" />
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-sm btn-outline-sm" (click)="closeForm()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button type="submit" class="btn-sm btn-primary-sm" [disabled]="isSaving()">
+              @if (isSaving()) {
+                <span class="loader-spinner-sm"></span>
+              }
+              {{ 'common.save' | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- -- Delete Confirm -- -->
+  @if (deleteTarget(); as target) {
+    <div class="modal-backdrop" (click)="closeDelete()">
+      <div class="modal-card surface chamfer-sm modal-narrow" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ 'admin_specializations.delete_title' | translate }}</h3>
+          <button type="button" class="icon-btn" (click)="closeDelete()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p class="confirm-text">
+          {{ 'admin_specializations.delete_confirm' | translate }}
+          <strong dir="rtl">{{ target.name_ar }}</strong>
+          <strong dir="ltr">{{ target.name_en }}</strong>
+        </p>
+        <div class="form-actions">
+          <button type="button" class="btn-sm btn-outline-sm" (click)="closeDelete()">
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button type="button" class="btn-sm btn-danger-sm" [disabled]="isDeleting()" (click)="confirmDelete()">
+            @if (isDeleting()) {
+              <span class="loader-spinner-sm"></span>
+            }
+            {{ 'common.delete' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (toast(); as t) {
+    <div class="staff-toast" [class.staff-toast-error]="t.error">
+      <i class="fa-solid" [class.fa-circle-check]="!t.error" [class.fa-circle-exclamation]="t.error"></i>
+      {{ t.key | translate }}
+    </div>
+  }
+</section>

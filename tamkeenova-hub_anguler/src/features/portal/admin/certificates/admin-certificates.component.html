@@ -1,0 +1,303 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'admin_certificates.title' | translate }}</h1>
+      <p class="text-muted">{{ 'admin_certificates.subtitle' | translate }}</p>
+    </div>
+    <button type="button" class="btn-hero" (click)="openIssue()">
+      <span class="btn-hero-icon"><i class="fa-solid fa-plus"></i></span>
+      {{ 'admin_certificates.issue' | translate }}
+    </button>
+  </div>
+
+  <app-admin-nav />
+
+  <!-- -- Toolbar -- -->
+  <div class="toolbar">
+    <div class="toolbar-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input
+        type="text"
+        class="field-input"
+        [placeholder]="'admin_certificates.search_placeholder' | translate"
+        [ngModel]="search()"
+        (ngModelChange)="onSearch($event)"
+      />
+    </div>
+    <button type="button" class="btn-sm btn-outline-sm" (click)="load()" [disabled]="isLoading()">
+      <i class="fa-solid" [class.fa-spin]="isLoading()">&#xf2f1;</i>
+      {{ 'common.retry' | translate }}
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="staff-empty"><div class="loader-spinner"></div></div>
+  } @else if (hasError()) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ 'admin_certificates.load_error' | translate }}</p>
+      <button type="button" class="btn-primary-sm btn-sm" (click)="load()">
+        {{ 'common.retry' | translate }}
+      </button>
+    </div>
+  } @else if (filtered().length === 0) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-certificate"></i>
+      <p>{{ 'admin_certificates.empty' | translate }}</p>
+    </div>
+  } @else {
+    <div class="table-wrap staff-fade">
+      <table class="staff-table">
+        <thead>
+          <tr>
+            <th>{{ 'admin_certificates.col_title' | translate }}</th>
+            <th>{{ 'admin_certificates.col_owner' | translate }}</th>
+            <th>{{ 'admin_certificates.col_type' | translate }}</th>
+            <th>{{ 'admin_certificates.col_hours' | translate }}</th>
+            <th>{{ 'admin_certificates.col_code' | translate }}</th>
+            <th>{{ 'admin_certificates.col_status' | translate }}</th>
+            <th>{{ 'admin_certificates.col_actions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (cert of filtered(); track cert.id) {
+            <tr>
+              <td>
+                <div class="cert-title-cell">
+                  <strong>{{ cert.title }}</strong>
+                  @if (cert.issued_at) {
+                    <small class="text-muted">{{ cert.issued_at | date: 'yyyy/MM/dd' }}</small>
+                  }
+                </div>
+              </td>
+              <td>
+                <div class="table-user">
+                  <span class="table-avatar">
+                    @if (cert.users?.profile_image) {
+                      <img [src]="cert.users!.profile_image!" [alt]="cert.users?.full_name" />
+                    } @else {
+                      {{ initials(cert.users?.full_name ?? '') }}
+                    }
+                  </span>
+                  <span class="table-user-main">
+                    <span class="table-user-name">{{ cert.users?.full_name ?? cert.user_id }}</span>
+                  </span>
+                </div>
+              </td>
+              <td>
+                @if (cert.certificate_type) {
+                  <span class="badge" [class]="typeBadge(cert.certificate_type)">
+                    {{ 'status.certificate_type.' + cert.certificate_type | translate }}
+                  </span>
+                } @else {
+                  <span class="table-muted">—</span>
+                }
+              </td>
+              <td class="table-muted">{{ cert.training_hours ?? '—' }}</td>
+              <td>
+                <button type="button" class="code-chip" (click)="copyCode(cert.verification_code)" [title]="'common.copied' | translate">
+                  <i class="fa-solid fa-barcode"></i>
+                  {{ cert.verification_code }}
+                </button>
+              </td>
+              <td>
+                <span class="badge" [class.badge-approved]="cert.is_valid" [class.badge-rejected]="!cert.is_valid">
+                  {{ (cert.is_valid ? 'admin_certificates.valid' : 'admin_certificates.revoked_label') | translate }}
+                </span>
+              </td>
+              <td>
+                <div class="cell-actions">
+                  <button
+                    type="button"
+                    class="btn-sm btn-outline-sm"
+                    (click)="triggerPdfInput(cert.id)"
+                    [disabled]="uploadingId() === cert.id"
+                  >
+                    @if (uploadingId() === cert.id) {
+                      <span class="loader-spinner-sm"></span>
+                    } @else {
+                      <i class="fa-solid fa-file-pdf"></i>
+                    }
+                    {{ 'admin_certificates.upload_pdf' | translate }}
+                  </button>
+                  <input
+                    hidden
+                    type="file"
+                    accept="application/pdf"
+                    [id]="'cert-pdf-input-' + cert.id"
+                    (change)="onPdfSelected($event, cert)"
+                  />
+                  <button type="button" class="btn-sm btn-outline-sm" (click)="openEdit(cert)">
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  @if (cert.is_valid) {
+                    <button type="button" class="btn-sm btn-danger-sm" (click)="revoke(cert)">
+                      <i class="fa-solid fa-ban"></i>
+                      {{ 'admin_certificates.revoke' | translate }}
+                    </button>
+                  }
+                  <button type="button" class="btn-sm btn-danger-sm" (click)="askDelete(cert)">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- -- Issue / Edit Modal -- -->
+  @if (showIssueModal()) {
+    <div class="modal-backdrop" (click)="closeIssue()">
+      <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>
+            {{ (editTarget() ? 'admin_certificates.edit_title' : 'admin_certificates.issue_title') | translate }}
+          </h3>
+          <button type="button" class="icon-btn" (click)="closeIssue()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <form [formGroup]="issueForm" (ngSubmit)="save()">
+          <!-- -- User picker (only when issuing) -- -->
+          @if (!editTarget()) {
+            <div class="field">
+              <label class="field-label">{{ 'admin_certificates.recipient' | translate }}</label>
+              @if (selectedUser(); as user) {
+                <div class="picked-user">
+                  <span class="table-avatar">{{ initials(user.full_name) }}</span>
+                  <span class="picked-user-info">
+                    <strong>{{ user.full_name }}</strong>
+                    <small class="text-muted">{{ user.email }}</small>
+                  </span>
+                  <button type="button" class="icon-btn icon-btn-danger" (click)="clearUser()">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              } @else {
+                <div class="user-picker">
+                  <input
+                    type="text"
+                    class="field-input"
+                    [placeholder]="'admin_certificates.search_user' | translate"
+                    (input)="searchUsers($any($event.target).value)"
+                  />
+                  @if (isSearchingUsers()) {
+                    <div class="user-picker-loading"><span class="loader-spinner-sm"></span></div>
+                  }
+                  @if (userSearchTerm().length === 1) {
+                    <div class="user-picker-hint">
+                      <i class="fa-solid fa-keyboard"></i>
+                      {{ 'admin_certificates.min_chars_hint' | translate }}
+                    </div>
+                  } @else if (userSearchTerm().length >= 2 && userResults().length === 0 && !isSearchingUsers()) {
+                    <div class="user-picker-empty">
+                      <i class="fa-solid fa-user-slash"></i>
+                      {{ 'admin_certificates.no_user_found' | translate }}
+                    </div>
+                  }
+                  @if (userResults().length > 0) {
+                    <ul class="user-picker-list">
+                      @for (user of userResults(); track user.id) {
+                        <li>
+                          <button type="button" class="user-picker-item" (click)="pickUser(user)">
+                            <span class="table-avatar">{{ initials(user.full_name) }}</span>
+                            <span class="picker-item-text">
+                              <strong>{{ user.full_name }}</strong>
+                              <small class="text-muted">{{ 'status.user_role.' + user.role | translate }} · {{ user.email }}</small>
+                            </span>
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <div class="field">
+            <label class="field-label" for="cert-title">{{ 'admin_certificates.f_title' | translate }}</label>
+            <input id="cert-title" type="text" class="field-input" formControlName="title" />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="cert-desc">{{ 'admin_certificates.f_description' | translate }}</label>
+            <textarea id="cert-desc" class="field-input field-textarea" formControlName="description" rows="2"></textarea>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label class="field-label" for="cert-hours">{{ 'admin_certificates.f_hours' | translate }}</label>
+              <input id="cert-hours" type="number" min="0" class="field-input" formControlName="training_hours" />
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="cert-type">{{ 'admin_certificates.f_type' | translate }}</label>
+              <select id="cert-type" class="field-input" formControlName="certificate_type">
+                @for (type of certificateTypes; track type) {
+                  <option [ngValue]="type">{{ 'status.certificate_type.' + type | translate }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          @if (formError(); as error) {
+            <div class="form-error-banner">{{ error | translate }}</div>
+          }
+
+          <div class="form-actions">
+            <button type="button" class="btn-sm btn-outline-sm" (click)="closeIssue()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button type="submit" class="btn-sm btn-primary-sm" [disabled]="isSaving()">
+              @if (isSaving()) {
+                <span class="loader-spinner-sm"></span>
+              }
+              {{ 'common.save' | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- -- Delete Confirm -- -->
+  @if (deleteTarget(); as target) {
+    <div class="modal-backdrop" (click)="closeDelete()">
+      <div class="modal-card surface chamfer-sm modal-narrow" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ 'admin_certificates.delete_title' | translate }}</h3>
+          <button type="button" class="icon-btn" (click)="closeDelete()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p class="confirm-text">
+          {{ 'admin_certificates.delete_confirm' | translate }}
+          <strong>{{ target.title }}</strong>
+        </p>
+        <div class="form-actions">
+          <button type="button" class="btn-sm btn-outline-sm" (click)="closeDelete()">
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button type="button" class="btn-sm btn-danger-sm" [disabled]="isDeleting()" (click)="confirmDelete()">
+            @if (isDeleting()) {
+              <span class="loader-spinner-sm"></span>
+            }
+            {{ 'common.delete' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (toast(); as t) {
+    <div class="staff-toast" [class.staff-toast-error]="t.error">
+      <i class="fa-solid" [class.fa-circle-check]="!t.error" [class.fa-circle-exclamation]="t.error"></i>
+      {{ t.key | translate }}
+    </div>
+  }
+</section>

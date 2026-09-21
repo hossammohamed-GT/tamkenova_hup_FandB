@@ -1,0 +1,31 @@
+<div class="app-loader" #root>
+  <div class="loader-content">
+    <svg class="loader-mark" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+      <path
+        #gatePath
+        class="loader-path loader-path-gate"
+        d="M4,250 L4,4 L252,4 L252,250 L218,250 L218,38 L38,38 L38,250 Z"
+      ></path>
+      <path
+        #tPath
+        class="loader-path loader-path-t"
+        d="M71,82 L185,82 L185,114 L144,114 L144,248 L110,248 L110,114 L71,114 Z"
+      ></path>
+    </svg>
+
+    <div class="loader-wordmark">
+      @for (letter of wordmarkLetters; track $index) {
+        <span class="loader-letter" [class.is-accent]="letter.accent" [style.--i]="$index">{{ letter.char }}</span>
+      }
+    </div>
+
+    <div class="loader-status">
+      <span class="loader-status-text">{{ 'loader.loading' | translate }}</span>
+      <span class="loader-dots">
+        <span class="loader-dot"></span>
+        <span class="loader-dot"></span>
+        <span class="loader-dot"></span>
+      </span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,233 @@
+<section class="dashboard-page stable-dashboard">
+  @if (isLoading() && !hasLoaded()) {
+    <div class="dashboard-loader stable-loader">
+      <div class="loader-spinner"></div>
+      <p>{{ 'loader.loading' | translate }}</p>
+    </div>
+  }
+  <div class="dashboard-content-stable" [class.is-loading]="isLoading() && hasLoaded()">
+    <!-- -- Hero Section -- -->
+    <div class="dashboard-hero chamfer-sm">
+      <div class="dashboard-hero-bg"></div>
+
+      <div class="dashboard-hero-content">
+        <div class="dashboard-hero-avatar">
+          @if (avatar()) {
+            <img [src]="avatar()!" [alt]="displayName()" />
+          } @else {
+            <div class="dashboard-hero-avatar-placeholder">
+              <i class="fa-solid fa-user"></i>
+            </div>
+          }
+          <div class="dashboard-hero-avatar-badge">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+        </div>
+
+        <div class="dashboard-hero-info">
+          <span class="dashboard-hero-greeting">{{ 'dashboard.welcome' | translate }}</span>
+          <h1 class="dashboard-hero-name">{{ displayName() }}</h1>
+          <p class="dashboard-hero-subtitle">{{ 'student_dashboard.my_learning' | translate }}</p>
+        </div>
+
+        @if (profile(); as p) {
+          <div class="dashboard-hero-stats">
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{ activeEnrollments().length }}</span>
+              <span class="hero-stat-label">{{ 'student_dashboard.active_enrollments' | translate }}</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{ p.completed_programs_count }}</span>
+              <span class="hero-stat-label">{{ 'student_dashboard.completed_programs' | translate }}</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{ p.certificates_count }}</span>
+              <span class="hero-stat-label">{{ 'student_dashboard.certificates' | translate }}</span>
+            </div>
+            <div class="hero-stat-divider"></div>
+            <div class="hero-stat">
+              <span class="hero-stat-value">{{ p.total_training_hours }}</span>
+              <span class="hero-stat-label">{{ 'student_dashboard.training_hours' | translate }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- -- Quick Actions -- -->
+    <div class="quick-actions-section">
+      <h2 class="section-title">{{ 'student_dashboard.quick_actions' | translate }}</h2>
+
+      <div class="quick-actions-grid">
+        @for (action of quickActions; track action.route) {
+          <a
+            [routerLink]="action.route"
+            class="quick-action-card surface chamfer-sm"
+            [attr.data-color]="action.color"
+          >
+            <div class="quick-action-icon">
+              <i class="fa-solid" [class]="action.icon"></i>
+            </div>
+            <span class="quick-action-label">{{ action.labelKey | translate }}</span>
+            <i class="quick-action-arrow fa-solid fa-arrow-left rtl-flip"></i>
+          </a>
+        }
+      </div>
+    </div>
+
+    <!-- -- Overview Cards -- -->
+    <div class="dashboard-sections">
+      <h2 class="section-title">{{ 'student_dashboard.overview' | translate }}</h2>
+
+      <div class="sections-grid">
+        <a routerLink="/portal/student/enrollments" class="section-card surface chamfer-sm animate-in">
+          <div class="section-card-header">
+            <div class="section-card-icon" style="--icon-color: var(--color-primary)">
+              <i class="fa-solid fa-book"></i>
+            </div>
+            <div class="section-card-count">{{ activeEnrollments().length }}</div>
+          </div>
+          <div class="section-card-body">
+            <h3 class="section-card-title">{{ 'student_dashboard.cards.enrollments' | translate }}</h3>
+            <p class="section-card-desc text-muted">{{ 'student_dashboard.cards.enrollments_desc' | translate }}</p>
+          </div>
+          <div class="section-card-footer">
+            <span>{{ 'student_dashboard.view_all' | translate }}</span>
+            <i class="fa-solid fa-arrow-left rtl-flip"></i>
+          </div>
+        </a>
+
+        <a routerLink="/portal/student/consultations" class="section-card surface chamfer-sm animate-in" style="animation-delay: 0.1s">
+          <div class="section-card-header">
+            <div class="section-card-icon" style="--icon-color: var(--color-accent)">
+              <i class="fa-solid fa-comments"></i>
+            </div>
+            <div class="section-card-count">{{ consultations().length }}</div>
+          </div>
+          <div class="section-card-body">
+            <h3 class="section-card-title">{{ 'student_dashboard.cards.consultations' | translate }}</h3>
+            <p class="section-card-desc text-muted">{{ 'student_dashboard.cards.consultations_desc' | translate }}</p>
+          </div>
+          <div class="section-card-footer">
+            <span>{{ 'student_dashboard.manage' | translate }}</span>
+            <i class="fa-solid fa-arrow-left rtl-flip"></i>
+          </div>
+        </a>
+
+        <a routerLink="/portal/student/certificates" class="section-card surface chamfer-sm animate-in" style="animation-delay: 0.2s">
+          <div class="section-card-header">
+            <div class="section-card-icon" style="--icon-color: var(--color-success)">
+              <i class="fa-solid fa-certificate"></i>
+            </div>
+            <div class="section-card-count">{{ profile()?.certificates_count ?? 0 }}</div>
+          </div>
+          <div class="section-card-body">
+            <h3 class="section-card-title">{{ 'student_dashboard.cards.certificates' | translate }}</h3>
+            <p class="section-card-desc text-muted">{{ 'student_dashboard.cards.certificates_desc' | translate }}</p>
+          </div>
+          <div class="section-card-footer">
+            <span>{{ 'student_dashboard.view_all' | translate }}</span>
+            <i class="fa-solid fa-arrow-left rtl-flip"></i>
+          </div>
+        </a>
+
+        <a routerLink="/portal/student/notifications" class="section-card surface chamfer-sm animate-in" style="animation-delay: 0.3s">
+          <div class="section-card-header">
+            <div class="section-card-icon" style="--icon-color: var(--color-text)">
+              <i class="fa-solid fa-bell"></i>
+            </div>
+            @if (unreadCount() > 0) {
+              <div class="section-card-count section-card-count-alert">{{ unreadCount() }}</div>
+            }
+          </div>
+          <div class="section-card-body">
+            <h3 class="section-card-title">{{ 'notifications.title' | translate }}</h3>
+            <p class="section-card-desc text-muted">{{ 'notifications.subtitle' | translate }}</p>
+          </div>
+          <div class="section-card-footer">
+            <span>{{ 'student_dashboard.view_all' | translate }}</span>
+            <i class="fa-solid fa-arrow-left rtl-flip"></i>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- -- Recent Activity -- -->
+    <div class="recent-grid">
+      <div class="recent-card surface chamfer-sm">
+        <div class="recent-card-header">
+          <h3>{{ 'student_dashboard.recent_enrollments' | translate }}</h3>
+          <a routerLink="/portal/student/enrollments" class="recent-link">
+            {{ 'student_dashboard.view_all' | translate }}
+          </a>
+        </div>
+
+        @if (recentEnrollments().length === 0) {
+          <div class="recent-empty">
+            <i class="fa-solid fa-book-open"></i>
+            <p>{{ 'student_dashboard.no_enrollments' | translate }}</p>
+            <a routerLink="/programs" class="btn-accent recent-cta">
+              {{ 'student_dashboard.browse_programs_cta' | translate }}
+            </a>
+          </div>
+        } @else {
+          <div class="recent-list">
+            @for (e of recentEnrollments(); track e.id) {
+              <div class="recent-item">
+                <div class="recent-item-info">
+                  <span class="recent-item-title">{{ e.training_programs.title }}</span>
+                  <span class="recent-item-meta text-muted">
+                    {{ e.training_programs.trainers?.users?.full_name ?? '' }}
+                    @if (e.progress > 0) {
+                      • {{ 'student_dashboard.progress' | translate }} {{ e.progress }}%
+                    }
+                  </span>
+                </div>
+                <span class="badge" [class.badge-approved]="e.status === 'ACTIVE' || e.status === 'COMPLETED'" [class.badge-pending]="e.status === 'SUSPENDED'" [class.badge-rejected]="e.status === 'CANCELLED'">
+                  {{ 'status.enrollment.' + e.status | translate }}
+                </span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="recent-card surface chamfer-sm">
+        <div class="recent-card-header">
+          <h3>{{ 'student_dashboard.recent_consultations' | translate }}</h3>
+          <a routerLink="/portal/student/consultations" class="recent-link">
+            {{ 'student_dashboard.view_all' | translate }}
+          </a>
+        </div>
+
+        @if (recentConsultations().length === 0) {
+          <div class="recent-empty">
+            <i class="fa-solid fa-comments"></i>
+            <p>{{ 'student_dashboard.no_consultations' | translate }}</p>
+            <a routerLink="/portal/student/trainers" class="btn-accent recent-cta">
+              {{ 'student_dashboard.find_trainers_cta' | translate }}
+            </a>
+          </div>
+        } @else {
+          <div class="recent-list">
+            @for (c of recentConsultations(); track c.id) {
+              <div class="recent-item">
+                <div class="recent-item-info">
+                  <span class="recent-item-title">{{ c.title }}</span>
+                  <span class="recent-item-meta text-muted">
+                    {{ c.trainers?.users?.full_name ?? '' }}
+                  </span>
+                </div>
+                <span class="badge" [class.badge-approved]="c.status === 'APPROVED' || c.status === 'SCHEDULED' || c.status === 'COMPLETED'" [class.badge-pending]="c.status === 'PENDING'" [class.badge-rejected]="c.status === 'REJECTED' || c.status === 'CANCELLED'">
+                  {{ 'status.consultation.' + c.status | translate }}
+                </span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>

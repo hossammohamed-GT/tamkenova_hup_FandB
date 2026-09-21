@@ -1,0 +1,349 @@
+.student-trainers-page {
+  --glass-bg: color-mix(in srgb, var(--color-surface) 72%, transparent);
+}
+
+.glass-filter-bar {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  box-shadow: var(--shadow-sm);
+  animation: filter-slide 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes filter-slide {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.filters-bar {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  border-radius: var(--radius-lg);
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+
+.search-box i {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 1rem;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.search-input {
+  padding-inline-start: 2.6rem;
+  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.filter-select {
+  min-width: 160px;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+}
+
+.trainers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.4rem;
+}
+
+.glass-trainer-card {
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, border-color 0.3s ease;
+  background: color-mix(in srgb, var(--color-surface) 84%, transparent);
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  opacity: 0;
+  transform: translateY(18px);
+  animation: card-enter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  animation-delay: var(--i, 0s);
+}
+
+@keyframes card-enter {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.glass-trainer-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+  border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
+}
+
+.trainer-top {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.trainer-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid var(--color-border);
+  transition: transform var(--transition-base), border-color var(--transition-base);
+}
+
+.glass-trainer-card:hover .trainer-avatar {
+  transform: scale(1.05);
+  border-color: var(--color-primary);
+}
+
+.trainer-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  font-size: 1.4rem;
+}
+
+.trainer-identity h3 {
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.trainer-spec {
+  display: inline-block;
+  margin-top: 0.25rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.trainer-bio {
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+}
+
+/* Interactive rating */
+.trainer-rating-interactive {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface-alt) 65%, transparent);
+  backdrop-filter: blur(8px);
+  border: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+  transition: all 0.3s ease;
+}
+
+.trainer-rating-interactive:hover {
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-alt));
+  border-color: color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+.rating-stars {
+  display: flex;
+  gap: 0.1rem;
+}
+
+.star-btn {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 0;
+}
+
+.star-btn:hover {
+  transform: scale(1.28) translateY(-2px);
+}
+
+.star-btn:active {
+  transform: scale(0.9);
+}
+
+.star-btn i {
+  font-size: 1.05rem;
+  color: var(--color-border);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.star-btn.is-active i,
+.star-btn.is-hovered i {
+  color: var(--color-accent);
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-accent) 45%, transparent));
+}
+
+.star-btn.is-hovered i {
+  animation: star-wiggle 0.38s ease;
+}
+
+@keyframes star-wiggle {
+  0%,100% { transform: rotate(0) scale(1.15); }
+  25% { transform: rotate(-10deg) scale(1.25); }
+  75% { transform: rotate(10deg) scale(1.25); }
+}
+
+.star-btn.is-user i {
+  animation: star-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes star-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.45); }
+  100% { transform: scale(1.15); }
+}
+
+.star-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--color-accent) 28%, transparent) 0%, transparent 70%);
+  opacity: 0;
+  transform: scale(0.4);
+  transition: all 0.28s ease;
+  pointer-events: none;
+}
+
+.star-btn.is-hovered .star-glow,
+.star-btn.is-active .star-glow {
+  opacity: 1;
+  transform: scale(1.7);
+}
+
+.rating-info {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+}
+
+.rating-value {
+  font-weight: 800;
+  font-family: var(--font-numeric);
+  color: var(--color-text);
+}
+
+.rating-info small {
+  color: var(--color-text-muted);
+}
+
+.rating-spin {
+  color: var(--color-accent);
+  font-size: 0.8rem;
+}
+
+.rating-success-msg {
+  color: var(--color-success);
+  font-weight: 700;
+  font-size: 0.72rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  animation: success-in 0.35s ease;
+}
+
+@keyframes success-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.rating-error-msg {
+  font-size: 0.7rem;
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+.trainer-stats {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.trainer-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: auto;
+}
+
+.btn-sm {
+  height: 42px;
+  padding-inline: 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  flex: 1;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.btn-sm:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.glass-empty {
+  background: color-mix(in srgb, var(--color-surface) 75%, transparent);
+  backdrop-filter: blur(16px);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.page-info {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-trainer-card,
+  .star-btn,
+  .star-btn i {
+    animation: none;
+    transition: none;
+  }
+}

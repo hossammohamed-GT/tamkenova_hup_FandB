@@ -1,0 +1,143 @@
+.header-btn {
+  height: 42px;
+  padding-inline: 1.1rem;
+}
+
+.cert-title-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 140px;
+}
+
+.cert-title-cell strong {
+  font-size: 0.86rem;
+  color: var(--color-text);
+}
+
+.table-user-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.code-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--color-border);
+  background: color-mix(in srgb, var(--color-surface-alt) 55%, transparent);
+  color: var(--color-text);
+  font-size: 0.76rem;
+  font-weight: 700;
+  font-family: var(--font-numeric);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.code-chip:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* -- User picker -- */
+.user-picker {
+  position: relative;
+}
+
+.user-picker-loading {
+  position: absolute;
+  inset-inline-end: 0.8rem;
+  top: 14px;
+}
+
+.user-picker-list {
+  position: absolute;
+  z-index: 20;
+  inset-inline: 0;
+  top: calc(100% + 0.35rem);
+  margin: 0;
+  padding: 0.35rem;
+  list-style: none;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.user-picker-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.6rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+  text-align: start;
+  font-family: inherit;
+  transition: background-color var(--transition-fast);
+}
+
+.user-picker-item:hover {
+  background: color-mix(in srgb, var(--color-primary) 7%, transparent);
+}
+
+.picker-item-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.picker-item-text strong {
+  font-size: 0.82rem;
+  color: var(--color-text);
+}
+
+.picker-item-text small {
+  font-size: 0.7rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.picked-user {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid color-mix(in srgb, var(--color-success) 40%, var(--color-border));
+  background: color-mix(in srgb, var(--color-success) 6%, var(--color-surface));
+}
+
+.picked-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.picked-user-info strong {
+  font-size: 0.85rem;
+  color: var(--color-text);
+}
+
+.picked-user-info small {
+  font-size: 0.72rem;
+}
+
+.modal-narrow {
+  max-width: 440px;
+}
+
+.confirm-text {
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--color-text);
+}

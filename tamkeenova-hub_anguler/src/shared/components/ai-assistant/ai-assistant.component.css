@@ -1,0 +1,365 @@
+.assistant-root {
+  position: relative;
+}
+
+
+.assistant-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 30, 39, 0.55);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease;
+  z-index: 998;
+}
+
+[data-theme='dark'] .assistant-backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.assistant-backdrop.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+.assistant-shell {
+  position: fixed;
+  z-index: 1000;
+  overflow: hidden;
+  background: var(--color-primary);
+  box-shadow: var(--shadow-lg);
+  contain: layout style paint;
+}
+
+.state-open .panel-content {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 320ms ease 200ms;
+}
+
+
+.trigger {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.state-open .trigger,
+.state-closing .trigger {
+  pointer-events: none;
+}
+
+.trigger-ring {
+  position: absolute;
+  inset: -7px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0%, var(--color-accent) 35%, transparent 55%);
+  opacity: 0;
+  filter: blur(1.5px);
+}
+
+.state-closed .trigger-ring {
+  opacity: 0.6;
+  animation: ring-spin 3.6s linear infinite;
+}
+
+@keyframes ring-spin {
+  to { transform: rotate(360deg); }
+}
+
+.trigger-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  filter: brightness(0) invert(1);
+}
+
+
+.spark-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.trail-spark {
+  position: fixed;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 10px 1px var(--color-accent);
+  opacity: 0;
+  animation: spark-life 760ms ease-out forwards;
+}
+
+@keyframes spark-life {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4) rotate(0deg);
+  }
+  18% {
+    opacity: 1;
+    transform: translate(calc(var(--dx) * 0.2), calc(var(--dy) * 0.2)) scale(1) rotate(calc(var(--spin) * 40deg));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(0.2) rotate(calc(var(--spin) * 140deg));
+  }
+}
+
+
+.panel-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+  background: var(--color-surface);
+}
+
+.panel-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.panel-avatar {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.panel-avatar-mark {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.panel-header-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.panel-title {
+  font-weight: 700;
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+.panel-badge {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.panel-close {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.panel-close:hover {
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+}
+
+
+.panel-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: var(--color-surface);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.panel-messages::-webkit-scrollbar {
+  width: 5px;
+}
+
+.panel-messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panel-messages::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 10px;
+}
+
+.panel-messages::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+.message {
+  max-width: 80%;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.message-assistant {
+  align-self: flex-start;
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  border-end-start-radius: 4px;
+}
+
+.message-user {
+  align-self: flex-end;
+  background: var(--color-primary);
+  color: #ffffff;
+  border-end-end-radius: 4px;
+}
+
+.message-typing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.85rem 1.1rem;
+}
+
+.message-typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  animation: typing-bounce 1.2s ease-in-out infinite;
+}
+
+.message-typing span:nth-child(2) { animation-delay: 0.15s; }
+.message-typing span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typing-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+
+.panel-input {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  padding: 0.85rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-surface);
+  flex-shrink: 0;
+}
+
+.panel-input textarea {
+  flex: 1;
+  resize: none;
+  max-height: 120px;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.panel-input textarea::-webkit-scrollbar {
+  width: 5px;
+}
+
+.panel-input textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.panel-input textarea::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 10px;
+}
+
+.panel-input textarea::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+.panel-input textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.panel-send {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: #ffffff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast), opacity var(--transition-fast);
+}
+
+.panel-send:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.panel-send:not(:disabled):hover {
+  background: var(--color-primary-hover);
+}
+
+.rtl-flip {
+  transform: scaleX(1);
+}
+html[dir='rtl'] .rtl-flip {
+  transform: scaleX(-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trigger-ring {
+    animation: none;
+  }
+  .trail-spark {
+    display: none;
+  }
+}

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TamkeeNova HUB — Colors</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{ font-family:'Cairo',sans-serif; }
+  .half{ padding:60px 40px; }
+  .light{ background:#F6F7F9; color:#101E27; }
+  .dark{ background:#1E1F22; color:#ECEDEE; }
+  h2{ font-size:1.4rem; font-weight:800; margin-bottom:6px; }
+  .sub{ font-size:.85rem; opacity:.6; margin-bottom:30px; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:16px; }
+  .swatch{ border-radius:12px; overflow:hidden; border:1px solid rgba(0,0,0,.08); }
+  .dark .swatch{ border-color:rgba(255,255,255,.08); }
+  .fill{ height:70px; }
+  .info{ padding:10px 12px; }
+  .light .info{ background:#FFFFFF; }
+  .dark .info{ background:#26282B; }
+  .name{ font-weight:700; font-size:.82rem; }
+  .hex{ direction:ltr; text-align:right; font-family:monospace; font-size:.76rem; opacity:.65; margin-top:3px; }
+</style>
+</head>
+<body>
+
+<div class="half light">
+  <h2>Light Mode</h2>
+  <div class="grid" id="lightGrid"></div>
+</div>
+
+<div class="half dark">
+  <h2>Dark Mode</h2>
+  <div class="grid" id="darkGrid"></div>
+</div>
+
+<script>
+  const lightTokens = [
+    ['Primary','#004265'],
+    ['Primary Hover','#01597F'],
+    ['Accent','#BE8A3F'],
+    ['Background','#F6F7F9'],
+    ['Surface','#FFFFFF'],
+    ['Surface Alt','#EEF1F4'],
+    ['Border','#E1E6EA'],
+    ['Text','#101E27'],
+    ['Text Muted','#5B6B74'],
+    ['Success','#3E8E6B'],
+    ['Danger','#C1554A'],
+  ];
+  const darkTokens = [
+    ['Primary','#4F9E71'],
+    ['Primary Hover','#62B384'],
+    ['Accent','#C17B4E'],
+    ['Accent Hover','#D18F63'],
+    ['Background','#1E1F22'],
+    ['Surface','#26282B'],
+    ['Surface Alt','#303235'],
+    ['Border','#3A3D40'],
+    ['Text','#ECEDEE'],
+    ['Text Muted','#9A9DA1'],
+    ['Success','#4F9E71'],
+    ['Danger','#C1594E'],
+  ];
+  function render(id, tokens){
+    const grid = document.getElementById(id);
+    tokens.forEach(([name,hex])=>{
+      const el = document.createElement('div');
+      el.className='swatch';
+      el.innerHTML = `<div class="fill" style="background:${hex}"></div>
+        <div class="info"><div class="name">${name}</div><div class="hex">${hex}</div></div>`;
+      grid.appendChild(el);
+    });
+  }
+  render('lightGrid', lightTokens);
+  render('darkGrid', darkTokens);
+</script>
+</body>
+</html>

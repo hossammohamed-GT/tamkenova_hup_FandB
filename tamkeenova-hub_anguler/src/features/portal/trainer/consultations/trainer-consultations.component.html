@@ -1,0 +1,204 @@
+<section class="portal-page trainer-consultations-page stable-consult-page">
+  <div class="portal-header stable-header">
+    <div>
+      <h1><i class="fa-solid fa-comments"></i> إدارة الاستشارات</h1>
+      <p class="text-muted">تابع طلبات الاستشارات من الطلاب / الكلاينت وقم بإدارتها — كل التفاصيل متاحة</p>
+    </div>
+    <div class="header-stats glass-stats">
+      <span class="stat"><i class="fa-solid fa-inbox"></i> {{ consultations().length }} طلب</span>
+      <span class="stat pending"><i class="fa-solid fa-clock"></i> {{ consultations().filter(c=>c.status==='PENDING').length }} معلق</span>
+    </div>
+  </div>
+
+  @if (isLoading() && !hasLoaded()) {
+  <div class="empty-state stable-loader"><div class="loader-spinner"></div><p>جاري تحميل الاستشارات...</p></div>
+  } @else {
+  <div class="consult-content-stable">
+    <div class="filter-pills glass-pills stable-pills">
+      @for (s of statuses; track s) {
+      <button type="button" class="filter-pill stable-pill" [class.is-active]="activeFilter() === s" (click)="setFilter(s)">
+        {{ s === 'ALL' ? ('common.all' | translate) : ('status.consultation.' + s | translate) }}
+      </button>
+      }
+    </div>
+
+    @if (filtered().length === 0) {
+    <div class="empty-state surface glass-empty stable-empty">
+      <div class="empty-icon"><i class="fa-solid fa-comments"></i></div>
+      <h3>لا توجد استشارات</h3>
+      <p class="text-muted">
+        @if (activeFilter() !== 'ALL') { لا توجد استشارات بحالة {{ 'status.consultation.' + activeFilter() | translate }} }
+        @else { لم يتم طلب أي استشارات بعد — شارك بروفايلك مع الطلاب }
+      </p>
+      @if (activeFilter() !== 'ALL') {
+        <button type="button" class="btn-outline stable-btn" (click)="setFilter('ALL')"><i class="fa-solid fa-rotate"></i> عرض الكل</button>
+      }
+    </div>
+    } @else {
+    <div class="item-list stable-list">
+      @for (c of filtered(); track c.id) {
+      <article class="consult-card surface chamfer-sm glass-consult-card stable-card">
+        <div class="consult-main">
+          <div class="consult-student">
+            @if (c.users?.profile_image) {
+            <img [src]="c.users!.profile_image!" [alt]="c.users!.full_name" class="student-avatar" />
+            } @else {
+            <div class="consult-avatar-fallback"><i class="fa-solid fa-user"></i></div>
+            }
+            <div class="student-main-info">
+              <h3 class="consult-title">{{ c.title }}</h3>
+              <span class="consult-student-name">
+                <i class="fa-solid fa-user"></i> {{ c.users?.full_name ?? $any(c).student?.full_name ?? 'طالب / كلاينت' }}
+                @if (c.users?.email) { <span dir="ltr" class="email-badge">• {{ c.users?.email }}</span> }
+              </span>
+              @if ($any(c).users?.username || $any(c).student?.username) {
+                <span class="username-badge" dir="ltr">@{{ $any(c).users?.username ?? $any(c).student?.username }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="consult-meta">
+            <span [class]="badgeClass(c.status)"><i class="fa-solid fa-circle" style="font-size:0.5rem"></i> {{ 'status.consultation.' + c.status | translate }}</span>
+            <span class="consult-date"><i class="fa-regular fa-calendar"></i> {{ c.created_at | date:'yyyy/MM/dd' }}</span>
+            @if (c.preferred_date) {
+            <span class="consult-date preferred"><i class="fa-solid fa-clock"></i> يفضل: {{ c.preferred_date | date:'yyyy/MM/dd' }} {{ c.preferred_time ?? '' }}</span>
+            }
+          </div>
+
+          @if (c.description) {
+          <p class="consult-desc">{{ c.description | slice:0:140 }}{{ c.description.length > 140 ? '…' : '' }}</p>
+          }
+
+          <div class="consult-contact-info">
+            @if (c.contact_phone) { <span class="contact-chip"><i class="fa-solid fa-phone"></i> <span dir="ltr">{{ c.contact_phone }}</span></span> }
+            @if (c.preferred_contact_method) { <span class="contact-chip"><i class="fa-solid fa-comment-dots"></i> {{ c.preferred_contact_method }}</span> }
+            @if (c.price) { <span class="contact-chip price"><i class="fa-solid fa-tag"></i> {{ c.price }} ج.م</span> }
+          </div>
+        </div>
+
+        <div class="consult-actions premium-actions">
+          <button type="button" class="btn-primary btn-details stable-btn" (click)="openDetails(c)">
+            <i class="fa-solid fa-eye"></i> تفاصيل كاملة وإدارة
+          </button>
+          <div class="quick-actions">
+            @for (act of allowedActions(c.status); track act.value) {
+            <span class="quick-action-chip" [class.is-danger]="act.value==='REJECT' || act.value==='CANCEL'" [class.is-success]="act.value==='APPROVE' || act.value==='COMPLETE'">
+              <i class="fa-solid" [class]="act.icon"></i> {{ act.label }}
+            </span>
+            }
+          </div>
+        </div>
+      </article>
+      }
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Details & Management Modal - Premium -->
+  @if (selected(); as d) {
+  <div class="modal-backdrop stable-modal-backdrop" (click)="closeDetails()">
+    <div class="modal-card surface chamfer-sm glass-modal premium-modal stable-modal" (click)="$event.stopPropagation()">
+      <div class="modal-head">
+        <h3><i class="fa-solid fa-comments"></i> إدارة الاستشارة — تفاصيل كاملة</h3>
+        <button type="button" class="icon-btn stable-btn" (click)="closeDetails()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      @if (loadingDetails()) {
+      <div class="empty-state stable-loader"><div class="loader-spinner"></div></div>
+      } @else {
+      <div class="detail-hero">
+        <div>
+          <h4 class="modal-title">{{ d.title }}</h4>
+          <p class="text-muted" style="font-size:0.85rem; margin-top:0.3rem">تم الطلب في {{ d.created_at | date:'yyyy/MM/dd HH:mm' }}</p>
+        </div>
+        <span [class]="badgeClass(d.status)">{{ 'status.consultation.' + d.status | translate }}</span>
+      </div>
+
+      @if (d.description) {
+      <div class="detail-section">
+        <h5><i class="fa-solid fa-align-left"></i> وصف الطلب</h5>
+        <p class="detail-desc">{{ d.description }}</p>
+      </div>
+      }
+
+      <div class="detail-section">
+        <h5><i class="fa-solid fa-user"></i> بيانات الطالب / الكلاينت كاملة</h5>
+        <div class="person-detail-card glass-person">
+          @if (d.users?.profile_image || $any(d).student?.profile_image) {
+          <img [src]="d.users?.profile_image ?? $any(d).student?.profile_image" [alt]="d.users?.full_name ?? 'student'" class="person-avatar" />
+          } @else {
+          <div class="person-avatar-fallback"><i class="fa-solid fa-user"></i></div>
+          }
+          <div class="person-info">
+            <strong>{{ d.users?.full_name ?? $any(d).student?.full_name ?? '—' }}</strong>
+            @if (d.users?.email || $any(d).student?.email) { <span><i class="fa-solid fa-envelope"></i> <span dir="ltr">{{ d.users?.email ?? $any(d).student?.email }}</span></span> }
+            @if (d.users?.phone || $any(d).student?.phone) { <span><i class="fa-solid fa-phone"></i> <span dir="ltr">{{ d.users?.phone ?? $any(d).student?.phone }}</span></span> }
+            @if (d.users?.whatsapp || $any(d).student?.whatsapp) { <span><i class="fa-brands fa-whatsapp"></i> <span dir="ltr">{{ d.users?.whatsapp ?? $any(d).student?.whatsapp }}</span></span> }
+            @if ($any(d).users?.bio || $any(d).student?.bio || d.users?.bio) { <p class="person-bio">{{ $any(d).users?.bio ?? $any(d).student?.bio ?? d.users?.bio }}</p> }
+            <div class="person-actions">
+              <button type="button" class="btn-outline btn-sm stable-btn" (click)="goToStudentProfile()"><i class="fa-solid fa-arrow-up-right-from-square"></i> عرض صفحة الشخص</button>
+              @if (d.users?.email) { <a [href]="'mailto:' + d.users?.email" class="btn-outline btn-sm stable-btn"><i class="fa-solid fa-envelope"></i> إرسال إيميل</a> }
+              @if (d.contact_phone || d.users?.phone) { <a [href]="'tel:' + (d.contact_phone ?? d.users?.phone)" class="btn-outline btn-sm stable-btn"><i class="fa-solid fa-phone"></i> اتصال</a> }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-row"><span class="text-muted">التاريخ المفضل</span><strong>{{ d.preferred_date ? (d.preferred_date | date:'yyyy/MM/dd') : '—' }} {{ d.preferred_time ?? '' }}</strong></div>
+        <div class="detail-row"><span class="text-muted">رقم التواصل</span><strong dir="ltr">{{ d.contact_phone ?? '—' }}</strong></div>
+        <div class="detail-row"><span class="text-muted">طريقة التواصل المفضلة</span><strong>{{ d.preferred_contact_method ?? '—' }}</strong></div>
+        @if (d.scheduled_at) { <div class="detail-row"><span class="text-muted">الموعد المحدد</span><strong>{{ d.scheduled_at | date:'yyyy/MM/dd HH:mm' }}</strong></div> }
+        @if (d.price) { <div class="detail-row"><span class="text-muted">السعر</span><strong>{{ d.price }} ج.م</strong></div> }
+        @if (d.student_notes) { <div class="detail-row detail-col"><span class="text-muted">ملاحظات الطالب / الكلاينت</span><p>{{ d.student_notes }}</p></div> }
+        @if (d.trainer_notes) { <div class="detail-row detail-col"><span class="text-muted">ملاحظاتك السابقة</span><p>{{ d.trainer_notes }}</p></div> }
+        @if (d.rejection_reason) { <div class="detail-row detail-col"><span class="text-muted">سبب الرفض</span><p class="text-danger">{{ d.rejection_reason }}</p></div> }
+      </div>
+
+      @if (allowedActions(d.status).length > 0) {
+      <div class="status-update-section glass-update">
+        <h5><i class="fa-solid fa-gear"></i> تحديث حالة الاستشارة</h5>
+        <div class="action-selector">
+          @for (act of allowedActions(d.status); track act.value) {
+          <button type="button" class="action-btn stable-btn" [class.is-active]="action() === act.value" [class.is-danger]="act.value === 'REJECT' || act.value === 'CANCEL'" [class.is-success]="act.value === 'APPROVE' || act.value === 'COMPLETE'" (click)="action.set($any(act.value))">
+            <i class="fa-solid" [class]="act.icon"></i> {{ act.label }}
+          </button>
+          }
+        </div>
+        <div class="field">
+          <label class="field-label">ملاحظات للطالب / الكلاينت</label>
+          <textarea class="field-input field-textarea" rows="3" [ngModel]="trainerNotes()" (ngModelChange)="trainerNotes.set($event)" placeholder="اكتب ملاحظاتك هنا..."></textarea>
+        </div>
+        @if (action() === 'REJECT') {
+        <div class="field">
+          <label class="field-label">سبب الرفض *</label>
+          <input type="text" class="field-input" [ngModel]="rejectionReason()" (ngModelChange)="rejectionReason.set($event)" placeholder="اذكر سبب الرفض بوضوح" />
+        </div>
+        }
+        @if (action() === 'SCHEDULE') {
+        <div class="field">
+          <label class="field-label">تحديد الموعد النهائي *</label>
+          <input type="datetime-local" class="field-input" dir="ltr" [ngModel]="scheduledAt()" (ngModelChange)="scheduledAt.set($event)" />
+        </div>
+        }
+        @if (updateError()) {
+        <div class="form-error-banner"><i class="fa-solid fa-triangle-exclamation"></i> {{ updateError()! | translate }}</div>
+        }
+        <button type="button" class="btn-accent btn-update stable-btn" (click)="updateStatus()" [disabled]="isUpdating()">
+          @if (isUpdating()) { <div class="loader-spinner-sm"></div> }
+          @else { <i class="fa-solid fa-paper-plane"></i> {{ action() === 'APPROVE' ? 'تأكيد الموافقة' : action() === 'REJECT' ? 'تأكيد الرفض' : action() === 'SCHEDULE' ? 'تأكيد الموعد' : action() === 'COMPLETE' ? 'إتمام الاستشارة' : 'تأكيد الإلغاء' }} }
+        </button>
+      </div>
+      } @else {
+        <div class="no-actions-note"><i class="fa-solid fa-circle-info"></i> هذه الاستشارة في حالة نهائية: {{ 'status.consultation.' + d.status | translate }}</div>
+      }
+      }
+    </div>
+  </div>
+  }
+
+  @if (toastMessage()) {
+  <div class="toast toast-success stable-toast"><i class="fa-solid fa-circle-check"></i> {{ toastMessage() }}</div>
+  }
+</section>

@@ -1,0 +1,84 @@
+<section class="portal-page status-page">
+  <div class="status-card surface chamfer-sm">
+
+    @if (isLoading()) {
+    <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    }
+
+    @else if (status(); as s) {
+
+    <!-- -- Pending Application State -- -->
+    @if (s.status === 'PENDING') {
+    <div class="status-icon is-pending">
+      <i class="fa-solid fa-hourglass-half"></i>
+    </div>
+    <span class="badge badge-pending">{{ 'volunteer_status.pending_badge' | translate }}</span>
+    <h1 class="status-title">{{ 'volunteer_status.pending_title' | translate }}</h1>
+    <p class="status-text text-muted">{{ 'volunteer_status.pending_text' | translate }}</p>
+
+    <ol class="status-timeline">
+      <li class="is-done">
+        <span class="tl-dot"><i class="fa-solid fa-check"></i></span>
+        <span class="tl-label">{{ 'volunteer_status.timeline_submitted' | translate }}</span>
+      </li>
+      <li class="is-current">
+        <span class="tl-dot"><i class="fa-solid fa-magnifying-glass"></i></span>
+        <span class="tl-label">{{ 'volunteer_status.timeline_review' | translate }}</span>
+      </li>
+      <li>
+        <span class="tl-dot"><i class="fa-solid fa-flag-checkered"></i></span>
+        <span class="tl-label">{{ 'volunteer_status.timeline_decision' | translate }}</span>
+      </li>
+    </ol>
+
+    <div class="status-actions">
+      <button type="button" class="btn-primary status-btn" (click)="refresh()">
+        <i class="fa-solid fa-rotate-right"></i>
+        {{ 'trainer_status.refresh' | translate }}
+      </button>
+    </div>
+    }
+
+    <!-- -- Rejected Application State -- -->
+    @else if (s.status === 'REJECTED') {
+    <div class="status-icon is-rejected">
+      <i class="fa-solid fa-circle-xmark"></i>
+    </div>
+    <span class="badge badge-rejected">{{ 'volunteer_status.rejected_badge' | translate }}</span>
+    <h1 class="status-title">{{ 'volunteer_status.rejected_title' | translate }}</h1>
+    <p class="status-text text-muted">{{ 'volunteer_status.rejected_text' | translate }}</p>
+
+    <div class="rejection-box">
+      <span class="rejection-label">
+        <i class="fa-solid fa-comment-dots"></i>
+        {{ 'trainer_status.rejection_reason' | translate }}
+      </span>
+      <p class="rejection-reason">
+        {{ s.rejection_reason || ('trainer_status.no_reason' | translate) }}
+      </p>
+    </div>
+
+    <div class="status-actions">
+      <button type="button" class="btn-primary status-btn" (click)="refresh()">
+        <i class="fa-solid fa-rotate-right"></i>
+        {{ 'trainer_status.refresh' | translate }}
+      </button>
+    </div>
+    }
+
+    <!-- -- Approved State -- -->
+    @else {
+    <div class="status-icon is-approved">
+      <i class="fa-solid fa-circle-check"></i>
+    </div>
+    <span class="badge badge-approved">{{ 'volunteer_status.approved_badge' | translate }}</span>
+    <h1 class="status-title">{{ 'volunteer_status.approved_redirect' | translate }}</h1>
+    }
+
+    <button type="button" class="status-logout" (click)="logout()">
+      <i class="fa-solid fa-right-from-bracket rtl-flip"></i>
+      {{ 'nav.logout' | translate }}
+    </button>
+    }
+  </div>
+</section>

@@ -1,0 +1,376 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'my_tasks.title' | translate }}</h1>
+      <p class="text-muted">{{ 'my_tasks.subtitle' | translate }}</p>
+    </div>
+    <button type="button" class="btn-outline-sm btn-sm header-btn" (click)="load()" [disabled]="isLoading()">
+      <i class="fa-solid" [class.fa-spin]="isLoading()">&#xf2f1;</i>
+      {{ 'common.retry' | translate }}
+    </button>
+  </div>
+
+  <!-- -- Status Filters -- -->
+  <div class="filter-pills staff-fade">
+    @for (f of statusFilters; track f) {
+      <button
+        type="button"
+        class="filter-pill"
+        [class.is-active]="activeFilter() === f"
+        (click)="setFilter(f)"
+      >
+        {{ f === 'ALL' ? ('common.all' | translate) : ('status.task.' + f | translate) }}
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="staff-empty"><div class="loader-spinner"></div></div>
+  } @else if (hasError()) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ 'my_tasks.load_error' | translate }}</p>
+      <button type="button" class="btn-primary-sm btn-sm" (click)="load()">
+        {{ 'common.retry' | translate }}
+      </button>
+    </div>
+  } @else if (filtered().length === 0) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-list-check"></i>
+      <p>{{ 'my_tasks.empty' | translate }}</p>
+    </div>
+  } @else {
+    <div class="my-task-grid">
+      @for (item of filtered(); track item.id) {
+        <article
+          class="my-task-card surface staff-fade"
+          [class.is-locked]="item.is_locked"
+        >
+          <div class="my-task-top">
+            <span class="badge" [class]="priorityBadge(item.task.priority)">
+              {{ 'status.task_priority.' + item.task.priority | translate }}
+            </span>
+            <span class="badge" [class]="statusBadge(item.status)">
+              {{ 'status.task.' + item.status | translate }}
+            </span>
+          </div>
+
+          <h3 class="my-task-title">{{ item.task.title }}</h3>
+
+          @if (item.task.description) {
+            <p class="my-task-desc text-muted">{{ item.task.description }}</p>
+          }
+
+          <div class="task-meta">
+            <span class="task-meta-item" [class]="deadlineClass(item.task.deadline)">
+              <i class="fa-regular fa-calendar"></i>
+              {{ item.task.deadline | date: 'yyyy/MM/dd' }}
+            </span>
+            <span class="task-meta-item">
+              <i class="fa-regular fa-clock"></i>
+              {{ item.task.estimated_hours ?? '—' }} {{ 'common.hours_unit' | translate }}
+            </span>
+            <span class="task-meta-item">
+              <i class="fa-solid fa-bullseye"></i>
+              {{ item.task.required_score ?? '—' }}
+            </span>
+          </div>
+
+          @if (item.is_locked) {
+            <div class="locked-note">
+              <i class="fa-solid fa-lock"></i>
+              {{ 'my_tasks.locked' | translate }}
+            </div>
+          } @else if (item.status === 'APPROVED') {
+            <div class="score-banner">
+              <i class="fa-solid fa-award"></i>
+              {{ 'my_tasks.score' | translate }}: <strong>{{ item.score ?? '—' }}</strong>/100
+              @if (item.hours_awarded) {
+                <span class="hours-awarded">+{{ item.hours_awarded }} {{ 'common.hours_unit' | translate }}</span>
+              }
+            </div>
+          } @else if (item.status === 'REJECTED') {
+            @if (item.review_note) {
+              <p class="review-note">
+                <i class="fa-solid fa-comment-dots"></i>
+                {{ item.review_note }}
+              </p>
+            }
+          }
+
+          <button type="button" class="btn-sm btn-primary-sm open-btn" (click)="openDetails(item)">
+            <i class="fa-solid fa-folder-open"></i>
+            {{ 'my_tasks.open' | translate }}
+          </button>
+        </article>
+      }
+    </div>
+  }
+
+  <!-- ================= Task Details Modal ================= -->
+  @if (selected(); as item) {
+    <div class="modal-backdrop" (click)="closeDetails()">
+      <div class="modal-card surface chamfer-sm modal-wide" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ item.task.title }}</h3>
+          <button type="button" class="icon-btn" (click)="closeDetails()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="staff-detail-grid">
+          <div class="staff-detail-item">
+            <span class="staff-detail-label">{{ 'my_tasks.f_priority' | translate }}</span>
+            <span class="badge" [class]="priorityBadge(item.task.priority)">
+              {{ 'status.task_priority.' + item.task.priority | translate }}
+            </span>
+          </div>
+          <div class="staff-detail-item">
+            <span class="staff-detail-label">{{ 'my_tasks.f_deadline' | translate }}</span>
+            <span class="staff-detail-value">{{ item.task.deadline | date: 'yyyy/MM/dd HH:mm' }}</span>
+          </div>
+          <div class="staff-detail-item">
+            <span class="staff-detail-label">{{ 'my_tasks.f_required_score' | translate }}</span>
+            <span class="staff-detail-value">{{ item.task.required_score ?? '—' }}</span>
+          </div>
+          <div class="staff-detail-item">
+            <span class="staff-detail-label">{{ 'my_tasks.f_estimated_hours' | translate }}</span>
+            <span class="staff-detail-value">{{ item.task.estimated_hours ?? '—' }}</span>
+          </div>
+        </div>
+
+        @if (item.task.description) {
+          <p class="desc-text">{{ item.task.description }}</p>
+        }
+
+        <!-- -- Timeline -- -->
+        <div class="timeline staff-timeline">
+          @for (step of timelineSteps(item); track step.key) {
+            <div
+              class="timeline-step"
+              [class.is-done]="step.state === 'done'"
+              [class.is-current]="step.state === 'current'"
+              [class.is-rejected]="step.state === 'rejected'"
+            >
+              <div class="timeline-marker">
+                <span class="timeline-dot">
+                  @if (step.state === 'done') {
+                    <i class="fa-solid fa-check"></i>
+                  } @else if (step.state === 'rejected') {
+                    <i class="fa-solid fa-xmark"></i>
+                  }
+                </span>
+                @if (step.key !== 'SUBMITTED' || item.status === 'APPROVED' || item.status === 'REJECTED') {
+                  <span class="timeline-line"></span>
+                } @else {
+                  <span class="timeline-line"></span>
+                }
+              </div>
+              <span class="timeline-label">{{ 'status.task.' + step.key | translate }}</span>
+            </div>
+          }
+        </div>
+
+        @if (item.is_locked) {
+          <div class="locked-note locked-note-lg">
+            <i class="fa-solid fa-lock"></i>
+            {{ 'my_tasks.locked' | translate }}
+          </div>
+        }
+
+        <!-- -- Actions: Start -- -->
+        @if (canStart(item)) {
+          <div class="action-band">
+            <button type="button" class="btn-primary-sm btn-sm" [disabled]="busy()" (click)="startTask(item)">
+              @if (busy()) {
+                <span class="loader-spinner-sm"></span>
+              }
+              <i class="fa-solid fa-play"></i>
+              {{ 'my_tasks.start' | translate }}
+            </button>
+          </div>
+        }
+
+        <!-- -- Submission -- -->
+        @if (canSubmit(item)) {
+          <h4 class="detail-subtitle">
+            {{ (item.status === 'REJECTED' ? 'my_tasks.resubmit' : 'my_tasks.submit_title') | translate }}
+          </h4>
+
+          <form [formGroup]="submitForm" (ngSubmit)="submit()">
+            <div class="field">
+              <label class="field-label" for="submit-content">{{ 'my_tasks.f_content' | translate }}</label>
+              <textarea
+                id="submit-content"
+                class="field-input field-textarea"
+                formControlName="content"
+                rows="3"
+                [placeholder]="'my_tasks.f_content_placeholder' | translate"
+              ></textarea>
+            </div>
+
+            <div class="field">
+              <label class="field-label" for="submit-link">{{ 'my_tasks.f_link' | translate }}</label>
+              <input
+                id="submit-link"
+                type="url"
+                class="field-input"
+                formControlName="link_url"
+                [placeholder]="'https://...'"
+              />
+            </div>
+
+            <div class="field">
+              <label class="field-label">{{ 'my_tasks.f_files' | translate }}</label>
+              <label class="file-drop" for="task-files-input">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                {{ 'my_tasks.files_hint' | translate }}
+              </label>
+              <input
+                id="task-files-input"
+                hidden
+                type="file"
+                multiple
+                (change)="onFilesSelected($event)"
+              />
+              @if (selectedFiles().length > 0) {
+                <div class="attachments-row files-preview">
+                  @for (file of selectedFiles(); track $index) {
+                    <span class="file-chip">
+                      <i class="fa-solid fa-file"></i>
+                      {{ file.name }}
+                      <button type="button" class="picked-remove" (click)="removeFile($index)">
+                        <i class="fa-solid fa-xmark"></i>
+                      </button>
+                    </span>
+                  }
+                </div>
+              }
+            </div>
+
+            @if (submitError(); as error) {
+              <div class="form-error-banner">{{ error | translate }}</div>
+            }
+
+            <div class="form-actions">
+              <button type="submit" class="btn-sm btn-primary-sm" [disabled]="isSubmitting()">
+                @if (isSubmitting()) {
+                  <span class="loader-spinner-sm"></span>
+                }
+                <i class="fa-solid fa-paper-plane"></i>
+                {{ 'my_tasks.submit' | translate }}
+              </button>
+            </div>
+          </form>
+        }
+
+        <!-- -- Existing submission (read only) -- -->
+        @if (item.submission && item.status !== 'IN_PROGRESS' && item.status !== 'PENDING') {
+          <h4 class="detail-subtitle">{{ 'my_tasks.submission' | translate }}</h4>
+          <div class="submission-box">
+            @if (item.submission.content) {
+              <p class="submission-text">{{ item.submission.content }}</p>
+            }
+            @if (item.submission.link_url) {
+              <a class="file-chip" [href]="item.submission.link_url" target="_blank" rel="noopener">
+                <i class="fa-solid fa-link"></i>
+                {{ 'my_tasks.open_link' | translate }}
+              </a>
+            }
+            @if (filesOf(item.submission).length > 0) {
+              <div class="attachments-row">
+                @for (file of filesOf(item.submission); track file.id) {
+                  <a class="file-chip" [href]="file.url" target="_blank" rel="noopener">
+                    <i class="fa-solid fa-paperclip"></i>
+                    {{ file.name || ('my_tasks.attachment' | translate) }}
+                  </a>
+                }
+              </div>
+            }
+            @if (item.submission.submitted_at) {
+              <small class="text-muted">
+                {{ 'my_tasks.submitted_at' | translate }} {{ item.submission.submitted_at | date: 'yyyy/MM/dd HH:mm' }}
+              </small>
+            }
+          </div>
+        }
+
+        <!-- -- Result -- -->
+        @if (item.status === 'APPROVED') {
+          <div class="result-banner result-approved">
+            <i class="fa-solid fa-circle-check"></i>
+            <div>
+              <strong>{{ 'my_tasks.approved_title' | translate }}</strong>
+              <p>{{ 'my_tasks.approved_desc' | translate }} {{ item.score ?? '' }}@if (item.score !== null && item.score !== undefined) {/100}</p>
+              @if (item.hours_awarded) {
+                <p class="hours-awarded">
+                  <i class="fa-regular fa-clock"></i>
+                  {{ 'my_tasks.hours_awarded' | translate }}: {{ item.hours_awarded }} {{ 'common.hours_unit' | translate }}
+                </p>
+              }
+            </div>
+          </div>
+        } @else if (item.status === 'REJECTED') {
+          <div class="result-banner result-rejected">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <div>
+              <strong>{{ 'my_tasks.rejected_title' | translate }}</strong>
+              @if (item.review_note) {
+                <p>{{ item.review_note }}</p>
+              }
+              @if (item.rejected_count > 0) {
+                <small>{{ 'my_tasks.rejected_count' | translate }}: {{ item.rejected_count }}</small>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- -- Comments -- -->
+        <h4 class="detail-subtitle">{{ 'my_tasks.comments' | translate }} ({{ comments().length }})</h4>
+
+        @if (isLoadingComments()) {
+          <div class="staff-empty staff-empty-sm"><span class="loader-spinner-sm"></span></div>
+        } @else if (comments().length === 0) {
+          <p class="text-muted no-comments">{{ 'my_tasks.no_comments' | translate }}</p>
+        } @else {
+          <div class="comment-list">
+            @for (comment of comments(); track comment.id) {
+              <div class="comment-item">
+                <span class="table-avatar">
+                  {{ (comment.users?.full_name ?? '?').charAt(0) }}
+                </span>
+                <div class="comment-bubble">
+                  <span class="comment-author">{{ comment.users?.full_name ?? comment.user_id }}</span>
+                  <p class="comment-body">{{ comment.body }}</p>
+                  <span class="comment-date">{{ comment.created_at | date: 'yyyy/MM/dd HH:mm' }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <form [formGroup]="commentForm" (ngSubmit)="sendComment()" class="comment-form">
+          <input
+            type="text"
+            class="field-input"
+            formControlName="body"
+            [placeholder]="'my_tasks.add_comment' | translate"
+          />
+          <button type="submit" class="btn-sm btn-primary-sm" [disabled]="isSendingComment()">
+            @if (isSendingComment()) {
+              <span class="loader-spinner-sm"></span>
+            }
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (toast(); as t) {
+    <div class="staff-toast" [class.staff-toast-error]="t.error">
+      <i class="fa-solid" [class.fa-circle-check]="!t.error" [class.fa-circle-exclamation]="t.error"></i>
+      {{ t.key | translate }}
+    </div>
+  }
+</section>

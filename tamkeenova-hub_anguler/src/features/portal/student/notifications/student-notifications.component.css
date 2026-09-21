@@ -1,0 +1,441 @@
+.notifications-page {
+  --glass-bg: color-mix(in srgb, var(--color-surface) 78%, transparent);
+}
+
+.glass-btn {
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.glass-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-mark-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.btn-mark-all:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.glass-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding: 0.6rem;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px);
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  width: fit-content;
+}
+
+.filter-pill {
+  padding: 0.5rem 1.1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-pill:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+  transform: translateY(-1px);
+}
+
+.filter-pill.is-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-primary) 25%, transparent);
+}
+
+.filter-pill:disabled {
+  cursor: default;
+}
+
+.notif-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.glass-notif-card {
+  display: flex;
+  gap: 1rem;
+  padding: 1.2rem 1.35rem;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-inline-start: 3px solid transparent;
+  background: color-mix(in srgb, var(--color-surface) 84%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  opacity: 0;
+  transform: translateY(12px);
+  animation: notif-enter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.glass-notif-card:nth-child(1) { animation-delay: 0.04s; }
+.glass-notif-card:nth-child(2) { animation-delay: 0.08s; }
+.glass-notif-card:nth-child(3) { animation-delay: 0.12s; }
+.glass-notif-card:nth-child(4) { animation-delay: 0.16s; }
+.glass-notif-card:nth-child(5) { animation-delay: 0.2s; }
+
+@keyframes notif-enter {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.glass-notif-card:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px) scale(1.005);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.glass-notif-card.is-unread {
+  border-inline-start-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-surface));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+.notif-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  font-size: 1.1rem;
+  transition: transform var(--transition-base);
+}
+
+.glass-notif-card:hover .notif-icon {
+  transform: scale(1.08);
+}
+
+.glass-notif-card.is-unread .notif-icon {
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  color: var(--color-accent);
+}
+
+.notif-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.notif-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.notif-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.notif-dot {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-accent);
+  animation: dot-pulse 1.8s infinite;
+}
+
+@keyframes dot-pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+.notif-view-hint {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  opacity: 0;
+  transform: translateX(6px);
+  transition: all var(--transition-fast);
+}
+
+.glass-notif-card:hover .notif-view-hint {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.notif-message {
+  font-size: 0.86rem;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+  margin: 0.35rem 0 0.6rem;
+}
+
+.notif-date {
+  font-size: 0.74rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.glass-empty {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+}
+
+/* Modal glass */
+.glass-backdrop {
+  background: rgba(16, 30, 39, 0.45);
+  backdrop-filter: blur(6px) saturate(120%);
+}
+
+.glass-modal {
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+  backdrop-filter: blur(26px) saturate(170%);
+  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+  max-width: 640px;
+  animation: modal-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.notif-detail-original {
+  display: flex;
+  gap: 1rem;
+  padding: 1.2rem 1.5rem;
+  background: color-mix(in srgb, var(--color-surface-alt) 65%, transparent);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.notif-detail-original-icon {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+  color: var(--color-primary);
+  font-size: 1.1rem;
+}
+
+.notif-detail-original h4 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin-bottom: 0.3rem;
+}
+
+.notif-detail-original p {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.notif-detail-date {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.notif-detail-section {
+  padding: 1.3rem 1.5rem;
+}
+
+.notif-detail-section h4 {
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.notif-detail-section h4 i {
+  color: var(--color-accent);
+}
+
+.detail-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.88rem;
+}
+
+.detail-row.detail-col {
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.detail-row p {
+  background: var(--color-surface-alt);
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  line-height: 1.7;
+}
+
+.detail-person {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--color-surface-alt) 60%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.detail-person h5 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.person-card {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.person-card img,
+.person-fallback {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.person-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+}
+
+.person-card div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.person-card strong {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.notif-detail-empty {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  color: var(--color-text-muted);
+}
+
+.notif-detail-empty i {
+  font-size: 1.8rem;
+  margin-bottom: 0.8rem;
+  display: block;
+  color: var(--color-border);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-notif-card,
+  .glass-modal {
+    animation: none;
+  }
+}
+
+/* ================= Notification tones ================= */
+.notif-icon.tone-primary,
+.notif-detail-original-icon.tone-primary {
+  background: color-mix(in srgb, var(--color-primary) 13%, transparent);
+  color: var(--color-primary);
+}
+
+.notif-icon.tone-info,
+.notif-detail-original-icon.tone-info {
+  background: color-mix(in srgb, #2f7fbf 14%, transparent);
+  color: #2f7fbf;
+}
+
+.notif-icon.tone-accent,
+.notif-detail-original-icon.tone-accent {
+  background: color-mix(in srgb, var(--color-accent) 15%, transparent);
+  color: var(--color-accent);
+}
+
+.notif-icon.tone-success,
+.notif-detail-original-icon.tone-success {
+  background: color-mix(in srgb, var(--color-success) 14%, transparent);
+  color: var(--color-success);
+}
+
+.notif-icon.tone-danger,
+.notif-detail-original-icon.tone-danger {
+  background: color-mix(in srgb, var(--color-danger) 13%, transparent);
+  color: var(--color-danger);
+}
+
+.notif-icon.tone-neutral,
+.notif-detail-original-icon.tone-neutral {
+  background: color-mix(in srgb, var(--color-text-muted) 13%, transparent);
+  color: var(--color-text-muted);
+}
+
+.notif-detail-type {
+  display: inline-block;
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.4rem;
+}
+
+.notif-detail-type.tone-primary { background: color-mix(in srgb, var(--color-primary) 12%, transparent); color: var(--color-primary); }
+.notif-detail-type.tone-info { background: color-mix(in srgb, #2f7fbf 13%, transparent); color: #2f7fbf; }
+.notif-detail-type.tone-accent { background: color-mix(in srgb, var(--color-accent) 14%, transparent); color: var(--color-accent); }
+.notif-detail-type.tone-success { background: color-mix(in srgb, var(--color-success) 13%, transparent); color: var(--color-success); }
+.notif-detail-type.tone-danger { background: color-mix(in srgb, var(--color-danger) 12%, transparent); color: var(--color-danger); }
+.notif-detail-type.tone-neutral { background: color-mix(in srgb, var(--color-text-muted) 12%, transparent); color: var(--color-text-muted); }

@@ -1,0 +1,159 @@
+
+<section class="hero">
+  <div class="hero-media chamfer-lg">
+    @for (img of heroImages; track img; let i = $index) {
+      <div
+        class="hero-media-slide"
+        [class.is-active]="activeHeroIndex() === i"
+        [style.background-image]="'url(' + img + ')'"
+      ></div>
+    }
+    <div class="hero-media-overlay"></div>
+  </div>
+
+  <div class="hero-content">
+    <span class="hero-eyebrow">{{ 'home.hero.eyebrow' | translate }}</span>
+    <h1 class="hero-title display">
+      {{ 'home.hero.title_line1' | translate }}<br />
+      <span class="hero-title-accent">{{ 'home.hero.title_line2' | translate }}</span>
+    </h1>
+    <p class="hero-subtitle">{{ 'home.hero.subtitle' | translate }}</p>
+    <a routerLink="/programs" class="btn-primary hero-cta">
+      {{ 'home.hero.cta' | translate }}
+      <i class="fa-solid fa-arrow-left rtl-flip"></i>
+    </a>
+  </div>
+</section>
+
+
+<section class="partners" appScrollReveal>
+  <div class="partners-heading">
+    <span class="partners-rule"></span>
+    <p class="partners-label">{{ 'home.partners.label' | translate }}</p>
+    <span class="partners-rule"></span>
+  </div>
+
+  <div class="partners-flip-grid">
+    @for (slot of slots(); track $index) {
+      <div class="partner-box surface chamfer-sm">
+        <div class="partner-box-track">
+          <img
+            class="partner-img partner-img-current"
+            [class.slide-out]="slot.sliding"
+            [class.no-transition]="slot.resetting"
+            [src]="slot.currentImg"
+            alt="partner logo"
+            loading="lazy"
+          />
+          <img
+            class="partner-img partner-img-next"
+            [class.slide-in]="slot.sliding"
+            [class.no-transition]="slot.resetting"
+            [src]="slot.nextImg"
+            alt="partner logo"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    }
+  </div>
+</section>
+
+
+<section class="stats">
+  @for (stat of stats; track stat.labelKey; let i = $index) {
+    <div class="stat-item" appScrollReveal>
+      <span class="stat-value display"
+        >{{ stat.value }}<span class="stat-suffix">{{ stat.suffix }}</span></span
+      >
+      <span class="stat-label">{{ stat.labelKey | translate }}</span>
+    </div>
+  }
+</section>
+
+
+<section class="services">
+  <div class="section-heading" appScrollReveal>
+    <span class="section-label">{{ 'home.services.label' | translate }}</span>
+    <h2 class="section-title display">{{ 'home.services.title' | translate }}</h2>
+  </div>
+
+  <div class="services-grid">
+    @for (service of services; track service.route; let i = $index) {
+      <a [routerLink]="service.route" class="service-card chamfer-sm surface" appScrollReveal>
+        <div class="service-icon">
+          <i [class]="service.icon"></i>
+        </div>
+        <h3 class="service-title">{{ service.titleKey | translate }}</h3>
+        <p class="service-desc">{{ service.descKey | translate }}</p>
+        <span class="service-link">
+          {{ service.linkKey | translate }}
+          <i class="fa-solid fa-arrow-left rtl-flip"></i>
+        </span>
+      </a>
+    }
+  </div>
+</section>
+
+<app-trainers-showcase></app-trainers-showcase>
+
+
+<section class="gallery-teaser" appScrollReveal>
+  <div class="gallery-content">
+    <span class="section-label">{{ 'home.gallery.label' | translate }}</span>
+    <h2 class="section-title display">{{ 'home.gallery.title' | translate }}</h2>
+    <p class="gallery-desc">{{ 'home.gallery.desc' | translate }}</p>
+
+    <div class="gallery-event">
+      <i class="fa-solid fa-calendar-days"></i>
+      <span>{{ 'home.gallery.latest_event' | translate }}</span>
+    </div>
+
+    <a routerLink="/gallery" class="btn-primary gallery-cta">
+      {{ 'home.gallery.link' | translate }}
+      <i class="fa-solid fa-arrow-left rtl-flip"></i>
+    </a>
+  </div>
+
+  <div class="gallery-preview chamfer-lg">
+    @for (img of galleryImages; track img) {
+      <div class="gallery-preview-tile" [style.background-image]="'url(' + img + ')'"></div>
+    }
+  </div>
+</section>
+
+
+<section class="contact">
+  <div class="contact-inner contact-reveal" appScrollReveal>
+    <div class="contact-heading">
+      <span class="section-label contact-label">{{ 'contact.eyebrow' | translate }}</span>
+      <h2 class="section-title contact-title display">{{ 'contact.title' | translate }}</h2>
+      <p class="contact-subtitle">{{ 'contact.subtitle' | translate }}</p>
+    </div>
+
+    <div class="contact-grid">
+      @for (channel of contactChannels; track channel.key) {
+        <a
+          [href]="channel.href"
+          [target]="channel.external ? '_blank' : null"
+          rel="noopener"
+          class="contact-card chamfer-sm"
+        >
+          <span class="contact-card-icon"><i [class]="channel.icon"></i></span>
+          <span class="contact-card-text">
+            <span class="contact-card-label">{{ channel.labelKey | translate }}</span>
+            <span class="contact-card-value" dir="ltr">{{ channel.value }}</span>
+          </span>
+          <span class="contact-card-arrow"><i class="fa-solid fa-arrow-left rtl-flip"></i></span>
+        </a>
+      }
+    </div>
+
+    <a [href]="whatsappUrl" target="_blank" rel="noopener" class="contact-whatsapp-cta">
+      <i class="fa-brands fa-whatsapp"></i>
+      <span>{{ 'contact.whatsapp_cta' | translate }}</span>
+    </a>
+  </div>
+</section>
+
+<app-footer></app-footer>

@@ -1,0 +1,50 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'admin_dashboard.title' | translate }}</h1>
+      <p class="text-muted">{{ 'admin_dashboard.subtitle' | translate }}</p>
+    </div>
+    <button type="button" class="btn-outline-sm" (click)="load()" [disabled]="isLoading()">
+      <i class="fa-solid" [class.fa-spin]="isLoading()">&#xf2f1;</i>
+      {{ 'common.retry' | translate }}
+    </button>
+  </div>
+
+  <app-admin-nav />
+
+  @if (isLoading()) {
+    <div class="staff-empty staff-fade">
+      <div class="loader-spinner"></div>
+    </div>
+  } @else if (hasError()) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ 'admin_dashboard.load_error' | translate }}</p>
+      <button type="button" class="btn-primary-sm btn-sm" (click)="load()">
+        {{ 'common.retry' | translate }}
+      </button>
+    </div>
+  } @else {
+    <div class="stats-grid">
+      @for (card of cards(); track card.labelKey) {
+        <a
+          [routerLink]="card.route"
+          class="stat-card staff-fade"
+          [style.--stat-color]="card.color"
+        >
+          <span class="stat-icon"><i class="fa-solid" [class]="card.icon"></i></span>
+          <span class="stat-text">
+            <span class="stat-value">{{ card.value }}</span>
+            <span class="stat-label">{{ card.labelKey | translate }}</span>
+            @if ((card.pending ?? 0) > 0) {
+              <span class="stat-sub">
+                <i class="fa-solid fa-hourglass-half"></i>
+                {{ card.pending }} {{ card.pendingLabelKey | translate }}
+              </span>
+            }
+          </span>
+        </a>
+      }
+    </div>
+  }
+</section>

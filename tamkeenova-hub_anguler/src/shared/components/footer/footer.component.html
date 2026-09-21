@@ -1,0 +1,57 @@
+<footer class="site-footer">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a routerLink="/" class="footer-logo">
+        <img src="/images/logo.svg" alt="TamkeeNova" class="footer-mark" />
+        <span class="footer-word">Tamkee<span class="footer-word-accent">Nova</span></span>
+      </a>
+      <p class="footer-tagline">{{ 'footer.tagline' | translate }}</p>
+      <div class="footer-socials">
+        @for (social of socialLinks; track social.label) {
+          <a
+            [href]="social.href"
+            target="_blank"
+            rel="noopener"
+            class="footer-social-btn"
+            [attr.aria-label]="social.label"
+          >
+            <i [class]="social.icon"></i>
+          </a>
+        }
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h3 class="footer-col-title">{{ 'footer.quick_links' | translate }}</h3>
+      <ul class="footer-links">
+        @for (link of quickLinks; track link.route) {
+          <li>
+            <a [routerLink]="link.route">{{ link.labelKey | translate }}</a>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h3 class="footer-col-title">{{ 'footer.contact_title' | translate }}</h3>
+      <ul class="footer-links">
+        <li><a href="tel:01013494727" dir="ltr">01013494727</a></li>
+        <li><a href="mailto:info@tamkeenova.com">info@tamkeenova.com</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>{{ 'footer.rights' | translate: { year: currentYear } }}</p>
+
+    <a
+      href="https://www.linkedin.com/in/hossam-mohamed-abd/"
+      target="_blank"
+      rel="noopener"
+      class="footer-credit"
+    >
+      <span>{{ 'footer.built_by' | translate }} Hossam Mohamed</span>
+      <i class="fa-brands fa-linkedin"></i>
+    </a>
+  </div>
+</footer>

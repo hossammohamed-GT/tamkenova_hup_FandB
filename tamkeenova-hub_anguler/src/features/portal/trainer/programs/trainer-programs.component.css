@@ -1,0 +1,202 @@
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 46px;
+  padding-inline: 1.3rem;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.empty-state p {
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
+}
+
+/* -- Program Grid -- */
+.programs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.program-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.program-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.program-card-media {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--color-surface-alt);
+  overflow: hidden;
+}
+
+.program-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.program-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  color: var(--color-border);
+}
+
+.badge-level {
+  position: absolute;
+  top: 0.75rem;
+  inset-inline-start: 0.75rem;
+  background: color-mix(in srgb, var(--color-primary) 92%, transparent);
+  color: #fff;
+  backdrop-filter: blur(4px);
+}
+
+.program-card-body {
+  padding: 1.1rem 1.25rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.program-card-title {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+.program-card-desc {
+  font-size: 0.82rem;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.program-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.program-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-family: var(--font-numeric);
+}
+
+.program-price strong {
+  font-size: 1.15rem;
+  color: var(--color-primary);
+}
+
+.program-price s {
+  font-size: 0.8rem;
+}
+
+.program-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.program-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem 1.1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+/* -- Modal Header -- */
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.modal-head h2 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+/* -- Deletion Confirmation -- */
+.confirm-card {
+  max-width: 420px;
+  text-align: center;
+}
+
+.confirm-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  color: var(--color-danger);
+}
+
+.confirm-card h2 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 0.4rem;
+}
+
+.confirm-card p {
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.confirm-actions {
+  justify-content: center;
+}
+
+.btn-danger {
+  height: 46px;
+  padding-inline: 1.3rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-danger);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: filter var(--transition-fast);
+}
+
+.btn-danger:hover {
+  filter: brightness(0.92);
+}
+
+.btn-danger:disabled,
+.btn-add:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

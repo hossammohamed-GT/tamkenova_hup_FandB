@@ -1,0 +1,251 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'admin_volunteers.title' | translate }}</h1>
+      <p class="text-muted">{{ 'admin_volunteers.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <app-admin-nav />
+
+  <!-- -- Status Filters -- -->
+  <div class="filter-pills staff-fade">
+    @for (f of filters; track f) {
+      <button
+        type="button"
+        class="filter-pill"
+        [class.is-active]="activeFilter() === f"
+        (click)="setFilter(f)"
+      >
+        @if (f === 'PENDING' && pendingCount() > 0 && activeFilter() !== f) {
+          <span class="pill-count">{{ pendingCount() }}</span>
+        }
+        {{ f === 'ALL' ? ('common.all' | translate) : ('status.volunteer.' + f | translate) }}
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="staff-empty"><div class="loader-spinner"></div></div>
+  } @else if (hasError()) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ 'admin_volunteers.load_error' | translate }}</p>
+      <button type="button" class="btn-primary-sm btn-sm" (click)="load()">
+        {{ 'common.retry' | translate }}
+      </button>
+    </div>
+  } @else if (filtered().length === 0) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-people-group"></i>
+      <p>{{ 'admin_volunteers.empty' | translate }}</p>
+    </div>
+  } @else {
+    <div class="volunteer-grid">
+      @for (volunteer of filtered(); track volunteer.id) {
+        <article
+          class="volunteer-card surface chamfer-sm staff-fade"
+          [class.is-pending]="statusOf(volunteer) === 'PENDING'"
+          (click)="openDetails(volunteer)"
+        >
+          <div class="volunteer-card-head">
+            <span class="volunteer-avatar">
+              @if (volunteer.users?.profile_image) {
+                <img [src]="volunteer.users!.profile_image!" [alt]="volunteer.users?.full_name" />
+              } @else {
+                {{ initials(volunteer.users?.full_name ?? '') }}
+              }
+            </span>
+
+            <div class="volunteer-head-text">
+              <h3 class="volunteer-name">{{ volunteer.users?.full_name ?? '—' }}</h3>
+              <span class="volunteer-mail" dir="ltr">{{ volunteer.users?.email ?? '' }}</span>
+            </div>
+
+            <span class="badge" [class]="statusBadge(statusOf(volunteer))">
+              {{ 'status.volunteer.' + statusOf(volunteer) | translate }}
+            </span>
+          </div>
+
+          <div class="volunteer-chips">
+            <span class="volunteer-chip">
+              <i class="fa-solid fa-clock"></i>
+              {{ volunteer.total_hours ?? 0 }} {{ 'common.hours_unit' | translate }}
+            </span>
+            <span class="volunteer-chip">
+              <i class="fa-regular fa-calendar"></i>
+              {{ volunteer.created_at | date: 'yyyy/MM/dd' }}
+            </span>
+            @if (volunteer.users?.phone) {
+              <span class="volunteer-chip" dir="ltr">
+                <i class="fa-solid fa-phone"></i>
+                {{ volunteer.users?.phone }}
+              </span>
+            }
+          </div>
+
+          @if (volunteer.bio) {
+            <p class="volunteer-bio">{{ volunteer.bio }}</p>
+          }
+
+          @if (statusOf(volunteer) === 'REJECTED' && volunteer.rejection_reason) {
+            <p class="volunteer-reject-note">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              {{ volunteer.rejection_reason }}
+            </p>
+          }
+
+          <div class="volunteer-card-actions" (click)="$event.stopPropagation()">
+            @switch (statusOf(volunteer)) {
+              @case ('PENDING') {
+                <button
+                  type="button"
+                  class="btn-sm btn-success-sm"
+                  [disabled]="busyId() === volunteer.id"
+                  (click)="approve(volunteer)"
+                >
+                  <i class="fa-solid fa-check"></i>
+                  {{ 'admin_volunteers.approve' | translate }}
+                </button>
+                <button type="button" class="btn-sm btn-danger-sm" (click)="askReject(volunteer)">
+                  <i class="fa-solid fa-xmark"></i>
+                  {{ 'admin_volunteers.reject' | translate }}
+                </button>
+              }
+              @case ('REJECTED') {
+                <button
+                  type="button"
+                  class="btn-sm btn-success-sm"
+                  [disabled]="busyId() === volunteer.id"
+                  (click)="approve(volunteer)"
+                >
+                  <i class="fa-solid fa-rotate-right"></i>
+                  {{ 'admin_volunteers.approve' | translate }}
+                </button>
+              }
+              @case ('APPROVED') {
+                <button type="button" class="btn-sm btn-danger-sm" (click)="askReject(volunteer)">
+                  <i class="fa-solid fa-xmark"></i>
+                  {{ 'admin_volunteers.reject' | translate }}
+                </button>
+              }
+            }
+
+            <span class="volunteer-card-tools">
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="openDetails(volunteer)"
+                [attr.aria-label]="'common.view' | translate"
+              >
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </span>
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  <!-- -- Reject Modal -- -->
+  @if (rejectTarget(); as target) {
+    <div class="modal-backdrop" (click)="closeReject()">
+      <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ 'admin_volunteers.reject_title' | translate }}</h3>
+          <button type="button" class="icon-btn" (click)="closeReject()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <p class="reject-subject text-muted">
+          <i class="fa-solid fa-people-group"></i>
+          {{ target.users?.full_name }}
+        </p>
+
+        <form [formGroup]="rejectForm" (ngSubmit)="confirmReject()">
+          <div class="field">
+            <label class="field-label" for="vol-reject-reason">
+              {{ 'admin_volunteers.reject_reason' | translate }}
+            </label>
+            <textarea
+              id="vol-reject-reason"
+              class="field-input field-textarea"
+              formControlName="reason"
+              rows="3"
+              [placeholder]="'admin_volunteers.reject_reason_placeholder' | translate"
+            ></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-sm btn-outline-sm" (click)="closeReject()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button type="submit" class="btn-sm btn-danger-sm" [disabled]="isRejecting()">
+              @if (isRejecting()) {
+                <span class="loader-spinner-sm"></span>
+              }
+              {{ 'admin_volunteers.reject_confirm' | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- -- Details Modal -- -->
+  @if (details(); as d) {
+    <div class="modal-backdrop" (click)="closeDetails()">
+      <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ d.users?.full_name }}</h3>
+          <button type="button" class="icon-btn" (click)="closeDetails()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        @if (isLoadingDetails()) {
+          <div class="staff-empty"><div class="loader-spinner"></div></div>
+        } @else {
+          <div class="staff-detail-grid">
+            <div class="staff-detail-item">
+              <span class="staff-detail-label">{{ 'admin_volunteers.email' | translate }}</span>
+              <span class="staff-detail-value">{{ d.users?.email ?? '—' }}</span>
+            </div>
+            <div class="staff-detail-item">
+              <span class="staff-detail-label">{{ 'admin_volunteers.phone' | translate }}</span>
+              <span class="staff-detail-value">{{ d.users?.phone ?? '—' }}</span>
+            </div>
+            <div class="staff-detail-item">
+              <span class="staff-detail-label">{{ 'admin_volunteers.col_hours' | translate }}</span>
+              <span class="staff-detail-value">{{ d.total_hours ?? 0 }} {{ 'common.hours_unit' | translate }}</span>
+            </div>
+            <div class="staff-detail-item">
+              <span class="staff-detail-label">{{ 'admin_volunteers.col_status' | translate }}</span>
+              <span class="badge" [class]="statusBadge(statusOf(d))">
+                {{ 'status.volunteer.' + statusOf(d) | translate }}
+              </span>
+            </div>
+          </div>
+
+          @if (d.bio) {
+            <h4 class="detail-subtitle">{{ 'admin_volunteers.bio' | translate }}</h4>
+            <p class="bio-text">{{ d.bio }}</p>
+          }
+
+          @if (d.rejection_reason) {
+            <h4 class="detail-subtitle">{{ 'admin_volunteers.reject_reason' | translate }}</h4>
+            <p class="bio-text">{{ d.rejection_reason }}</p>
+          }
+        }
+      </div>
+    </div>
+  }
+
+  @if (volunteerError(); as key) {
+    <div class="staff-toast staff-toast-error">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      {{ key | translate }}
+    </div>
+  }
+</section>

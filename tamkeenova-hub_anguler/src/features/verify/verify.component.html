@@ -1,0 +1,200 @@
+<app-page-header
+  [eyebrowKey]="'verify.title'"
+  [titleKey]="'verify.title'"
+  [subtitleKey]="'verify.subtitle'"
+></app-page-header>
+
+<section class="verify-page">
+  <!-- -- Tabs -- -->
+  <div class="verify-tabs surface">
+    <button
+      type="button"
+      class="verify-tab"
+      [class.is-active]="activeTab() === 'certificate'"
+      (click)="setTab('certificate')"
+    >
+      <i class="fa-solid fa-certificate"></i>
+      {{ 'verify.certificate_tab' | translate }}
+    </button>
+    <button
+      type="button"
+      class="verify-tab"
+      [class.is-active]="activeTab() === 'user'"
+      (click)="setTab('user')"
+    >
+      <i class="fa-solid fa-user-check"></i>
+      {{ 'verify.user_tab' | translate }}
+    </button>
+  </div>
+
+  <!-- -- Certificate Tab -- -->
+  @if (activeTab() === 'certificate') {
+    <div class="verify-card surface chamfer-sm animate-in">
+      <label class="field-label" for="verify-code">{{ 'verify.code_label' | translate }}</label>
+      <div class="verify-input-row">
+        <input
+          id="verify-code"
+          type="text"
+          class="field-input verify-input"
+          dir="ltr"
+          [placeholder]="'verify.code_placeholder' | translate"
+          [(ngModel)]="code"
+          (keyup.enter)="verifyCertificate()"
+        />
+        <button type="button" class="btn-accent verify-btn" (click)="verifyCertificate()" [disabled]="isVerifying() || !code().trim()">
+          @if (isVerifying()) {
+            <div class="loader-spinner-sm"></div>
+            {{ 'verify.verifying' | translate }}
+          } @else {
+            <i class="fa-solid fa-shield-halved"></i>
+            {{ 'verify.verify_btn' | translate }}
+          }
+        </button>
+      </div>
+
+      @if (certError()) {
+        <div class="result-banner result-error animate-in">
+          <i class="fa-solid fa-circle-xmark"></i>
+          {{ 'verify.invalid' | translate }}
+        </div>
+      }
+
+      @if (certResult(); as r) {
+        <div class="result-banner result-success animate-in">
+          <i class="fa-solid fa-circle-check"></i>
+          {{ 'verify.valid' | translate }}
+        </div>
+
+        <div class="cert-result">
+          <div class="cert-result-head">
+            @if (r.certificate.holder.image) {
+              <img [src]="r.certificate.holder.image" [alt]="r.certificate.holder.name" />
+            } @else {
+              <div class="cert-result-avatar"><i class="fa-solid fa-user"></i></div>
+            }
+            <div>
+              <span class="result-label">{{ 'verify.holder' | translate }}</span>
+              <h3>{{ r.certificate.holder.name }}</h3>
+              <code dir="ltr">{{ r.certificate.verification_code }}</code>
+            </div>
+          </div>
+
+          <h4 class="cert-result-title">{{ r.certificate.title }}</h4>
+
+          <div class="result-grid">
+            @if (r.certificate.program) {
+              <div class="result-item">
+                <span class="result-label">{{ 'verify.program' | translate }}</span>
+                <strong>{{ r.certificate.program.title }}</strong>
+              </div>
+            }
+            @if (r.certificate.trainer) {
+              <div class="result-item">
+                <span class="result-label">{{ 'verify.trainer' | translate }}</span>
+                <strong>{{ r.certificate.trainer.name }}</strong>
+              </div>
+            }
+            <div class="result-item">
+              <span class="result-label">{{ 'verify.issued_at' | translate }}</span>
+              <strong>{{ r.certificate.issued_at | date: 'yyyy/MM/dd' }}</strong>
+            </div>
+            @if (r.certificate.training_hours) {
+              <div class="result-item">
+                <span class="result-label">{{ 'verify.training_hours' | translate }}</span>
+                <strong>{{ r.certificate.training_hours }}</strong>
+              </div>
+            }
+          </div>
+
+          @if (r.certificate.pdf_url) {
+            <a [href]="r.certificate.pdf_url" target="_blank" rel="noopener" class="btn-outline btn-view">
+              <i class="fa-solid fa-file-pdf"></i>
+              {{ 'verify.view_pdf' | translate }}
+            </a>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- -- User Tab -- -->
+  @if (activeTab() === 'user') {
+    <div class="verify-card surface chamfer-sm animate-in">
+      <label class="field-label" for="verify-username">{{ 'verify.username_label' | translate }}</label>
+      <div class="verify-input-row">
+        <input
+          id="verify-username"
+          type="text"
+          class="field-input verify-input"
+          dir="ltr"
+          [placeholder]="'verify.username_placeholder' | translate"
+          [(ngModel)]="username"
+          (keyup.enter)="verifyUser()"
+        />
+        <button type="button" class="btn-accent verify-btn" (click)="verifyUser()" [disabled]="isVerifying() || !username().trim()">
+          @if (isVerifying()) {
+            <div class="loader-spinner-sm"></div>
+            {{ 'verify.verifying' | translate }}
+          } @else {
+            <i class="fa-solid fa-user-check"></i>
+            {{ 'verify.verify_btn' | translate }}
+          }
+        </button>
+      </div>
+
+      @if (userError()) {
+        <div class="result-banner result-error animate-in">
+          <i class="fa-solid fa-circle-xmark"></i>
+          {{ 'verify.user_not_found' | translate }}
+        </div>
+      }
+
+      @if (userResult(); as u) {
+        <div class="cert-result animate-in">
+          <div class="cert-result-head">
+            @if (u.user.image) {
+              <img [src]="u.user.image" [alt]="u.user.name" />
+            } @else {
+              <div class="cert-result-avatar"><i class="fa-solid fa-user"></i></div>
+            }
+            <div>
+              <h3>{{ u.user.name }}</h3>
+              @if (u.user.username) {
+                <code dir="ltr">&#64;{{ u.user.username }}</code>
+              }
+              @if (u.user.bio) {
+                <p class="text-muted user-bio">{{ u.user.bio }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="user-stats">
+            <div class="user-stat">
+              <strong>{{ u.stats.total_completed_programs }}</strong>
+              <span>{{ 'verify.completed_programs' | translate }}</span>
+            </div>
+            <div class="user-stat">
+              <strong>{{ u.stats.total_certificates }}</strong>
+              <span>{{ 'verify.certificates' | translate }}</span>
+            </div>
+            <div class="user-stat">
+              <strong>{{ u.stats.total_training_hours }}</strong>
+              <span>{{ 'verify.training_hours' | translate }}</span>
+            </div>
+            <div class="user-stat">
+              <strong>{{ u.stats.total_skills }}</strong>
+              <span>{{ 'verify.skills' | translate }}</span>
+            </div>
+          </div>
+
+          @if (u.user.username) {
+            <a [routerLink]="['/u', u.user.username]" class="btn-outline btn-view">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+              {{ 'student_profile.view_public' | translate }}
+            </a>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>

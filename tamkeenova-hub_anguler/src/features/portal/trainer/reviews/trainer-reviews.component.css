@@ -1,0 +1,108 @@
+.reviews-overview {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+@media (max-width: 720px) {
+  .reviews-overview {
+    grid-template-columns: 1fr;
+  }
+}
+
+.reviews-score {
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+.reviews-score-value {
+  font-family: var(--font-numeric);
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--color-primary);
+}
+.reviews-score-count {
+  font-size: 0.78rem;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 0.2rem;
+  color: var(--color-accent);
+  font-size: 0.95rem;
+}
+
+.reviews-dist {
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.65rem;
+}
+.dist-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 32px;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.82rem;
+}
+.dist-star {
+  font-family: var(--font-numeric);
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+.dist-star i {
+  color: var(--color-accent);
+  font-size: 0.7rem;
+}
+.dist-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  overflow: hidden;
+}
+.dist-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-hover));
+  transition: width var(--transition-slow);
+}
+.dist-count {
+  text-align: end;
+  font-family: var(--font-numeric);
+}
+
+.reviews-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+.review-card {
+  padding: 1.25rem 1.4rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.review-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.review-date {
+  font-size: 0.76rem;
+  font-family: var(--font-numeric);
+}
+.review-comment {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--color-text);
+}

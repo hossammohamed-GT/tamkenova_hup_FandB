@@ -1,0 +1,44 @@
+# note
+
+# note
+/dist
+/tmp
+/out-tsc
+/bazel-out
+
+# note
+/node_modules
+npm-debug.log
+yarn-error.log
+
+# note
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# note
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/mcp.json
+.history/*
+
+# note
+/.angular/cache
+.sass-cache/
+/connect.lock
+/coverage
+/libpeerconnection.log
+testem.log
+/typings
+__screenshots__/
+
+# note
+.DS_Store
+Thumbs.db

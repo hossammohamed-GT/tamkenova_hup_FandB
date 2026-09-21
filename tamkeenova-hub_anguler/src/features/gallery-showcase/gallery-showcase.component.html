@@ -1,0 +1,137 @@
+<section class="gshowcase-hero">
+  <div class="ghero-heading" appScrollReveal>
+    <span class="ghero-eyebrow">{{
+      'gallery_page.hero_eyebrow' | translate }}</span>
+    <h1 class="ghero-title display">{{
+      'gallery_page.hero_title' | translate }}</h1>
+    <p class="ghero-subtitle">{{
+      'gallery_page.hero_subtitle' | translate }}</p>
+  </div>
+
+  <div class="ghero-marquee">
+    <div class="gmarquee-row gmarquee-row-a">
+      <div class="gmarquee-track">
+        @for (img of marqueeRowTop(); track $index) {
+        <div class="gmarquee-item chamfer-sm"
+          [style.background-image]="'url(' + img + ')'">
+        </div>
+        }
+      </div>
+    </div>
+
+    <div class="gmarquee-row gmarquee-row-b">
+      <div class="gmarquee-track">
+        @for (img of marqueeRowBottom(); track $index) {
+        <div class="gmarquee-item chamfer-sm"
+          [style.background-image]="'url(' + img + ')'">
+        </div>
+        }
+      </div>
+    </div>
+
+    <div class="gmarquee-edge gmarquee-edge-start"></div>
+    <div class="gmarquee-edge gmarquee-edge-end"></div>
+  </div>
+</section>
+
+<!-- -- Program Gallery Grid -- -->
+<section class="gshowcase-section">
+  <div class="section-heading" appScrollReveal>
+    <span class="section-label">{{
+      'gallery_page.programs_label' | translate }}</span>
+    <h2 class="section-title display">{{
+      'gallery_page.programs_title' | translate }}</h2>
+  </div>
+
+  <div class="gmasonry-grid">
+    @for (image of programs(); track image.src; let i =
+    $index) {
+    <button type="button" class="gmasonry-tile"
+      appScrollReveal [style.--i]="i"
+      [style.aspect-ratio]="getAspectRatio(image.src)"
+      (mousemove)="onTileTilt($event)"
+      (mouseleave)="onTileTiltReset($event)"
+      (click)="openLightbox($event, 'programs', i)">
+      <span class="gmasonry-skeleton"
+        [class.is-hidden]="isImageLoaded(image.src)"></span>
+      <img [src]="image.src" [alt]="image.alt || ''"
+        loading="lazy" class="gmasonry-img"
+        [class.is-loaded]="isImageLoaded(image.src)"
+        (load)="onImageLoad($event, image.src)" />
+      <span class="gmasonry-glow"></span>
+      <span class="gmasonry-tile-overlay">
+        <span class="gmasonry-tile-icon"><i
+            class="fa-solid fa-expand"></i></span>
+      </span>
+    </button>
+    }
+  </div>
+</section>
+
+<!-- -- Event Gallery Grid -- -->
+<section class="gshowcase-section">
+  <div class="section-heading" appScrollReveal>
+    <span class="section-label">{{
+      'gallery_page.events_label' | translate }}</span>
+    <h2 class="section-title display">{{
+      'gallery_page.events_title' | translate }}</h2>
+  </div>
+
+  <div class="gmasonry-grid">
+    @for (image of events(); track image.src; let i =
+    $index) {
+    <button type="button" class="gmasonry-tile"
+      appScrollReveal [style.--i]="i"
+      [style.aspect-ratio]="getAspectRatio(image.src)"
+      (mousemove)="onTileTilt($event)"
+      (mouseleave)="onTileTiltReset($event)"
+      (click)="openLightbox($event, 'events', i)">
+      <span class="gmasonry-skeleton"
+        [class.is-hidden]="isImageLoaded(image.src)"></span>
+      <img [src]="image.src" [alt]="image.alt || ''"
+        loading="lazy" class="gmasonry-img"
+        [class.is-loaded]="isImageLoaded(image.src)"
+        (load)="onImageLoad($event, image.src)" />
+      <span class="gmasonry-glow"></span>
+      <span class="gmasonry-tile-overlay">
+        <span class="gmasonry-tile-icon"><i
+            class="fa-solid fa-expand"></i></span>
+      </span>
+    </button>
+    }
+  </div>
+</section>
+
+<!-- -- Image Lightbox -- -->
+@if (isLightboxOpen) {
+<div class="glightbox-backdrop" (click)="closeLightbox()">
+  <div class="glightbox-frame"
+    [style.--origin-x.%]="originX()"
+    [style.--origin-y.%]="originY()"
+    (click)="$event.stopPropagation()">
+    <div class="glightbox-glow"></div>
+
+    <button type="button" class="glightbox-close"
+      (click)="closeLightbox()" aria-label="Close">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+    @if (currentImage(); as img) {
+    <img class="glightbox-image"
+      [class.is-visible]="imgVisible()" [src]="img.src"
+      [alt]="img.alt || ''" />
+    }
+
+    <button type="button"
+      class="glightbox-nav glightbox-nav-prev"
+      (click)="lightboxPrev()" aria-label="Previous">
+      <i class="fa-solid fa-chevron-left rtl-flip"></i>
+    </button>
+    <button type="button"
+      class="glightbox-nav glightbox-nav-next"
+      (click)="lightboxNext()" aria-label="Next">
+      <i class="fa-solid fa-chevron-right rtl-flip"></i>
+    </button>
+  </div>
+</div>
+}

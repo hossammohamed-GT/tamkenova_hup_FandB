@@ -1,0 +1,221 @@
+@if (loading()) {
+<div class="trainer-details-skeleton">
+  <div class="skeleton-hero shimmer"></div>
+  <div class="skeleton-stats">
+    <div class="skeleton-box shimmer"></div>
+    <div class="skeleton-box shimmer"></div>
+    <div class="skeleton-box shimmer"></div>
+    <div class="skeleton-box shimmer"></div>
+    <div class="skeleton-box shimmer"></div>
+  </div>
+  <div class="skeleton-card shimmer"></div>
+  <div class="skeleton-card shimmer"></div>
+</div>
+} @else if (notFound()) {
+<div class="trainer-not-found" appScrollReveal>
+  <i class="fa-solid fa-user-slash"></i>
+  <h2>{{ 'team_details.not_found_title' | translate }}</h2>
+  <p>{{ 'team_details.not_found_text' | translate }}</p>
+  <a routerLink="/team" class="btn-primary not-found-btn">
+    {{ 'team_details.back_to_team' | translate }}
+  </a>
+</div>
+} @else if (trainer(); as t) {
+<div class="trainer-details">
+  <a routerLink="/team" class="back-link" appScrollReveal>
+    <i class="fa-solid fa-arrow-right rtl-flip"></i>
+    {{ 'team_details.back' | translate }}
+  </a>
+
+  <!-- Hero -->
+  <section class="trainer-hero surface chamfer-lg"
+    appScrollReveal>
+    <div class="trainer-hero-bg"></div>
+
+    <div class="trainer-hero-content">
+      <div class="trainer-hero-avatar-wrap">
+        @if (avatar()) {
+        <img [src]="avatar()" [alt]="name()"
+          class="trainer-hero-avatar" />
+        } @else {
+        <div class="trainer-hero-avatar-fallback">{{
+          initials() }}</div>
+        }
+        @if (t.is_available) {
+        <span class="hero-availability-dot"></span>
+        }
+      </div>
+
+      <h1 class="trainer-hero-name">{{ name() }}</h1>
+      <span class="trainer-hero-spec">{{ specialization()
+        }}</span>
+
+      @if (rating() > 0) {
+      <div class="trainer-hero-rating">
+        <app-star-rating [rating]="rating()" />
+        <span class="rating-value">{{ rating() | number:
+          '1.1-1' }}</span>
+        <span class="rating-count">({{ ratingsCount()
+          }})</span>
+      </div>
+      }
+
+      <button type="button" class="btn-accent hero-book-btn"
+        (click)="openBooking()">
+        <i class="fa-solid fa-calendar-check"></i>
+        {{ 'team.book_btn' | translate }}
+      </button>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="trainer-stats-grid" appScrollReveal>
+    <div class="stat-box surface">
+      <i class="fa-solid fa-briefcase"></i>
+      <span class="stat-value">{{ experienceYears()
+        }}</span>
+      <span class="stat-label">{{ 'team_details.years_exp' |
+        translate }}</span>
+    </div>
+    <div class="stat-box surface">
+      <i class="fa-solid fa-users"></i>
+      <span class="stat-value">{{ studentsCount() }}</span>
+      <span class="stat-label">{{ 'team_details.students' |
+        translate }}</span>
+    </div>
+    <div class="stat-box surface">
+      <i class="fa-solid fa-book"></i>
+      <span class="stat-value">{{ programsCount() }}</span>
+      <span class="stat-label">{{ 'team_details.programs' |
+        translate }}</span>
+    </div>
+    <div class="stat-box surface">
+      <i class="fa-solid fa-certificate"></i>
+      <span class="stat-value">{{ certificates().length
+        }}</span>
+      <span class="stat-label">{{
+        'team_details.certificates' | translate }}</span>
+    </div>
+    <div class="stat-box surface">
+      <i class="fa-solid fa-star"></i>
+      <span class="stat-value">{{ reviewsCount() }}</span>
+      <span class="stat-label">{{ 'team_details.reviews' |
+        translate }}</span>
+    </div>
+  </section>
+
+  <div class="trainer-details-body">
+    <div class="trainer-details-main">
+      @if (bio()) {
+      <section class="detail-card surface" appScrollReveal>
+        <h3 class="detail-card-title">
+          <i class="fa-solid fa-quote-right"></i>
+          {{ 'team_details.bio' | translate }}
+        </h3>
+        <p class="detail-card-text">{{ bio() }}</p>
+      </section>
+      } @if (description()) {
+      <section class="detail-card surface" appScrollReveal>
+        <h3 class="detail-card-title">
+          <i class="fa-solid fa-align-right"></i>
+          {{ 'team_details.about' | translate }}
+        </h3>
+        <p class="detail-card-text">{{ description() }}</p>
+      </section>
+      }
+
+      <section class="detail-card surface" appScrollReveal>
+        <h3 class="detail-card-title">
+          <i class="fa-solid fa-certificate"></i>
+          {{ 'team_details.certificates_title' | translate
+          }}
+        </h3>
+        @if (certificates().length > 0) {
+        <div class="certificates-list">
+          @for (cert of certificates(); track cert.id) {
+          <a [href]="cert.certificate_url" target="_blank"
+            rel="noopener" class="certificate-chip">
+            <i class="fa-solid fa-award"></i>
+            <span>{{ cert.title ||
+              ('team_details.certificates' | translate)
+              }}</span>
+          </a>
+          }
+        </div>
+        } @else {
+        <p class="empty-text">{{
+          'team_details.no_certificates' | translate }}</p>
+        }
+      </section>
+
+      <section class="detail-card surface" appScrollReveal>
+        <h3 class="detail-card-title">
+          <i class="fa-solid fa-book-open"></i>
+          {{ 'team_details.programs_title' | translate }}
+        </h3>
+        @if (programs().length > 0) {
+        <div class="programs-preview-grid">
+          @for (p of programs(); track p.id) {
+          <a routerLink="/programs"
+            class="program-preview-card surface-alt">
+            <span class="program-preview-title">{{ p.title
+              }}</span>
+          </a>
+          }
+        </div>
+        } @else {
+        <p class="empty-text">{{ 'team_details.no_programs'
+          | translate }}</p>
+        }
+      </section>
+    </div>
+
+    <aside class="trainer-details-side">
+      @if (hasPriceRange()) {
+      <div class="price-card surface" appScrollReveal>
+        <span class="price-card-label">{{
+          'team_details.consultation_price' | translate
+          }}</span>
+        <div class="price-card-value">
+          {{ priceFrom() }} - {{ priceTo() }}
+          <span class="price-card-currency">{{
+            'trainer_programs.currency' | translate
+            }}</span>
+        </div>
+        @if (duration()) {
+        <span class="price-card-duration">
+          <i class="fa-regular fa-clock"></i>
+          {{ duration() }} {{ 'team_details.duration' |
+          translate }}
+        </span>
+        }
+        <button type="button"
+          class="btn-accent price-card-btn"
+          (click)="openBooking()">
+          {{ 'team.book_btn' | translate }}
+        </button>
+      </div>
+      } @if (socials().length > 0) {
+      <div class="socials-card surface" appScrollReveal>
+        <span class="socials-card-label">{{
+          'team_details.links' | translate }}</span>
+        <div class="socials-list">
+          @for (s of socials(); track s.key) {
+          <a [href]="s.url" target="_blank" rel="noopener"
+            class="social-link"
+            [title]="'team_details.' + s.key | translate">
+            <i [class]="s.icon"></i>
+          </a>
+          }
+        </div>
+      </div>
+      }
+    </aside>
+  </div>
+
+  <!-- @if (showBooking()) {
+  <app-booking-modal [trainer]="t"
+    (closed)="closeBooking()" />
+  } -->
+</div>
+}

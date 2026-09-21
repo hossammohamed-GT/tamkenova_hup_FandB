@@ -1,0 +1,235 @@
+<section class="profile-page stable-profile-page">
+  @if (isLoading() && !hasLoaded()) {
+    <div class="profile-loader stable-loader">
+      <div class="loader-spinner"></div>
+      <p>{{ 'loader.loading' | translate }}</p>
+    </div>
+  } @else {
+    <div class="profile-content-stable">
+      @if (displayProfile(); as p) {
+        <div class="profile-hero chamfer-sm stable-hero">
+          <div class="profile-hero-bg"></div>
+          <div class="profile-hero-content">
+            <div class="profile-avatar-wrapper">
+              <div class="profile-avatar" [class.is-uploading]="isUploadingImage()">
+                @if (profileImage()) {
+                  <img [src]="profileImage()!" [alt]="p.full_name" />
+                } @else {
+                  <div class="profile-avatar-placeholder">
+                    <i class="fa-solid fa-user"></i>
+                  </div>
+                }
+                @if (isUploadingImage()) {
+                  <div class="profile-avatar-overlay">
+                    <div class="loader-spinner-sm"></div>
+                  </div>
+                }
+              </div>
+              <input type="file" id="student-avatar-input" accept="image/jpeg,image/png,image/webp" hidden (change)="onFileSelected($event)" />
+              <button type="button" class="avatar-upload-btn" (click)="triggerFileInput()" [disabled]="isUploadingImage()" [attr.aria-label]="'student_profile.change_image' | translate">
+                <i class="fa-solid fa-camera"></i>
+              </button>
+            </div>
+            <div class="profile-hero-info">
+              <h1 class="profile-hero-name">{{ p.full_name }}</h1>
+              <p class="profile-hero-email">{{ p.email }}</p>
+              <div class="profile-hero-meta">
+                @if (p.username) {
+                  <span class="profile-hero-username" dir="ltr">@{{ p.username }}</span>
+                }
+                <span class="profile-hero-date text-muted">
+                  {{ 'student_profile.member_since' | translate }} {{ p.created_at | date: 'yyyy/MM/dd' }}
+                </span>
+              </div>
+            </div>
+            <div class="profile-hero-stats stable-stats">
+              <div class="hero-mini-stat">
+                <span class="hero-mini-value">{{ p.completed_programs_count }}</span>
+                <span class="hero-mini-label">{{ 'student_profile.stats.completed' | translate }}</span>
+              </div>
+              <div class="hero-mini-stat">
+                <span class="hero-mini-value">{{ p.certificates_count }}</span>
+                <span class="hero-mini-label">{{ 'student_profile.stats.certificates' | translate }}</span>
+              </div>
+              <div class="hero-mini-stat">
+                <span class="hero-mini-value">{{ p.total_training_hours }}</span>
+                <span class="hero-mini-label">{{ 'student_profile.stats.hours' | translate }}</span>
+              </div>
+            </div>
+          </div>
+          @if (uploadImageError()) {
+            <div class="profile-image-error">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              {{ uploadImageError() | translate }}
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="profile-hero chamfer-sm stable-hero">
+          <div class="profile-hero-bg"></div>
+          <div class="profile-hero-content">
+            <div class="profile-avatar-wrapper">
+              <div class="profile-avatar"><div class="profile-avatar-placeholder"><i class="fa-solid fa-user"></i></div></div>
+            </div>
+            <div class="profile-hero-info">
+              <h1 class="profile-hero-name">الطالب / الكلاينت</h1>
+              <p class="profile-hero-email text-muted">جاري تحميل البيانات...</p>
+            </div>
+          </div>
+        </div>
+      }
+
+      <nav class="profile-tabs surface stable-tabs">
+        @for (tab of tabs; track tab.id) {
+          <button type="button" class="profile-tab" [class.is-active]="activeTab() === tab.id" (click)="setTab(tab.id)">
+            <i class="fa-solid" [class]="tab.icon"></i>
+            <span>{{ tab.labelKey | translate }}</span>
+          </button>
+        }
+      </nav>
+
+      @if (activeTab() === 'general') {
+        <form [formGroup]="generalForm" (ngSubmit)="saveGeneral()" class="profile-section surface stable-section" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label class="field-label" for="full_name">{{ 'student_profile.fields.full_name' | translate }}</label>
+              <input id="full_name" type="text" class="field-input" formControlName="full_name" />
+              @if (generalForm.controls.full_name.touched && generalForm.controls.full_name.invalid) {
+                <span class="field-hint is-error">{{ 'auth.errors.full_name' | translate }}</span>
+              }
+            </div>
+            <div class="field">
+              <label class="field-label" for="username">{{ 'student_profile.fields.username' | translate }}</label>
+              <input id="username" type="text" class="field-input" formControlName="username" dir="ltr" placeholder="username" />
+              <span class="field-hint">{{ 'student_profile.fields.username_hint' | translate }}</span>
+              @if (generalForm.controls.username.touched && generalForm.controls.username.invalid) {
+                <span class="field-hint is-error">{{ 'auth.errors.username' | translate }}</span>
+              }
+            </div>
+            <div class="field field-full">
+              <label class="field-label" for="bio">{{ 'student_profile.fields.bio' | translate }}</label>
+              <textarea id="bio" class="field-input field-textarea" formControlName="bio" rows="3"></textarea>
+            </div>
+            <div class="field field-full">
+              <label class="field-label" for="location">{{ 'student_profile.fields.location' | translate }}</label>
+              <input id="location" type="text" class="field-input" formControlName="location" />
+            </div>
+          </div>
+          @if (errorMessage()) {
+            <div class="form-error-banner" style="margin-top: 1rem">{{ errorMessage() | translate }}</div>
+          }
+          <div class="form-actions">
+            <button type="submit" class="btn-primary btn-save" [disabled]="isSaving() || generalForm.pristine">
+              @if (isSaving()) { <div class="loader-spinner-sm"></div> } @else { <i class="fa-solid fa-floppy-disk"></i> {{ 'student_profile.save' | translate }} }
+            </button>
+            @if (saveSuccess()) {
+              <span class="save-success-msg text-success"><i class="fa-solid fa-circle-check"></i> {{ 'student_profile.save_success' | translate }}</span>
+            }
+          </div>
+        </form>
+
+        @if (displayProfile(); as p) {
+          <div class="profile-section surface stable-section">
+            <h3 class="portal-section-title">{{ 'student_profile.skills' | translate }}</h3>
+            @if (p.skills.length === 0) {
+              <p class="text-muted empty-hint">{{ 'student_profile.no_skills' | translate }}</p>
+            } @else {
+              <div class="skills-list">
+                @for (skill of p.skills; track skill.name) {
+                  <span class="skill-chip"><i class="fa-solid fa-check"></i>{{ skill.name }}</span>
+                }
+              </div>
+            }
+          </div>
+          @if (p.username) {
+            <div class="profile-section surface stable-section public-profile-row">
+              <div>
+                <h3 class="portal-section-title">{{ 'student_profile.public_profile' | translate }}</h3>
+                <p class="text-muted public-link" dir="ltr">/u/{{ p.username }}</p>
+              </div>
+              <a [routerLink]="['/u', p.username]" class="btn-outline">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                {{ 'student_profile.view_public' | translate }}
+              </a>
+            </div>
+          }
+        }
+      }
+
+      @if (activeTab() === 'contact') {
+        <form [formGroup]="contactForm" (ngSubmit)="saveContact()" class="profile-section surface stable-section" novalidate>
+          <div class="form-grid">
+            <div class="field">
+              <label class="field-label" for="email">{{ 'student_profile.fields.email' | translate }}</label>
+              <input id="email" type="email" class="field-input" formControlName="email" dir="ltr" />
+              @if (contactForm.controls.email.touched && contactForm.controls.email.invalid) {
+                <span class="field-hint is-error">{{ 'auth.errors.email' | translate }}</span>
+              }
+            </div>
+            <div class="field">
+              <label class="field-label" for="phone">{{ 'student_profile.fields.phone' | translate }}</label>
+              <input id="phone" type="tel" class="field-input" formControlName="phone" dir="ltr" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="whatsapp">{{ 'student_profile.fields.whatsapp' | translate }}</label>
+              <input id="whatsapp" type="tel" class="field-input" formControlName="whatsapp" dir="ltr" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="website"><i class="fa-solid fa-globe"></i> {{ 'student_profile.fields.website' | translate }}</label>
+              <input id="website" type="url" class="field-input" formControlName="website_url" dir="ltr" placeholder="https://..." />
+            </div>
+            <div class="field field-full">
+              <label class="field-label" for="linkedin"><i class="fa-brands fa-linkedin"></i> {{ 'student_profile.fields.linkedin' | translate }}</label>
+              <input id="linkedin" type="url" class="field-input" formControlName="linkedin_url" dir="ltr" placeholder="https://linkedin.com/in/..." />
+            </div>
+          </div>
+          @if (errorMessage()) {
+            <div class="form-error-banner" style="margin-top: 1rem">{{ errorMessage() | translate }}</div>
+          }
+          <div class="form-actions">
+            <button type="submit" class="btn-primary btn-save" [disabled]="isSaving() || contactForm.pristine">
+              @if (isSaving()) { <div class="loader-spinner-sm"></div> } @else { <i class="fa-solid fa-floppy-disk"></i> {{ 'student_profile.save' | translate }} }
+            </button>
+            @if (saveSuccess()) {
+              <span class="save-success-msg text-success"><i class="fa-solid fa-circle-check"></i> {{ 'student_profile.save_success' | translate }}</span>
+            }
+          </div>
+        </form>
+      }
+
+      @if (activeTab() === 'security') {
+        <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" class="profile-section surface stable-section" novalidate>
+          <h3 class="portal-section-title">{{ 'student_profile.password_change' | translate }}</h3>
+          <div class="form-grid">
+            <div class="field field-full">
+              <label class="field-label" for="current_password">{{ 'student_profile.fields.current_password' | translate }}</label>
+              <input id="current_password" type="password" class="field-input" formControlName="current_password" dir="ltr" autocomplete="current-password" />
+            </div>
+            <div class="field">
+              <label class="field-label" for="new_password">{{ 'student_profile.fields.new_password' | translate }}</label>
+              <input id="new_password" type="password" class="field-input" formControlName="new_password" dir="ltr" autocomplete="new-password" />
+              @if (passwordForm.controls.new_password.touched && passwordForm.controls.new_password.invalid) {
+                <span class="field-hint is-error">{{ 'student_profile.errors.password_weak' | translate }}</span>
+              }
+            </div>
+            <div class="field">
+              <label class="field-label" for="confirm_password">{{ 'student_profile.fields.confirm_password' | translate }}</label>
+              <input id="confirm_password" type="password" class="field-input" formControlName="confirm_password" dir="ltr" autocomplete="new-password" />
+            </div>
+          </div>
+          @if (passwordError()) {
+            <div class="form-error-banner" style="margin-top: 1rem">{{ passwordError() | translate }}</div>
+          }
+          @if (passwordDone()) {
+            <div class="success-banner" style="margin-top: 1rem"><i class="fa-solid fa-circle-check"></i> {{ 'student_profile.password_success' | translate }}</div>
+          }
+          <div class="form-actions">
+            <button type="submit" class="btn-primary btn-save" [disabled]="isChangingPassword()">
+              @if (isChangingPassword()) { <div class="loader-spinner-sm"></div> } @else { <i class="fa-solid fa-key"></i> {{ 'student_profile.password_change' | translate }} }
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,184 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'student_enrollments.title' | translate }}</h1>
+      <p class="text-muted">{{ 'student_enrollments.subtitle' | translate }}</p>
+    </div>
+    <a routerLink="/programs" class="btn-accent header-cta">
+      <i class="fa-solid fa-plus"></i>
+      {{ 'student_enrollments.browse_cta' | translate }}
+    </a>
+  </div>
+
+  @if (isLoading()) {
+    <div class="empty-state"><div class="loader-spinner"></div></div>
+  } @else {
+    <!-- -- Status Filters -- -->
+    <div class="filter-pills">
+      @for (s of statuses; track s) {
+        <button
+          type="button"
+          class="filter-pill"
+          [class.is-active]="activeFilter() === s"
+          (click)="setFilter(s)"
+        >
+          {{ s === 'ALL' ? ('common.all' | translate) : ('status.enrollment.' + s | translate) }}
+        </button>
+      }
+    </div>
+
+    @if (filtered().length === 0) {
+      <div class="empty-state surface">
+        <i class="fa-solid fa-book-open"></i>
+        <p>{{ 'student_enrollments.empty' | translate }}</p>
+        <a routerLink="/programs" class="btn-accent empty-cta">
+          {{ 'student_enrollments.browse_cta' | translate }}
+        </a>
+      </div>
+    } @else {
+      <div class="enroll-grid">
+        @for (e of filtered(); track e.id) {
+          <article class="enroll-card surface chamfer-sm animate-in">
+            <div class="enroll-cover">
+              @if (e.training_programs.image_url) {
+                <img [src]="e.training_programs.image_url" [alt]="e.training_programs.title" />
+              } @else {
+                <div class="enroll-cover-placeholder">
+                  <i class="fa-solid fa-book"></i>
+                </div>
+              }
+              <span class="badge enroll-badge" [class]="badgeClass(e.status)">
+                {{ 'status.enrollment.' + e.status | translate }}
+              </span>
+            </div>
+
+            <div class="enroll-body">
+              <h3 class="enroll-title">{{ e.training_programs.title }}</h3>
+              <p class="enroll-trainer text-muted">
+                <i class="fa-solid fa-chalkboard-user"></i>
+                {{ e.training_programs.trainers?.users?.full_name ?? '' }}
+              </p>
+
+              @if (e.status === 'ACTIVE' && e.progress > 0) {
+                <div class="progress-row">
+                  <div class="progress-bar">
+                    <div class="progress-fill" [style.width.%]="e.progress"></div>
+                  </div>
+                  <span class="progress-label">{{ e.progress }}%</span>
+                </div>
+              }
+
+              <div class="enroll-meta">
+                <span><i class="fa-regular fa-clock"></i> {{ e.training_programs.duration_hours ?? '—' }} {{ 'common.hours_unit' | translate }}</span>
+                <span><i class="fa-regular fa-calendar"></i> {{ e.enrolled_at | date: 'yyyy/MM/dd' }}</span>
+              </div>
+
+              <div class="enroll-actions">
+                <button type="button" class="btn-outline btn-sm" (click)="openDetails(e)">
+                  {{ 'student_enrollments.details' | translate }}
+                </button>
+                @if (e.status === 'ACTIVE' || e.status === 'SUSPENDED') {
+                  <button type="button" class="btn-danger-outline btn-sm" (click)="askCancel(e)">
+                    {{ 'student_enrollments.cancel' | translate }}
+                  </button>
+                }
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  }
+
+  <!-- -- Details Modal -- -->
+  @if (selected(); as d) {
+    <div class="modal-backdrop" (click)="closeDetails()">
+      <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ 'student_enrollments.details' | translate }}</h3>
+          <button type="button" class="icon-btn" (click)="closeDetails()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        @if (loadingDetails()) {
+          <div class="empty-state"><div class="loader-spinner"></div></div>
+        } @else {
+          <h4 class="modal-title">{{ d.training_programs.title }}</h4>
+          <span class="badge" [class]="badgeClass(d.status)">
+            {{ 'status.enrollment.' + d.status | translate }}
+          </span>
+
+          @if (d.training_programs.description) {
+            <p class="modal-desc">{{ d.training_programs.description }}</p>
+          }
+
+          <div class="detail-rows">
+            <div class="detail-row">
+              <span class="text-muted">{{ 'student_enrollments.enrolled_at' | translate }}</span>
+              <strong>{{ d.enrolled_at | date: 'yyyy/MM/dd' }}</strong>
+            </div>
+            @if (d.completed_at) {
+              <div class="detail-row">
+                <span class="text-muted">{{ 'student_enrollments.completed_at' | translate }}</span>
+                <strong>{{ d.completed_at | date: 'yyyy/MM/dd' }}</strong>
+              </div>
+            }
+            <div class="detail-row">
+              <span class="text-muted">{{ 'student_enrollments.progress' | translate }}</span>
+              <strong>{{ d.progress }}%</strong>
+            </div>
+            @if (d.trainer_notes) {
+              <div class="detail-row detail-col">
+                <span class="text-muted">{{ 'student_enrollments.trainer_notes' | translate }}</span>
+                <p>{{ d.trainer_notes }}</p>
+              </div>
+            }
+          </div>
+
+          <div class="form-actions">
+            <a [routerLink]="['/programs', d.training_programs.id]" class="btn-outline btn-link">
+              {{ 'student_enrollments.view_program' | translate }}
+            </a>
+            @if (d.status === 'ACTIVE' || d.status === 'SUSPENDED') {
+              <button type="button" class="btn-danger btn-sm" (click)="askCancel(d)">
+                {{ 'student_enrollments.cancel' | translate }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- -- Cancel Confirm Modal -- -->
+  @if (cancelTarget(); as t) {
+    <div class="modal-backdrop" (click)="closeCancel()">
+      <div class="modal-card modal-card-sm surface chamfer-sm" (click)="$event.stopPropagation()">
+        <div class="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h3>{{ 'student_enrollments.cancel_confirm_title' | translate }}</h3>
+        <p class="text-muted">{{ 'student_enrollments.cancel_confirm_text' | translate }}</p>
+        <p class="confirm-item">{{ t.training_programs.title }}</p>
+        <div class="form-actions form-actions-center">
+          <button type="button" class="btn-outline" (click)="closeCancel()">
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button type="button" class="btn-danger" (click)="confirmCancel()" [disabled]="isCancelling()">
+            @if (isCancelling()) {
+              <div class="loader-spinner-sm"></div>
+            } @else {
+              {{ 'common.confirm' | translate }}
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (toastMessage()) {
+    <div class="toast toast-success animate-in">
+      <i class="fa-solid fa-circle-check"></i>
+      {{ toastMessage() | translate }}
+    </div>
+  }
+</section>

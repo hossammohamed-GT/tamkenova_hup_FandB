@@ -1,0 +1,103 @@
+<div class="auth-page">
+  <section class="auth-visual-col">
+    <app-auth-visual-panel mode="login" />
+  </section>
+
+  <section class="auth-form-col">
+    <div class="auth-card">
+
+      <span class="auth-eyebrow">{{ 'auth.login.eyebrow' |
+        translate }}</span>
+      <h1 class="auth-title">{{ 'auth.login.title' |
+        translate }}</h1>
+      <p class="auth-subtitle text-muted">{{
+        'auth.login.subtitle' | translate }}</p>
+      <div class="auth-role-hint glass-hint">
+        <i class="fa-solid fa-users"></i>
+        <span>{{ 'auth.login.student_hint' | translate }}</span>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()"
+        class="auth-form" novalidate>
+
+        <div class="field"
+          [class.is-valid]="isFieldValid('email')"
+          [class.is-invalid]="isFieldInvalid('email')">
+          <label class="field-label" for="email">{{
+            'auth.fields.email' | translate }}</label>
+          <div class="field-input-wrap">
+            <input id="email" type="email"
+              class="field-input" formControlName="email"
+              (input)="markTouched('email')"
+              autocomplete="email" dir="ltr" />
+            <i class="fa-solid fa-check field-status-icon is-valid"
+              [class.is-visible]="isFieldValid('email')"></i>
+            <i class="fa-solid fa-xmark field-status-icon is-invalid"
+              [class.is-visible]="isFieldInvalid('email')"></i>
+          </div>
+          <span class="field-hint"
+            [class.is-error]="isFieldInvalid('email')">
+            @if (isFieldInvalid('email')) {
+            {{ 'auth.errors.email' | translate }}
+            }
+          </span>
+        </div>
+
+        <div class="field"
+          [class.is-valid]="isFieldValid('password')"
+          [class.is-invalid]="isFieldInvalid('password')">
+          <label class="field-label" for="password">{{
+            'auth.fields.password' | translate }}</label>
+          <div class="field-input-wrap">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              id="password" class="field-input"
+              formControlName="password"
+              (input)="markTouched('password')"
+              autocomplete="current-password" />
+            <button type="button"
+              class="field-toggle-visibility"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="'auth.toggle_password' | translate">
+              <i class="fa-solid"
+                [class.fa-eye]="!showPassword()"
+                [class.fa-eye-slash]="showPassword()"></i>
+            </button>
+          </div>
+          <span class="field-hint"
+            [class.is-error]="isFieldInvalid('password')">
+            @if (isFieldInvalid('password')) {
+            {{ 'auth.errors.password_required' | translate
+            }}
+            }
+          </span>
+        </div>
+
+        @if (errorMessage()) {
+        <div class="form-error-banner">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>{{ errorMessage() | translate }}</span>
+        </div>
+        }
+
+        <button type="submit"
+          class="btn-primary auth-submit"
+          [disabled]="isLoading()">
+          @if (isLoading()) {
+          <i class="fa-solid fa-spinner"></i>
+          } @else {
+          {{ 'auth.login.submit' | translate }}
+          }
+        </button>
+
+      </form>
+
+      <p class="auth-switch text-muted">
+        {{ 'auth.login.no_account' | translate }}
+        <a routerLink="/register">{{ 'auth.register.title' |
+          translate }}</a>
+      </p>
+
+    </div>
+  </section>
+</div>

@@ -1,0 +1,418 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'admin_trainers.title' | translate }}</h1>
+      <p class="text-muted">{{ 'admin_trainers.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <app-admin-nav />
+
+  <!-- -- Status Filters -- -->
+  <div class="filter-pills staff-fade">
+    @for (f of filters; track f) {
+      <button
+        type="button"
+        class="filter-pill"
+        [class.is-active]="activeFilter() === f"
+        (click)="setFilter(f)"
+      >
+        @if (f === 'PENDING' && pendingCount() > 0 && activeFilter() !== f) {
+          <span class="pill-count">{{ pendingCount() }}</span>
+        }
+        {{ f === 'ALL' ? ('common.all' | translate) : ('status.trainer.' + f | translate) }}
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="staff-empty"><div class="loader-spinner"></div></div>
+  } @else if (hasError()) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ 'admin_trainers.load_error' | translate }}</p>
+      <button type="button" class="btn-primary-sm btn-sm" (click)="load()">
+        {{ 'common.retry' | translate }}
+      </button>
+    </div>
+  } @else if (filtered().length === 0) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-chalkboard-user"></i>
+      <p>{{ 'admin_trainers.empty' | translate }}</p>
+    </div>
+  } @else {
+    <div class="trainer-grid">
+      @for (trainer of filtered(); track trainer.id) {
+        <article
+          class="trainer-card surface chamfer-sm staff-fade"
+          [class.is-pending]="(trainer.trainer_status ?? 'PENDING') === 'PENDING'"
+          (click)="openDetails(trainer)"
+        >
+          <div class="trainer-card-head">
+            <span class="trainer-avatar">
+              @if (trainer.users?.profile_image) {
+                <img [src]="trainer.users!.profile_image!" [alt]="trainer.users?.full_name" />
+              } @else {
+                {{ initials(trainer.users?.full_name ?? '') }}
+              }
+            </span>
+
+            <div class="trainer-head-text">
+              <h3 class="trainer-name">{{ trainer.users?.full_name ?? '—' }}</h3>
+              <span class="trainer-mail" dir="ltr">{{ trainer.users?.email ?? '' }}</span>
+            </div>
+
+            <span class="badge" [class]="statusBadge(trainer.trainer_status ?? 'PENDING')">
+              {{ 'status.trainer.' + (trainer.trainer_status ?? 'PENDING') | translate }}
+            </span>
+          </div>
+
+          <div class="trainer-chips">
+            <span class="trainer-chip">
+              <i class="fa-solid fa-layer-group"></i>
+              {{ specializationName(trainer) }}
+            </span>
+            <span class="trainer-chip">
+              <i class="fa-regular fa-calendar"></i>
+              {{ trainer.created_at | date: 'yyyy/MM/dd' }}
+            </span>
+            @if (trainer.years_of_experience) {
+              <span class="trainer-chip">
+                <i class="fa-solid fa-briefcase"></i>
+                {{ trainer.years_of_experience }} {{ 'admin_trainers.years_short' | translate }}
+              </span>
+            }
+            @if ((trainer.trainer_certificates?.length ?? 0) > 0) {
+              <span class="trainer-chip">
+                <i class="fa-solid fa-certificate"></i>
+                {{ trainer.trainer_certificates!.length }}
+              </span>
+            }
+          </div>
+
+          @if (trainer.rejection_reason) {
+            <p class="trainer-reject-note">
+              <i class="fa-solid fa-circle-exclamation"></i>
+              {{ trainer.rejection_reason }}
+            </p>
+          }
+
+          <div class="trainer-card-actions" (click)="$event.stopPropagation()">
+            @switch (trainer.trainer_status ?? 'PENDING') {
+              @case ('PENDING') {
+                <button
+                  type="button"
+                  class="btn-sm btn-success-sm"
+                  [disabled]="busyId() === trainer.id"
+                  (click)="act(trainer, 'approve')"
+                >
+                  <i class="fa-solid fa-check"></i>
+                  {{ 'admin_trainers.approve' | translate }}
+                </button>
+                <button type="button" class="btn-sm btn-danger-sm" (click)="askReject(trainer)">
+                  <i class="fa-solid fa-xmark"></i>
+                  {{ 'admin_trainers.reject' | translate }}
+                </button>
+              }
+              @case ('APPROVED') {
+                <button
+                  type="button"
+                  class="btn-sm btn-danger-sm"
+                  [disabled]="busyId() === trainer.id"
+                  (click)="act(trainer, 'suspend')"
+                >
+                  <i class="fa-solid fa-pause"></i>
+                  {{ 'admin_trainers.suspend' | translate }}
+                </button>
+              }
+              @case ('SUSPENDED') {
+                <button
+                  type="button"
+                  class="btn-sm btn-success-sm"
+                  [disabled]="busyId() === trainer.id"
+                  (click)="act(trainer, 'activate')"
+                >
+                  <i class="fa-solid fa-play"></i>
+                  {{ 'admin_trainers.activate' | translate }}
+                </button>
+              }
+              @case ('REJECTED') {
+                <button
+                  type="button"
+                  class="btn-sm btn-success-sm"
+                  [disabled]="busyId() === trainer.id"
+                  (click)="act(trainer, 'activate')"
+                >
+                  <i class="fa-solid fa-rotate-right"></i>
+                  {{ 'admin_trainers.activate' | translate }}
+                </button>
+              }
+            }
+
+            <span class="trainer-card-tools">
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="openDetails(trainer)"
+                [attr.aria-label]="'common.view' | translate"
+              >
+                <i class="fa-solid fa-eye"></i>
+              </button>
+              <button
+                type="button"
+                class="icon-btn"
+                (click)="openEdit(trainer)"
+                [attr.aria-label]="'common.edit' | translate"
+              >
+                <i class="fa-solid fa-pen"></i>
+              </button>
+            </span>
+          </div>
+        </article>
+      }
+    </div>
+  }
+
+  <!-- -- Reject Modal -- -->
+  @if (rejectTarget(); as target) {
+    <div class="modal-backdrop" (click)="closeReject()">
+      <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ 'admin_trainers.reject_title' | translate }}</h3>
+          <button type="button" class="icon-btn" (click)="closeReject()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <p class="reject-subject text-muted">
+          <i class="fa-solid fa-chalkboard-user"></i>
+          {{ target.users?.full_name }}
+        </p>
+
+        <form [formGroup]="rejectForm" (ngSubmit)="confirmReject()">
+          <div class="field">
+            <label class="field-label" for="reject-reason">
+              {{ 'admin_trainers.reject_reason' | translate }}
+            </label>
+            <textarea
+              id="reject-reason"
+              class="field-input field-textarea"
+              formControlName="reason"
+              rows="3"
+              [placeholder]="'admin_trainers.reject_reason_placeholder' | translate"
+            ></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-sm btn-outline-sm" (click)="closeReject()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button type="submit" class="btn-sm btn-danger-sm" [disabled]="isRejecting()">
+              @if (isRejecting()) {
+                <span class="loader-spinner-sm"></span>
+              }
+              {{ 'admin_trainers.reject_confirm' | translate }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- -- Details Modal -- -->
+  @if (details(); as d) {
+    <div class="modal-backdrop" (click)="closeDetails()">
+      <div class="modal-card surface chamfer-sm modal-wide" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ d.users?.full_name }}</h3>
+          <button type="button" class="icon-btn" (click)="closeDetails()">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        @if (isLoadingDetails()) {
+          <div class="staff-empty"><div class="loader-spinner"></div></div>
+        } @else {
+          <div class="subtabs">
+            <button type="button" class="subtab" [class.is-active]="detailsTab() === 'info'" (click)="setDetailsTab('info')">
+              {{ 'admin_trainers.tab_info' | translate }}
+            </button>
+            <button type="button" class="subtab" [class.is-active]="detailsTab() === 'certificates'" (click)="setDetailsTab('certificates')">
+              {{ 'admin_trainers.tab_certificates' | translate }} ({{ d.trainer_certificates?.length ?? 0 }})
+            </button>
+            <button type="button" class="subtab" [class.is-active]="detailsTab() === 'documents'" (click)="setDetailsTab('documents')">
+              {{ 'admin_trainers.tab_documents' | translate }} ({{ d.trainer_documents?.length ?? 0 }})
+            </button>
+          </div>
+
+          @switch (detailsTab()) {
+            @case ('info') {
+              <div class="staff-detail-grid">
+                <div class="staff-detail-item">
+                  <span class="staff-detail-label">{{ 'admin_trainers.col_specialization' | translate }}</span>
+                  <span class="staff-detail-value">{{ specializationName(d) }}</span>
+                </div>
+                <div class="staff-detail-item">
+                  <span class="staff-detail-label">{{ 'admin_trainers.experience' | translate }}</span>
+                  <span class="staff-detail-value">{{ d.years_of_experience ?? '—' }}</span>
+                </div>
+                <div class="staff-detail-item">
+                  <span class="staff-detail-label">{{ 'admin_trainers.email' | translate }}</span>
+                  <span class="staff-detail-value">{{ d.users?.email ?? '—' }}</span>
+                </div>
+                <div class="staff-detail-item">
+                  <span class="staff-detail-label">{{ 'admin_trainers.status_label' | translate }}</span>
+                  <span class="badge" [class]="statusBadge(d.trainer_status ?? 'PENDING')">
+                    {{ 'status.trainer.' + (d.trainer_status ?? 'PENDING') | translate }}
+                  </span>
+                </div>
+              </div>
+              @if (d.bio_ar || d.bio_en) {
+                <h4 class="detail-subtitle">{{ 'admin_trainers.bio' | translate }}</h4>
+                @if (d.bio_ar) {
+                  <p class="bio-text" dir="rtl">{{ d.bio_ar }}</p>
+                }
+                @if (d.bio_en) {
+                  <p class="bio-text" dir="ltr">{{ d.bio_en }}</p>
+                }
+              }
+            }
+            @case ('certificates') {
+              @if ((d.trainer_certificates?.length ?? 0) === 0) {
+                <div class="staff-empty">
+                  <i class="fa-solid fa-certificate"></i>
+                  <p>{{ 'admin_trainers.no_certificates' | translate }}</p>
+                </div>
+              } @else {
+                <ul class="staff-item-list">
+                  @for (cert of d.trainer_certificates; track cert.id) {
+                    <li class="staff-item-row">
+                      <div class="staff-item-main">
+                        <strong>{{ cert.title ?? '—' }}</strong>
+                        <a class="staff-item-link" [href]="cert.certificate_url" target="_blank" rel="noopener">
+                          {{ cert.certificate_url }}
+                        </a>
+                      </div>
+                      <div class="item-row-actions">
+                        <a class="icon-btn" [href]="cert.certificate_url" target="_blank" rel="noopener">
+                          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                        <button type="button" class="icon-btn icon-btn-danger" (click)="removeCertificate(cert)">
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              }
+
+              <form [formGroup]="certificateForm" (ngSubmit)="addCertificate()" class="add-form">
+                <div class="add-form-grid">
+                  <div class="field">
+                    <input
+                      type="text"
+                      class="field-input"
+                      formControlName="title"
+                      [placeholder]="'admin_trainers.cert_title' | translate"
+                    />
+                  </div>
+                  <div class="field">
+                    <input
+                      type="url"
+                      class="field-input"
+                      formControlName="certificate_url"
+                      [placeholder]="'admin_trainers.cert_url' | translate"
+                    />
+                  </div>
+                  <button type="submit" class="btn-sm btn-primary-sm" [disabled]="isAddingCertificate()">
+                    @if (isAddingCertificate()) {
+                      <span class="loader-spinner-sm"></span>
+                    }
+                    <i class="fa-solid fa-plus"></i>
+                    {{ 'common.save' | translate }}
+                  </button>
+                </div>
+                @if (certificateForm.invalid && certificateForm.touched) {
+                  <span class="field-hint is-error">{{ 'admin_trainers.cert_form_error' | translate }}</span>
+                }
+              </form>
+            }
+            @case ('documents') {
+              @if ((d.trainer_documents?.length ?? 0) === 0) {
+                <div class="staff-empty">
+                  <i class="fa-solid fa-folder-open"></i>
+                  <p>{{ 'admin_trainers.no_documents' | translate }}</p>
+                </div>
+              } @else {
+                <ul class="staff-item-list">
+                  @for (doc of d.trainer_documents; track doc.id) {
+                    <li class="staff-item-row">
+                      <div class="staff-item-main">
+                        <strong>{{ doc.file_name }}</strong>
+                        <small class="text-muted">{{ doc.file_type ?? '—' }}</small>
+                      </div>
+                      <div class="item-row-actions">
+                        <a class="icon-btn" [href]="doc.file_url" target="_blank" rel="noopener">
+                          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                        <button type="button" class="icon-btn icon-btn-danger" (click)="removeDocument(doc)">
+                          <i class="fa-solid fa-trash"></i>
+                        </button>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              }
+
+              <form [formGroup]="documentForm" (ngSubmit)="addDocument()" class="add-form">
+                <div class="add-form-grid add-form-grid-3">
+                  <div class="field">
+                    <input
+                      type="text"
+                      class="field-input"
+                      formControlName="file_name"
+                      [placeholder]="'admin_trainers.doc_name' | translate"
+                    />
+                  </div>
+                  <div class="field">
+                    <input
+                      type="url"
+                      class="field-input"
+                      formControlName="file_url"
+                      [placeholder]="'admin_trainers.doc_url' | translate"
+                    />
+                  </div>
+                  <div class="field">
+                    <select class="field-input" formControlName="file_type">
+                      <option value="CV">CV</option>
+                      <option value="ID">ID</option>
+                      <option value="CERTIFICATE">CERTIFICATE</option>
+                      <option value="OTHER">OTHER</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="btn-sm btn-primary-sm" [disabled]="isAddingDocument()">
+                    @if (isAddingDocument()) {
+                      <span class="loader-spinner-sm"></span>
+                    }
+                    <i class="fa-solid fa-plus"></i>
+                    {{ 'common.save' | translate }}
+                  </button>
+                </div>
+                @if (documentForm.invalid && documentForm.touched) {
+                  <span class="field-hint is-error">{{ 'admin_trainers.doc_form_error' | translate }}</span>
+                }
+              </form>
+            }
+          }
+        }
+      </div>
+    </div>
+  }
+
+  @if (toastError(); as key) {
+    <div class="staff-toast staff-toast-error">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      {{ key | translate }}
+    </div>
+  }
+</section>

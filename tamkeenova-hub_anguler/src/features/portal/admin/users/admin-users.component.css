@@ -1,0 +1,166 @@
+.filter-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.filter-pill {
+  padding: 0.5rem 1.1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast),
+    color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.filter-pill:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+.filter-pill.is-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.table-user-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.verify-icon.is-ok {
+  color: var(--color-success);
+}
+
+.verify-icon.is-no {
+  color: var(--color-danger);
+}
+
+/* -- Role options -- */
+.role-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+@media (max-width: 560px) {
+  .role-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+.role-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.8rem 0.9rem;
+  text-align: start;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.role-option:hover {
+  border-color: var(--color-primary);
+}
+
+.role-option.is-selected {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
+}
+
+.role-option-radio {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 0.1rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: #fff;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.role-option.is-selected .role-option-radio {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.role-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.role-option-text strong {
+  font-size: 0.84rem;
+  color: var(--color-text);
+}
+
+.role-option-text small {
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+/* -- Activity list -- */
+.activity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.activity-item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.activity-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  margin-top: 0.45rem;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+.activity-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.activity-body strong {
+  font-size: 0.84rem;
+  color: var(--color-text);
+}
+
+.activity-date {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  margin-top: 0.15rem;
+}

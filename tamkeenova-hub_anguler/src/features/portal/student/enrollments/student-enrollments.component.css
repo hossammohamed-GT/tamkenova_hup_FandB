@@ -1,0 +1,341 @@
+.header-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.3rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.portal-page {
+  background-image:
+    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--color-primary) 5%, transparent) 0%, transparent 38%),
+    radial-gradient(circle at 88% 65%, color-mix(in srgb, var(--color-accent) 6%, transparent) 0%, transparent 42%);
+}
+
+.filter-pills {
+  background: color-mix(in srgb, var(--color-surface) 78%, transparent);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  padding: 0.8rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  animation: filter-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes filter-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.enroll-card {
+  background: color-mix(in srgb, var(--color-surface) 84%, transparent) !important;
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent) !important;
+  animation: enroll-enter 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+@keyframes enroll-enter {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.enroll-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.08);
+}
+
+.filter-pills {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.filter-pill {
+  padding: 0.5rem 1.1rem;
+  border: 1.5px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-pill:hover {
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+.filter-pill.is-active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.empty-cta {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.7rem 1.4rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.enroll-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.enroll-card {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.enroll-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.enroll-cover {
+  position: relative;
+  height: 150px;
+  background: var(--color-surface-alt);
+}
+
+.enroll-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.enroll-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  color: var(--color-border);
+  background: linear-gradient(135deg, var(--color-surface-alt), color-mix(in srgb, var(--color-primary) 12%, var(--color-surface-alt)));
+}
+
+.enroll-badge {
+  position: absolute;
+  top: 0.75rem;
+  inset-inline-start: 0.75rem;
+  background: var(--color-surface);
+}
+
+.enroll-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.enroll-title {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.enroll-trainer {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  transition: width 0.4s ease;
+}
+
+.progress-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--color-primary);
+}
+
+.enroll-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
+}
+
+.enroll-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.enroll-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: auto;
+  padding-top: 0.6rem;
+}
+
+.btn-sm {
+  height: 40px;
+  padding-inline: 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.btn-danger-outline {
+  height: 40px;
+  padding-inline: 1rem;
+  border: 1.5px solid color-mix(in srgb, var(--color-danger) 40%, transparent);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-danger);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-danger-outline:hover {
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  padding: 0.5rem 1.3rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* -- Modal -- */
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.modal-head h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+}
+
+.modal-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 0.6rem;
+}
+
+.modal-desc {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--color-text-muted);
+  margin: 0.9rem 0;
+}
+
+.detail-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-alt);
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.85rem;
+}
+
+.detail-col {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.modal-card-sm {
+  max-width: 440px;
+  text-align: center;
+}
+
+.confirm-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  color: var(--color-danger);
+  font-size: 1.4rem;
+}
+
+.modal-card-sm h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.5rem;
+}
+
+.modal-card-sm p {
+  font-size: 0.85rem;
+}
+
+.confirm-item {
+  margin-top: 0.6rem;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.form-actions-center {
+  justify-content: center;
+}

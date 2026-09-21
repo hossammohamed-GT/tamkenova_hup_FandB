@@ -1,0 +1,269 @@
+<section class="profile-page">
+  <!-- Loader فقط عند التحميل الأولي -->
+  @if (isLoading() && !hasLoaded()) {
+  <div class="profile-loader">
+    <div class="loader-spinner"></div>
+    <p>{{ 'loader.loading' | translate }}</p>
+  </div>
+  } @else {
+  <!-- حتى لو فشل التحميل، اعرض واجهة مستقرة -->
+  @if (displayProfile(); as p) {
+  <!-- Profile Header - ثابت لا يختفي -->
+  <div class="profile-hero chamfer-sm glass-hero-stable">
+    <div class="profile-hero-bg"></div>
+    <div class="profile-hero-content">
+      <div class="profile-avatar-wrapper">
+        <div class="profile-avatar" [class.is-uploading]="isUploadingImage()">
+          @if (profileImage()) {
+          <img [src]="profileImage()!" [alt]="p.users.full_name" />
+          } @else {
+          <div class="profile-avatar-placeholder">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          }
+          @if (isUploadingImage()) {
+          <div class="profile-avatar-overlay">
+            <div class="loader-spinner-sm"></div>
+          </div>
+          }
+        </div>
+        <input type="file" id="profile-image-input" accept="image/*" hidden (change)="onFileSelected($event)" />
+        <button type="button" class="avatar-upload-btn" (click)="triggerFileInput()" [disabled]="isUploadingImage()" [attr.aria-label]="'trainer_profile.change_image' | translate">
+          <i class="fa-solid fa-camera"></i>
+        </button>
+      </div>
+      <div class="profile-hero-info">
+        <h1 class="profile-hero-name">{{ p.users.full_name }}</h1>
+        <p class="profile-hero-email">{{ p.users.email }}</p>
+        <div class="profile-hero-meta">
+          <span class="badge" [class.badge-pending]="p.trainer_status === 'PENDING'" [class.badge-approved]="p.trainer_status === 'APPROVED'" [class.badge-rejected]="p.trainer_status === 'REJECTED'">
+            {{ 'trainer_status.' + (p.trainer_status | lowercase) + '_badge' | translate }}
+          </span>
+          <span class="profile-hero-spec">
+            <i class="fa-solid fa-briefcase"></i>
+            {{ p.specializations.name_ar }}
+          </span>
+        </div>
+      </div>
+    </div>
+    @if (uploadImageError()) {
+    <div class="profile-image-error">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      {{ uploadImageError() | translate }}
+    </div>
+    }
+  </div>
+  } @else {
+  <!-- Fallback hero لو profile null -->
+  <div class="profile-hero chamfer-sm glass-hero-stable">
+    <div class="profile-hero-bg"></div>
+    <div class="profile-hero-content">
+      <div class="profile-avatar-wrapper">
+        <div class="profile-avatar">
+          <div class="profile-avatar-placeholder"><i class="fa-solid fa-user"></i></div>
+        </div>
+      </div>
+      <div class="profile-hero-info">
+        <h1 class="profile-hero-name">المدرب</h1>
+        <p class="profile-hero-email text-muted">جاري تحميل البيانات...</p>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Tab Navigation - ثابت دائما -->
+  <nav class="profile-tabs surface glass-tabs-stable">
+    @for (tab of tabs; track tab.id) {
+    <button type="button" class="profile-tab" [class.is-active]="activeTab() === tab.id" (click)="setTab(tab.id)">
+      <i class="fa-solid" [class]="tab.icon"></i>
+      <span>{{ tab.labelKey | translate }}</span>
+    </button>
+    }
+  </nav>
+
+  <!-- Profile Form - ثابت، لا يختفي عند تغيير التاب -->
+  <form [formGroup]="form" (ngSubmit)="save()" class="profile-form" novalidate>
+
+    @if (activeTab() === 'general') {
+    <div class="profile-section stable-section">
+      <div class="form-grid">
+        <div class="field">
+          <label class="field-label" for="bio_ar">{{ 'auth.trainer_register.bio_ar_label' | translate }}</label>
+          <textarea id="bio_ar" class="field-input field-textarea" formControlName="bio_ar" rows="2"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label" for="bio_en">{{ 'auth.trainer_register.bio_en_label' | translate }}</label>
+          <textarea id="bio_en" class="field-input field-textarea" formControlName="bio_en" rows="2" dir="ltr"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label" for="desc_ar">{{ 'auth.trainer_register.description_ar_label' | translate }}</label>
+          <textarea id="desc_ar" class="field-input field-textarea" formControlName="description_ar" rows="4"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label" for="desc_en">{{ 'auth.trainer_register.description_en_label' | translate }}</label>
+          <textarea id="desc_en" class="field-input field-textarea" formControlName="description_en" rows="4" dir="ltr"></textarea>
+        </div>
+      </div>
+    </div>
+    }
+
+    @if (activeTab() === 'specialization') {
+    <div class="profile-section stable-section">
+      @if (displayProfile(); as p) {
+      <div class="spec-current surface-alt">
+        <div class="spec-icon"><i class="fa-solid fa-briefcase"></i></div>
+        <div>
+          <h3>{{ p.specializations.name_ar }}</h3>
+          <p class="text-muted">{{ p.specializations.name_en }}</p>
+        </div>
+      </div>
+      }
+      <button type="button" class="btn-outline spec-request-toggle" (click)="toggleSpecRequest()">
+        <i class="fa-solid fa-plus"></i>
+        {{ 'trainer_profile.request_new_specialization' | translate }}
+      </button>
+      @if (showSpecRequest()) {
+      <div class="spec-request-form surface-alt stable-section">
+        @if (specRequestDone()) {
+        <div class="success-message">
+          <i class="fa-solid fa-circle-check"></i>
+          {{ 'trainer_profile.spec_request_sent' | translate }}
+        </div>
+        } @else {
+        <!-- تم إصلاح التداخل: div بدلا من form -->
+        <div [formGroup]="specRequestForm" class="form-grid">
+          <div class="field">
+            <label class="field-label">{{ 'trainer_profile.spec_name_ar' | translate }}</label>
+            <input type="text" class="field-input" formControlName="name_ar" />
+          </div>
+          <div class="field">
+            <label class="field-label">{{ 'trainer_profile.spec_name_en' | translate }}</label>
+            <input type="text" class="field-input" formControlName="name_en" dir="ltr" />
+          </div>
+          <div class="form-actions field-full">
+            <button type="button" class="btn-primary" [disabled]="specRequestSaving()" (click)="submitSpecRequest()">
+              @if (specRequestSaving()) {
+              <div class="loader-spinner-sm"></div>
+              } @else {
+              <i class="fa-solid fa-paper-plane"></i>
+              {{ 'trainer_profile.send_request' | translate }}
+              }
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+    }
+
+    @if (activeTab() === 'links') {
+    <div class="profile-section stable-section">
+      <div class="form-grid">
+        <div class="field field-full">
+          <label class="field-label" for="linkedin"><i class="fa-brands fa-linkedin"></i> {{ 'auth.trainer_register.linkedin_label' | translate }}</label>
+          <input id="linkedin" type="url" class="field-input" formControlName="linkedin_url" dir="ltr" placeholder="https://linkedin.com/in/..." />
+        </div>
+        <div class="field field-full">
+          <label class="field-label" for="facebook"><i class="fa-brands fa-facebook"></i> {{ 'auth.trainer_register.facebook_label' | translate }}</label>
+          <input id="facebook" type="url" class="field-input" formControlName="facebook_url" dir="ltr" placeholder="https://facebook.com/..." />
+        </div>
+        <div class="field field-full">
+          <label class="field-label" for="website"><i class="fa-solid fa-globe"></i> {{ 'auth.trainer_register.website_label' | translate }}</label>
+          <input id="website" type="url" class="field-input" formControlName="website_url" dir="ltr" placeholder="https://..." />
+        </div>
+        <div class="field field-full">
+          <label class="field-label" for="portfolio"><i class="fa-solid fa-palette"></i> {{ 'auth.trainer_register.portfolio_label' | translate }}</label>
+          <input id="portfolio" type="url" class="field-input" formControlName="portfolio_url" dir="ltr" placeholder="https://behance.net/..." />
+        </div>
+      </div>
+    </div>
+    }
+
+    @if (activeTab() === 'pricing') {
+    <div class="profile-section stable-section">
+      <div class="pricing-grid">
+        <div class="pricing-card surface-alt">
+          <label class="field-label" for="price_from"><i class="fa-solid fa-tag"></i> {{ 'auth.trainer_register.price_from_label' | translate }}</label>
+          <input id="price_from" type="number" min="0" class="field-input" formControlName="consultation_price_from" dir="ltr" />
+        </div>
+        <div class="pricing-card surface-alt">
+          <label class="field-label" for="price_to"><i class="fa-solid fa-tags"></i> {{ 'auth.trainer_register.price_to_label' | translate }}</label>
+          <input id="price_to" type="number" min="0" class="field-input" formControlName="consultation_price_to" dir="ltr" />
+        </div>
+        <div class="pricing-card surface-alt">
+          <label class="field-label" for="duration"><i class="fa-regular fa-clock"></i> {{ 'auth.trainer_register.duration_label' | translate }}</label>
+          <input id="duration" type="number" min="0" class="field-input" formControlName="consultation_duration" dir="ltr" />
+        </div>
+      </div>
+    </div>
+    }
+
+    @if (activeTab() === 'certificates') {
+    <div class="profile-section stable-section">
+      <div class="dynamic-list">
+        @for (ctrl of certificateUrls.controls; track $index) {
+        <div class="dynamic-item stable-item">
+          <div class="dynamic-item-icon"><i class="fa-solid fa-certificate"></i></div>
+          <input type="url" class="field-input" [formControl]="ctrl" dir="ltr" placeholder="https://..." />
+          <button type="button" class="dynamic-item-remove" (click)="removeCertificate($index)"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        }
+      </div>
+      <button type="button" class="btn-add-dynamic" (click)="addCertificate()"><i class="fa-solid fa-plus"></i> {{ 'auth.trainer_register.add_certificate' | translate }}</button>
+    </div>
+    }
+
+    @if (activeTab() === 'documents') {
+    <div class="profile-section stable-section">
+      <div class="dynamic-list">
+        @for (group of documents.controls; track $index) {
+        <div class="dynamic-doc stable-item" [formGroup]="group">
+          <div class="dynamic-doc-icon"><i class="fa-solid fa-file-lines"></i></div>
+          <div class="dynamic-doc-fields">
+            <input type="text" class="field-input" formControlName="file_name" [placeholder]="'auth.trainer_register.file_name_label' | translate" />
+            <input type="url" class="field-input" formControlName="file_url" dir="ltr" [placeholder]="'auth.trainer_register.file_url_label' | translate" />
+            <select class="field-input" formControlName="file_type">
+              <option value="CV">CV</option>
+              <option value="CERTIFICATE">Certificate</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
+          <button type="button" class="dynamic-item-remove" (click)="removeDocument($index)"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        }
+      </div>
+      <button type="button" class="btn-add-dynamic" (click)="addDocument()"><i class="fa-solid fa-plus"></i> {{ 'auth.trainer_register.add_document' | translate }}</button>
+    </div>
+    }
+
+  </form>
+
+  @if (hasChanges()) {
+  <button type="button" class="fab" (click)="save()" [disabled]="isSaving()" [attr.aria-label]="'trainer_profile.save' | translate">
+    @if (isSaving()) {
+    <div class="loader-spinner-sm"></div>
+    } @else if (saveSuccess()) {
+    <i class="fa-solid fa-check"></i>
+    } @else {
+    <i class="fa-solid fa-floppy-disk"></i>
+    }
+  </button>
+  }
+
+  @if (errorMessage()) {
+  <div class="toast toast-error">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    {{ errorMessage() | translate }}
+  </div>
+  }
+
+  @if (saveSuccess()) {
+  <div class="toast toast-success">
+    <i class="fa-solid fa-circle-check"></i>
+    {{ 'trainer_profile.save_success' | translate }}
+  </div>
+  }
+
+  }
+</section>

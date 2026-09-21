@@ -1,0 +1,143 @@
+<section class="portal-page stable-consult-page">
+  <div class="portal-header stable-header">
+    <div>
+      <h1>{{ 'student_consultations.title' | translate }}</h1>
+      <p class="text-muted">{{ 'student_consultations.subtitle' | translate }}</p>
+    </div>
+    <a routerLink="/portal/student/trainers" class="btn-accent header-cta stable-btn">
+      <i class="fa-solid fa-plus"></i>
+      {{ 'student_consultations.new_request' | translate }}
+    </a>
+  </div>
+
+  @if (isLoading() && !hasLoaded()) {
+    <div class="empty-state stable-loader"><div class="loader-spinner"></div></div>
+  } @else {
+    <div class="consult-content-stable">
+      <div class="filter-pills stable-pills">
+        @for (s of statuses; track s) {
+          <button type="button" class="filter-pill stable-pill" [class.is-active]="activeFilter() === s" (click)="setFilter(s)">
+            {{ s === 'ALL' ? ('common.all' | translate) : ('status.consultation.' + s | translate) }}
+          </button>
+        }
+      </div>
+
+      @if (filtered().length === 0) {
+        <div class="empty-state surface stable-empty">
+          <i class="fa-solid fa-comments"></i>
+          <p>{{ 'student_consultations.empty' | translate }}</p>
+          <a routerLink="/portal/student/trainers" class="btn-accent empty-cta">
+            {{ 'student_consultations.find_trainer_cta' | translate }}
+          </a>
+        </div>
+      } @else {
+        <div class="item-list stable-list">
+          @for (c of filtered(); track c.id) {
+            <article class="consult-card surface chamfer-sm stable-card">
+              <div class="consult-main">
+                <div class="consult-trainer">
+                  @if (c.trainers?.users?.profile_image) {
+                    <img [src]="c.trainers!.users!.profile_image!" [alt]="c.trainers!.users!.full_name" />
+                  } @else {
+                    <div class="consult-avatar-fallback"><i class="fa-solid fa-user"></i></div>
+                  }
+                  <div>
+                    <h3 class="consult-title">{{ c.title }}</h3>
+                    <span class="consult-trainer-name text-muted">{{ c.trainers?.users?.full_name ?? '' }}</span>
+                  </div>
+                </div>
+                <div class="consult-meta">
+                  <span class="badge" [class]="badgeClass(c.status)">{{ 'status.consultation.' + c.status | translate }}</span>
+                  <span class="consult-date text-muted"><i class="fa-regular fa-calendar"></i> {{ c.created_at | date: 'yyyy/MM/dd' }}</span>
+                  @if (c.scheduled_at) {
+                    <span class="consult-date text-muted"><i class="fa-regular fa-clock"></i> {{ c.scheduled_at | date: 'yyyy/MM/dd HH:mm' }}</span>
+                  }
+                </div>
+              </div>
+              <div class="consult-actions">
+                <button type="button" class="btn-outline btn-sm stable-btn" (click)="openDetails(c)">{{ 'student_consultations.details' | translate }}</button>
+                @if (c.status === 'PENDING') {
+                  <button type="button" class="btn-danger-outline btn-sm stable-btn" (click)="askCancel(c)">{{ 'student_consultations.cancel' | translate }}</button>
+                }
+                @if (c.status === 'COMPLETED') {
+                  <button type="button" class="btn-accent btn-sm stable-btn" (click)="openReview(c)"><i class="fa-solid fa-star"></i> {{ 'student_consultations.review' | translate }}</button>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  @if (selected(); as d) {
+    <div class="modal-backdrop stable-modal-backdrop" (click)="closeDetails()">
+      <div class="modal-card surface chamfer-sm stable-modal" (click)="$event.stopPropagation()">
+        <div class="modal-head">
+          <h3>{{ 'student_consultations.details' | translate }}</h3>
+          <button type="button" class="icon-btn" (click)="closeDetails()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        @if (loadingDetails()) {
+          <div class="empty-state"><div class="loader-spinner"></div></div>
+        } @else {
+          <h4 class="modal-title">{{ d.title }}</h4>
+          <span class="badge" [class]="badgeClass(d.status)">{{ 'status.consultation.' + d.status | translate }}</span>
+          @if (d.description) { <p class="modal-desc">{{ d.description }}</p> }
+          <div class="detail-rows">
+            <div class="detail-row"><span class="text-muted">{{ 'program_details.trainer' | translate }}</span><strong>{{ d.trainers?.users?.full_name ?? '—' }}</strong></div>
+            @if (d.scheduled_at) { <div class="detail-row"><span class="text-muted">{{ 'student_consultations.scheduled_at' | translate }}</span><strong>{{ d.scheduled_at | date: 'yyyy/MM/dd HH:mm' }}</strong></div> }
+            @if (d.price) { <div class="detail-row"><span class="text-muted">{{ 'student_consultations.price' | translate }}</span><strong>{{ d.price }} {{ 'common.currency' | translate }}</strong></div> }
+            @if (d.trainer_notes) { <div class="detail-row detail-col"><span class="text-muted">{{ 'student_consultations.trainer_notes' | translate }}</span><p>{{ d.trainer_notes }}</p></div> }
+            @if (d.rejection_reason) { <div class="detail-row detail-col"><span class="text-muted">{{ 'student_consultations.rejection_reason' | translate }}</span><p class="text-danger">{{ d.rejection_reason }}</p></div> }
+          </div>
+          <div class="form-actions">
+            @if (d.status === 'PENDING') { <button type="button" class="btn-danger btn-sm stable-btn" (click)="askCancel(d)">{{ 'student_consultations.cancel' | translate }}</button> }
+            @if (d.status === 'COMPLETED') { <button type="button" class="btn-accent btn-sm stable-btn" (click)="openReview(d)"><i class="fa-solid fa-star"></i> {{ 'student_consultations.review' | translate }}</button> }
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (cancelTarget(); as t) {
+    <div class="modal-backdrop stable-modal-backdrop" (click)="closeCancel()">
+      <div class="modal-card modal-card-sm surface chamfer-sm stable-modal" (click)="$event.stopPropagation()">
+        <div class="confirm-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <h3>{{ 'student_consultations.cancel_confirm_title' | translate }}</h3>
+        <p class="text-muted">{{ 'student_consultations.cancel_confirm_text' | translate }}</p>
+        <p class="confirm-item">{{ t.title }}</p>
+        <div class="form-actions form-actions-center">
+          <button type="button" class="btn-outline stable-btn" (click)="closeCancel()">{{ 'common.cancel' | translate }}</button>
+          <button type="button" class="btn-danger stable-btn" (click)="confirmCancel()" [disabled]="isCancelling()">
+            @if (isCancelling()) { <div class="loader-spinner-sm"></div> } @else { {{ 'common.confirm' | translate }} }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (reviewTarget(); as r) {
+    <div class="modal-backdrop stable-modal-backdrop" (click)="closeReview()">
+      <div class="modal-card modal-card-sm surface chamfer-sm stable-modal" (click)="$event.stopPropagation()">
+        <h3>{{ 'student_consultations.review' | translate }}</h3>
+        <p class="text-muted review-sub">{{ r.title }}</p>
+        <div class="stars-row" role="radiogroup" aria-label="rating">
+          @for (n of [1, 2, 3, 4, 5]; track n) {
+            <button type="button" class="star-btn" [class.is-active]="n <= reviewRating()" (click)="setRating(n)"><i class="fa-solid fa-star"></i></button>
+          }
+        </div>
+        <textarea class="field-input field-textarea" rows="3" [placeholder]="'student_consultations.review_placeholder' | translate" [(ngModel)]="reviewComment"></textarea>
+        <div class="form-actions form-actions-center">
+          <button type="button" class="btn-outline stable-btn" (click)="closeReview()">{{ 'common.cancel' | translate }}</button>
+          <button type="button" class="btn-accent btn-submit stable-btn" (click)="submitReview()" [disabled]="isReviewing()">
+            @if (isReviewing()) { <div class="loader-spinner-sm"></div> } @else { {{ 'student_consultations.review_submit' | translate }} }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (toastMessage()) {
+    <div class="toast toast-success stable-toast"><i class="fa-solid fa-circle-check"></i> {{ toastMessage() | translate }}</div>
+  }
+</section>

@@ -1,0 +1,11 @@
+  <section class="page-header">
+    <div class="page-header-inner" >
+      @if (eyebrowKey()) {
+        <span class="page-header-eyebrow">{{ eyebrowKey() | translate }}</span>
+      }
+      <h1 class="page-header-title display">{{ titleKey() | translate }}</h1>
+      @if (subtitleKey()) {
+        <p class="page-header-subtitle">{{ subtitleKey() | translate }}</p>
+      }
+    </div>
+  </section>

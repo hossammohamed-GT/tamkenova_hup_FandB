@@ -1,0 +1,156 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'volunteer_dashboard.title' | translate }}</h1>
+      <p class="text-muted">
+        {{ 'dashboard.welcome' | translate }} {{ currentUser()?.full_name }} — {{ 'volunteer_dashboard.subtitle' | translate }}
+      </p>
+    </div>
+  </div>
+
+  <!-- -- Volunteer Sub Nav -- -->
+  <nav class="staff-nav">
+    <a class="staff-nav-item is-active" routerLink="/portal/volunteer">
+      <i class="fa-solid fa-gauge-high"></i>
+      <span>{{ 'volunteer_dashboard.nav_dashboard' | translate }}</span>
+    </a>
+    <a class="staff-nav-item" routerLink="/portal/volunteer/tasks">
+      <i class="fa-solid fa-list-check"></i>
+      <span>{{ 'my_tasks.title' | translate }}</span>
+    </a>
+    <a class="staff-nav-item" routerLink="/portal/volunteer/notifications">
+      <i class="fa-solid fa-bell"></i>
+      <span>{{ 'notifications.title' | translate }}</span>
+    </a>
+  </nav>
+
+  @if (isLoading()) {
+    <div class="staff-empty"><div class="loader-spinner"></div></div>
+  } @else if (hasError()) {
+    <div class="staff-empty">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>{{ 'volunteer_dashboard.load_error' | translate }}</p>
+      <button type="button" class="btn-primary-sm btn-sm" (click)="load()">
+        {{ 'common.retry' | translate }}
+      </button>
+    </div>
+  } @else {
+    <!-- -- Core stats + gauge -- -->
+    <div class="dash-layout">
+      <div class="stats-grid">
+        @for (card of coreCards(); track card.labelKey) {
+          <a [routerLink]="card.route" class="stat-card staff-fade" [style.--stat-color]="card.color">
+            <span class="stat-icon"><i class="fa-solid" [class]="card.icon"></i></span>
+            <span class="stat-text">
+              <span class="stat-value">{{ card.value }}</span>
+              <span class="stat-label">{{ card.labelKey | translate }}</span>
+            </span>
+          </a>
+        }
+      </div>
+
+      <div class="gauge-card surface staff-fade">
+        <h3 class="gauge-title">{{ 'volunteer_dashboard.completion' | translate }}</h3>
+        <div class="gauge-wrap">
+          <svg width="130" height="130" viewBox="0 0 120 120" role="img" [attr.aria-label]="displayStats().average_completion">
+            <circle class="gauge-ring-track" cx="60" cy="60" r="52" fill="none" stroke-width="10" />
+            <circle
+              class="gauge-ring"
+              cx="60"
+              cy="60"
+              r="52"
+              fill="none"
+              stroke="var(--color-success)"
+              stroke-width="10"
+              stroke-linecap="round"
+              [attr.stroke-dasharray]="circumference"
+              [attr.stroke-dashoffset]="progressOffset()"
+              transform="rotate(-90 60 60)"
+            />
+          </svg>
+          <span class="gauge-value">{{ displayStats().average_completion ?? 0 }}%</span>
+        </div>
+        <p class="gauge-hint text-muted">{{ 'volunteer_dashboard.completion_hint' | translate }}</p>
+      </div>
+    </div>
+
+    <!-- -- Volunteer impact stats -- -->
+    <h2 class="section-title impact-title">{{ 'volunteer_dashboard.impact' | translate }}</h2>
+    <div class="stats-grid impact-grid">
+      @for (card of volunteerCards(); track card.labelKey) {
+        <div class="stat-card staff-fade" [style.--stat-color]="card.color">
+          <span class="stat-icon"><i class="fa-solid" [class]="card.icon"></i></span>
+          <span class="stat-text">
+            <span class="stat-value">{{ card.value }}@if (card.suffix) {{{card.suffix}}}</span>
+            <span class="stat-label">{{ card.labelKey | translate }}</span>
+          </span>
+        </div>
+      }
+    </div>
+
+    <!-- -- Last tasks -- -->
+    @if ((displayStats().last_tasks?.length ?? 0) > 0) {
+      <h2 class="section-title impact-title">{{ 'volunteer_dashboard.last_tasks' | translate }}</h2>
+      <div class="table-wrap staff-fade">
+        <table class="staff-table">
+          <thead>
+            <tr>
+              <th>{{ 'volunteer_dashboard.col_task' | translate }}</th>
+              <th>{{ 'volunteer_dashboard.col_status' | translate }}</th>
+              <th>{{ 'volunteer_dashboard.col_score' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (task of displayStats().last_tasks; track task.id) {
+              <tr>
+                <td [attr.data-label]="'volunteer_dashboard.col_task' | translate">
+                  <strong class="last-task-title">{{ task.title }}</strong>
+                </td>
+                <td [attr.data-label]="'volunteer_dashboard.col_status' | translate">
+                  <span class="badge" [class]="statusBadge(task.status)">
+                    {{ 'status.task.' + task.status | translate }}
+                  </span>
+                </td>
+                <td [attr.data-label]="'volunteer_dashboard.col_score' | translate">
+                  @if (task.score !== null && task.score !== undefined) {
+                    <span class="score-chip">
+                      <i class="fa-solid fa-star"></i>
+                      {{ task.score }}/100
+                    </span>
+                  } @else {
+                    <span class="table-muted">—</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- -- Quick actions -- -->
+    <div class="quick-row">
+      <a routerLink="/portal/volunteer/tasks" class="quick-card surface staff-fade">
+        <span class="quick-icon" style="--stat-color: var(--color-primary)">
+          <i class="fa-solid fa-list-check"></i>
+        </span>
+        <span class="quick-text">
+          <strong>{{ 'volunteer_dashboard.go_tasks' | translate }}</strong>
+          <small class="text-muted">{{ 'volunteer_dashboard.go_tasks_hint' | translate }}</small>
+        </span>
+        <i class="fa-solid fa-arrow-left rtl-flip quick-arrow"></i>
+      </a>
+
+      <a routerLink="/portal/volunteer/notifications" class="quick-card surface staff-fade">
+        <span class="quick-icon" style="--stat-color: var(--color-accent)">
+          <i class="fa-solid fa-bell"></i>
+        </span>
+        <span class="quick-text">
+          <strong>{{ 'notifications.title' | translate }}</strong>
+          <small class="text-muted">{{ 'notifications.subtitle' | translate }}</small>
+        </span>
+        <i class="fa-solid fa-arrow-left rtl-flip quick-arrow"></i>
+      </a>
+    </div>
+  }
+</section>
