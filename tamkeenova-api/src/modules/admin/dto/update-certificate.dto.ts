@@ -11,6 +11,22 @@ export class UpdateCertificateDto {
   description?: string;
 
   @IsOptional()
+  @IsString()
+  title_ar?: string;
+
+  @IsOptional()
+  @IsString()
+  title_en?: string;
+
+  @IsOptional()
+  @IsString()
+  description_ar?: string;
+
+  @IsOptional()
+  @IsString()
+  description_en?: string;
+
+  @IsOptional()
   @IsInt()
   @Min(0)
   training_hours?: number;

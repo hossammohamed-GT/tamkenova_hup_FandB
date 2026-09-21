@@ -103,7 +103,11 @@ export interface AdminCertificate {
   trainer_id: string | null;
   program_id: string | null;
   title: string;
+  title_ar?: string | null;
+  title_en?: string | null;
   description: string | null;
+  description_ar?: string | null;
+  description_en?: string | null;
   training_hours: number | null;
   certificate_type: CertificateType | null;
   certificate_url: string | null;
@@ -121,7 +125,11 @@ export interface AdminCertificate {
 export interface IssueCertificatePayload {
   user_id: string;
   title: string;
+  title_ar?: string;
+  title_en?: string;
   description?: string;
+  description_ar?: string;
+  description_en?: string;
   training_hours?: number;
   certificate_type?: CertificateType;
   trainer_id?: string;
@@ -174,6 +182,8 @@ export interface SpecializationSuggestion {
 export interface AdminProgram {
   id: string;
   title: string;
+  title_ar?: string | null;
+  title_en?: string | null;
   description: string | null;
   price: string | number | null;
   duration_hours: number | null;

@@ -35,11 +35,13 @@ export class StudentCertificatesComponent {
     });
   }
 
-  async downloadCertificate(cert: StudentCertificate): Promise<void> {
+  async downloadCertificate(cert: StudentCertificate, language: 'ar' | 'en'): Promise<void> {
     // A composed, high-resolution certificate artwork: navy identity, ivory paper and Tamkeenova gold.
     const canvas = document.createElement('canvas'); canvas.width = 1800; canvas.height = 1273;
     const ctx = canvas.getContext('2d'); if (!ctx) return;
     const navy = '#004265', gold = '#be8a3f', ink = '#101e27', paper = '#fcfaf4';
+    const isArabic = language === 'ar'; const title = (isArabic ? cert.title_ar : cert.title_en) || cert.title; const description = ((isArabic ? cert.description_ar : cert.description_en) || cert.description || '').slice(0, 145); const labels = isArabic ? { cert: 'شهادة إنجاز', presented: 'تشهد هذه الشهادة بأن', completed: 'أتم بنجاح', issued: 'تاريخ الإصدار', verify: 'امسح للتحقق' } : { cert: 'Certificate of Achievement', presented: 'This certificate is proudly presented to', completed: 'Has successfully completed', issued: 'Issued', verify: 'SCAN TO VERIFY' };
+    ctx.direction = isArabic ? 'rtl' : 'ltr';
     ctx.fillStyle = navy; ctx.fillRect(0, 0, 1800, 1273);
     // Architectural side bands and subtle pattern
     ctx.fillStyle = '#003650'; ctx.fillRect(0, 0, 210, 1273); ctx.fillRect(1590, 0, 210, 1273);
@@ -56,23 +58,23 @@ export class StudentCertificatesComponent {
     try { const logo = await this.loadImage('/images/logo.svg'); ctx.drawImage(logo, 805, 155, 110, 110); } catch {}
     ctx.fillStyle = navy; ctx.font = 'bold 30px Arial'; ctx.fillText('TAMKEENOVA', 900, 292);
     ctx.fillStyle = gold; ctx.font = '18px Arial'; ctx.fillText('EMPOWERMENT  •  TRAINING  •  IMPACT', 900, 325);
-    ctx.fillStyle = ink; ctx.font = 'bold 60px Georgia, serif'; ctx.fillText('Certificate of Achievement', 900, 445);
+    ctx.fillStyle = ink; ctx.font = 'bold 60px Georgia, serif'; ctx.fillText(labels.cert, 900, 445);
     ctx.fillStyle = gold; ctx.font = 'bold 22px Arial'; ctx.fillText((cert.certificate_type || 'CERTIFICATE').toUpperCase(), 900, 495);
-    ctx.fillStyle = '#69757a'; ctx.font = '25px Arial'; ctx.fillText('This certificate is proudly presented to', 900, 570);
-    ctx.fillStyle = navy; ctx.font = 'bold 62px Georgia, serif'; ctx.fillText(cert.trainers?.users?.full_name || cert.title, 900, 670);
+    ctx.fillStyle = '#69757a'; ctx.font = '25px Arial'; ctx.fillText(labels.presented, 900, 570);
+    ctx.fillStyle = navy; ctx.font = 'bold 62px Georgia, serif'; ctx.fillText(cert.trainers?.users?.full_name || title, 900, 670);
     ctx.strokeStyle = gold; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(560, 700); ctx.lineTo(1240, 700); ctx.stroke();
-    ctx.fillStyle = ink; ctx.font = 'bold 32px Arial'; ctx.fillText(cert.title, 900, 770);
+    ctx.fillStyle = ink; ctx.font = 'bold 32px Arial'; ctx.fillText(title, 900, 770);
     ctx.fillStyle = '#69757a'; ctx.font = '22px Arial';
-    const description = (cert.description || '').slice(0, 145); if (description) ctx.fillText(description, 900, 820);
-    ctx.font = '20px Arial'; ctx.fillText(`Issued ${new Date(cert.issued_at).toLocaleDateString()}   |   Verification code: ${cert.verification_code}`, 900, 875);
+    if (description) ctx.fillText(description, 900, 820);
+    ctx.font = '20px Arial'; ctx.fillText(`${labels.issued} ${new Date(cert.issued_at).toLocaleDateString()}   |   Verification code: ${cert.verification_code}`, 900, 875);
     // QR area is deliberately on a white card for reliable scanning after download/printing.
     ctx.fillStyle = '#ffffff'; ctx.fillRect(1330, 905, 205, 205); ctx.strokeStyle = gold; ctx.lineWidth = 3; ctx.strokeRect(1330, 905, 205, 205);
     const verifyUrl = `${window.location.origin}/verify?code=${encodeURIComponent(cert.verification_code)}`;
     const qr = await QRCode.toDataURL(verifyUrl, { width: 185, margin: 1, color: { dark: navy, light: '#ffffff' } }); ctx.drawImage(await this.loadImage(qr), 1340, 915, 185, 185);
-    ctx.fillStyle = '#69757a'; ctx.font = '16px Arial'; ctx.fillText('SCAN TO VERIFY', 1432, 1135);
+    ctx.fillStyle = '#69757a'; ctx.font = '16px Arial'; ctx.fillText(labels.verify, 1432, 1135);
     const logos = (cert.partner_ids || []).map((id) => this.partnerLogo(id)).filter((url): url is string => !!url).slice(0, 6);
     for (let i = 0; i < logos.length; i++) { try { ctx.drawImage(await this.loadImage(logos[i]), 300 + i * 125, 990, 95, 55); } catch {} }
-    const link = document.createElement('a'); link.download = `tamkeenova-certificate-${cert.verification_code}.png`; link.href = canvas.toDataURL('image/png'); link.click();
+    const link = document.createElement('a'); link.download = `tamkeenova-certificate-${cert.verification_code}-${language}.png`; link.href = canvas.toDataURL('image/png'); link.click();
   }
 
   private loadImage(src: string): Promise<HTMLImageElement> { return new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = reject; image.src = src; }); }

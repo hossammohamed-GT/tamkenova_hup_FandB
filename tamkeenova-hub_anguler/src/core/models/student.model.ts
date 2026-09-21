@@ -179,8 +179,12 @@ export interface StudentCertificate {
   id: string;
   verification_code: string;
   title: string;
+  title_ar?: string | null;
+  title_en?: string | null;
   certificate_type?: string | null;
   description: string | null;
+  description_ar?: string | null;
+  description_en?: string | null;
   pdf_url: string | null;
   qr_code_url: string | null;
   partner_ids?: string[] | null;

@@ -330,7 +330,11 @@ export class AdminRepository {
     program_id?: string | null;
     verification_code: string;
     title: string;
+    title_ar?: string | null;
+    title_en?: string | null;
     description?: string | null;
+    description_ar?: string | null;
+    description_en?: string | null;
     pdf_url?: string | null;
     qr_code_url?: string | null;
     partner_ids?: string[];
@@ -344,7 +348,11 @@ export class AdminRepository {
         program_id: data.program_id || null,
         verification_code: data.verification_code,
         title: data.title,
+        title_ar: data.title_ar || null,
+        title_en: data.title_en || null,
         description: data.description || null,
+        description_ar: data.description_ar || null,
+        description_en: data.description_en || null,
         pdf_url: data.pdf_url || null,
         qr_code_url: data.qr_code_url || null,
         partner_ids: data.partner_ids || [],

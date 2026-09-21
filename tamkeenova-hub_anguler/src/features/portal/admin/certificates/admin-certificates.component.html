@@ -233,6 +233,19 @@
             <small class="field-hint">{{ 'admin_certificates.partners_hint' | translate }}</small>
           </div>
 
+          <div class="field bilingual-fields">
+            <label class="field-label">{{ 'admin_certificates.title_ar' | translate }}</label>
+            <input id="cert-title-ar" class="field-input" formControlName="title_ar" dir="rtl" placeholder="عنوان الشهادة أو البرنامج" />
+            <label class="field-label">{{ 'admin_certificates.title_en' | translate }}</label>
+            <input id="cert-title-en" class="field-input" formControlName="title_en" dir="ltr" placeholder="Certificate or program title" />
+          </div>
+          <div class="field bilingual-fields">
+            <label class="field-label">{{ 'admin_certificates.description_ar' | translate }}</label>
+            <textarea class="field-input" formControlName="description_ar" dir="rtl"></textarea>
+            <label class="field-label">{{ 'admin_certificates.description_en' | translate }}</label>
+            <textarea class="field-input" formControlName="description_en" dir="ltr"></textarea>
+          </div>
+
           <div class="field">
             <label class="field-label" for="cert-title">{{ 'admin_certificates.f_title' | translate }}</label>
             <input id="cert-title" type="text" class="field-input" formControlName="title" />

@@ -820,7 +820,9 @@
     "program": "البرنامج",
     "trainer": "المدرب",
     "certificate_of": "شهادة إنجاز",
-    "download_image": "تحميل صورة الشهادة"
+    "download_image": "تحميل صورة الشهادة",
+    "download_ar": "تحميل النسخة العربية",
+    "download_en": "تحميل النسخة الإنجليزية"
   },
   "student_corporate": {
     "title": "طلبات الشركات",
@@ -1170,7 +1172,11 @@
     "no_user_found": "لا يوجد مستخدم بهذا الاسم أو البريد الإلكتروني",
     "min_chars_hint": "اكتب حرفين على الأقل لبدء البحث",
     "partners": "شركاء النجاح في الشهادة",
-    "partners_hint": "حدد شعارات الشركاء التي ستظهر على هذه الشهادة."
+    "partners_hint": "حدد شعارات الشركاء التي ستظهر على هذه الشهادة.",
+    "title_ar": "Arabic title",
+    "title_en": "English title",
+    "description_ar": "Arabic description",
+    "description_en": "English description"
   },
   "admin_corporate": {
     "title": "طلبات الشركات",

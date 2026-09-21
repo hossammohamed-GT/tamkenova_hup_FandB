@@ -54,7 +54,11 @@ export class AdminCertificatesComponent implements OnInit {
 
   issueForm = this.fb.nonNullable.group({
     title: ['', Validators.required],
+    title_ar: [''],
+    title_en: [''],
     description: [''],
+    description_ar: [''],
+    description_en: [''],
     training_hours: this.fb.control<number | null>(null),
     certificate_type: this.fb.nonNullable.control<CertificateType>('TRAINING'),
   });
@@ -155,7 +159,11 @@ export class AdminCertificatesComponent implements OnInit {
     this.selectedPartnerIds.set(cert.partner_ids ?? []);
     this.issueForm.reset({
       title: cert.title,
+      title_ar: cert.title_ar ?? '',
+      title_en: cert.title_en ?? '',
       description: cert.description ?? '',
+      description_ar: cert.description_ar ?? '',
+      description_en: cert.description_en ?? '',
       training_hours: cert.training_hours ?? null,
       certificate_type: cert.certificate_type ?? 'OTHER',
     });
@@ -217,7 +225,11 @@ export class AdminCertificatesComponent implements OnInit {
       this.adminService
         .updateCertificate(cert.id, {
           title: raw.title,
+          title_ar: raw.title_ar || undefined,
+          title_en: raw.title_en || undefined,
           description: raw.description || undefined,
+          description_ar: raw.description_ar || undefined,
+          description_en: raw.description_en || undefined,
           training_hours: raw.training_hours ?? undefined,
           certificate_type: raw.certificate_type,
           partner_ids: this.selectedPartnerIds(),
@@ -253,7 +265,11 @@ export class AdminCertificatesComponent implements OnInit {
       .issueCertificate({
         user_id: user.id,
         title: raw.title,
+        title_ar: raw.title_ar || undefined,
+        title_en: raw.title_en || undefined,
         description: raw.description || undefined,
+        description_ar: raw.description_ar || undefined,
+        description_en: raw.description_en || undefined,
         training_hours: raw.training_hours ?? undefined,
         certificate_type: raw.certificate_type,
         partner_ids: this.selectedPartnerIds(),

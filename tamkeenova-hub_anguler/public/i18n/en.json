@@ -820,7 +820,9 @@
     "program": "Program",
     "trainer": "Trainer",
     "certificate_of": "Certificate of Achievement",
-    "download_image": "Download certificate image"
+    "download_image": "Download certificate image",
+    "download_ar": "Download Arabic image",
+    "download_en": "Download English image"
   },
   "student_corporate": {
     "title": "Corporate Requests",
@@ -1170,7 +1172,11 @@
     "no_user_found": "No user found with this name or email",
     "min_chars_hint": "Type at least 2 characters to search",
     "partners": "Success partners on certificate",
-    "partners_hint": "Select the partner logos to show on this certificate."
+    "partners_hint": "Select the partner logos to show on this certificate.",
+    "title_ar": "Arabic title",
+    "title_en": "English title",
+    "description_ar": "Arabic description",
+    "description_en": "English description"
   },
   "admin_corporate": {
     "title": "Corporate Requests",

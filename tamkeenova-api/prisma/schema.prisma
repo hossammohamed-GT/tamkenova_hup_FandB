@@ -348,7 +348,11 @@ model certificates {
   enrollment_id     String?          @db.Uuid
   verification_code String           @unique @db.VarChar(20)
   title             String           @db.VarChar(255)
+  title_ar          String?
+  title_en          String?
   description       String?
+  description_ar    String?
+  description_en    String?
   pdf_url           String?
   qr_code_url       String?
   partner_ids       Json?
