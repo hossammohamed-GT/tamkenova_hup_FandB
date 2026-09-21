@@ -861,6 +861,15 @@ export class AdminService {
   }
 
 
+  async approveProgram(adminId: string, id: string) {
+    return this.setProgramVisibility(adminId, id, true);
+  }
+
+  async rejectProgram(adminId: string, id: string) {
+    return this.setProgramVisibility(adminId, id, false);
+  }
+
+
   // Handle delete program
   async deleteProgram(adminId: string, id: string) {
     const program = await this.adminRepo.getProgramById(id);

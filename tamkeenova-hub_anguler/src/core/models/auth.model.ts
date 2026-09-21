@@ -18,6 +18,7 @@ export interface RegisterRequest {
   email: string;
   phone: string;
   password: string;
+  confirm_password: string;
   role: UserRole;
   username?: string;
   // -- Trainer Registration Fields --
@@ -50,6 +51,7 @@ export interface VolunteerRegisterRequest {
   email: string;
   phone: string;
   password: string;
+  confirm_password: string;
   bio?: string;
 }
 

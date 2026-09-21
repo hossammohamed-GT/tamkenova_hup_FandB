@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
+  AbstractControl,
   FormArray,
   FormBuilder,
   FormControl,
@@ -43,6 +44,8 @@ export class TrainerRegisterComponent {
   specializations = signal<Specialization[]>([]);
   specializationsLoading = signal(true);
   specializationsError = signal(false);
+  specializationSearch = signal('');
+  requestingSpecialization = signal(false);
 
   private touchedFields = signal<Set<string>>(new Set());
   // Backend error tied to a specific field (e.g. email exists) — shown inline
@@ -57,6 +60,7 @@ export class TrainerRegisterComponent {
     'email',
     'phone',
     'password',
+    'confirm_password',
     'specialization_id',
   ];
   private readonly step2Fields = [
@@ -82,7 +86,10 @@ export class TrainerRegisterComponent {
     email: ['', [Validators.required, Validators.email]],
     phone: ['', [Validators.required, Validators.pattern(/^01[0125]\d{8}$/)]],
     password: ['', [Validators.required, Validators.minLength(8)]],
-    specialization_id: ['', [Validators.required]],
+    confirm_password: ['', [Validators.required, Validators.minLength(8)]],
+    specialization_id: [''],
+    specialization_name_ar: [''],
+    specialization_name_en: [''],
 
     bio_ar: [''],
     bio_en: [''],
@@ -97,7 +104,7 @@ export class TrainerRegisterComponent {
     consultation_price_from: this.fb.control<number | null>(null),
     consultation_price_to: this.fb.control<number | null>(null),
     consultation_duration: this.fb.control<number | null>(null),
-  });
+  }, { validators: (group: AbstractControl) => group.get('password')?.value === group.get('confirm_password')?.value ? null : { passwordMismatch: true } });
 
   certificateUrls = new FormArray<FormControl<string>>([]);
   documents = new FormArray<
@@ -153,7 +160,7 @@ export class TrainerRegisterComponent {
 
   isFieldInvalid(field: string): boolean {
     const control = this.form.get(field);
-    return !!control && control.invalid && this.isTouched(field);
+    return !!control && (control.invalid || (field === 'confirm_password' && this.form.hasError('passwordMismatch'))) && this.isTouched(field);
   }
 
   onPasswordInput(value: string): void {
@@ -165,8 +172,21 @@ export class TrainerRegisterComponent {
     this.showPassword.update((v) => !v);
   }
 
+  filteredSpecializations(): Specialization[] {
+    const term = this.specializationSearch().trim().toLowerCase();
+    if (!term) return this.specializations();
+    return this.specializations().filter((item) => `${item.name_ar} ${item.name_en}`.toLowerCase().includes(term));
+  }
+
   selectSpecialization(id: string): void {
-    this.form.controls.specialization_id.setValue(id);
+    this.requestingSpecialization.set(false);
+    this.form.patchValue({ specialization_id: id, specialization_name_ar: '', specialization_name_en: '' });
+    this.markTouched('specialization_id');
+  }
+
+  startSpecializationRequest(): void {
+    this.requestingSpecialization.set(true);
+    this.form.controls.specialization_id.setValue('');
     this.markTouched('specialization_id');
   }
 
@@ -213,12 +233,43 @@ export class TrainerRegisterComponent {
       this.markTouched(f);
     });
 
+    if (step === 1 && !this.form.controls.specialization_id.value && !this.form.controls.specialization_name_ar.value.trim()) {
+      this.form.controls.specialization_id.setErrors({ required: true });
+      return;
+    }
     if (!this.isStepValid(step)) return;
     this.currentStep.update((s) => Math.min(s + 1, this.totalSteps));
   }
 
   goBack(): void {
     this.currentStep.update((s) => Math.max(s - 1, 1));
+  }
+
+
+  checkAvailability(field: 'email' | 'username' | 'phone'): void {
+    const value = this.form.controls[field].value.trim();
+    if (!value || this.form.controls[field].invalid) return;
+    this.authService.checkAvailability({ [field]: value }).subscribe({
+      next: (res) => {
+        const available = res.data[`${field}_available` as keyof typeof res.data];
+        if (!available) {
+          const key = `errors.AUTH_${field.toUpperCase()}_EXISTS`;
+          this.serverFieldError.set({ field, key });
+        } else if (this.serverFieldError()?.field === field) {
+          this.serverFieldError.set(null);
+        }
+      },
+      error: () => undefined,
+    });
+  }
+
+  suggestUsername(): void {
+    const username = this.form.controls.username.value;
+    const email = this.form.controls.email.value;
+    if (!username && email.includes('@')) {
+      this.form.controls.username.setValue(email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '').slice(0, 20));
+      this.markTouched('username');
+    }
   }
 
   submit(): void {
@@ -241,8 +292,11 @@ export class TrainerRegisterComponent {
       email: raw.email,
       phone: raw.phone,
       password: raw.password,
+      confirm_password: raw.confirm_password,
       role: 'TRAINER' as const,
-      specialization_id: raw.specialization_id,
+      specialization_id: raw.specialization_id || undefined,
+      specialization_name_ar: raw.specialization_name_ar || undefined,
+      specialization_name_en: raw.specialization_name_en || undefined,
       bio_ar: raw.bio_ar || undefined,
       bio_en: raw.bio_en || undefined,
       description_ar: raw.description_ar || undefined,

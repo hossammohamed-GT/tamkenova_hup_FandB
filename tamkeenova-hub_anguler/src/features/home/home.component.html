@@ -35,7 +35,7 @@
 
   <div class="partners-flip-grid">
     @for (slot of slots(); track $index) {
-      <div class="partner-box surface chamfer-sm">
+      <a class="partner-box surface chamfer-sm" [href]="partners()[$index].website_url || null" [target]="partners()[$index].website_url ? '_blank' : null" rel="noopener">
         <div class="partner-box-track">
           <img
             class="partner-img partner-img-current"
@@ -54,7 +54,7 @@
             loading="lazy"
           />
         </div>
-      </div>
+      </a>
     }
   </div>
 </section>

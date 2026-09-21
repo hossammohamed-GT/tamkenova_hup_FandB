@@ -1,6 +1,8 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { PartnersService } from '../../core/services/partners.service';
+import { StrategicPartner } from '../../core/models/partner.model';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 // import { TrainersShowcaseComponent } from '../trainers-showcase/trainers-showcase.component';
 import { TrainersShowcaseComponent } from './trainers-showcase/trainers-showcase.component';
@@ -27,6 +29,7 @@ interface PartnerSlot {
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  private partnersService = inject(PartnersService);
   heroImages = [
     '/images/hero/hero1.jpg',
     '/images/hero/hero2.jpg',
@@ -77,13 +80,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     },
   ];
 
-  partnersImages: string[] = [
-    '/images/partners/partners1.png',
-    '/images/partners/partners2.png',
-    '/images/partners/partners3.png',
-    '/images/partners/partners4.png',
-    '/images/partners/partners5.png',
-  ];
+  partnersImages: string[] = [];
+  partners = signal<StrategicPartner[]>([]);
 
   private readonly slotsCount = 5;
   private readonly staggerMs = 220;
@@ -139,7 +137,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       }, 5000);
     }
 
-    this.initPartnersWave();
+    this.partnersService.listPublic().subscribe({
+      next: (partners) => {
+        this.partners.set(partners ?? []);
+        this.partnersImages = (partners ?? []).map((partner) => partner.logo_url);
+        this.initPartnersWave();
+      },
+      error: () => this.initPartnersWave(),
+    });
   }
 
   ngOnDestroy(): void {
@@ -148,7 +153,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private initPartnersWave(): void {
-    const initial = this.partnersImages.slice(0, this.slotsCount);
+    const count = Math.min(this.slotsCount, this.partnersImages.length);
+    if (!count) { this.slots.set([]); return; }
+    const initial = this.partnersImages.slice(0, count);
     this.slotPointers = initial.map((_, i) => i);
     this.slots.set(
       initial.map((img) => ({ currentImg: img, nextImg: img, sliding: false, resetting: false })),
@@ -165,7 +172,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private scheduleNextWave(): void {
-    const waveDuration = (this.slotsCount - 1) * this.staggerMs + this.slideDurationMs;
+    const waveDuration = (this.slotPointers.length - 1) * this.staggerMs + this.slideDurationMs;
     const totalDelay = waveDuration + this.wavePauseMs;
 
     const t = setTimeout(() => {
@@ -176,7 +183,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private runWave(): void {
-    for (let i = 0; i < this.slotsCount; i++) {
+    for (let i = 0; i < this.slotPointers.length; i++) {
       const t = setTimeout(() => this.startSlide(i), i * this.staggerMs);
       this.partnerTimers.push(t);
     }

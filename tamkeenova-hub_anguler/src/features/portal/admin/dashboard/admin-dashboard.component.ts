@@ -109,7 +109,7 @@ export class AdminDashboardComponent implements OnInit {
         value: s.consultations_count,
         icon: 'fa-comments',
         color: '#0ea5a4',
-        route: '/portal/admin/programs',
+        route: '/portal/admin/consultations',
       },
       {
         labelKey: 'admin_dashboard.corporate_requests',

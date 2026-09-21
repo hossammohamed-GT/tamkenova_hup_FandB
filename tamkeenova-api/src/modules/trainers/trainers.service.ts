@@ -18,6 +18,7 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { StorageService } from '../storage/storage.service';
 
 import { Multer } from 'multer';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class TrainersService {
@@ -26,6 +27,7 @@ export class TrainersService {
   constructor(
     private readonly trainersRepository: TrainersRepository,
     private readonly storageService: StorageService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
 
@@ -125,6 +127,22 @@ export class TrainersService {
       duration_hours: dto.duration_hours || 0,
 
       level: dto.level || 'BEGINNER',
+      // Programs stay hidden until an administrator reviews them.
+      is_active: false,
+    }).then(async (program) => {
+      try {
+        const admins = await this.notificationsService.getAdminUsers();
+        await this.notificationsService.createBulkNotifications(admins.map((admin) => admin.id), {
+          title: 'New program awaiting review',
+          message: `${dto.title} was submitted by a trainer and is waiting for approval.`,
+          type: 'PROGRAM_SUBMITTED',
+          reference_id: program.id,
+          reference_type: 'PROGRAM',
+        });
+      } catch {
+        // A notification outage must not make a successfully saved program look failed.
+      }
+      return program;
     });
   }
 

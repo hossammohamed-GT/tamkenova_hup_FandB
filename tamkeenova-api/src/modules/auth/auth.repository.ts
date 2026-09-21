@@ -271,18 +271,14 @@ export class AuthRepository {
 
 
   // Handle create notification
-  async createNotification(data: {
-    user_id: string;
-    title: string;
-    message: string;
-  }) {
+  async createNotification(data: { user_id: string; title: string; message: string; type?: string; reference_id?: string; reference_type?: string }) {
     return this.prisma.notifications.create({
-      data: {
-        user_id: data.user_id,
-        title: data.title,
-        message: data.message,
-      },
+      data: { user_id: data.user_id, title: data.title, message: data.message, type: data.type, reference_id: data.reference_id, reference_type: data.reference_type },
     });
+  }
+
+  createSpecializationRequest(data: { user_id: string; name_ar: string; name_en?: string }) {
+    return this.prisma.specialization_requests.create({ data });
   }
 
 
