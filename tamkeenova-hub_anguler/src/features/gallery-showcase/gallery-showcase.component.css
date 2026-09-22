@@ -71,12 +71,17 @@
 .gmarquee-row {
   overflow: hidden;
   width: 100%;
+  /* The -50% loop math assumes LTR box alignment. Without this, RTL flips
+     the overflow side and the strip slides off-screen leaving emptiness. */
+  direction: ltr;
 }
 
 .gmarquee-track {
   display: flex;
   width: max-content;
-  gap: 1rem;
+  /* No gap: it would offset the -50% loop point by half a gap and cause a
+     visible jump every cycle. Spacing lives on the items instead. */
+  gap: 0;
   will-change: transform;
 }
 
@@ -116,6 +121,8 @@
   flex: 0 0 auto;
   width: 300px;
   height: 200px;
+  margin-inline-end: 1rem;
+  background-color: var(--color-surface-alt);
   background-size: cover;
   background-position: center;
   border: 1px solid var(--color-border);
