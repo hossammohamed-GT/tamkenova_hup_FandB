@@ -1511,7 +1511,9 @@
     "TASK_SUBMISSION_FAILED": "تعذّر حفظ التسليم. حاول مرة أخرى.",
     "TASK_NOT_ASSIGNED": "لست مُسنَدًا إلى هذه المهمة.",
     "NOTIFICATION_NOT_FOUND": "الإشعار غير موجود.",
-    "AUTH_PASSWORD_MISMATCH": "كلمتا المرور غير متطابقتين."
+    "AUTH_PASSWORD_MISMATCH": "كلمتا المرور غير متطابقتين",
+    "AUTH_PASSWORD_POLICY": "كلمة المرور لازم تكون 8 حروف على الأقل وفيها حرف كبير وحرف صغير ورقم",
+    "AUTH_SUPER_ADMIN_ONLY": "الأمر ده متاح للسوبر أدمن فقط"
   },
   "trainer_consultations": {
     "update_error": "تعذر تحديث حالة الاستشارة، حاول تاني",

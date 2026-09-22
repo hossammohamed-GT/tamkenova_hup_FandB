@@ -6,6 +6,9 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthVisualPanelComponent } from '../../../shared/components/auth-visual-panel/auth-visual-panel.component';
 import { apiErrorKey } from '../../../core/utils/api-error';
+import { PASSWORD_REQUIREMENTS } from '../../../core/utils/password-strength';
+
+const STRONG_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,128}$/;
 
 @Component({
   selector: 'app-reset-password',
@@ -22,11 +25,13 @@ export class ResetPasswordComponent {
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   showPassword = signal(false);
-  email = this.authService.getPendingEmail() ?? '';
+  passwordValue = signal('');
+  readonly passwordRequirements = PASSWORD_REQUIREMENTS;
 
   form = this.fb.nonNullable.group({
+    email: [this.authService.getPendingEmail() ?? '', [Validators.required, Validators.email]],
     otp: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(6)]],
-    new_password: ['', [Validators.required, Validators.minLength(8)]],
+    new_password: ['', [Validators.required, Validators.pattern(STRONG_PASSWORD)]],
     confirm_password: ['', [Validators.required]],
   });
 
@@ -34,10 +39,20 @@ export class ResetPasswordComponent {
     this.showPassword.update((v) => !v);
   }
 
+  isRequirementMet(test: (v: string) => boolean): boolean {
+    return test(this.passwordValue());
+  }
+
+  onPasswordInput(value: string): void {
+    this.passwordValue.set(value);
+  }
+
   submit(): void {
-    if (this.form.invalid || !this.email) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
-      if (!this.email) this.errorMessage.set('auth.errors.generic');
+      if (this.form.controls.new_password.invalid) {
+        this.errorMessage.set('errors.AUTH_PASSWORD_POLICY');
+      }
       return;
     }
     const value = this.form.getRawValue();
@@ -47,9 +62,10 @@ export class ResetPasswordComponent {
     }
     this.isLoading.set(true);
     this.errorMessage.set(null);
+    this.authService.setPendingEmail(value.email);
     this.authService
       .resetPassword({
-        email: this.email,
+        email: value.email,
         otp: value.otp,
         new_password: value.new_password,
         confirm_password: value.confirm_password,

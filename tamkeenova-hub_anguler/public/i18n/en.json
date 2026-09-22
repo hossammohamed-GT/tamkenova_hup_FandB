@@ -1511,7 +1511,9 @@
     "TASK_SUBMISSION_FAILED": "We couldn't save the submission. Please try again.",
     "TASK_NOT_ASSIGNED": "You aren't assigned to this task.",
     "NOTIFICATION_NOT_FOUND": "This notification no longer exists.",
-    "AUTH_PASSWORD_MISMATCH": "Passwords do not match."
+    "AUTH_PASSWORD_MISMATCH": "Passwords do not match",
+    "AUTH_PASSWORD_POLICY": "Password must include an uppercase letter, a lowercase letter, and a number",
+    "AUTH_SUPER_ADMIN_ONLY": "Only a super admin can do this"
   },
   "trainer_consultations": {
     "update_error": "Could not update the consultation status, please retry",

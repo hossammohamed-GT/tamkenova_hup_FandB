@@ -145,13 +145,25 @@ export class AuthService {
     if (redirect) this.router.navigate(['/login']);
   }
 
-  private pendingEmail = signal<string | null>(null);
-  // -- Store the Email Awaiting Verification --
+  private pendingEmail = signal<string | null>(this.readPendingEmail());
+
   setPendingEmail(email: string): void {
     this.pendingEmail.set(email);
+    try {
+      if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('pending_email', email);
+    } catch {}
   }
-  // -- Retrieve the Email Awaiting Verification --
+
   getPendingEmail(): string | null {
-    return this.pendingEmail();
+    return this.pendingEmail() ?? this.readPendingEmail();
+  }
+
+  private readPendingEmail(): string | null {
+    try {
+      if (typeof sessionStorage === 'undefined') return null;
+      return sessionStorage.getItem('pending_email');
+    } catch {
+      return null;
+    }
   }
 }
