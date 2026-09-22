@@ -32,17 +32,17 @@ export class HomeComponent implements OnInit, OnDestroy {
   private partnersService = inject(PartnersService);
   heroImages = [
     '/images/gallery/gallery-01.jpg',
-    '/images/gallery/gallery-02.jpg',
-    '/images/gallery/gallery-03.jpg',
-    '/images/gallery/gallery-04.jpg',
+    '/images/gallery/gallery-13.jpg',
+    '/images/gallery/gallery-14.jpg',
+    '/images/gallery/gallery-15.jpg',
   ];
   activeHeroIndex = signal(0);
   private heroTimer?: ReturnType<typeof setInterval>;
 
   galleryImages: string[] = [
-    '/images/gallery/gallery-05.jpg',
-    '/images/gallery/gallery-06.jpg',
-    '/images/gallery/gallery-07.jpg',
+    '/images/gallery/gallery-16.jpg',
+    '/images/gallery/gallery-17.jpg',
+    '/images/gallery/gallery-21.jpg',
   ];
 
   stats = [
