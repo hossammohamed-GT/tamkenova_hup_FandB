@@ -496,7 +496,19 @@
     "profile_desc": "Edit your personal details",
     "view_all": "View All",
     "manage": "Manage",
-    "edit": "Edit"
+    "edit": "Edit",
+    "steps_profile": "Profile",
+    "steps_programs": "Add programs",
+    "steps_availability": "Set availability",
+    "steps_reviews": "Get reviews",
+    "steps_rating": "Average rating",
+    "steps_consultations": "Manage consultations",
+    "profile_complete_title": "Your profile is complete",
+    "profile_complete_desc": "Your profile now appears in full to students",
+    "steps_remaining": "{{count}} steps left",
+    "completion_hint": "The more complete your profile, the more visible you are to students",
+    "consultations_link": "Manage consultations",
+    "consultations_desc": "Follow up on consultation requests and respond to them"
   },
   "trainer_profile": {
     "tabs": {

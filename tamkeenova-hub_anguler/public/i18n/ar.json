@@ -496,7 +496,19 @@
     "profile_desc": "تعديل بياناتك الشخصية",
     "view_all": "عرض الكل",
     "manage": "إدارة",
-    "edit": "تعديل"
+    "edit": "تعديل",
+    "steps_profile": "الملف الشخصي",
+    "steps_programs": "إضافة برامج",
+    "steps_availability": "تحديد المواعيد",
+    "steps_reviews": "الحصول على تقييمات",
+    "steps_rating": "متوسط التقييم",
+    "steps_consultations": "إدارة الاستشارات",
+    "profile_complete_title": "بروفايلك مكتمل",
+    "profile_complete_desc": "بروفايلك يظهر الآن بشكل كامل للطلاب",
+    "steps_remaining": "متبقي {{count}} خطوات",
+    "completion_hint": "كلما أكملت بروفايلك، زاد ظهورك للطلاب",
+    "consultations_link": "إدارة الاستشارات",
+    "consultations_desc": "تابع طلبات الاستشارات والرد عليها"
   },
   "trainer_profile": {
     "tabs": {
