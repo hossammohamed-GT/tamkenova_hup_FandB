@@ -350,7 +350,7 @@ export class StudentsService {
 
     return {
       valid: certificate.is_valid,
-      certificate,
+      certificate: { ...certificate, description: certificate.template_version === '2026.3' ? null : certificate.description },
     };
   }
 

@@ -1,9 +1,15 @@
 import { jest } from '@jest/globals';
+import { certificateData } from './certificate-data';
 import { AdminService } from './admin.service';
 
 describe('certificate issue and edit workflow', () => {
   const payload = {
     user_id: 'holder',
+    recipient_name_ar: 'ليلى أحمد',
+    recipient_name_en: 'Snapshot Name',
+    program_name_ar: 'القيادة',
+    program_name_en: 'Leadership',
+    signature_name: 'Ahmed Hassan',
     certificate_type: 'TRAINING' as const,
     certificate_language: 'en' as const,
     recipient_name: 'Snapshot Name',
@@ -27,7 +33,7 @@ describe('certificate issue and edit workflow', () => {
       getCertificateById: jest
         .fn<(...args: any[]) => Promise<any>>()
         .mockResolvedValue({
-          ...payload,
+          ...certificateData(payload),
           issued_at: new Date('2026-09-21'),
           verification_code: 'TAM-ORIGINAL',
           is_valid: false,
@@ -62,11 +68,11 @@ describe('certificate issue and edit workflow', () => {
     const { repository, service } = setup();
     const result = await service.issueCertificate('admin', payload);
     expect(result.certificate.verification_code).toMatch(/^TAM-[A-F0-9]{16}$/);
-    expect(result.certificate.recipient_name).toBe('Snapshot Name');
+    expect(result.certificate.recipient_name).toBe('ليلى أحمد');
     expect(repository.createCertificate).toHaveBeenCalledWith(
       expect.objectContaining({
         student_id: 'holder',
-        template_version: '2026.2',
+        template_version: '2026.3',
       }),
     );
     expect(repository.logActivity).toHaveBeenCalledWith(

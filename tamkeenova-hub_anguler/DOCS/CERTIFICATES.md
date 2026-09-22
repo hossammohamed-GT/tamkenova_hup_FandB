@@ -1,73 +1,62 @@
-# Certificate studio — 2026.2
+# Certificate studio — 2026.3
 
-## Four independent editions
+## One issue, two language editions
 
-The current collection contains **training / Arabic, training / English, volunteer / Arabic, and volunteer / English**. Certificate language is chosen by the administrator and saved independently of the website language. Names/program names are entered in the intended language, never automatically translated.
+The administrator enters **Arabic and English recipient names**, **Arabic and English program names for training**, hours/date, **one signature name**, and optional partner logos. A single issue request creates **one certificate record with two renderable editions**. They share ownership, verification code, date, hours, partner snapshots, signature and revocation status.
 
-Arabic has a genuine mirrored RTL composition, Arabic fixed copy, Arabic numerals, an Amiri title/signature and a right-hand brand rail on training certificates. English has its own English-only fixed copy and left-to-right layout. Training uses a navy brand rail and gold medallion; volunteer recognition uses an open ivory composition, corner ribbons and a medallion. Both keep the official Tamkeenova mark and navy/gold identity.
+The editor's language switch changes the **preview only**. It does not decide which language the recipient receives. Both language versions are validated and pre-rendered before the single API request; overflow in the non-preview language also blocks issuance. Names are entered explicitly, never automatically translated or copied into a missing language.
 
-### Immutable artwork
+- **TRAINING** → Training / completion certificate, Arabic and English.
+- **VOLUNTEER** → **Experience certificate**, Arabic and English. This is the existing backend enum, not a new role/type.
+- Recipients at `/portal/certificates` have separate **Arabic PDF / PNG and English PDF / PNG** download buttons on one record.
+- The administrator's PDF download contains **two A4 landscape pages**, Arabic then English. One download avoids browser multiple-download blocking.
+- The issuance email links to the recipient's certificates and explains that both editions are available. Verification uses `/verify?code=...`.
 
-- `public/certificates/{training|volunteer}-{ar|en}-v2.png`: complete 3508 × 2481 print artwork without partners.
-- `*-v2-partners.png`: the same composition with the **fixed** partner-band heading baked into the image, replacing the footer motto. Used automatically only when logos are selected; an empty certificate never displays a misleading empty “partners” heading.
-- `*-v2-thumb.png`: 900px thumbnails, not additional selectable templates.
-- `*-v2.svg`: build-time masters, not the runtime compositor.
-- `scripts/build-certificate-artwork-v2.mjs`: offline deterministic builder (`npm run certificates:artwork`). Uses bundled OFL fonts and `@resvg/resvg-js`.
+## Reference-inspired design
 
-Titles, descriptions, organization logo, signature, decorative frames, medallion, labels and footer wording are permanently flattened into the PNG. Runtime rendering inserts only the approved certificate values **plus administrator-selected partner images**, as requested for this edition. No fixed wording is generated at runtime.
+The collection uses a navy engraved border, flowing gold ribbons, warm ivory paper, subtle laurels, centered Tamkeenova branding, and formal serif/Arabic typography. It follows the supplied visual reference's composition without copying another organization's logo, named officers, accreditation claims or personal handwriting.
 
-The signature is a fixed **institutional typographic endorsement** (“Tamkeenova” / “إدارة تمكينوفا”), not an invented officer's handwriting or an accreditation claim. Any future personal signature must be supplied/approved by the organization and baked into a new artwork version.
+`public/certificates/{training|experience}-{ar|en}-v3.jpg` contains complete **3508 × 2481** fixed artwork. The `-partners.jpg` variant includes the fixed collaboration label at the bottom; the normal variant has a motto instead. `-thumb.jpg` files are 900px gallery previews. JPEG at quality 96 keeps the textured print artwork compact; the runtime compositor exports lossless high-resolution PNG and PDF with a quality-97 JPEG image per page. This keeps textured two-page PDFs compact instead of embedding 50+ MB of uncompressed pixels; QR decoding is tested from the actual embedded PDF image.
 
-## Partner selection and safety
+- `scripts/build-certificate-artwork-v3.mjs` builds artwork offline from SVG masters, bundled OFL fonts and the committed border source.
+- `ornate-v3-background.jpg` is the AI-generated, text-free ornamental border. All wording and branding are typeset deterministically at build time.
+- SVG masters reference the border in the same directory; the builder embeds it for rasterization.
+- Run `npm run certificates:artwork` to build **only 2026.3**. Do not overwrite issued versions in routine releases.
+- Fixed text, labels, logo and decorations are flattened into artwork. Runtime paints only recipient, program, hours, date, certificate code, QR, **one signature name**, and selected partner images.
 
-Administrators can choose **up to four logos**, in any combination:
+### Signature
 
-1. Select an active registered partner from the existing partner library.
-2. Upload PNG, JPEG or WebP files directly from their device (maximum 2 MiB each).
-3. Reorder or remove logos before saving. The first selected logo appears first in reading order: rightmost in Arabic, leftmost in English.
+The field is labelled **“أدخل اسم التوقيع / Enter signature name”**. One shared name is saved for both editions and rendered into one reserved signature rectangle. Latin names use the bundled Mrs Saint Delafield cursive font; Arabic names use Amiri calligraphy. Text shrinks within bounded limits and never silently truncates.
 
-The preview, PDF and PNG share the same compositor. Logos are centered in an isolated footer band, keep their aspect ratios and never overlap the signature, date or QR. Fully transparent outer padding is trimmed with a safety margin; visible logo content is never cropped or stretched. Opaque backgrounds are retained.
+This is **decorative signature lettering**, not a scanned handwritten signature, cryptographic digital signature or a claim that a named person personally signed. There are no prefilled real-person signatures and no second signature field. The editor clearly explains the distinction.
 
-### Image snapshots, not mutable URLs
+## Trainees in the frontend; existing roles in the backend
 
-Images are normalized in the browser into small raster PNG snapshots, no larger than 512 × 256 and 90,000 data-URL characters each. These snapshots are saved in `partner_logos` on the certificate. Future library edits/deletions, expiring image URLs or a user's website language changes cannot alter an issued document.
+All Arabic/English UI dictionaries now present the former role as **متدرب / Trainee**, including registration, navigation, role selectors, dashboard, tasks, approvals, status, errors and notifications. The experience certificate is labelled **شهادة خبرة / Experience certificate**. Backend-generated notification wording is adapted for display only.
 
-The API independently validates the count, name, data-URL format, PNG signature, dimensions **before decompression**, CRC/content and size. It re-encodes to remove metadata, rejects duplicate image bytes and stores the normalized snapshots. SVG and remote URLs are never accepted as API image payloads. The backend never fetches arbitrary image URLs, avoiding server-side URL-fetch/SSRF risks. JSON request bodies are bounded at 1 MiB (four maximum-size snapshots fit comfortably).
+Canonical frontend URLs:
 
-The optional `source_id` records the registered partner UUID as provenance metadata. It is not a live logo reference or an authorization token; directly uploaded logos need no library record.
+- `/register/trainee`
+- `/portal/trainee` and its existing status/tasks/notifications children
+- `/portal/admin/trainees`
 
-Registered-logo imports are browser-side, bounded CORS fetches with a ten-second timeout and no credentials. If the image host disallows CORS or uses an unsupported source format, the admin sees an error and can upload a raster file instead. Failed selections never silently disappear into an issued certificate: issuance is disabled until retry succeeds or the admin explicitly skips that image. Library outages do not block direct uploads or existing snapshots.
+Old frontend URLs redirect to their equivalents so existing links still work. **API URLs, `VOLUNTEER` roles/enums, payload identifiers, tables, permissions and approval workflows are unchanged.** In particular, registration still calls the existing `/auth/register/volunteer` API and profile/status calls still use `/volunteers`.
 
-## Exact field positions
+## Storage — no new database schema changes in this follow-up
 
-The logical artboard is **1800 × 1273**, measured from the upper-left. Preview and export scale the whole artboard together. These are the **English edition** rectangles:
+Version 2026.3 adds **no Prisma columns, SQL migration, role conversion or data backfill** relative to 2026.2. It uses existing certificate fields:
 
-| Field | Training X | Volunteer X | Y | Width | Height | Font / minimum | Lines |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| Recipient | 405 | 220 | 467 | 1260 training / 1360 volunteer | 120 | 64 / 30 | 2 |
-| Program | 425 | — | 671 | 1220 | 105 | 40 / 24 | 2 |
-| Hours | 435 | 305 | 887 | 240 | 70 | 44 / 26 | 1 |
-| Date | 750 | 600 | 887 | 310 | 70 | 33 / 25 | 1 |
-| QR | 1465 | 1385 | 868 | 164 | 164 | — | — |
-| Partner band | 440 | 305 | 1131 | 1190 | 82 | — | — |
+- `recipient_name` / `program_name`: Arabic canonical snapshots for existing integrations.
+- `title_ar` / `title_en`: language-specific list titles; experience titles are fixed localized descriptions.
+- `description`: a versioned JSON string with `schema: "tamkeenova.certificate/2026.3"`, `recipient_name_ar`, `recipient_name_en`, `program_name_ar`, `program_name_en`, and `signature_name`.
+- `template_version`: `2026.3`; `certificate_language: "ar"` is only the canonical/default preview language, **not a restriction to Arabic**.
+- Existing `partner_logos`: bounded immutable image snapshots.
 
-For Arabic, **`x = 1800 - English x - width`**. Y/dimensions are unchanged. Text and logos stay upright; only their positioning is mirrored.
+No new-language or signature keys are passed to Prisma as columns. Only trusted, version-matched metadata is read; old free-text descriptions are never reinterpreted as the new envelope. Public verification does not display the internal JSON description; it exposes available languages and recipient-name snapshots instead. Authenticated certificate consumers must preserve `description` for rendering.
 
-`src/core/certificates/certificate-template.ts` is the authoritative manifest. `partnerSlots()` calculates a centered row of 0–4 slots, maximum width 230, with 40-unit gaps and the template's reading order. Each logo is contained within its slot.
+Existing **2026.1** bilingual and **2026.2** single-language records keep their original artwork/downloads. They are not silently changed or assigned invented translations/signatures. Explicit upgrading requires both language versions and a signature name, retaining the code, ownership and revocation status. Unknown/NULL versions still require review.
 
-Names/programs wrap at word boundaries and shrink within fixed limits. Unfittable values cause a visible error rather than truncation or overlap. Arabic/Latin fonts are explicitly loaded before rendering. Dates are stored as timezone-independent `YYYY-MM-DD`; Arabic artwork renders Arabic numerals. Hours are integers 1–100,000; recipient names up to 120 characters; training program names up to 180. Control characters and bidi override controls are rejected in certificate text.
-
-## Workflow and exports
-
-- Admin: `/portal/admin/certificates`, four template cards and separate type/language selectors in the editor.
-- Enter recipient account, display-name snapshot, training program (training only), hours/date and optional partners.
-- Preview placeholders are clearly identified as examples. Final QR codes are assigned on issue.
-- Save pre-renders before calling the API; the server validates independently and assigns a cryptographically random verification code and template version.
-- Admin PDF downloads and recipient PDF/PNG downloads use the same high-resolution image. PDF is A4 landscape.
-- `/portal/certificates` is available to authenticated recipients, including volunteers via their dashboard. The JWT-protected API retrieves only the authenticated user's records.
-- Download filenames include certificate type, saved language and verification code for the new editions.
-- QR codes are generated locally, with a four-module quiet zone, pointing to `{frontend-origin}/verify?code=...`. Download production certificates from the production frontend, not a temporary preview hostname.
-- Revocation and deletion remain separate administrator-only operations. Editing content cannot change account ownership, verification code or revocation state.
+**Deployment context:** this follow-up requires no additional migration on a 2026.2 deployment. If deploying the entire rebuild PR from the original pre-rebuild database, its earlier additive `prisma/rebuild-certificates.sql` remains the prerequisite for the previously introduced certificate fields. No database migration has been run in this sandbox, and no role/table renaming is required.
 
 ## API contract
 
@@ -77,68 +66,68 @@ Names/programs wrap at word boundaries and shrink within fixed limits. Unfittabl
 {
   "user_id": "recipient-account-uuid",
   "certificate_type": "TRAINING",
-  "certificate_language": "ar",
-  "recipient_name": "ليلى أحمد محمد",
-  "program_name": "القيادة والتطوير المهني",
+  "recipient_name_ar": "ليلى أحمد محمد",
+  "recipient_name_en": "Layla Ahmed Mohamed",
+  "program_name_ar": "القيادة والتطوير المهني",
+  "program_name_en": "Leadership and Professional Development",
+  "signature_name": "Ahmed Hassan",
   "training_hours": 48,
   "issued_at": "2026-09-22",
   "partner_logos": []
 }
 ```
 
-`partner_logos` may be omitted or an array of up to four `{ "name": "Partner name", "data_url": "data:image/png;base64,...", "source_id": "optional-partner-uuid" }` snapshots. The shown ellipsis is illustrative, not a valid PNG. `source_id` must be omitted for direct uploads. For `VOLUNTEER`, omit `program_name` or send `null`; a non-empty program is rejected.
+For an **experience certificate**, keep `certificate_type: "VOLUNTEER"` and omit/clear both program names. Both recipient names and one signature are required for every new issue. Signature ≤80 characters; each name ≤120; each program ≤180; hours integer 1–100,000; valid date 1900–2100. Control/bidi-override characters are rejected. Dates are stored as UTC date-only values and displayed consistently; Arabic certificates use Arabic numerals.
 
-`PATCH /api/admin/certificates/:id` accepts any subset of these fields except `user_id`, validating the merged record. Omitted logos preserve existing snapshots; `partner_logos: []` explicitly removes them. `null` is not an empty selection. Changing training to volunteer requires clearing `program_name`.
+`PATCH /api/admin/certificates/:id` validates partial changes against the saved envelope. Omission preserves the other language, signature and partner images. Null is not valid for required names/signature. Changing training to experience requires clearing **both** program names. Account ownership, version, verification code, validity, raw metadata and arbitrary fixed content are not editable request fields. `certificate_language` and old single-name/program fields are compatibility-only; they cannot replace the required bilingual values in new requests.
 
-Custom headings/descriptions/signatures, arbitrary QR URLs, client-selected template versions and PDF uploads remain unsupported. `partner_ids` is derived compatibility metadata, not an accepted request field. `title` is derived list/notification metadata, not the certificate's fixed heading. Responses retain `{ success, message, certificate }`.
+`partner_logos` accepts up to four `{name, data_url, source_id?}` normalized PNG snapshots. Omitted logos preserve images on PATCH; `[]` clears; `null` is invalid. Names ≤80 chars, data URLs ≤90,000 chars, decoded PNG ≤512 × 256. Optional source ID is a registered-partner UUID; direct uploads need none.
 
-## Backward compatibility
+## Exact rectangles
 
-**2026.1 certificates keep their original bilingual artwork, original field positions and original downloads.** The old assets and manifest remain immutable. They are not offered for new issuance. The previous body-signature/date/QR layout is not silently replaced on download.
+Logical artboard: **1800 × 1273**, top-left origin. All preview/export content uses the same manifest in `src/core/certificates/certificate-template.ts`.
 
-An admin may explicitly upgrade a record using the new editor. The editor explains that saving adopts the selected new edition; it requires a language choice and preserves verification code/validity. A partial API edit of a 2026.1 record without explicitly supplying the new language is rejected rather than silently upgrading.
+| Field | English X | Y | Width × height | Font / minimum | Lines |
+|---|---:|---:|---:|---:|---:|
+| Recipient | 340 | 470 | 1120 × 118 | 74 / 30 | 2 |
+| Program (training only) | 390 | 653 | 1020 × 90 | 44 / 25 | 2 |
+| Date | 370 | 858 | 300 × 66 | 31 / 23 | 1 |
+| Hours | 760 | 858 | 220 × 66 | 36 / 25 | 1 |
+| Certificate code | 1080 | 858 | 350 × 66 | 23 / 16 | 1 |
+| Signature | 585 | 941 | 630 × 128 | 88 / 36 | 1 |
+| QR | 1240 | 949 | 142 × 142 | — | — |
+| Bottom partners | 530 | 1152 | 740 × 64 | — | — |
 
-Pre-rebuild historical rows with NULL versions remain verifiable but require admin review before new-artwork export. Unsupported `OTHER` records are never rendered as training certificates by fallback.
+Arabic mirrors the date, hours, certificate code and QR using `x = 1800 - x - width`; centered name/program/signature/partner rectangles are unchanged. Text/images remain upright. First-selected partner appears first in reading order. Partner slots are centered, contained, and never overlap the signature or QR.
 
-## Deployment — rerun the additive migration
+## Image and rendering safety
 
-```sh
-cd tamkeenova-api
-npm ci
-npm run db:certificates
-npm run build
-```
+Administrators select registered partners or upload PNG/JPEG/WebP files ≤2 MiB each, maximum four. Browser imports use bounded 10-second CORS requests without credentials. Transparent outer padding is normalized with a bounded probe and safety margin; opaque backgrounds and aspect ratio are retained. Snapshots, not mutable library URLs, are saved.
 
-`prisma/rebuild-certificates.sql` is transactional and idempotent. It now also adds **`certificate_language varchar(2)` and `partner_logos jsonb`**. Rerun it even if the 2026.1 migration was already applied. It preserves existing rows without backfilling or changing their designs.
+API validation checks PNG signature, dimensions **before decompression**, CRC/content, count and size, and canonical re-encoding strips metadata. Duplicate images are rejected. SVG/remote image URLs are not accepted by the API; it never fetches arbitrary image URLs. The JSON body limit is 1 MiB. Failed imports prevent saving until retried or explicitly skipped.
 
-Deploy the new API and frontend together: language is now required for new issuance. Normal database/Prisma engine configuration is required in deployment. No live database migration has been applied in the coding sandbox.
+QRs are generated locally with a four-module quiet zone and point to the frontend's `/verify?code=...` route. Download production credentials from the production frontend, not a temporary preview host. Required fonts are self-hosted and loaded before layout; overflow and corrupt/missing artwork stop issue/export instead of creating incomplete documents.
+
+## Validation and deployment
 
 ```sh
 cd tamkeenova-hub_anguler
 npm ci
+npm run test:certificates
+npm run certificates:artwork  # deliberate artwork development only
 npm run build
 npm start -- --host 0.0.0.0
-```
-
-Development uses relative `/api` requests, proxied to port 3000 by `proxy.conf.json`; production uses `environment.prod.ts`. Certificate fonts/assets are self-hosted. Keep versioned artwork/fonts for the lifetime of issued certificates. `npm run certificates:artwork` builds only the new edition; do not regenerate or overwrite frozen artwork in routine releases.
-
-## Tests and visual review
-
-```sh
-# Frontend manifest, logo geometry, validation and monolingual fixed-copy checks
-cd tamkeenova-hub_anguler
-npm run test:certificates
-
-# Browser workflow (start the frontend first; HTTP APIs are intercepted fixtures)
-npx playwright install chromium
+# In another terminal, with Chromium installed:
 npm run test:certificates:e2e
-# Optional CERTIFICATE_TEST_URL and CHROMIUM_PATH overrides.
 
-# API DTO, PNG safety, language, issuance/update, snapshot and verification tests
 cd ../tamkeenova-api
+npm ci
 npm run test:certificates
+npm run build
 ```
 
-Coverage includes all four editions; Arabic/RTL/mobile layout; transparent-padding normalization; registered and uploaded logos; ordering/removal/four-logo limit; corrupted/unavailable images; issue/update payloads; old-edition exports; PDF/PNG; QR decoding; and pixel checks that everything outside the permitted regions remains identical to its fixed artwork.
+Deploy frontend and API together because new issuance requires bilingual fields. Normal Prisma/database configuration is required. Browser tests use intercepted HTTP fixtures; API tests use mocked repositories. **Live database-backed issuance still needs deployment-environment verification.**
 
-`DOCS/certificate-design-preview.png` shows the four current designs with illustrative data and partner placement. These are design samples, not issued credentials or claims of endorsement. Live database-backed issuance and the migration still need verification in the deployment environment.
+Coverage includes paired payloads, partial edits, one signature, saved language snapshots, both recipient formats, a two-page admin PDF, overflow in either language, partner safety/ordering/persistence, QR decoding, geometry and unchanged pixels outside approved regions, RTL/mobile, legacy editions, and trainee URLs/labels with unchanged backend identifiers.
+
+`DOCS/certificate-design-preview.png` shows all four new artworks with illustrative names, signature and partner placement. These samples are not issued credentials or claims of partner endorsement.

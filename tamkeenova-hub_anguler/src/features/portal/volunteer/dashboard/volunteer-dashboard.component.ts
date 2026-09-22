@@ -50,28 +50,28 @@ export class VolunteerDashboardComponent implements OnInit {
         value: s.total_tasks,
         icon: 'fa-list-check',
         color: 'var(--color-primary)',
-        route: '/portal/volunteer/tasks',
+        route: '/portal/trainee/tasks',
       },
       {
         labelKey: 'volunteer_dashboard.current',
         value: s.current_tasks,
         icon: 'fa-spinner',
         color: 'var(--color-accent)',
-        route: '/portal/volunteer/tasks',
+        route: '/portal/trainee/tasks',
       },
       {
         labelKey: 'volunteer_dashboard.completed',
         value: s.completed_tasks,
         icon: 'fa-circle-check',
         color: 'var(--color-success)',
-        route: '/portal/volunteer/tasks',
+        route: '/portal/trainee/tasks',
       },
       {
         labelKey: 'volunteer_dashboard.delayed',
         value: s.delayed_tasks,
         icon: 'fa-triangle-exclamation',
         color: 'var(--color-danger)',
-        route: '/portal/volunteer/tasks',
+        route: '/portal/trainee/tasks',
       },
     ];
   });

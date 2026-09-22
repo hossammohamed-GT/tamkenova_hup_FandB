@@ -106,6 +106,7 @@ export class VerificationRepository {
             verification_code: true,
             title: true,
             description: true,
+            template_version: true,
             issued_at: true,
             training_hours: true,
             pdf_url: true,

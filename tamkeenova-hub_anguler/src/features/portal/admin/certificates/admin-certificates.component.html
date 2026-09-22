@@ -95,7 +95,9 @@
                     }}</small>
                   }
                   @if (cert.issued_at) {
-                    <small class="text-muted">{{ cert.issued_at | date: 'yyyy/MM/dd' : 'UTC' }}</small>
+                    <small class="text-muted">{{
+                      cert.issued_at | date: 'yyyy/MM/dd' : 'UTC'
+                    }}</small>
                   }
                 </div>
               </td>
@@ -123,7 +125,10 @@
                       <span class="certificate-language-badge"
                         >·
                         {{
-                          'certificate_studio.language_' + cert.certificate_language | translate
+                          (cert.template_version === version
+                            ? 'certificate_studio.both_languages'
+                            : 'certificate_studio.language_' + cert.certificate_language
+                          ) | translate
                         }}</span
                       >
                     }
@@ -268,7 +273,7 @@
             @if (editTarget() && editTarget()?.template_version !== version) {
               <p class="legacy-note">
                 {{
-                  (editTarget()?.template_version === '2026.1'
+                  (['2026.1', '2026.2'].includes(editTarget()?.template_version ?? '')
                     ? 'certificate_studio.upgrade_notice'
                     : 'certificate_studio.legacy'
                   ) | translate
@@ -347,7 +352,7 @@
 
             <div class="field">
               <label class="field-label" for="cert-recipient">{{
-                'certificate_studio.recipient_name' | translate
+                'certificate_studio.recipient_name_ar' | translate
               }}</label>
               <input
                 id="cert-recipient"
@@ -359,10 +364,23 @@
               />
               <small class="field-hint">{{ 'certificate_studio.snapshot' | translate }}</small>
             </div>
+            <div class="field">
+              <label class="field-label" for="cert-recipient-en">{{
+                'certificate_studio.recipient_name_en' | translate
+              }}</label>
+              <input
+                id="cert-recipient-en"
+                class="field-input"
+                formControlName="recipient_name_en"
+                maxlength="120"
+                dir="ltr"
+                required
+              />
+            </div>
             @if (issueForm.controls.certificate_type.value === 'TRAINING') {
               <div class="field">
                 <label class="field-label" for="cert-program">{{
-                  'certificate_studio.program_name' | translate
+                  'certificate_studio.program_name_ar' | translate
                 }}</label>
                 <input
                   id="cert-program"
@@ -372,8 +390,35 @@
                   dir="auto"
                   required
                 />
+                <label class="field-label" for="cert-program-en">{{
+                  'certificate_studio.program_name_en' | translate
+                }}</label>
+                <input
+                  id="cert-program-en"
+                  class="field-input"
+                  formControlName="program_name_en"
+                  maxlength="180"
+                  dir="ltr"
+                  required
+                />
               </div>
             }
+            <div class="field signature-editor">
+              <label class="field-label" for="cert-signature">{{
+                'certificate_studio.signature_name' | translate
+              }}</label>
+              <input
+                id="cert-signature"
+                class="field-input"
+                formControlName="signature_name"
+                maxlength="80"
+                dir="auto"
+                required
+              />
+              <small class="field-hint">{{
+                'certificate_studio.signature_hint' | translate
+              }}</small>
+            </div>
             <div class="form-grid">
               <div class="field">
                 <label class="field-label" for="cert-hours">{{

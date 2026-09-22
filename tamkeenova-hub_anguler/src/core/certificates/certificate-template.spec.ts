@@ -11,6 +11,7 @@ import {
 } from './certificate-template';
 
 const training: CertificateValues = {
+  signature_name: 'Ahmed Hassan',
   certificate_type: 'TRAINING',
   certificate_language: 'en',
   recipient_name: 'ليلى أحمد محمد',
@@ -28,19 +29,23 @@ describe('fixed certificate templates', () => {
       'VOLUNTEER-en',
     ]);
     expect(Object.keys(CERTIFICATE_TEMPLATES[0].fields).sort()).toEqual([
+      'code',
       'date',
       'hours',
       'partners',
       'program',
       'qr',
       'recipient',
+      'signature',
     ]);
     expect(Object.keys(CERTIFICATE_TEMPLATES[2].fields).sort()).toEqual([
+      'code',
       'date',
       'hours',
       'partners',
       'qr',
       'recipient',
+      'signature',
     ]);
   });
   it('mirrors Arabic field locations without mirroring content', () => {

@@ -1,5 +1,5 @@
 import { ValidationPipe } from '@nestjs/common';
-import { certificateData } from './certificate-data';
+import { legacyCertificateData as certificateData } from './certificate-data';
 import { IssueCertificateDto } from './dto/issue-certificate.dto';
 import { UpdateCertificateDto } from './dto/update-certificate.dto';
 
@@ -11,7 +11,7 @@ const values = {
   training_hours: 32,
   issued_at: '2026-09-21',
 };
-const issue = { ...values, user_id: '550e8400-e29b-41d4-a716-446655440000' };
+const issue = { ...values, recipient_name_ar: 'ليلى أحمد', recipient_name_en: 'Layla Ahmed', program_name_ar: 'القيادة', program_name_en: 'Leadership', signature_name: 'Ahmed Hassan', user_id: '550e8400-e29b-41d4-a716-446655440000' };
 const pipe = new ValidationPipe({
   transform: true,
   whitelist: true,

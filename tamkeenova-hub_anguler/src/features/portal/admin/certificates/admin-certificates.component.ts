@@ -20,6 +20,8 @@ import { apiErrorKey } from '../../../../core/utils/api-error';
 import { CertificateRenderer } from '../../../../core/certificates/certificate-renderer.service';
 import {
   CERTIFICATE_TEMPLATES,
+  bilingualData,
+  certificateLanguages,
   CertificateLanguage,
   PartnerLogo,
   MAX_PARTNER_LOGOS,
@@ -95,7 +97,10 @@ export class AdminCertificatesComponent implements OnInit {
     certificate_type: this.fb.nonNullable.control<TemplateType>('TRAINING'),
     certificate_language: this.fb.nonNullable.control<CertificateLanguage>(this.theme.language()),
     recipient_name: ['', [Validators.required, Validators.maxLength(120)]],
+    recipient_name_en: ['', [Validators.required, Validators.maxLength(120)]],
     program_name: ['', Validators.maxLength(180)],
+    program_name_en: ['', Validators.maxLength(180)],
+    signature_name: ['', [Validators.required, Validators.maxLength(80)]],
     training_hours: this.fb.control<number | null>(null, [
       Validators.required,
       Validators.min(1),
@@ -110,9 +115,14 @@ export class AdminCertificatesComponent implements OnInit {
     return this.certificates().filter(
       (c) =>
         !term ||
-        [c.title, c.recipient_name, c.verification_code, c.users?.full_name].some((v) =>
-          v?.toLowerCase().includes(term),
-        ),
+        [
+          c.title,
+          c.title_en,
+          c.recipient_name,
+          bilingualData(c)?.recipient_name_en,
+          c.verification_code,
+          c.users?.full_name,
+        ].some((v) => v?.toLowerCase().includes(term)),
     );
   });
 
@@ -187,15 +197,27 @@ export class AdminCertificatesComponent implements OnInit {
     void this.updatePreview();
   }
   openEdit(cert: AdminCertificate): void {
-    this.resetLogos(cert.template_version === this.version ? (cert.partner_logos ?? []) : []);
+    this.resetLogos(cert.partner_logos ?? []);
+    const dual = bilingualData(cert);
     this.editTarget.set(cert);
     this.selectedUser.set(null);
     this.formError.set(null);
     this.issueForm.reset({
       certificate_type: cert.certificate_type === 'VOLUNTEER' ? 'VOLUNTEER' : 'TRAINING',
       certificate_language: cert.certificate_language ?? this.theme.language(),
-      recipient_name: cert.recipient_name ?? cert.users?.full_name ?? '',
-      program_name: cert.program_name ?? (cert.certificate_type === 'TRAINING' ? cert.title : ''),
+      recipient_name:
+        dual?.recipient_name_ar ??
+        (cert.certificate_language === 'ar' ? (cert.recipient_name ?? '') : ''),
+      recipient_name_en:
+        dual?.recipient_name_en ??
+        (cert.certificate_language !== 'ar' ? (cert.recipient_name ?? '') : ''),
+      program_name:
+        dual?.program_name_ar ??
+        (cert.certificate_language === 'ar' ? (cert.program_name ?? '') : ''),
+      program_name_en:
+        dual?.program_name_en ??
+        (cert.certificate_language !== 'ar' ? (cert.program_name ?? '') : ''),
+      signature_name: dual?.signature_name ?? '',
       training_hours: cert.training_hours,
       issued_at: cert.issued_at.slice(0, 10),
     });
@@ -212,7 +234,10 @@ export class AdminCertificatesComponent implements OnInit {
   }
   selectTemplate(type: TemplateType): void {
     this.issueForm.controls.certificate_type.setValue(type);
-    if (type === 'VOLUNTEER') this.issueForm.controls.program_name.setValue('');
+    if (type === 'VOLUNTEER') {
+      this.issueForm.controls.program_name.setValue('');
+      this.issueForm.controls.program_name_en.setValue('');
+    }
     void this.updatePreview();
   }
   searchUsers(term: string): void {
@@ -242,7 +267,8 @@ export class AdminCertificatesComponent implements OnInit {
     this.selectedUser.set(user);
     this.userResults.set([]);
     this.userSearchTerm.set('');
-    this.issueForm.controls.recipient_name.setValue(user.full_name);
+    const field = /[\u0600-\u06ff]/u.test(user.full_name) ? 'recipient_name' : 'recipient_name_en';
+    this.issueForm.controls[field].setValue(user.full_name);
   }
   clearUser(): void {
     this.selectedUser.set(null);
@@ -358,19 +384,22 @@ export class AdminCertificatesComponent implements OnInit {
     void this.updatePreview();
   }
 
-  private values(preview: boolean): CertificateValues {
+  private values(preview: boolean, language?: CertificateLanguage): CertificateValues {
     const raw = this.issueForm.getRawValue();
+    const selected = language ?? raw.certificate_language;
     return {
       ...raw,
+      certificate_language: selected,
+      signature_name: raw.signature_name.trim() || (preview ? 'Ahmed Hassan' : ''),
       template_version: TEMPLATE_VERSION,
       partner_logos: this.selectedLogos(),
       recipient_name:
-        raw.recipient_name.trim() ||
-        (preview ? (raw.certificate_language === 'ar' ? 'اسم المستلم' : 'Recipient name') : ''),
+        (selected === 'ar' ? raw.recipient_name : raw.recipient_name_en).trim() ||
+        (preview ? (selected === 'ar' ? 'اسم المستلم' : 'Recipient name') : ''),
       program_name:
         raw.certificate_type === 'TRAINING'
-          ? raw.program_name.trim() ||
-            (preview ? (raw.certificate_language === 'ar' ? 'اسم البرنامج' : 'Program name') : '')
+          ? (selected === 'ar' ? raw.program_name : raw.program_name_en).trim() ||
+            (preview ? (selected === 'ar' ? 'اسم البرنامج' : 'Program name') : '')
           : null,
       training_hours: raw.training_hours ?? (preview ? 1 : 0),
       verification_code: this.editTarget()?.verification_code ?? 'PREVIEW-NOT-ISSUED',
@@ -406,14 +435,22 @@ export class AdminCertificatesComponent implements OnInit {
     this.isSaving.set(true);
     this.formError.set(null);
     try {
-      const values = this.values(false);
-      // Do not issue a document if fonts, artwork or text fitting fail.
-      await this.renderer.render(values, 900);
-      const { verification_code: _code, template_version: _version, ...fields } = values;
+      // Both editions must fit before one atomic issue/update request is sent.
+      await Promise.all(
+        this.languages.map((language) => this.renderer.render(this.values(false, language), 900)),
+      );
+      const raw = this.issueForm.getRawValue();
+      const training = raw.certificate_type === 'TRAINING';
       const payload = {
-        ...fields,
-        certificate_language: this.issueForm.controls.certificate_language.value,
-        program_name: fields.program_name ?? null,
+        certificate_type: raw.certificate_type,
+        recipient_name_ar: raw.recipient_name.trim(),
+        recipient_name_en: raw.recipient_name_en.trim(),
+        program_name_ar: training ? raw.program_name.trim() : null,
+        program_name_en: training ? raw.program_name_en.trim() : null,
+        signature_name: raw.signature_name.trim(),
+        training_hours: raw.training_hours!,
+        issued_at: raw.issued_at,
+        partner_logos: this.selectedLogos(),
       };
       const editing = this.editTarget();
       const record = editing
@@ -447,7 +484,9 @@ export class AdminCertificatesComponent implements OnInit {
     if (this.downloadingId()) return;
     this.downloadingId.set(cert.id);
     try {
-      await this.renderer.download(certificateValues(cert));
+      await this.renderer.downloadPair(
+        certificateLanguages(cert).map((language) => certificateValues(cert, language)),
+      );
     } catch (error) {
       this.showToast(this.renderError(error), true);
     } finally {

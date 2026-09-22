@@ -19,6 +19,9 @@ export class CertificateRenderer {
     return (this.fonts ??= Promise.all(
       [
         ['CertificateLatin', '/certificates/fonts/manrope-600-normal.ttf'],
+        ['CertificateSignature', '/certificates/fonts/signature-400.ttf'],
+        ['CertificateCalligraphy', '/certificates/fonts/amiri-400-normal.ttf'],
+        ['CertificateSerif', '/certificates/fonts/cormorant-garamond-500-normal.ttf'],
         ['CertificateArabic', '/certificates/fonts/noto-sans-arabic-600-normal.ttf'],
       ].map(async ([name, url]) => {
         const face = await new FontFace(name, `url(${url})`).load();
@@ -68,8 +71,31 @@ export class CertificateRenderer {
     ctx.scale(canvas.width / ARTBOARD.width, canvas.height / ARTBOARD.height);
     // The sole source of fixed wording/branding. Optional partner logos use a reserved band.
     ctx.drawImage(artwork, 0, 0, ARTBOARD.width, ARTBOARD.height);
-    this.drawField(ctx, values.recipient_name, template.fields.recipient);
-    if (template.fields.program) this.drawField(ctx, values.program_name!, template.fields.program);
+    this.drawField(
+      ctx,
+      values.recipient_name,
+      template.fields.recipient,
+      undefined,
+      template.version === '2026.3' ? 'serif' : undefined,
+    );
+    if (template.fields.program)
+      this.drawField(
+        ctx,
+        values.program_name!,
+        template.fields.program,
+        undefined,
+        template.version === '2026.3' ? 'serif' : undefined,
+      );
+    if (template.fields.signature)
+      this.drawField(
+        ctx,
+        values.signature_name!,
+        template.fields.signature,
+        undefined,
+        'signature',
+      );
+    if (template.fields.code)
+      this.drawField(ctx, values.verification_code, template.fields.code, 'ltr');
     const digits = (value: string) =>
       template.language === 'ar'
         ? value.replace(/[0-9]/g, (digit) => '٠١٢٣٤٥٦٧٨٩'[Number(digit)])
@@ -104,10 +130,19 @@ export class CertificateRenderer {
     text: string,
     box: FieldBox,
     direction?: CanvasDirection,
+    style?: 'signature' | 'serif',
   ): void {
-    const family = /[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff]/u.test(text)
-      ? 'CertificateArabic, CertificateLatin'
-      : 'CertificateLatin, CertificateArabic';
+    const isArabic = /[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff]/u.test(text);
+    const family =
+      style === 'signature'
+        ? isArabic
+          ? 'CertificateCalligraphy'
+          : 'CertificateSignature'
+        : style === 'serif' && !isArabic
+          ? 'CertificateSerif'
+          : /[\u0600-\u06ff\u0750-\u077f\u08a0-\u08ff]/u.test(text)
+            ? 'CertificateArabic, CertificateLatin'
+            : 'CertificateLatin, CertificateArabic';
     const fitted = fitText(text, box, (line, size) => {
       ctx.font = `${size}px ${family}`;
       return ctx.measureText(line).width;
@@ -117,7 +152,7 @@ export class CertificateRenderer {
     ctx.rect(box.x, box.y, box.width, box.height);
     ctx.clip();
     ctx.font = `${fitted.size}px ${family}`;
-    ctx.fillStyle = '#004265';
+    ctx.fillStyle = style === 'signature' ? '#152734' : style === 'serif' ? '#102c40' : '#004265';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.direction = direction ?? (/[\u0600-\u06ff]/u.test(text) ? 'rtl' : 'ltr');
@@ -132,15 +167,36 @@ export class CertificateRenderer {
     ctx.restore();
   }
 
+  async downloadPair(values: CertificateValues[]): Promise<void> {
+    if (values.length === 1) return this.download(values[0]);
+    const { jsPDF } = await import('jspdf');
+    const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
+    for (let i = 0; i < values.length; i++) {
+      const canvas = await this.render(values[i], 3508);
+      if (i) pdf.addPage('a4', 'landscape');
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.97), 'JPEG', 0, 0, 297, 210);
+    }
+    pdf.setProperties({ title: 'Tamkeenova — Arabic & English', creator: 'Tamkeenova' });
+    pdf.save(`tamkeenova-bilingual-${values[0].verification_code}.pdf`);
+  }
+
   async download(values: CertificateValues, format: 'png' | 'pdf' = 'pdf'): Promise<void> {
     const canvas = await this.render(values, 3508);
     const language = getCertificateTemplate(values).language;
-    const filename = `tamkeenova-${values.certificate_type.toLowerCase()}-${language ? `${language}-` : ''}${values.verification_code}`;
+    const filename = `tamkeenova-${values.certificate_type === 'VOLUNTEER' && values.template_version === '2026.3' ? 'experience' : values.certificate_type.toLowerCase()}-${language ? `${language}-` : ''}${values.verification_code}`;
     if (format === 'pdf') {
       const { jsPDF } = await import('jspdf');
-      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
       pdf.setProperties({ title: `${values.recipient_name} — Tamkeenova`, creator: 'Tamkeenova' });
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, 297, 210);
+      const textured = values.template_version === '2026.3';
+      pdf.addImage(
+        canvas.toDataURL(textured ? 'image/jpeg' : 'image/png', 0.97),
+        textured ? 'JPEG' : 'PNG',
+        0,
+        0,
+        297,
+        210,
+      );
       pdf.save(`${filename}.pdf`);
       return;
     }

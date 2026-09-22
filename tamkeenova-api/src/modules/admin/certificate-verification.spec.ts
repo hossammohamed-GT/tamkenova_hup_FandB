@@ -19,7 +19,9 @@ describe('versioned certificate verification', () => {
   };
   function service(record: unknown) {
     return new VerificationService({
-      getCertificateByCode: jest.fn<(...args: any[]) => Promise<any>>().mockResolvedValue(record),
+      getCertificateByCode: jest
+        .fn<(...args: any[]) => Promise<any>>()
+        .mockResolvedValue(record),
     } as any);
   }
   it('verifies the saved recipient and program rather than mutable profile or old relations', async () => {
@@ -37,6 +39,25 @@ describe('versioned certificate verification', () => {
     }).verifyCertificate(saved.verification_code);
     expect(result.status).toBe('INVALID');
     expect(result.verified).toBe(false);
+  });
+  it('verifies both editions under one code without exposing the metadata envelope', async () => {
+    const result = await service({
+      ...saved,
+      template_version: '2026.3',
+      certificate_language: 'ar',
+      description: JSON.stringify({
+        schema: 'tamkeenova.certificate/2026.3',
+        recipient_name_ar: 'ليلى أحمد',
+        recipient_name_en: 'Layla Ahmed',
+        signature_name: 'Ahmed Hassan',
+      }),
+    }).verifyCertificate(saved.verification_code);
+    expect(result.certificate.available_languages).toEqual(['ar', 'en']);
+    expect(result.certificate.recipient_name_ar).toBe('ليلى أحمد');
+    expect(result.certificate.recipient_name_en).toBe('Layla Ahmed');
+    expect(result.certificate.description).toBeNull();
+    expect(result.certificate).not.toHaveProperty('signature_name');
+    expect(result.certificate).not.toHaveProperty('partner_logos');
   });
   it('never verifies a non-issued preview code', async () => {
     await expect(

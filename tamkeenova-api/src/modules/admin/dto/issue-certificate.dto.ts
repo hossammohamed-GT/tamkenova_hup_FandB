@@ -32,8 +32,34 @@ export class CertificatePartnerLogoDto {
 
 // Fixed headings, descriptions and institutional signature remain uneditable.
 export class IssueCertificateDto {
+  @IsString()
+  @MaxLength(120)
+  @Matches(/\S/u)
+  recipient_name_ar: string;
+
+  @IsString()
+  @MaxLength(120)
+  @Matches(/\S/u)
+  recipient_name_en: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(180)
+  program_name_ar?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(180)
+  program_name_en?: string | null;
+
+  @IsString()
+  @MaxLength(80)
+  @Matches(/\S/u)
+  signature_name: string;
+
+  @IsOptional()
   @IsIn(['ar', 'en'])
-  certificate_language: 'ar' | 'en';
+  certificate_language?: 'ar' | 'en';
 
   @IsOptional()
   @IsArray()
@@ -48,10 +74,11 @@ export class IssueCertificateDto {
   @IsIn(['TRAINING', 'VOLUNTEER'])
   certificate_type: 'TRAINING' | 'VOLUNTEER';
 
+  @IsOptional()
   @IsString()
   @MaxLength(120)
   @Matches(/\S/u)
-  recipient_name: string;
+  recipient_name?: string;
 
   @IsOptional()
   @IsString()

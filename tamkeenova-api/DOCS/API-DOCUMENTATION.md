@@ -555,7 +555,7 @@ Authorization: Required
 
 ## 5. Certificates
 
-> Certificate issuance and artwork were rebuilt in version 2026.2. See the [current certificate contract](../../tamkeenova-hub_anguler/DOCS/CERTIFICATES.md). Historical response examples below may have legacy fields; new records additionally contain `recipient_name`, `program_name`, `template_version`, `certificate_type`, `certificate_language` and optional `partner_logos` snapshots. PDF/PNG and verification QR images are generated locally from fixed artwork, not uploaded.
+> Certificate studio **2026.3** issues Arabic and English editions together, with one shared signature name and bottom partner logos. See the [current contract](../../tamkeenova-hub_anguler/DOCS/CERTIFICATES.md). Both-language snapshots are stored in a versioned JSON envelope in the existing `description` field; authenticated certificate consumers must retain it for rendering. `VOLUNTEER` is still the backend enum but the frontend calls the role **Trainee** and its certificate **Experience certificate**. No new schema/role changes are introduced in this follow-up. Examples below may describe historical fields/editions.
 
 ### 5.1 My Certificates
 

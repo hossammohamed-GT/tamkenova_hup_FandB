@@ -1,3 +1,4 @@
+import { bilingualMetadata } from '../admin/certificate-data';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { VerificationRepository } from './verification.repository';
 
@@ -25,12 +26,17 @@ export class VerificationService {
         id: certificate.id,
         verification_code: certificate.verification_code,
         title: certificate.title,
+        title_ar: certificate.title_ar,
+        title_en: certificate.title_en,
         certificate_type: certificate.certificate_type,
         template_version: certificate.template_version,
         certificate_language: certificate.certificate_language,
         recipient_name: certificate.recipient_name,
         program_name: certificate.program_name,
-        description: certificate.description,
+        description: certificate.template_version === '2026.3' ? null : certificate.description,
+        available_languages: certificate.template_version === '2026.3' ? ['ar', 'en'] : [certificate.certificate_language].filter(Boolean),
+        recipient_name_ar: bilingualMetadata(certificate)?.recipient_name_ar ?? null,
+        recipient_name_en: bilingualMetadata(certificate)?.recipient_name_en ?? null,
         issued_at: certificate.issued_at,
         training_hours: certificate.training_hours,
         pdf_url: certificate.pdf_url,
@@ -108,7 +114,7 @@ export class VerificationService {
         id: c.id,
         verification_code: c.verification_code,
         title: c.title,
-        description: c.description,
+        description: c.template_version === '2026.3' ? null : c.description,
         issued_at: c.issued_at,
         training_hours: c.training_hours,
         pdf_url: c.pdf_url,

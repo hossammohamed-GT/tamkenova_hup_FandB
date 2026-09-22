@@ -36,7 +36,12 @@
           <h3 class="cert-title">{{ cert.title }}</h3>
           @if (cert.certificate_language) {
             <p class="text-muted">
-              {{ 'certificate_studio.language_' + cert.certificate_language | translate }}
+              {{
+                (cert.template_version === '2026.3'
+                  ? 'certificate_studio.both_languages'
+                  : 'certificate_studio.language_' + cert.certificate_language
+                ) | translate
+              }}
             </p>
           }
 
@@ -96,24 +101,28 @@
           }
           <div class="cert-actions">
             @if (canRender(cert) && cert.is_valid) {
-              <button
-                type="button"
-                class="btn-accent btn-sm"
-                [disabled]="!!downloadingId()"
-                (click)="downloadCertificate(cert, 'pdf')"
-              >
-                <i class="fa-solid fa-file-pdf"></i>
-                {{ 'certificate_studio.download_pdf' | translate }}
-              </button>
-              <button
-                type="button"
-                class="btn-outline btn-sm"
-                [disabled]="!!downloadingId()"
-                (click)="downloadCertificate(cert, 'png')"
-              >
-                <i class="fa-solid fa-download"></i>
-                {{ 'certificate_studio.download_png' | translate }}
-              </button>
+              @for (language of languagesFor(cert); track language) {
+                <button
+                  type="button"
+                  class="btn-accent btn-sm"
+                  [disabled]="!!downloadingId()"
+                  (click)="downloadCertificate(cert, 'pdf', language)"
+                >
+                  <i class="fa-solid fa-file-pdf"></i>
+                  {{ 'certificate_studio.download_pdf' | translate }} ·
+                  {{ 'certificate_studio.language_' + language | translate }}
+                </button>
+                <button
+                  type="button"
+                  class="btn-outline btn-sm"
+                  [disabled]="!!downloadingId()"
+                  (click)="downloadCertificate(cert, 'png', language)"
+                >
+                  <i class="fa-solid fa-download"></i>
+                  {{ 'certificate_studio.download_png' | translate }} ·
+                  {{ 'certificate_studio.language_' + language | translate }}
+                </button>
+              }
             }
             <a
               [routerLink]="['/verify']"

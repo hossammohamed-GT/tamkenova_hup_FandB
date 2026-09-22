@@ -7,6 +7,8 @@ import { StudentCertificate } from '../../../../core/models/student.model';
 import { CertificateRenderer } from '../../../../core/certificates/certificate-renderer.service';
 import {
   certificateValues,
+  certificateLanguages,
+  CertificateLanguage,
   canRenderCertificate,
   getCertificateTemplate,
 } from '../../../../core/certificates/certificate-template';
@@ -21,6 +23,7 @@ import {
 export class StudentCertificatesComponent {
   private studentService = inject(StudentService);
   private renderer = inject(CertificateRenderer);
+  readonly languagesFor = certificateLanguages;
   readonly canRender = canRenderCertificate;
   thumbnail(cert: StudentCertificate): string {
     return getCertificateTemplate(certificateValues(cert)).thumbnail;
@@ -48,12 +51,16 @@ export class StudentCertificatesComponent {
       },
     });
   }
-  async downloadCertificate(cert: StudentCertificate, format: 'png' | 'pdf'): Promise<void> {
+  async downloadCertificate(
+    cert: StudentCertificate,
+    format: 'png' | 'pdf',
+    language?: CertificateLanguage,
+  ): Promise<void> {
     if (this.downloadingId() || !cert.is_valid) return;
     this.downloadingId.set(cert.id);
     this.downloadError.set(null);
     try {
-      await this.renderer.download(certificateValues(cert), format);
+      await this.renderer.download(certificateValues(cert, language), format);
     } catch (error) {
       this.downloadError.set(
         error instanceof Error && error.message.startsWith('certificate_studio.')

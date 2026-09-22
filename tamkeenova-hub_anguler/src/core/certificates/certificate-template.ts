@@ -1,5 +1,5 @@
 export type TemplateType = 'TRAINING' | 'VOLUNTEER';
-export const TEMPLATE_VERSION = '2026.2';
+export const TEMPLATE_VERSION = '2026.3';
 export type CertificateLanguage = 'ar' | 'en';
 export const MAX_PARTNER_LOGOS = 4;
 export const MAX_PARTNER_DATA_LENGTH = 90000;
@@ -32,6 +32,8 @@ export interface CertificateTemplate {
   artwork: string;
   thumbnail: string;
   fields: {
+    signature?: FieldBox;
+    code?: FieldBox;
     partners?: Rectangle;
     recipient: FieldBox;
     program?: FieldBox;
@@ -76,73 +78,181 @@ const LEGACY_TEMPLATES: readonly CertificateTemplate[] = [
     fields: { ...shared },
   },
 ];
+const V2_TEMPLATES: readonly CertificateTemplate[] = (['TRAINING', 'VOLUNTEER'] as const).flatMap(
+  (type) =>
+    (['ar', 'en'] as const).map((language) => {
+      const training = type === 'TRAINING';
+      const stem = `/certificates/${type.toLowerCase()}-${language}-v2`;
+      const mirror = <T extends Rectangle>(box: T): T =>
+        language === 'ar' ? { ...box, x: ARTBOARD.width - box.x - box.width } : box;
+      return {
+        type,
+        language,
+        version: '2026.2',
+        artwork: `${stem}.png`,
+        partnerArtwork: `${stem}-partners.png`,
+        thumbnail: `${stem}-thumb.png`,
+        fields: {
+          recipient: mirror({
+            x: training ? 405 : 220,
+            y: 467,
+            width: training ? 1260 : 1360,
+            height: 120,
+            fontSize: 64,
+            minFontSize: 30,
+            lines: 2,
+          }),
+          ...(training
+            ? {
+                program: mirror({
+                  x: 425,
+                  y: 671,
+                  width: 1220,
+                  height: 105,
+                  fontSize: 40,
+                  minFontSize: 24,
+                  lines: 2,
+                }),
+              }
+            : {}),
+          hours: mirror({
+            x: training ? 435 : 305,
+            y: 887,
+            width: 240,
+            height: 70,
+            fontSize: 44,
+            minFontSize: 26,
+            lines: 1,
+          }),
+          date: mirror({
+            x: training ? 750 : 600,
+            y: 887,
+            width: 310,
+            height: 70,
+            fontSize: 33,
+            minFontSize: 25,
+            lines: 1,
+          }),
+          qr: mirror({ x: training ? 1465 : 1385, y: 868, width: 164, height: 164 }),
+          partners: mirror({ x: training ? 440 : 305, y: 1131, width: 1190, height: 82 }),
+        },
+      };
+    }),
+);
 export const CERTIFICATE_TEMPLATES: readonly CertificateTemplate[] = (
   ['TRAINING', 'VOLUNTEER'] as const
 ).flatMap((type) =>
   (['ar', 'en'] as const).map((language) => {
-    const training = type === 'TRAINING';
-    const stem = `/certificates/${type.toLowerCase()}-${language}-v2`;
+    const stem = `/certificates/${type === 'TRAINING' ? 'training' : 'experience'}-${language}-v3`;
     const mirror = <T extends Rectangle>(box: T): T =>
-      language === 'ar' ? { ...box, x: ARTBOARD.width - box.x - box.width } : box;
+      language === 'ar' ? { ...box, x: 1800 - box.x - box.width } : box;
     return {
       type,
       language,
       version: TEMPLATE_VERSION,
-      artwork: `${stem}.png`,
-      partnerArtwork: `${stem}-partners.png`,
-      thumbnail: `${stem}-thumb.png`,
+      artwork: `${stem}.jpg`,
+      partnerArtwork: `${stem}-partners.jpg`,
+      thumbnail: `${stem}-thumb.jpg`,
       fields: {
-        recipient: mirror({
-          x: training ? 405 : 220,
-          y: 467,
-          width: training ? 1260 : 1360,
-          height: 120,
-          fontSize: 64,
+        recipient: {
+          x: 340,
+          y: 470,
+          width: 1120,
+          height: 118,
+          fontSize: 74,
           minFontSize: 30,
           lines: 2,
-        }),
-        ...(training
+        },
+        ...(type === 'TRAINING'
           ? {
-              program: mirror({
-                x: 425,
-                y: 671,
-                width: 1220,
-                height: 105,
-                fontSize: 40,
-                minFontSize: 24,
+              program: {
+                x: 390,
+                y: 653,
+                width: 1020,
+                height: 90,
+                fontSize: 44,
+                minFontSize: 25,
                 lines: 2,
-              }),
+              },
             }
           : {}),
-        hours: mirror({
-          x: training ? 435 : 305,
-          y: 887,
-          width: 240,
-          height: 70,
-          fontSize: 44,
-          minFontSize: 26,
+        date: mirror({
+          x: 370,
+          y: 858,
+          width: 300,
+          height: 66,
+          fontSize: 31,
+          minFontSize: 23,
           lines: 1,
         }),
-        date: mirror({
-          x: training ? 750 : 600,
-          y: 887,
-          width: 310,
-          height: 70,
-          fontSize: 33,
+        hours: mirror({
+          x: 760,
+          y: 858,
+          width: 220,
+          height: 66,
+          fontSize: 36,
           minFontSize: 25,
           lines: 1,
         }),
-        qr: mirror({ x: training ? 1465 : 1385, y: 868, width: 164, height: 164 }),
-        partners: mirror({ x: training ? 440 : 305, y: 1131, width: 1190, height: 82 }),
+        code: mirror({
+          x: 1080,
+          y: 858,
+          width: 350,
+          height: 66,
+          fontSize: 23,
+          minFontSize: 16,
+          lines: 1,
+        }),
+        signature: {
+          x: 585,
+          y: 941,
+          width: 630,
+          height: 128,
+          fontSize: 88,
+          minFontSize: 36,
+          lines: 1,
+        },
+        qr: mirror({ x: 1240, y: 949, width: 142, height: 142 }),
+        partners: { x: 530, y: 1152, width: 740, height: 64 },
       },
     };
   }),
 );
+export interface BilingualCertificateData {
+  schema: 'tamkeenova.certificate/2026.3';
+  recipient_name_ar: string;
+  recipient_name_en: string;
+  program_name_ar: string | null;
+  program_name_en: string | null;
+  signature_name: string;
+}
+export function bilingualData(record: {
+  template_version?: string | null;
+  description?: string | null;
+}): BilingualCertificateData | null {
+  if (record.template_version !== TEMPLATE_VERSION) return null;
+  try {
+    const value = JSON.parse(record.description ?? '');
+    return value?.schema === 'tamkeenova.certificate/2026.3' &&
+      typeof value.recipient_name_ar === 'string' &&
+      typeof value.recipient_name_en === 'string' &&
+      typeof value.signature_name === 'string'
+      ? value
+      : null;
+  } catch {
+    return null;
+  }
+}
+export function certificateLanguages(record: RenderableCertificate): CertificateLanguage[] {
+  return record.template_version === TEMPLATE_VERSION
+    ? ['ar', 'en']
+    : [record.certificate_language ?? 'ar'];
+}
 export function getCertificateTemplate(
   value: Pick<CertificateValues, 'certificate_type' | 'certificate_language' | 'template_version'>,
 ): CertificateTemplate {
   const version = value.template_version ?? TEMPLATE_VERSION;
-  const template = [...CERTIFICATE_TEMPLATES, ...LEGACY_TEMPLATES].find(
+  const template = [...CERTIFICATE_TEMPLATES, ...V2_TEMPLATES, ...LEGACY_TEMPLATES].find(
     (t) =>
       t.version === version &&
       t.type === value.certificate_type &&
@@ -156,8 +266,9 @@ export function canRenderCertificate(record: RenderableCertificate): boolean {
     !!record.recipient_name &&
     ['TRAINING', 'VOLUNTEER'].includes(record.certificate_type ?? '') &&
     (record.template_version === '2026.1' ||
-      (record.template_version === TEMPLATE_VERSION &&
-        ['ar', 'en'].includes(record.certificate_language ?? '')))
+      (record.template_version === '2026.2' &&
+        ['ar', 'en'].includes(record.certificate_language ?? '')) ||
+      (record.template_version === TEMPLATE_VERSION && !!bilingualData(record)))
   );
 }
 export function partnerSlots(template: CertificateTemplate, count: number): Rectangle[] {
@@ -176,6 +287,7 @@ export function partnerSlots(template: CertificateTemplate, count: number): Rect
   }));
 }
 export interface CertificateValues {
+  signature_name?: string;
   template_version?: string;
   certificate_language?: CertificateLanguage | null;
   partner_logos?: PartnerLogo[];
@@ -187,6 +299,7 @@ export interface CertificateValues {
   verification_code: string;
 }
 export interface RenderableCertificate {
+  description?: string | null;
   certificate_language?: CertificateLanguage | null;
   partner_logos?: PartnerLogo[] | null;
   certificate_type?: string | null;
@@ -197,14 +310,31 @@ export interface RenderableCertificate {
   issued_at: string;
   verification_code: string;
 }
-export function certificateValues(record: RenderableCertificate): CertificateValues {
+export function certificateValues(
+  record: RenderableCertificate,
+  language?: CertificateLanguage,
+): CertificateValues {
   if (!canRenderCertificate(record)) throw new Error('certificate_studio.legacy');
+  const dual = bilingualData(record);
+  const selected = language ?? record.certificate_language ?? 'ar';
   return {
     ...record,
+    ...(dual
+      ? {
+          certificate_language: selected,
+          recipient_name: selected === 'ar' ? dual.recipient_name_ar : dual.recipient_name_en,
+          program_name: selected === 'ar' ? dual.program_name_ar : dual.program_name_en,
+          signature_name: dual.signature_name,
+        }
+      : {}),
     template_version: record.template_version!,
     partner_logos: record.template_version === '2026.1' ? [] : (record.partner_logos ?? []),
     certificate_type: record.certificate_type as TemplateType,
-    recipient_name: record.recipient_name!,
+    recipient_name: dual
+      ? selected === 'ar'
+        ? dual.recipient_name_ar
+        : dual.recipient_name_en
+      : record.recipient_name!,
     training_hours: record.training_hours ?? 0,
   };
 }
@@ -242,6 +372,7 @@ export function validateValues(value: CertificateValues): void {
   if (
     !template ||
     !validText(value.recipient_name, 120) ||
+    (template.version === TEMPLATE_VERSION && !validText(value.signature_name, 80)) ||
     (value.certificate_type === 'TRAINING' && !validText(value.program_name, 180)) ||
     (value.certificate_type === 'VOLUNTEER' && !!value.program_name) ||
     !Number.isInteger(value.training_hours) ||

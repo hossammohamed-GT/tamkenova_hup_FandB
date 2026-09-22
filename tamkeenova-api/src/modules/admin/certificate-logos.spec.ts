@@ -1,7 +1,7 @@
 import { PNG } from 'pngjs';
 import { ValidationPipe } from '@nestjs/common';
 import { certificateLogos } from './certificate-logos';
-import { certificateData } from './certificate-data';
+import { legacyCertificateData as certificateData } from './certificate-data';
 import { IssueCertificateDto } from './dto/issue-certificate.dto';
 import { UpdateCertificateDto } from './dto/update-certificate.dto';
 
@@ -12,6 +12,7 @@ function image(n = 1) {
 }
 const logo = { name: 'Partner One', data_url: image() };
 const input = {
+  recipient_name_ar: 'ليلى أحمد', recipient_name_en: 'Layla Ahmed', program_name_ar: 'القيادة', program_name_en: 'Leadership', signature_name: 'Ahmed Hassan',
   user_id: '550e8400-e29b-41d4-a716-446655440000',
   recipient_name: 'Layla Ahmed',
   certificate_type: 'TRAINING',

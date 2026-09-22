@@ -130,11 +130,16 @@ export interface AdminCertificate {
 }
 
 export interface IssueCertificatePayload {
-  certificate_language: CertificateLanguage;
+  recipient_name_ar: string;
+  recipient_name_en: string;
+  program_name_ar?: string | null;
+  program_name_en?: string | null;
+  signature_name: string;
+  certificate_language?: CertificateLanguage;
   partner_logos?: PartnerLogo[];
   user_id: string;
   certificate_type: 'TRAINING' | 'VOLUNTEER';
-  recipient_name: string;
+  recipient_name?: string;
   program_name?: string | null;
   training_hours: number;
   issued_at: string;

@@ -10,15 +10,15 @@
 
   <!-- -- Volunteer Sub Nav -- -->
   <nav class="staff-nav">
-    <a class="staff-nav-item is-active" routerLink="/portal/volunteer">
+    <a class="staff-nav-item is-active" routerLink="/portal/trainee">
       <i class="fa-solid fa-gauge-high"></i>
       <span>{{ 'volunteer_dashboard.nav_dashboard' | translate }}</span>
     </a>
-    <a class="staff-nav-item" routerLink="/portal/volunteer/tasks">
+    <a class="staff-nav-item" routerLink="/portal/trainee/tasks">
       <i class="fa-solid fa-list-check"></i>
       <span>{{ 'my_tasks.title' | translate }}</span>
     </a>
-    <a class="staff-nav-item" routerLink="/portal/volunteer/notifications">
+    <a class="staff-nav-item" routerLink="/portal/trainee/notifications">
       <i class="fa-solid fa-bell"></i>
       <span>{{ 'notifications.title' | translate }}</span>
     </a>
@@ -131,7 +131,7 @@
 
     <!-- -- Quick actions -- -->
     <div class="quick-row">
-      <a routerLink="/portal/volunteer/tasks" class="quick-card surface staff-fade">
+      <a routerLink="/portal/trainee/tasks" class="quick-card surface staff-fade">
         <span class="quick-icon" style="--stat-color: var(--color-primary)">
           <i class="fa-solid fa-list-check"></i>
         </span>
@@ -142,7 +142,7 @@
         <i class="fa-solid fa-arrow-left rtl-flip quick-arrow"></i>
       </a>
 
-      <a routerLink="/portal/volunteer/notifications" class="quick-card surface staff-fade">
+      <a routerLink="/portal/trainee/notifications" class="quick-card surface staff-fade">
         <span class="quick-icon" style="--stat-color: var(--color-accent)">
           <i class="fa-solid fa-bell"></i>
         </span>

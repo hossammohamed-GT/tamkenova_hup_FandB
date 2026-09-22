@@ -493,7 +493,7 @@ export class AdminService {
     await this.notifyUser(
       dto.user_id,
       'شهادة جديدة',
-      `تم إصدار شهادة "${data.title}" لك.`,
+      `تم إصدار شهادة "${data.title}" لك باللغتين العربية والإنجليزية.`,
       'CERTIFICATE_ISSUED',
       certificate.id,
       'CERTIFICATE',

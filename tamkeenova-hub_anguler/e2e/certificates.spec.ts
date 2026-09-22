@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import jsQR from 'jsqr';
+import jpeg from 'jpeg-js';
 import { PNG } from 'pngjs';
 import { test, expect } from '@playwright/test';
 import { CERTIFICATE_TEMPLATES } from '../src/core/certificates/certificate-template';
@@ -23,11 +24,46 @@ const record = {
   issued_at: '2026-09-21T00:00:00Z',
   certificate_type: 'TRAINING',
   verification_code: 'TAM-0123456789ABCDEF',
-  template_version: '2026.2',
+  template_version: '2026.3',
+  description: JSON.stringify({
+    schema: 'tamkeenova.certificate/2026.3',
+    recipient_name_ar: 'ليلى أحمد محمد',
+    recipient_name_en: user.full_name,
+    program_name_ar: 'القيادة والتطوير المهني',
+    program_name_en: 'Leadership & Professional Development',
+    signature_name: 'Ahmed Hassan',
+  }),
   certificate_language: 'en',
   partner_logos: [],
   is_valid: true,
 };
+
+function issuedRecord(payload: any) {
+  return {
+    ...record,
+    ...payload,
+    certificate_language: 'ar',
+    recipient_name: payload.recipient_name_ar,
+    program_name: payload.program_name_ar,
+    description: JSON.stringify({
+      schema: 'tamkeenova.certificate/2026.3',
+      recipient_name_ar: payload.recipient_name_ar,
+      recipient_name_en: payload.recipient_name_en,
+      program_name_ar: payload.program_name_ar,
+      program_name_en: payload.program_name_en,
+      signature_name: payload.signature_name,
+    }),
+  };
+}
+async function fillBilingual(page: import('@playwright/test').Page, training = true) {
+  await page.locator('#cert-recipient').fill('ليلى أحمد محمد');
+  await page.locator('#cert-recipient-en').fill(user.full_name);
+  await page.locator('#cert-signature').fill('Ahmed Hassan');
+  if (training) {
+    await page.locator('#cert-program').fill('القيادة والتطوير المهني');
+    await page.locator('#cert-program-en').fill(record.program_name);
+  }
+}
 
 test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => {
@@ -45,10 +81,10 @@ test.beforeEach(async ({ page }) => {
     if (path === '/api/admin/certificates')
       response =
         route.request().method() === 'POST'
-          ? { certificate: { ...record, ...route.request().postDataJSON() } }
+          ? { certificate: issuedRecord(route.request().postDataJSON()) }
           : { data: [record] };
     if (path.startsWith('/api/admin/certificates/'))
-      response = { certificate: { ...record, ...route.request().postDataJSON() } };
+      response = { certificate: issuedRecord(route.request().postDataJSON()) };
     if (path === '/api/partners/admin')
       response = Array.from({ length: 5 }, (_, i) => ({
         id: `550e8400-e29b-41d4-a716-44665544000${i + 1}`,
@@ -72,7 +108,7 @@ test('training preview changes only designated rectangles; issue, edit and PDF e
   await page.locator('[data-template=TRAINING-en]').click();
   await page.locator('.user-picker input').fill('Layla');
   await page.locator('.user-picker-item').click();
-  await page.locator('#cert-program').fill('Leadership & Professional Development');
+  await fillBilingual(page);
   await page.locator('#cert-hours').fill('32');
   await page.locator('#cert-date').fill('2026-09-21');
   await expect(page.locator('.studio-preview img')).toBeVisible();
@@ -82,7 +118,7 @@ test('training preview changes only designated rectangles; issue, edit and PDF e
   const differences = await page.locator('.studio-preview img').evaluate(async (element, boxes) => {
     const preview = element as HTMLImageElement;
     const background = new Image();
-    background.src = '/certificates/training-en-v2.png';
+    background.src = '/certificates/training-en-v3.jpg';
     await background.decode();
     const make = () => {
       const c = document.createElement('canvas');
@@ -128,10 +164,12 @@ test('training preview changes only designated rectangles; issue, edit and PDF e
   expect((await request).postDataJSON()).toEqual({
     user_id: user.id,
     certificate_type: 'TRAINING',
-    certificate_language: 'en',
     partner_logos: [],
-    recipient_name: user.full_name,
-    program_name: record.program_name,
+    recipient_name_ar: 'ليلى أحمد محمد',
+    recipient_name_en: user.full_name,
+    program_name_ar: 'القيادة والتطوير المهني',
+    program_name_en: record.program_name,
+    signature_name: 'Ahmed Hassan',
     training_hours: 32,
     issued_at: '2026-09-21',
   });
@@ -139,19 +177,44 @@ test('training preview changes only designated rectangles; issue, edit and PDF e
   const downloadEvent = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Download PDF' }).first().click();
   const download = await downloadEvent;
-  expect(download.suggestedFilename()).toBe('tamkeenova-training-en-TAM-0123456789ABCDEF.pdf');
+  expect(download.suggestedFilename()).toBe('tamkeenova-bilingual-TAM-0123456789ABCDEF.pdf');
   await download.saveAs(testInfo.outputPath('training.pdf'));
+  expect(readFileSync(testInfo.outputPath('training.pdf')).toString('latin1')).toMatch(
+    /\/Count 2\b/,
+  );
+
+  const pdfBytes = readFileSync(testInfo.outputPath('training.pdf'));
+  expect(pdfBytes.length).toBeLessThan(10 * 1024 * 1024);
+  // Decode the actual first JPEG embedded in the two-page PDF and verify its QR.
+  const start = pdfBytes.indexOf(Buffer.from([255, 216, 255]));
+  const end = pdfBytes.indexOf(Buffer.from([255, 217]), start) + 2;
+  expect(start).toBeGreaterThan(0);
+  const pdfImage = jpeg.decode(pdfBytes.subarray(start, end), { useTArray: true });
+  const qrBox = CERTIFICATE_TEMPLATES[0].fields.qr;
+  const qx = Math.floor((qrBox.x * pdfImage.width) / 1800),
+    qy = Math.floor((qrBox.y * pdfImage.height) / 1273);
+  const size = Math.ceil((qrBox.width * pdfImage.width) / 1800);
+  const qrPixels = new Uint8ClampedArray(size * size * 4);
+  for (let y = 0; y < size; y++)
+    for (let x = 0; x < size; x++) {
+      const offset = ((qy + y) * pdfImage.width + qx + x) * 4;
+      qrPixels.set(pdfImage.data.subarray(offset, offset + 4), (y * size + x) * 4);
+    }
+  expect(jsQR(qrPixels, size, size)?.data).toBe(
+    new URL('/verify?code=TAM-0123456789ABCDEF', page.url()).href,
+  );
 
   await page.locator('.cell-actions button[aria-label]').first().click();
+  await fillBilingual(page, false);
   await page.locator('#cert-recipient').fill('ليلى أحمد محمد عبد الرحمن');
   const patch = page.waitForRequest(
     (r) => r.method() === 'PATCH' && r.url().includes('/certificates/'),
   );
   await page.locator('.studio-actions button[type=submit]').click();
-  expect((await patch).postDataJSON().recipient_name).toBe('ليلى أحمد محمد عبد الرحمن');
+  expect((await patch).postDataJSON().recipient_name_ar).toBe('ليلى أحمد محمد عبد الرحمن');
 });
 
-test('volunteer artwork has no program editor and handles Arabic on mobile', async ({
+test('experience artwork has no program editor and handles Arabic on mobile', async ({
   page,
 }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -161,6 +224,7 @@ test('volunteer artwork has no program editor and handles Arabic on mobile', asy
   await page.locator('.user-picker input').fill('Layla');
   await page.locator('.user-picker-item').click();
   await page.locator('#cert-recipient').fill('ليلى أحمد محمد عبد الرحمن');
+  await fillBilingual(page, false);
   await page.locator('#cert-hours').fill('80');
   await expect(page.locator('.studio-preview img')).toBeVisible();
   await expect(page.locator('.studio-actions button[type=submit]')).toBeEnabled();
@@ -179,8 +243,9 @@ test('volunteer artwork has no program editor and handles Arabic on mobile', asy
   await page.locator('.studio-actions button[type=submit]').click();
   expect((await request).postDataJSON()).toMatchObject({
     certificate_type: 'VOLUNTEER',
-    certificate_language: 'ar',
-    program_name: null,
+    program_name_ar: null,
+    program_name_en: null,
+    signature_name: 'Ahmed Hassan',
     training_hours: 80,
   });
 });
@@ -191,7 +256,7 @@ test('recipient downloads use the same versioned artwork and PNG renderer', asyn
   await page.goto('/portal/certificates');
   await expect(page.locator('.certificate-artwork')).toBeVisible();
   const event = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Download PNG' }).click();
+  await page.getByRole('button', { name: 'Download PNG · English edition', exact: true }).click();
   const download = await event;
   expect(download.suggestedFilename()).toBe('tamkeenova-training-en-TAM-0123456789ABCDEF.png');
   const file = testInfo.outputPath('training.png');
@@ -239,17 +304,7 @@ for (const template of CERTIFICATE_TEMPLATES) {
     await page.locator(`[data-template=${template.type}-${template.language}]`).click();
     await page.locator('.user-picker input').fill('Layla');
     await page.locator('.user-picker-item').click();
-    await page
-      .locator('#cert-recipient')
-      .fill(template.language === 'ar' ? 'ليلى أحمد محمد' : 'Layla Ahmed Hassan');
-    if (template.type === 'TRAINING')
-      await page
-        .locator('#cert-program')
-        .fill(
-          template.language === 'ar'
-            ? 'القيادة والتطوير المهني'
-            : 'Leadership & Professional Development',
-        );
+    await fillBilingual(page, template.type === 'TRAINING');
     await page.locator('#cert-hours').fill('48');
     await page.locator('#cert-date').fill('2026-09-22');
     for (let i = 0; i < 4; i++) {
@@ -320,7 +375,10 @@ for (const template of CERTIFICATE_TEMPLATES) {
     );
     await page.locator('.studio-actions button[type=submit]').click();
     const payload = (await request).postDataJSON();
-    expect(payload.certificate_language).toBe(template.language);
+    expect(payload.recipient_name_ar).toBe('ليلى أحمد محمد');
+    expect(payload.recipient_name_en).toBe(user.full_name);
+    expect(payload.signature_name).toBe('Ahmed Hassan');
+    expect(payload.certificate_language).toBeUndefined();
     expect(payload.partner_logos).toHaveLength(4);
     expect(payload.partner_logos[0].source_id).toBe('550e8400-e29b-41d4-a716-446655440002');
     for (const logo of payload.partner_logos) {
@@ -383,7 +441,10 @@ test('the previous bilingual edition remains downloadable without adopting a new
     '/certificates/training-v1-thumb.png',
   );
   const event = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Download PNG' }).click();
+  await page
+    .getByRole('button', { name: /Download PNG/ })
+    .first()
+    .click();
   const download = await event;
   expect(download.suggestedFilename()).toBe('tamkeenova-training-TAM-0123456789ABCDEF.png');
   await download.saveAs(testInfo.outputPath('legacy.png'));
@@ -420,10 +481,13 @@ test('recipient Arabic exports contain persisted partner pixels without consulti
   await page.goto('/portal/certificates');
   await expect(page.locator('.certificate-artwork')).toHaveAttribute(
     'src',
-    '/certificates/training-ar-v2-thumb.png',
+    '/certificates/training-ar-v3-thumb.jpg',
   );
   const pngEvent = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Download PNG' }).click();
+  await page
+    .getByRole('button', { name: /Download PNG/ })
+    .first()
+    .click();
   const download = await pngEvent;
   expect(download.suggestedFilename()).toContain('-ar-');
   const file = testInfo.outputPath('persisted-arabic-partner.png');
@@ -435,9 +499,191 @@ test('recipient Arabic exports contain persisted partner pixels without consulti
   const index = (y * result.width + x) * 4;
   expect([...result.data.subarray(index, index + 4)]).toEqual([170, 20, 40, 255]);
   const event = page.waitForEvent('download');
-  await page.getByRole('button', { name: 'Download PDF' }).click();
+  await page
+    .getByRole('button', { name: /Download PDF/ })
+    .first()
+    .click();
   const pdf = await event;
   const pdfFile = testInfo.outputPath('persisted-arabic-partner.pdf');
   await pdf.saveAs(pdfFile);
   expect(readFileSync(pdfFile).subarray(0, 5).toString()).toBe('%PDF-');
+});
+
+test('one issue requires both editions and checks overflow in the non-preview language', async ({
+  page,
+}) => {
+  let issues = 0;
+  page.on('request', (request) => {
+    if (request.method() === 'POST' && request.url().endsWith('/admin/certificates')) issues++;
+  });
+  await page.goto('/portal/admin/certificates');
+  await page.locator('[data-template=TRAINING-ar]').click();
+  await page.locator('.user-picker input').fill('Layla');
+  await page.locator('.user-picker-item').click();
+  await fillBilingual(page);
+  await page.locator('#cert-hours').fill('24');
+  await page.locator('#cert-signature').fill('');
+  await page.locator('.studio-actions button[type=submit]').click();
+  await expect(page.locator('.studio-fields [role=alert]')).toBeVisible();
+  expect(issues).toBe(0);
+  await page.locator('#cert-signature').fill('Ahmed Hassan');
+  await page.locator('#cert-recipient-en').fill('W'.repeat(120));
+  await expect(page.locator('.studio-actions button[type=submit]')).toBeEnabled();
+  await page.locator('.studio-actions button[type=submit]').click();
+  await expect(page.locator('.studio-fields [role=alert]')).toContainText('too wide');
+  expect(issues).toBe(0);
+});
+
+test('one recipient record offers both PDF and PNG editions regardless of website language', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/portal/certificates');
+  await expect(page.locator('.cert-card')).toHaveCount(1);
+  for (const language of ['Arabic', 'English']) {
+    await expect(
+      page.getByRole('button', { name: `Download PDF · ${language} edition`, exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: `Download PNG · ${language} edition`, exact: true }),
+    ).toBeVisible();
+  }
+  const outputs = [];
+  for (const language of ['Arabic', 'English']) {
+    const event = page.waitForEvent('download');
+    await page
+      .getByRole('button', { name: `Download PNG · ${language} edition`, exact: true })
+      .click();
+    const download = await event;
+    const path = testInfo.outputPath(`recipient-${language}.png`);
+    await download.saveAs(path);
+    outputs.push(readFileSync(path));
+  }
+  expect(outputs[0].equals(outputs[1])).toBe(false);
+  await page.screenshot({
+    path: testInfo.outputPath('recipient-both-editions.png'),
+    fullPage: true,
+  });
+});
+
+test('trainee wording and canonical routes keep the existing backend role and endpoints', async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    localStorage.setItem(
+      'user',
+      JSON.stringify({ id: 'trainee', full_name: 'Test Trainee', role: 'VOLUNTEER' }),
+    ),
+  );
+  let statusRequests = 0;
+  await page.route('**/api/volunteers/me', (route) => {
+    statusRequests++;
+    return route.fulfill({ json: { status: 'APPROVED' } });
+  });
+  await page.route('**/api/tasks/dashboard', (route) =>
+    route.fulfill({
+      json: {
+        total_tasks: 0,
+        current_tasks: 0,
+        completed_tasks: 0,
+        delayed_tasks: 0,
+        average_completion: 0,
+        total_hours: 0,
+        average_score: 0,
+        on_time_rate: 0,
+        certificates_count: 1,
+        last_tasks: [],
+      },
+    }),
+  );
+  await page.goto('/portal/volunteer');
+  await expect(page).toHaveURL(/\/portal\/trainee$/);
+  await expect(page.locator('h1')).toContainText('Trainee');
+  await expect(page.locator('body')).not.toContainText(/volunteer/i);
+  expect(statusRequests).toBeGreaterThan(0);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('user')!).role)).toBe(
+    'VOLUNTEER',
+  );
+  await page.goto('/portal/certificates');
+  await expect(
+    page.getByRole('button', { name: 'Download PDF · Arabic edition', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Download PDF · English edition', exact: true }),
+  ).toBeVisible();
+});
+
+test('registration and admin trainee routes retain old deep-link compatibility', async ({
+  page,
+}) => {
+  await page.goto('/portal/admin/volunteers');
+  await expect(page).toHaveURL(/\/portal\/admin\/trainees$/);
+  await expect(page.locator('h1')).toContainText('Trainees');
+  await expect(page.locator('body')).not.toContainText(/volunteer/i);
+  await page.addInitScript(() => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  });
+  await page.goto('/register/volunteer');
+  await expect(page).toHaveURL(/\/register\/trainee$/);
+  await expect(page.locator('h1')).toContainText('Trainee');
+  await expect(page.locator('body')).not.toContainText(/volunteer/i);
+});
+
+test('Arabic signature lettering fits and an edited shared signature persists with both languages', async ({
+  page,
+}) => {
+  await page.goto('/portal/admin/certificates');
+  await page.locator('.cell-actions button[aria-label]').first().click();
+  await expect(page.locator('#cert-recipient')).toHaveValue('ليلى أحمد محمد');
+  await expect(page.locator('#cert-recipient-en')).toHaveValue(user.full_name);
+  await expect(page.locator('#cert-signature')).toHaveValue('Ahmed Hassan');
+  await page.locator('#cert-signature').fill('أحمد حسن');
+  await page.locator('[data-language=ar]').click();
+  await expect(page.locator('.studio-preview img')).toBeVisible();
+  await expect(page.locator('.studio-actions button[type=submit]')).toBeEnabled();
+  const ar = await page.locator('.studio-preview img').getAttribute('src');
+  await page.locator('[data-language=en]').click();
+  await expect(page.locator('.studio-actions button[type=submit]')).toBeEnabled();
+  await expect(page.locator('.studio-preview img')).not.toHaveAttribute('src', ar!);
+  const pending = page.waitForRequest(
+    (r) => r.method() === 'PATCH' && r.url().includes('/certificates/'),
+  );
+  await page.locator('.studio-actions button[type=submit]').click();
+  expect((await pending).postDataJSON()).toMatchObject({
+    signature_name: 'أحمد حسن',
+    recipient_name_ar: 'ليلى أحمد محمد',
+    recipient_name_en: user.full_name,
+  });
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.locator('.cell-actions button[aria-label]').first().click();
+  await expect(page.locator('#cert-signature')).toHaveValue('أحمد حسن');
+});
+
+test('the shared verification link displays both saved names without raw metadata', async ({
+  page,
+}) => {
+  await page.route('**/api/verify/certificate/*', (route) =>
+    route.fulfill({
+      json: {
+        verified: true,
+        status: 'VALID',
+        verified_at: '2026-09-22T00:00:00Z',
+        certificate: {
+          ...record,
+          description: null,
+          recipient_name_ar: 'ليلى أحمد محمد',
+          recipient_name_en: user.full_name,
+          title: 'القيادة والتطوير المهني',
+          title_en: record.program_name,
+          holder: { name: 'ليلى أحمد محمد', username: null, image: null },
+          program: null,
+          trainer: null,
+        },
+      },
+    }),
+  );
+  await page.goto('/verify?code=TAM-0123456789ABCDEF');
+  await expect(page.locator('.cert-result')).toContainText('ليلى أحمد محمد');
+  await expect(page.locator('.cert-result')).toContainText(user.full_name);
+  await expect(page.locator('.cert-result')).not.toContainText('tamkeenova.certificate/');
 });
