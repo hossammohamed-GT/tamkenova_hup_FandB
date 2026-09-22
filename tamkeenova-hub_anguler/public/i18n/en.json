@@ -1551,7 +1551,9 @@
     "inactive": "Hidden",
     "hide": "Hide",
     "show": "Show",
-    "load_error": "Could not load partners"
+    "load_error": "Could not load partners",
+    "check_fields": "Check the fields: both names and the logo (a valid https URL) are required",
+    "action_error": "Could not complete the action — check the data and try again"
   },
   "certificate_studio": {
     "TRAINING": "Training certificate",

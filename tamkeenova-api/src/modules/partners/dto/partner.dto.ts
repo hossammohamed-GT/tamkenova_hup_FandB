@@ -1,4 +1,5 @@
 import { IsBoolean, IsInt, IsOptional, IsString, IsUrl, MaxLength, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class PartnerDto {
   @IsString()
@@ -13,6 +14,7 @@ export class PartnerDto {
   logo_url: string;
 
   @IsOptional()
+  @Transform(({ value }) => (value === '' ? undefined : value))
   @IsUrl()
   website_url?: string;
 
@@ -42,6 +44,7 @@ export class UpdatePartnerDto {
   logo_url?: string;
 
   @IsOptional()
+  @Transform(({ value }) => (value === '' ? undefined : value))
   @IsUrl()
   website_url?: string;
 

@@ -1,5 +1,8 @@
 <section class="portal-page">
   <div class="portal-header"><div><h1>{{ 'admin_partners.title' | translate }}</h1><p class="text-muted">{{ 'admin_partners.subtitle' | translate }}</p></div><button class="btn-primary-sm" type="button" (click)="openCreate()">{{ 'admin_partners.add' | translate }}</button></div>
+  @if (actionErrorKey(); as errKey) {
+    <div class="form-error-banner" role="alert"><i class="fa-solid fa-triangle-exclamation"></i> <span>{{ errKey | translate }}</span>@for (detail of actionErrorDetails(); track detail) {<span class="banner-detail">{{ detail }}</span>}</div>
+  }
   <app-admin-nav />
   @if (showForm() || partners().length === 0) {
     <form class="partner-form surface" [formGroup]="form" (ngSubmit)="save()">
