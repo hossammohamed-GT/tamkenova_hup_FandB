@@ -1,103 +1,15 @@
-<div class="notfound-stage" #stage (mouseleave)="onMouseLeave()">
-  <!-- -- Star Field -- -->
-  <div class="star-field" aria-hidden="true">
-    @for (star of stars; track $index) {
-      <span
-        class="star"
-        [style.top.%]="star.top"
-        [style.left.%]="star.left"
-        [style.width.px]="star.size"
-        [style.height.px]="star.size"
-        [style.animation-delay.s]="star.delay"
-        [style.animation-duration.s]="star.duration"
-      ></span>
-    }
-  </div>
-
-  <!-- -- Background Orbs -- -->
-  <div class="orb-field" aria-hidden="true">
-    @for (orb of orbs; track $index) {
-      <div
-        class="orb-parallax"
-        [style.top.%]="orb.top"
-        [style.left.%]="orb.left"
-        [style.--depth]="orb.depth"
-      >
-        <div
-          class="orb orb-{{ orb.variant }}"
-          [style.width.px]="orb.size"
-          [style.height.px]="orb.size"
-          [style.animation-duration.s]="orb.duration"
-        ></div>
-      </div>
-    }
-  </div>
-
-  <!-- -- Fragment Effect -- -->
-  <div class="fragment-field" aria-hidden="true">
-    @for (frag of fragments; track $index) {
-      <div
-        class="fragment-parallax"
-        [style.top.%]="frag.top"
-        [style.left.%]="frag.left"
-        [style.--depth]="frag.depth"
-      >
-        <div
-          class="fragment-float"
-          [style.width.px]="frag.width"
-          [style.height.px]="frag.height"
-          [style.animation-duration.s]="frag.duration"
-          [style.animation-delay.s]="frag.delay"
-          [style.--rotate.deg]="frag.rotate"
-        ></div>
-      </div>
-    }
-  </div>
-
-  <!-- -- Scan Effect -- -->
-  <div class="scan-overlay" aria-hidden="true"></div>
-
-  <!-- -- Brand Mark -- -->
-  <div class="broken-mark" aria-hidden="true">
-    <svg class="broken-mark-svg" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
-      <path
-        class="mark-piece mark-piece-left"
-        d="M4,250 L4,4 L38,4 L38,250 Z"
-      ></path>
-      <path
-        class="mark-piece mark-piece-top"
-        d="M4,4 L252,4 L252,38 L4,38 Z"
-      ></path>
-      <path
-        class="mark-piece mark-piece-right"
-        d="M218,4 L252,4 L252,250 L218,250 Z"
-      ></path>
-      <path
-        class="mark-piece mark-piece-t-bar"
-        d="M71,82 L185,82 L185,114 L71,114 Z"
-      ></path>
-      <path
-        class="mark-piece mark-piece-t-stem"
-        d="M110,114 L144,114 L144,248 L110,248 Z"
-      ></path>
-    </svg>
-  </div>
-
-  <!-- -- Page Content -- -->
-  <div class="notfound-content">
-    <div class="glitch-number" [attr.data-text]="'404'">404</div>
-
+<div class="notfound">
+  <div class="notfound-card">
+    <span class="notfound-code numeric" aria-hidden="true">404</span>
     <h1 class="notfound-title">{{ 'notfound.title' | translate }}</h1>
     <p class="notfound-subtitle">{{ 'notfound.subtitle' | translate }}</p>
-
     <div class="notfound-actions">
-      <a routerLink="/" class="notfound-cta">
+      <a routerLink="/" class="btn-primary">
         <i class="fa-solid fa-house"></i>
         {{ 'notfound.cta_home' | translate }}
       </a>
-      <a routerLink="/programs" class="notfound-secondary">
+      <a routerLink="/programs" class="btn-secondary">
         {{ 'notfound.cta_programs' | translate }}
-        <i class="fa-solid fa-arrow-left rtl-flip"></i>
       </a>
     </div>
   </div>

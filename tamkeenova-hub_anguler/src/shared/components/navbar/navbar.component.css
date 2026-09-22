@@ -103,12 +103,12 @@ html[dir='rtl'] .brand-word-sub {
   inset-inline-start: 0;
   bottom: -2px;
   width: 100%;
-  height: 3px;
-  background: var(--color-accent);
-  clip-path: polygon(0 0, 100% 0, 88% 100%, 12% 100%);
+  height: 2px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-text);
   transform: scaleX(0);
   transform-origin: inset-inline-start;
-  transition: transform var(--transition-base);
+  transition: transform var(--duration-base) var(--ease-standard);
 }
 
 .navbar-link:hover {
@@ -447,7 +447,7 @@ html[dir='rtl'] .mobile-link-icon {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
   border-radius: 999px;
 }

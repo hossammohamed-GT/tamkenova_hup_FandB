@@ -84,12 +84,6 @@
   border-radius: 50%;
   background: var(--color-success);
   border: 2px solid var(--color-surface);
-  animation: avail-pulse 2s infinite;
-}
-
-@keyframes avail-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-success) 40%, transparent); }
-  50% { box-shadow: 0 0 0 6px transparent; }
 }
 
 /* Body */
@@ -110,9 +104,9 @@
 }
 
 .trainer-card-spec {
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   font-weight: 600;
-  color: var(--color-accent);
+  color: var(--color-accent-text);
 }
 
 .trainer-card-bio {

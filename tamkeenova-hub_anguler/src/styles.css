@@ -1,58 +1,168 @@
-:root {
-  --color-text: #101e27;
-  --color-text-muted: #5b6b74;
-  --color-border: #e1e6ea;
-  --color-surface-alt: #eef1f4;
-  --color-surface: #ffffff;
-  --color-background: #f6f7f9;
+/* ==========================================================================
+   TamkeeNova HUB — Design System v2
+   Single source of truth for tokens. Component styles must consume these
+   tokens instead of inventing values. Legacy variable names are preserved
+   as aliases so existing components keep working.
+   ========================================================================== */
 
+/* -- 1. Primitive + semantic tokens -------------------------------------- */
+:root {
+  /* Brand (unchanged identity) */
+  --color-primary: #004265;
+  --color-primary-hover: #01597f;
   --color-accent: #be8a3f;
   --color-accent-hover: #a8783a;
 
-  --color-primary: #004265;
-  --color-primary-hover: #01597f;
+  /* Text-safe action colors: pass 4.5:1 on surfaces in each theme.
+     Use these (not raw primary/accent) for text, icons and borders. */
+  --color-action: #004265;
+  --color-action-hover: #01597f;
+  --color-accent-text: #7d5c1e;
 
+  /* Text tiers */
+  --color-text: #101e27;            /* primary */
+  --color-text-muted: #5b6b74;      /* secondary */
+  --color-text-tertiary: #8595a0;   /* tertiary / placeholder-ish */
+
+  /* Surfaces, tiered by elevation */
+  --color-surface-0: #f6f7f9;       /* page */
+  --color-surface-1: #ffffff;       /* cards */
+  --color-surface-2: #eef1f4;       /* sunken / alt */
+  --color-surface-3: #e4e9ee;       /* hover wells, code blocks */
+  --color-background: var(--color-surface-0);
+  --color-surface: var(--color-surface-1);
+  --color-surface-alt: var(--color-surface-2);
+
+  /* Borders */
+  --color-border: #e1e6ea;          /* subtle */
+  --color-border-strong: #c9d2d9;   /* strong / inputs */
+
+  /* Status (bg + border + text triplets, designed per theme) */
   --color-danger: #c1554a;
   --color-success: #3e8e6b;
+  --color-warning: #9a6b1f;
+  --color-info: #2563a8;
+  --status-success-bg: #e9f4ee;
+  --status-warning-bg: #f8f0dd;
+  --status-danger-bg: #f9e9e6;
+  --status-info-bg: #e7f0f9;
 
-  --font-family-en: 'Inter', 'Segoe UI', sans-serif;
-  --font-family-ar: 'Cairo', 'Tajawal', sans-serif;
+  /* Focus */
+  --focus-ring: 0 0 0 3px rgba(0, 66, 101, 0.22);
 
+  /* Typography: one family stack per script, one numeric face */
+  --font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-arabic: 'Cairo', 'Tajawal', sans-serif;
+  --font-display: 'Tajawal', 'Cairo', sans-serif;
+  --font-numeric: 'Space Grotesk', 'Inter', sans-serif;
+  /* legacy aliases */
+  --font-family-en: var(--font-sans);
+  --font-family-ar: var(--font-arabic);
+  --font-display-ar: var(--font-display);
+  --font-body-ar: var(--font-arabic);
+
+  /* Type scale (size / line-height). Use these steps only. */
+  --text-xs: 0.75rem;    --leading-xs: 1.5;
+  --text-sm: 0.85rem;    --leading-sm: 1.55;
+  --text-md: 0.95rem;    --leading-md: 1.6;
+  --text-lg: 1.1rem;     --leading-lg: 1.6;
+  --text-xl: 1.35rem;    --leading-xl: 1.35;
+  --text-2xl: 1.75rem;   --leading-2xl: 1.3;
+  --text-3xl: 2.25rem;   --leading-3xl: 1.25;
+  --text-4xl: 3rem;      --leading-4xl: 1.2;
+
+  /* Spacing scale (4-based) */
+  --space-1: 0.25rem;   /* 4 */
+  --space-2: 0.5rem;    /* 8 */
+  --space-3: 0.75rem;   /* 12 */
+  --space-4: 1rem;      /* 16 */
+  --space-6: 1.5rem;    /* 24 */
+  --space-8: 2rem;      /* 32 */
+  --space-12: 3rem;     /* 48 */
+  --space-16: 4rem;     /* 64 */
+  --space-24: 6rem;     /* 96 */
+
+  /* Radius */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 999px;
 
+  /* Elevation: 3 meaningful levels */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
 
-  --transition-fast: 150ms ease;
-  --transition-base: 250ms ease;
-  --transition-slow: 400ms ease;
+  /* Motion: one family. fast = hover/focus, base = panels, slow = page. */
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  /* legacy aliases */
+  --transition-fast: var(--duration-fast) ease;
+  --transition-base: var(--duration-base) ease;
+  --transition-slow: var(--duration-slow) ease;
+
+  /* Z-index scale */
+  --z-base: 1;
+  --z-sticky: 100;
+  --z-dropdown: 200;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-loader: 600;
+
+  /* Layout */
+  --layout-max: 1200px;
+  --layout-narrow: 760px;
+  --layout-gutter: clamp(1.25rem, 6vw, 4rem);
+  --nav-clearance: 7rem;
+
+  /* Form */
+  --input-height: 44px;
 }
 
+/* -- 2. Dark theme: designed, not inverted -------------------------------- */
 [data-theme='dark'] {
   --color-text: #ecedee;
-  --color-text-muted: #9a9da1;
+  --color-text-muted: #a7abad;
+  --color-text-tertiary: #7e8287;
+
+  --color-surface-0: #1e1f22;
+  --color-surface-1: #26282b;
+  --color-surface-2: #303235;
+  --color-surface-3: #3a3d40;
+
   --color-border: #3a3d40;
-  --color-surface-alt: #303235;
-  --color-surface: #26282b;
-  --color-background: #1e1f22;
+  --color-border-strong: #4c5054;
 
-  --color-accent: #c17b4e;
-  --color-accent-hover: #d18f63;
-
+  /* Primary stays deep navy ONLY for filled buttons (white text on it
+     passes contrast). Interactive text/icons use the lightened ramp. */
   --color-primary: #004265;
   --color-primary-hover: #01597f;
+  --color-action: #6fb3d8;
+  --color-action-hover: #8fc6e4;
+  --color-accent: #c8975a;
+  --color-accent-hover: #d8a35f;
+  --color-accent-text: #d8a35f;
 
-  --color-danger: #c1594e;
-  --color-success: #4f9e71;
+  --color-danger: #d8736a;
+  --color-success: #5fae7f;
+  --color-warning: #d3a054;
+  --color-info: #6aa5dd;
+  --status-success-bg: rgba(95, 174, 127, 0.14);
+  --status-warning-bg: rgba(211, 160, 84, 0.14);
+  --status-danger-bg: rgba(216, 115, 106, 0.14);
+  --status-info-bg: rgba(106, 165, 221, 0.14);
+
+  --focus-ring: 0 0 0 3px rgba(111, 179, 216, 0.35);
 
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
   --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.45);
 }
 
+/* -- 3. Base --------------------------------------------------------------- */
 * {
   margin: 0;
   padding: 0;
@@ -67,10 +177,9 @@ body {
 body {
   background-color: var(--color-background);
   color: var(--color-text);
-  font-family: var(--font-family-en);
-  transition:
-    background-color var(--transition-base),
-    color var(--transition-base);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: var(--leading-md);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -79,98 +188,469 @@ a {
   text-decoration: none;
 }
 
+::selection {
+  background: var(--color-primary);
+  color: #fff;
+}
+
 html[dir='rtl'] body {
-  font-family: var(--font-family-ar);
-}
-
-html[dir='ltr'] body {
-  font-family: var(--font-family-en);
-}
-
-.card,
-.btn,
-.input {
-  transition:
-    background-color var(--transition-base),
-    border-color var(--transition-base),
-    color var(--transition-base);
-}
-
-.surface {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-}
-
-.surface-alt {
-  background-color: var(--color-surface-alt);
-}
-
-.text-muted {
-  color: var(--color-text-muted);
-}
-
-.btn-primary {
-  background-color: var(--color-primary);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-sm);
-  transition: background-color var(--transition-fast);
-}
-.btn-primary:hover {
-  background-color: var(--color-primary-hover);
-}
-
-.btn-accent {
-  background-color: var(--color-accent);
-  color: #fff;
-  border: none;
-  border-radius: var(--radius-sm);
-  transition: background-color var(--transition-fast);
-}
-.btn-accent:hover {
-  background-color: var(--color-accent-hover);
-}
-
-.text-danger {
-  color: var(--color-danger);
-}
-.text-success {
-  color: var(--color-success);
-}
-
-:root {
-  --font-display-ar: 'Tajawal', sans-serif;
-  --font-body-ar: 'Cairo', sans-serif;
-  --font-numeric: 'Space Grotesk', sans-serif;
-
-  --chamfer: 18px;
+  font-family: var(--font-arabic);
 }
 
 html[dir='rtl'] h1,
 html[dir='rtl'] h2,
 html[dir='rtl'] h3,
 html[dir='rtl'] .display {
-  font-family: var(--font-display-ar);
+  font-family: var(--font-display);
 }
 
-html[dir='rtl'] body {
-  font-family: var(--font-body-ar);
+img {
+  max-width: 100%;
 }
 
+/* -- 4. Focus visibility (one system, everywhere) --------------------------- */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: var(--radius-sm);
+}
+
+/* Skip link for keyboard users */
+.skip-link {
+  position: fixed;
+  top: -100px;
+  inset-inline-start: var(--space-4);
+  z-index: var(--z-loader);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  transition: top var(--duration-fast) var(--ease-standard);
+}
+
+.skip-link:focus-visible {
+  top: var(--space-4);
+  box-shadow: none;
+}
+
+/* -- 5. Type utilities ------------------------------------------------------ */
+.text-xs { font-size: var(--text-xs); line-height: var(--leading-xs); }
+.text-sm { font-size: var(--text-sm); line-height: var(--leading-sm); }
+.text-md { font-size: var(--text-md); line-height: var(--leading-md); }
+.text-lg { font-size: var(--text-lg); line-height: var(--leading-lg); }
+.text-muted { color: var(--color-text-muted); }
+.text-tertiary { color: var(--color-text-tertiary); }
+.text-danger { color: var(--color-danger); }
+.text-success { color: var(--color-success); }
+.numeric { font-family: var(--font-numeric); font-variant-numeric: tabular-nums; }
+
+/* -- 6. Layout primitives ---------------------------------------------------- */
+.container {
+  width: 100%;
+  max-width: var(--layout-max);
+  margin-inline: auto;
+  padding-inline: var(--layout-gutter);
+}
+
+.container-narrow {
+  width: 100%;
+  max-width: var(--layout-narrow);
+  margin-inline: auto;
+  padding-inline: var(--layout-gutter);
+}
+
+.section {
+  padding-block: var(--space-16);
+}
+
+.section-sm {
+  padding-block: var(--space-12);
+}
+
+/* -- 7. Buttons: one system ---------------------------------------------------
+   .btn + variant + optional size. Legacy .btn-primary/.btn-accent keep
+   working and now include sensible defaults (padding, height, weight). */
+.btn,
+.btn-primary,
+.btn-accent,
+.btn-secondary,
+.btn-ghost,
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-6);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-family: inherit;
+  line-height: 1;
+  cursor: pointer;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) var(--ease-standard),
+    border-color var(--duration-fast) var(--ease-standard),
+    color var(--duration-fast) var(--ease-standard),
+    opacity var(--duration-fast) var(--ease-standard);
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.btn-accent {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+.btn-accent:hover {
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+.btn-secondary {
+  background-color: var(--color-surface-1);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+.btn-secondary:hover {
+  border-color: var(--color-action);
+  color: var(--color-action);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--color-action);
+  min-height: 40px;
+  padding: 0 var(--space-3);
+}
+.btn-ghost:hover {
+  background-color: var(--color-surface-2);
+}
+
+.btn-danger {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+  color: #fff;
+}
+.btn-danger:hover {
+  filter: brightness(0.94);
+}
+
+.btn-sm {
+  min-height: 36px;
+  padding: 0 var(--space-4);
+  font-size: var(--text-xs);
+}
+
+.btn-lg {
+  min-height: 52px;
+  padding: 0 var(--space-8);
+  font-size: var(--text-md);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-primary:disabled,
+.btn-accent:disabled,
+.btn-secondary:disabled,
+.btn-ghost:disabled,
+.btn-danger:disabled,
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* -- 8. Badges: one status language ------------------------------------------ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  line-height: 1.5;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.badge-success { background: var(--status-success-bg); color: var(--color-success); border-color: var(--color-success); }
+.badge-warning { background: var(--status-warning-bg); color: var(--color-warning); border-color: var(--color-warning); }
+.badge-danger { background: var(--status-danger-bg); color: var(--color-danger); border-color: var(--color-danger); }
+.badge-info { background: var(--status-info-bg); color: var(--color-info); border-color: var(--color-info); }
+.badge-neutral { background: var(--color-surface-2); color: var(--color-text-muted); border-color: var(--color-border); }
+
+.badge-count {
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding-inline: 0.3rem;
+  justify-content: center;
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* -- 9. Cards: one architecture -----------------------------------------------
+   .surface = legacy base (kept). New semantic variants below define intent:
+   data (read-only records), action (clickable), dashboard (KPIs),
+   profile (identity), summary (totals/receipts). All solid, all calm. */
+.surface {
+  background-color: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.surface-alt {
+  background-color: var(--color-surface-2);
+}
+
+.card,
+.card-data,
+.card-action,
+.card-dashboard,
+.card-profile,
+.card-summary {
+  background-color: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+}
+
+.card-data {
+  padding: var(--space-4) var(--space-6);
+}
+
+a.card-action,
+button.card-action {
+  display: block;
+  width: 100%;
+  text-align: start;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-base) var(--ease-standard);
+}
+
+a.card-action:hover,
+button.card-action:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.card-dashboard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-6);
+}
+
+.card-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.card-summary {
+  background-color: var(--color-surface-2);
+}
+
+.card-title {
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.card-subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+.card-divider {
+  height: 1px;
+  background: var(--color-border);
+  margin-block: var(--space-4);
+  border: none;
+}
+
+/* -- 10. Inputs: one base (components align heights to --input-height) -------- */
+.input,
+.select,
+.textarea {
+  width: 100%;
+  min-height: var(--input-height);
+  padding: 0 var(--space-4);
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-1);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-family: inherit;
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
+}
+
+.textarea {
+  padding: var(--space-3) var(--space-4);
+  min-height: 120px;
+  resize: vertical;
+  line-height: var(--leading-md);
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--color-action);
+  box-shadow: var(--focus-ring);
+}
+
+.input[aria-invalid='true'],
+.field-input[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.field-hint-text {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.field-error-text {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+/* -- 11. Modal / skeleton / state language ------------------------------------ */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background: rgba(16, 30, 39, 0.55);
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-8);
+}
+
+.skeleton {
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-3);
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.state-block {
+  text-align: center;
+  padding: var(--space-12) var(--space-6);
+  color: var(--color-text-muted);
+}
+
+.state-block-icon {
+  font-size: var(--text-2xl);
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--space-4);
+}
+
+.state-block-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+/* -- 12. Legacy compat shims ---------------------------------------------------
+   Chamfer clip-paths are retired as a brand device: the classes now resolve
+   to the standard radius scale so existing templates render calm, correct
+   cards with zero HTML churn. */
+.chamfer-lg {
+  border-radius: var(--radius-lg);
+}
+
+.chamfer-sm {
+  border-radius: var(--radius-md);
+}
+
+.marquee-track {
+  animation: marquee-scroll 32s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+html[dir='rtl'] .marquee-track {
+  animation-direction: reverse;
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* Scroll reveal: subtle, single-frame, opacity-only when view-timeline
+   is available. Content is never hidden without animation support. */
 @supports (animation-timeline: view()) {
   [appScrollReveal] {
     animation: scroll-reveal linear both;
     animation-timeline: view();
     animation-range: entry 0% entry 55%;
-    will-change: opacity, transform;
   }
 }
 
 @keyframes scroll-reveal {
   from {
     opacity: 0;
-    transform: translateY(28px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -178,45 +658,32 @@ html[dir='rtl'] body {
   }
 }
 
-.marquee-track {
-  animation: marquee-scroll 32s linear infinite;
-}
-html[dir='rtl'] .marquee-track {
-  animation-direction: reverse;
-}
-@keyframes marquee-scroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-.chamfer-lg {
-  clip-path: polygon(6% 0%, 94% 0%, 100% 12%, 100% 100%, 0% 100%, 0% 12%);
-}
-.chamfer-sm {
-  clip-path: polygon(0 0, calc(100% - var(--chamfer)) 0, 100% var(--chamfer), 100% 100%, 0 100%);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [appScrollReveal] {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-  .marquee-track {
-    animation: none;
-  }
-  .contact::before,
-  .contact-whatsapp-cta {
-    animation: none;
-  }
-}
 .rtl-flip {
   transform: scaleX(-1);
 }
+
 html[dir='rtl'] .rtl-flip {
   transform: scaleX(1);
+}
+
+/* -- 13. Reduced motion: comprehensive ---------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [appScrollReveal] {
+    opacity: 1;
+    transform: none;
+  }
+
+  .marquee-track,
+  .gmarquee-track {
+    animation: none;
+  }
 }

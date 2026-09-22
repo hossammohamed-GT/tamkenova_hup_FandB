@@ -2,18 +2,13 @@
   min-height: 100vh;
   padding: 8rem 6vw 3rem;
   background-color: var(--color-background);
-  background-image:
-    radial-gradient(circle at 10% 20%, color-mix(in srgb, var(--color-primary) 5%, transparent) 0%, transparent 40%),
-    radial-gradient(circle at 90% 60%, color-mix(in srgb, var(--color-accent) 6%, transparent) 0%, transparent 45%);
 }
 
 .profile-hero,
 .profile-section,
 .profile-tabs {
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent) !important;
-  backdrop-filter: blur(18px) saturate(150%);
-  -webkit-backdrop-filter: blur(18px) saturate(150%);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent) !important;
+  background: var(--color-surface-1) !important;
+  border: 1px solid var(--color-border) !important;
   box-shadow: 0 8px 32px rgba(0,0,0,0.05);
 }
 

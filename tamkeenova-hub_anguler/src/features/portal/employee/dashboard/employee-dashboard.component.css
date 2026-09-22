@@ -23,7 +23,7 @@
   gap: 0.75rem;
   padding: 1.5rem 2rem;
   border-radius: var(--radius-md);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  border: 1px solid var(--color-border);
 }
 
 .gauge-title {
@@ -70,7 +70,7 @@
   gap: 0.9rem;
   padding: 1.1rem 1.2rem;
   border-radius: var(--radius-md);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  border: 1px solid var(--color-border);
   transition: border-color var(--transition-fast), box-shadow var(--transition-base);
 }
 

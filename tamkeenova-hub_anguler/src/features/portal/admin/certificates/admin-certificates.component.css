@@ -28,7 +28,7 @@
   padding: 0.35rem 0.7rem;
   border-radius: var(--radius-sm);
   border: 1px dashed var(--color-border);
-  background: color-mix(in srgb, var(--color-surface-alt) 55%, transparent);
+  background: var(--color-surface-2);
   color: var(--color-text);
   font-size: 0.76rem;
   font-weight: 700;

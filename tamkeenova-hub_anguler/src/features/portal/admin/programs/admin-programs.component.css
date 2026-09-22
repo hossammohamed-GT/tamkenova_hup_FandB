@@ -45,7 +45,7 @@
   height: 40px;
   border-radius: var(--radius-sm);
   object-fit: cover;
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  border: 1px solid var(--color-border);
 }
 
 .program-thumb-placeholder {

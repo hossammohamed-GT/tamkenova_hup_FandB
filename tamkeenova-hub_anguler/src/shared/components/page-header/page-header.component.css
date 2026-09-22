@@ -12,7 +12,7 @@
 
 .page-header-eyebrow {
   display: inline-block;
-  color: var(--color-accent);
+  color: var(--color-accent-text);
   font-weight: 600;
   font-size: 0.9rem;
   margin-block-end: 1rem;

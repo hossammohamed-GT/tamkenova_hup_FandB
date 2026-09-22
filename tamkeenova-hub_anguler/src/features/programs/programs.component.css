@@ -44,10 +44,6 @@
   border-color: color-mix(in srgb, var(--color-accent) 22%, transparent);
 }
 
-.hero-shape-3 {
-  display: none;
-}
-
 .programs-hero-content {
   position: relative;
   z-index: 1;

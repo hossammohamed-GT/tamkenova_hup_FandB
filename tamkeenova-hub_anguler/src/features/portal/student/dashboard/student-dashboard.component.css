@@ -2,9 +2,6 @@
   min-height: 100vh;
   padding: 8rem 6vw 3rem;
   background-color: var(--color-background);
-  background-image:
-    radial-gradient(circle at 15% 20%, color-mix(in srgb, var(--color-primary) 6%, transparent) 0%, transparent 40%),
-    radial-gradient(circle at 85% 70%, color-mix(in srgb, var(--color-accent) 7%, transparent) 0%, transparent 45%);
 }
 
 .dashboard-loader {
@@ -22,28 +19,14 @@
   position: relative;
   overflow: hidden;
   padding: 2.2rem;
-  background: color-mix(in srgb, var(--color-surface) 78%, transparent);
-  backdrop-filter: blur(22px) saturate(160%);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
   box-shadow: 0 12px 40px rgba(0,0,0,0.06);
   margin-bottom: 2.2rem;
-  animation: hero-enter 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-@keyframes hero-enter {
-  from { opacity: 0; transform: translateY(20px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .dashboard-hero-bg {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--color-accent) 18%, transparent), transparent 55%),
-    radial-gradient(circle at 10% 90%, color-mix(in srgb, var(--color-primary) 16%, transparent), transparent 55%),
-    linear-gradient(135deg, color-mix(in srgb, var(--color-surface) 40%, transparent) 0%, transparent 100%);
-  pointer-events: none;
+  display: none;
 }
 
 .dashboard-hero-content {
@@ -65,14 +48,12 @@
   height: 92px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid color-mix(in srgb, var(--color-surface) 90%, transparent);
+  border: 3px solid var(--color-surface-1);
   box-shadow: 0 8px 24px rgba(0,0,0,0.12);
   transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.dashboard-hero:hover .dashboard-hero-avatar img {
-  transform: scale(1.04);
-}
+
 
 .dashboard-hero-avatar-placeholder {
   display: flex;
@@ -98,12 +79,6 @@
   font-size: 0.85rem;
   border: 3px solid var(--color-surface);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-accent) 30%, transparent);
-  animation: badge-pulse 2.5s infinite;
-}
-
-@keyframes badge-pulse {
-  0%,100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
 }
 
 .dashboard-hero-info {
@@ -119,20 +94,13 @@
   gap: 0.4rem;
 }
 
-.dashboard-hero-greeting::before {
-  content: '👋';
-  font-size: 1rem;
-}
+
 
 .dashboard-hero-name {
   font-size: 1.85rem;
   font-weight: 800;
   color: var(--color-text);
   margin: 0.2rem 0;
-  background: linear-gradient(135deg, var(--color-text) 0%, var(--color-primary) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .dashboard-hero-subtitle {
@@ -147,10 +115,9 @@
   gap: 1.4rem;
   flex-wrap: wrap;
   padding: 1rem 1.2rem;
-  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
-  backdrop-filter: blur(12px);
+  background: var(--color-surface-1);
   border-radius: var(--radius-lg);
-  border: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+  border: 1px solid var(--color-border);
 }
 
 .hero-stat {
@@ -224,9 +191,8 @@
   gap: 0.9rem;
   padding: 1.2rem 1.35rem;
   transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
-  backdrop-filter: blur(14px) saturate(140%);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
   opacity: 0;
   transform: translateY(12px);
   animation: action-enter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
@@ -316,9 +282,8 @@ html[dir='ltr'] .quick-action-card:hover .quick-action-arrow {
   flex-direction: column;
   padding: 1.6rem;
   transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
-  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
-  backdrop-filter: blur(14px) saturate(140%);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
   opacity: 0;
   transform: translateY(14px);
   animation: card-enter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
@@ -437,9 +402,8 @@ html[dir='ltr'] .section-card:hover .section-card-footer i {
 
 .recent-card {
   padding: 1.6rem;
-  background: color-mix(in srgb, var(--color-surface) 84%, transparent);
-  backdrop-filter: blur(14px) saturate(140%);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
   animation: recent-enter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s backwards;
 }
 
@@ -491,7 +455,7 @@ html[dir='ltr'] .section-card:hover .section-card-footer i {
 }
 
 .recent-item:hover {
-  background: color-mix(in srgb, var(--color-surface-alt) 60%, transparent);
+  background: var(--color-surface-2);
   padding-inline: 0.6rem;
   border-radius: var(--radius-sm);
   margin-inline: -0.6rem;

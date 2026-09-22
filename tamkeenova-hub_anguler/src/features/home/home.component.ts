@@ -35,9 +35,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     '/images/hero/hero2.jpg',
     '/images/hero/hero3.jpg',
     '/images/hero/hero4.jpg',
-    '/images/hero/hero5.jpg',
-    '/images/hero/hero6.jpg',
-    '/images/hero/hero7.jpg',
   ];
   activeHeroIndex = signal(0);
   private heroTimer?: ReturnType<typeof setInterval>;

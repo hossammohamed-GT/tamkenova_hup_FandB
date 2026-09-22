@@ -100,7 +100,7 @@
   },
   "assistant": {
     "name": "TamkeeNova Assistant",
-    "badge": "Gemini Powered",
+    "badge": "Beta",
     "welcome": "Hi there! I'm the TamkeeNova assistant. Ask me about programs, services, or anything on the platform.",
     "placeholder": "Type your question...",
     "open": "Open AI assistant",

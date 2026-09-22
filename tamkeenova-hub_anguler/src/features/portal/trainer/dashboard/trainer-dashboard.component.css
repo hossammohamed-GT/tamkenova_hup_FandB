@@ -3,9 +3,6 @@
   min-height: 100vh;
   padding: 8rem 6vw 4rem;
   background: var(--color-background);
-  background-image:
-    radial-gradient(circle at 20% 15%, color-mix(in srgb, var(--color-primary) 6%, transparent) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, color-mix(in srgb, var(--color-accent) 7%, transparent) 0%, transparent 45%);
 }
 
 .dashboard-loader {
@@ -35,35 +32,19 @@
   padding: 2.6rem 2.2rem;
   margin-bottom: 2.2rem;
   overflow: hidden;
-  background: color-mix(in srgb, var(--color-surface) 78%, transparent);
-  backdrop-filter: blur(22px) saturate(160%);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
   box-shadow: 0 12px 40px rgba(0,0,0,0.06);
-  animation: hero-enter 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .glass-hero {
-  background: color-mix(in srgb, var(--color-surface) 78%, transparent) !important;
-  backdrop-filter: blur(22px) saturate(160%);
-  -webkit-backdrop-filter: blur(22px) saturate(160%);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent) !important;
+  background: var(--color-surface-1) !important;
+  border: 1px solid var(--color-border) !important;
   box-shadow: 0 12px 40px rgba(0,0,0,0.06);
 }
 
-@keyframes hero-enter {
-  from { opacity: 0; transform: translateY(20px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
 .dashboard-hero-bg {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 20% 50%, color-mix(in srgb, var(--color-primary) 14%, transparent), transparent 50%),
-    radial-gradient(circle at 80% 80%, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 50%);
-  opacity: 0.7;
-  pointer-events: none;
+  display: none;
 }
 
 .dashboard-hero-content {
@@ -88,7 +69,7 @@
   width: 108px;
   height: 108px;
   border-radius: 50%;
-  border: 4px solid color-mix(in srgb, var(--color-surface) 90%, transparent);
+  border: 4px solid var(--color-surface-1);
   box-shadow: 0 8px 24px rgba(0,0,0,0.15);
   overflow: hidden;
   background: var(--color-surface-alt);
@@ -129,12 +110,6 @@
   font-size: 0.95rem;
   border: 3px solid var(--color-surface);
   box-shadow: 0 4px 12px color-mix(in srgb, var(--color-accent) 30%, transparent);
-  animation: badge-pulse 2.5s infinite;
-}
-
-@keyframes badge-pulse {
-  0%,100% { transform: scale(1); }
-  50% { transform: scale(1.08); }
 }
 
 .dashboard-hero-info {
@@ -157,10 +132,6 @@
   color: var(--color-text);
   margin-bottom: 0.35rem;
   line-height: 1.2;
-  background: linear-gradient(135deg, var(--color-text) 0%, var(--color-primary) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .dashboard-hero-subtitle {
@@ -173,17 +144,14 @@
   align-items: center;
   gap: 1.4rem;
   padding: 1.1rem 1.5rem;
-  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: var(--color-surface-1);
   border-radius: var(--radius-lg);
-  border: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+  border: 1px solid var(--color-border);
 }
 
 .glass-stats {
-  background: color-mix(in srgb, var(--color-surface) 70%, transparent) !important;
-  backdrop-filter: blur(12px);
-  border: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
+  background: var(--color-surface-1) !important;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
 }
 
@@ -245,17 +213,14 @@
   padding: 1.8rem 2rem;
   border-radius: var(--radius-md);
   margin-bottom: 2.2rem;
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
   animation: card-enter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s backwards;
 }
 
 .glass-completion {
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent) !important;
-  backdrop-filter: blur(16px);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent) !important;
+  background: var(--color-surface-1) !important;
+  border: 1px solid var(--color-border) !important;
 }
 
 .completion-header {
@@ -364,9 +329,8 @@
   border-radius: var(--radius-md);
   text-decoration: none;
   overflow: hidden;
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
-  backdrop-filter: blur(14px) saturate(140%);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
   transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   opacity: 0;
   transform: translateY(12px);
@@ -374,9 +338,8 @@
 }
 
 .glass-action {
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent) !important;
-  backdrop-filter: blur(14px) saturate(140%);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent) !important;
+  background: var(--color-surface-1) !important;
+  border: 1px solid var(--color-border) !important;
 }
 
 .quick-action-card:nth-child(1) { animation-delay: 0.1s; }
@@ -473,9 +436,8 @@ html[dir='ltr'] .quick-action-card:hover .quick-action-arrow {
   border-radius: var(--radius-md);
   text-decoration: none;
   overflow: hidden;
-  background: color-mix(in srgb, var(--color-surface) 82%, transparent);
-  backdrop-filter: blur(14px) saturate(140%);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
   transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   opacity: 0;
   transform: translateY(14px);
@@ -483,9 +445,8 @@ html[dir='ltr'] .quick-action-card:hover .quick-action-arrow {
 }
 
 .glass-section-card {
-  background: color-mix(in srgb, var(--color-surface) 82%, transparent) !important;
-  backdrop-filter: blur(14px) saturate(140%);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent) !important;
+  background: var(--color-surface-1) !important;
+  border: 1px solid var(--color-border) !important;
 }
 
 @keyframes card-enter {
@@ -658,10 +619,8 @@ html[dir='ltr'] .section-card:hover .section-card-footer i {
   padding: 2.2rem;
   border-radius: 20px;
   margin-bottom: 2.5rem;
-  background: color-mix(in srgb, var(--color-surface) 85%, transparent) !important;
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent) !important;
+  background: var(--color-surface-1) !important;
+  border: 1px solid var(--color-border) !important;
   box-shadow: 0 16px 48px rgba(0,0,0,0.08), 0 0 0 1px color-mix(in srgb, var(--color-primary) 8%, transparent) inset;
   display: block !important;
   opacity: 1 !important;
@@ -844,9 +803,6 @@ html[dir='ltr'] .section-card:hover .section-card-footer i {
   color: var(--color-text);
   line-height: 1;
   background: linear-gradient(135deg, var(--color-text), var(--color-primary));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .progress-label {
@@ -928,7 +884,7 @@ html[dir='ltr'] .section-card:hover .section-card-footer i {
   align-items: center;
   gap: 0.75rem;
   padding: 0.85rem 1rem;
-  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  background: var(--color-surface-1);
   border: 1.5px solid var(--color-border);
   border-radius: 12px;
   text-decoration: none;

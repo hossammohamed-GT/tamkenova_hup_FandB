@@ -99,7 +99,7 @@
   font-size: 0.85rem;
   line-height: 1.7;
   color: var(--color-text-muted);
-  background: color-mix(in srgb, var(--color-surface-alt) 60%, transparent);
+  background: var(--color-surface-2);
   border-radius: var(--radius-sm);
   padding: 0.75rem 0.9rem;
 }
