@@ -1,3 +1,4 @@
+import type { CertificateLanguage, PartnerLogo } from '../certificates/certificate-template';
 // -- Admin Module Models (mirrors Tamkeenova Admin API) --
 
 import { TaskAssignee, Task } from './tasks.model';
@@ -98,17 +99,28 @@ export interface AdminVolunteer {
 }
 
 export interface AdminCertificate {
+  certificate_language?: CertificateLanguage | null;
+  partner_logos?: PartnerLogo[] | null;
+  student_id: string;
+  recipient_name?: string | null;
+  program_name?: string | null;
+  template_version?: string | null;
   id: string;
   user_id: string;
   trainer_id: string | null;
   program_id: string | null;
   title: string;
+  title_ar?: string | null;
+  title_en?: string | null;
   description: string | null;
+  description_ar?: string | null;
+  description_en?: string | null;
   training_hours: number | null;
   certificate_type: CertificateType | null;
   certificate_url: string | null;
   verification_code: string;
   qr_code_url: string | null;
+  partner_ids?: string[] | null;
   is_valid: boolean;
   issued_at: string;
   created_at: string;
@@ -118,13 +130,19 @@ export interface AdminCertificate {
 }
 
 export interface IssueCertificatePayload {
+  recipient_name_ar: string;
+  recipient_name_en: string;
+  program_name_ar?: string | null;
+  program_name_en?: string | null;
+  signature_name: string;
+  certificate_language?: CertificateLanguage;
+  partner_logos?: PartnerLogo[];
   user_id: string;
-  title: string;
-  description?: string;
-  training_hours?: number;
-  certificate_type?: CertificateType;
-  trainer_id?: string;
-  program_id?: string;
+  certificate_type: 'TRAINING' | 'VOLUNTEER';
+  recipient_name?: string;
+  program_name?: string | null;
+  training_hours: number;
+  issued_at: string;
 }
 
 export interface AdminCorporateRequest {
@@ -172,11 +190,14 @@ export interface SpecializationSuggestion {
 export interface AdminProgram {
   id: string;
   title: string;
+  title_ar?: string | null;
+  title_en?: string | null;
   description: string | null;
   price: string | number | null;
   duration_hours: number | null;
   level?: string | null;
   image_url: string | null;
+  is_active?: boolean;
   is_hidden?: boolean;
   is_published?: boolean;
   status?: string | null;
@@ -201,6 +222,7 @@ export interface AdminDashboardStats {
   pending_corporate_requests_count: number;
   certificates_count: number;
   tasks_count: number;
+  partners_count: number;
 }
 
 export interface AdminTask extends Task {

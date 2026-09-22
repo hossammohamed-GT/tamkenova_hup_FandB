@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 
 import { TrainersRepository } from './trainers.repository';
 
@@ -16,8 +20,11 @@ import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
 
 import { CreateReviewDto } from './dto/create-review.dto';
 import { StorageService } from '../storage/storage.service';
+import { assertSafeImage } from '../../common/security/file-upload';
+import { randomInt } from 'crypto';
 
 import { Multer } from 'multer';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class TrainersService {
@@ -26,6 +33,7 @@ export class TrainersService {
   constructor(
     private readonly trainersRepository: TrainersRepository,
     private readonly storageService: StorageService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
 
@@ -103,7 +111,7 @@ export class TrainersService {
     const slug =
       dto.title.toLowerCase().replace(/\s+/g, '-') +
       '-' +
-      Math.floor(Math.random() * 100000);
+      randomInt(100000, 1000000);
 
     return this.trainersRepository.createProgram({
       trainer_id: trainer.id,
@@ -125,6 +133,22 @@ export class TrainersService {
       duration_hours: dto.duration_hours || 0,
 
       level: dto.level || 'BEGINNER',
+      // Programs stay hidden until an administrator reviews them.
+      is_active: false,
+    }).then(async (program) => {
+      try {
+        const admins = await this.notificationsService.getAdminUsers();
+        await this.notificationsService.createBulkNotifications(admins.map((admin) => admin.id), {
+          title: 'New program awaiting review',
+          message: `${dto.title} was submitted by a trainer and is waiting for approval.`,
+          type: 'PROGRAM_SUBMITTED',
+          reference_id: program.id,
+          reference_type: 'PROGRAM',
+        });
+      } catch {
+        // A notification outage must not make a successfully saved program look failed.
+      }
+      return program;
     });
   }
 
@@ -391,27 +415,108 @@ export class TrainersService {
 
 
 
-  // Handle create review
+  // Handle create review (upsert: rating again updates the existing review)
   async createReview(userId: string, trainerId: string, dto: CreateReviewDto) {
+    const user = await this.trainersRepository.findUserById(userId);
+
+    if (!user || (user.role !== 'STUDENT' && user.role !== 'CLIENT')) {
+      throw new ForbiddenException('Only students can rate trainers');
+    }
+
     const trainer = await this.trainersRepository.findTrainerById(trainerId);
 
-    if (!trainer) {
+    if (!trainer || trainer.trainer_status !== 'APPROVED') {
       throw new BadRequestException('Trainer not found');
     }
 
-    await this.trainersRepository.createReview({
-      trainer_id: trainerId,
-      student_id: userId,
-      rating: dto.rating,
-      comment: dto.comment,
-    });
+    if (trainer.user_id === userId) {
+      throw new BadRequestException('You cannot rate your own profile');
+    }
 
-    await this.trainersRepository.updateTrainerRating(trainerId);
+    const existing =
+      await this.trainersRepository.findReviewByTrainerAndStudent(
+        trainerId,
+        userId,
+      );
 
-    return {
-      success: true,
-      message: 'Review added successfully',
-    };
+    if (existing) {
+      const data: { rating: number; comment?: string } = {
+        rating: dto.rating,
+      };
+
+      // Star-only re-rates from cards must not wipe an existing written comment.
+      if (dto.comment !== undefined && dto.comment.trim() !== '') {
+        data.comment = dto.comment;
+      }
+
+      const review = await this.trainersRepository.updateReview(
+        existing.id,
+        data,
+      );
+      const stats = await this.trainersRepository.updateTrainerRating(trainerId);
+
+      return {
+        success: true,
+        message: 'Review updated successfully',
+        updated: true,
+
+        data: {
+          review,
+          ...stats,
+        },
+      };
+    }
+
+    try {
+      const review = await this.trainersRepository.createReview({
+        trainer_id: trainerId,
+        student_id: userId,
+        rating: dto.rating,
+        comment: dto.comment,
+      });
+      const stats = await this.trainersRepository.updateTrainerRating(trainerId);
+
+      return {
+        success: true,
+        message: 'Review added successfully',
+        updated: false,
+
+        data: {
+          review,
+          ...stats,
+        },
+      };
+    } catch (e) {
+      // Concurrent double-submit raced past the existence check — treat as update.
+      if ((e as { code?: string })?.code === 'P2002') {
+        const raced =
+          await this.trainersRepository.findReviewByTrainerAndStudent(
+            trainerId,
+            userId,
+          );
+
+        if (raced) {
+          const review = await this.trainersRepository.updateReview(raced.id, {
+            rating: dto.rating,
+          });
+          const stats =
+            await this.trainersRepository.updateTrainerRating(trainerId);
+
+          return {
+            success: true,
+            message: 'Review updated successfully',
+            updated: true,
+
+            data: {
+              review,
+              ...stats,
+            },
+          };
+        }
+      }
+
+      throw e;
+    }
   }
 
 
@@ -447,11 +552,12 @@ export class TrainersService {
       throw new BadRequestException('Trainer not found');
     }
 
+    const mime = assertSafeImage(file);
     const uploaded = await this.storageService.uploadFile(
       'profile-images',
       file.originalname,
       file.buffer,
-      file.mimetype,
+      mime,
     );
 
     await this.trainersRepository.updateUserProfileImage(userId, uploaded.url);

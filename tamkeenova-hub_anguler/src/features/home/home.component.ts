@@ -1,6 +1,8 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { PartnersService } from '../../core/services/partners.service';
+import { StrategicPartner } from '../../core/models/partner.model';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 // import { TrainersShowcaseComponent } from '../trainers-showcase/trainers-showcase.component';
 import { TrainersShowcaseComponent } from './trainers-showcase/trainers-showcase.component';
@@ -27,22 +29,20 @@ interface PartnerSlot {
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  private partnersService = inject(PartnersService);
   heroImages = [
-    '/images/hero/hero1.jpg',
-    '/images/hero/hero2.jpg',
-    '/images/hero/hero3.jpg',
-    '/images/hero/hero4.jpg',
-    '/images/hero/hero5.jpg',
-    '/images/hero/hero6.jpg',
-    '/images/hero/hero7.jpg',
+    '/images/gallery/gallery-01.jpg',
+    '/images/gallery/gallery-13.jpg',
+    '/images/gallery/gallery-14.jpg',
+    '/images/gallery/gallery-15.jpg',
   ];
   activeHeroIndex = signal(0);
   private heroTimer?: ReturnType<typeof setInterval>;
 
   galleryImages: string[] = [
-    '/images/events/hero1.jpg',
-    '/images/events/hero2.jpg',
-    '/images/events/hero3.jpg',
+    '/images/gallery/gallery-16.jpg',
+    '/images/gallery/gallery-17.jpg',
+    '/images/gallery/gallery-21.jpg',
   ];
 
   stats = [
@@ -77,13 +77,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     },
   ];
 
-  partnersImages: string[] = [
-    '/images/partners/partners1.png',
-    '/images/partners/partners2.png',
-    '/images/partners/partners3.png',
-    '/images/partners/partners4.png',
-    '/images/partners/partners5.png',
-  ];
+  partnersImages: string[] = [];
+  partners = signal<StrategicPartner[]>([]);
 
   private readonly slotsCount = 5;
   private readonly staggerMs = 220;
@@ -139,7 +134,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       }, 5000);
     }
 
-    this.initPartnersWave();
+    this.partnersService.listPublic().subscribe({
+      next: (partners) => {
+        this.partners.set(partners ?? []);
+        this.partnersImages = (partners ?? []).map((partner) => partner.logo_url);
+        this.initPartnersWave();
+      },
+      error: () => this.initPartnersWave(),
+    });
   }
 
   ngOnDestroy(): void {
@@ -148,7 +150,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private initPartnersWave(): void {
-    const initial = this.partnersImages.slice(0, this.slotsCount);
+    const count = Math.min(this.slotsCount, this.partnersImages.length);
+    if (!count) { this.slots.set([]); return; }
+    // Warm the browser cache for every logo so slides never run on empty imgs.
+    if (typeof window !== 'undefined') {
+      for (const src of this.partnersImages) {
+        const warm = new Image();
+        warm.src = src;
+      }
+    }
+    const initial = this.partnersImages.slice(0, count);
     this.slotPointers = initial.map((_, i) => i);
     this.slots.set(
       initial.map((img) => ({ currentImg: img, nextImg: img, sliding: false, resetting: false })),
@@ -165,7 +176,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private scheduleNextWave(): void {
-    const waveDuration = (this.slotsCount - 1) * this.staggerMs + this.slideDurationMs;
+    const waveDuration = (this.slotPointers.length - 1) * this.staggerMs + this.slideDurationMs;
     const totalDelay = waveDuration + this.wavePauseMs;
 
     const t = setTimeout(() => {
@@ -176,26 +187,58 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private runWave(): void {
-    for (let i = 0; i < this.slotsCount; i++) {
+    for (let i = 0; i < this.slotPointers.length; i++) {
       const t = setTimeout(() => this.startSlide(i), i * this.staggerMs);
       this.partnerTimers.push(t);
     }
   }
 
   private startSlide(idx: number): void {
-    const current = this.slots();
-    const nextImg = this.pickNextLogo(idx);
+    this.trySlide(idx, 0);
+  }
 
-    const updated = [...current];
-    updated[idx] = { ...updated[idx], nextImg, sliding: true };
-    this.slots.set(updated);
+  // Slide only between decoded images: sliding an unloaded logo makes it pop
+  // in statically after the motion instead of riding it. Broken/slow URLs are
+  // skipped past so one bad logo never freezes a slot; the pointer advances
+  // only onto the logo that actually slides (no silent skips on overlap).
+  private trySlide(idx: number, attempts: number): void {
+    const slots = this.slots();
+    const total = this.partnersImages.length;
+    if (!slots[idx] || slots[idx].sliding || !total || attempts >= total) return;
+    const ptr = (this.slotPointers[idx] + 1) % total;
+    const candidate = this.partnersImages[ptr];
 
-    const t = setTimeout(() => this.finishSlide(idx), this.slideDurationMs);
-    this.partnerTimers.push(t);
+    const go = () => {
+      const live = this.slots();
+      if (!live[idx] || live[idx].sliding) return;
+      this.slotPointers[idx] = ptr;
+      const updated = [...live];
+      updated[idx] = { ...updated[idx], nextImg: candidate, sliding: true };
+      this.slots.set(updated);
+      const t = setTimeout(() => this.finishSlide(idx), this.slideDurationMs);
+      this.partnerTimers.push(t);
+    };
+    const skip = () => {
+      this.slotPointers[idx] = ptr;
+      this.trySlide(idx, attempts + 1);
+    };
+
+    if (typeof window === 'undefined') { go(); return; }
+    let settled = false;
+    const timer = setTimeout(() => { if (!settled) { settled = true; skip(); } }, 2000);
+    this.partnerTimers.push(timer);
+    const probe = new Image();
+    probe.onload = () => { if (!settled) { settled = true; clearTimeout(timer); go(); } };
+    probe.onerror = () => { if (!settled) { settled = true; clearTimeout(timer); skip(); } };
+    probe.src = candidate;
+    if (probe.complete) {
+      if (!settled) { settled = true; clearTimeout(timer); if (probe.naturalWidth) go(); else skip(); }
+    }
   }
 
   private finishSlide(idx: number): void {
     const s = this.slots();
+    if (!s[idx]) return;
     const updated = [...s];
     updated[idx] = {
       currentImg: updated[idx].nextImg,

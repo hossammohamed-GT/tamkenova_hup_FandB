@@ -33,10 +33,12 @@ export class TrainerCardComponent {
     () => this.trainer().specializations?.name_ar ?? this.trainer().specializations?.name_en ?? '',
   );
 
-  rating = computed(() =>
-    this.trainer().average_rating ? parseFloat(this.trainer().average_rating) : 0,
-  );
-  ratingsCount = computed(() => this.trainer().ratings_count ?? 0);
+  rating = computed(() => {
+    const override = this.averageOverride();
+    if (override !== null) return override;
+    return this.trainer().average_rating ? parseFloat(this.trainer().average_rating) : 0;
+  });
+  ratingsCount = computed(() => this.countOverride() ?? this.trainer().ratings_count ?? 0);
   experienceYears = computed(() => this.trainer().years_of_experience ?? 0);
   studentsCount = computed(() => this.trainer().total_students ?? 0);
   programsCount = computed(() => this.trainer()._count?.training_programs ?? 0);
@@ -64,8 +66,12 @@ export class TrainerCardComponent {
   userRating = signal(0);
   isRating = signal(false);
   ratingSuccess = signal(false);
+  ratingSuccessMsg = signal('student_trainers.rating_success');
   ratingError = signal<string | null>(null);
   showRatingHint = signal(false);
+  averageOverride = signal<number | null>(null);
+  countOverride = signal<number | null>(null);
+  private ratingMsgTimer: ReturnType<typeof setTimeout> | null = null;
 
   isStudent = this.authService.isStudent;
   isLoggedIn = this.authService.isLoggedIn;
@@ -110,30 +116,60 @@ export class TrainerCardComponent {
   onStarClick(star: number, event: Event): void {
     event.stopPropagation();
     event.preventDefault();
-    if (!this.interactiveRating() || !this.isLoggedIn() || !this.isStudent()) return;
-    if (this.isRating()) return;
+    if (!this.interactiveRating() || this.isRating()) return;
+
+    // Never fail silently: guests and non-students get a visible message under the card.
+    if (!this.isLoggedIn()) {
+      this.flashRatingError('student_trainers.login_to_rate');
+      return;
+    }
+    if (!this.isStudent()) {
+      this.flashRatingError('student_trainers.only_students');
+      return;
+    }
 
     this.isRating.set(true);
     this.ratingError.set(null);
+    this.ratingSuccess.set(false);
 
     this.trainerService.createReview(this.trainer().id, { rating: star, comment: '' }).subscribe({
-      next: () => {
+      next: (res) => {
         this.userRating.set(star);
+        this.ratingSuccessMsg.set(
+          res.updated ? 'student_trainers.rating_updated' : 'student_trainers.rating_success',
+        );
+        if (res.data) {
+          this.averageOverride.set(Number(res.data.average_rating) || 0);
+          this.countOverride.set(Number(res.data.ratings_count) || 0);
+        }
         this.ratingSuccess.set(true);
         this.isRating.set(false);
         this.rated.emit({ trainerId: this.trainer().id, rating: star });
-        setTimeout(() => this.ratingSuccess.set(false), 2500);
+        this.clearRatingMsgLater(() => this.ratingSuccess.set(false), 2500);
       },
       error: (err) => {
         this.isRating.set(false);
         if (err?.status === 409) {
-          this.ratingError.set('student_trainers.already_rated');
+          this.flashRatingError('student_trainers.already_rated');
         } else {
-          this.ratingError.set(apiErrorKey(err, 'auth.errors.generic'));
+          this.flashRatingError(apiErrorKey(err, 'auth.errors.generic'));
         }
-        setTimeout(() => this.ratingError.set(null), 3000);
       },
     });
+  }
+
+  private flashRatingError(key: string): void {
+    this.ratingSuccess.set(false);
+    this.ratingError.set(key);
+    this.clearRatingMsgLater(() => this.ratingError.set(null), 3500);
+  }
+
+  private clearRatingMsgLater(clear: () => void, ms: number): void {
+    if (this.ratingMsgTimer) clearTimeout(this.ratingMsgTimer);
+    this.ratingMsgTimer = setTimeout(() => {
+      this.ratingMsgTimer = null;
+      clear();
+    }, ms);
   }
 
   onBookClick(event: Event): void {

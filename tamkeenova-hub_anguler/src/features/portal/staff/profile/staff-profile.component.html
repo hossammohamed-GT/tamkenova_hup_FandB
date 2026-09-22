@@ -1,0 +1,184 @@
+<section class="portal-page">
+  <div class="portal-header">
+    <div>
+      <h1>{{ 'staff_profile.title' | translate }}</h1>
+      <p class="text-muted">{{ 'staff_profile.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <nav class="staff-nav">
+    <a class="staff-nav-item" [routerLink]="[basePath()]" routerLinkActive="is-active"
+      [routerLinkActiveOptions]="{ exact: true }">
+      <i class="fa-solid fa-gauge-high"></i>
+      <span>{{ navDashboardKey() | translate }}</span>
+    </a>
+    <a class="staff-nav-item" [routerLink]="[basePath() + '/tasks']" routerLinkActive="is-active">
+      <i class="fa-solid fa-list-check"></i>
+      <span>{{ 'my_tasks.title' | translate }}</span>
+    </a>
+    <a class="staff-nav-item" [routerLink]="[basePath() + '/notifications']" routerLinkActive="is-active">
+      <i class="fa-solid fa-bell"></i>
+      <span>{{ 'notifications.title' | translate }}</span>
+    </a>
+    @if (!isEmployee()) {
+    <a class="staff-nav-item" routerLink="/portal/certificates" routerLinkActive="is-active">
+      <i class="fa-solid fa-certificate"></i>
+      <span>{{ 'student_certificates.title' | translate }}</span>
+    </a>
+    }
+    <a class="staff-nav-item" [routerLink]="[basePath() + '/profile']" routerLinkActive="is-active">
+      <i class="fa-solid fa-user"></i>
+      <span>{{ 'nav.my_profile' | translate }}</span>
+    </a>
+  </nav>
+
+  @if (isLoading() && !profile()) {
+  <div class="staff-empty"><div class="loader-spinner"></div></div>
+  } @else if (profile(); as p) {
+  <!-- Hero -->
+  <div class="staff-hero chamfer-sm">
+    <div class="staff-hero-content">
+      <div class="staff-avatar-wrapper">
+        <div class="staff-avatar" [class.is-uploading]="isUploadingImage()">
+          @if (profileImage()) {
+          <img [src]="profileImage()!" [alt]="p.full_name" />
+          } @else {
+          <div class="staff-avatar-placeholder">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          }
+          @if (isUploadingImage()) {
+          <div class="staff-avatar-overlay">
+            <div class="loader-spinner-sm"></div>
+          </div>
+          }
+        </div>
+        <input type="file" id="staff-avatar-input" accept="image/jpeg,image/png,image/webp" hidden
+          (change)="onFileSelected($event)" />
+        <button type="button" class="avatar-upload-btn" (click)="triggerFileInput()"
+          [disabled]="isUploadingImage()" [attr.aria-label]="'staff_profile.change_image' | translate">
+          <i class="fa-solid fa-camera"></i>
+        </button>
+      </div>
+      <div class="staff-hero-info">
+        <h1 class="staff-hero-name">{{ p.full_name }}</h1>
+        <p class="staff-hero-email">{{ p.email }}</p>
+        <div class="staff-hero-meta">
+          <span class="staff-role-badge">{{ roleBadgeKey() | translate }}</span>
+          @if (p.username) {
+          <span class="staff-username" dir="ltr">@{{ p.username }}</span>
+          }
+          <span class="staff-date">
+            {{ 'staff_profile.member_since' | translate }} {{ p.created_at | date: 'yyyy/MM/dd' }}
+          </span>
+        </div>
+      </div>
+    </div>
+    @if (uploadImageError()) {
+    <div class="staff-image-error">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      {{ uploadImageError() | translate }}
+    </div>
+    }
+  </div>
+
+  <div class="staff-grid">
+    <!-- Read-only personal data -->
+    <div class="staff-card surface">
+      <h3 class="staff-card-title">
+        <i class="fa-solid fa-id-card"></i>
+        {{ 'staff_profile.data_title' | translate }}
+      </h3>
+      <div class="data-row">
+        <span>{{ 'staff_profile.full_name_label' | translate }}</span>
+        <strong>{{ p.full_name }}</strong>
+      </div>
+      <div class="data-row">
+        <span>{{ 'staff_profile.username_label' | translate }}</span>
+        <strong dir="ltr">@{{ p.username }}</strong>
+      </div>
+      <div class="data-row">
+        <span>{{ 'staff_profile.email_label' | translate }}</span>
+        <strong dir="ltr">{{ p.email }}</strong>
+      </div>
+      <div class="data-row">
+        <span>{{ 'staff_profile.role_label' | translate }}</span>
+        <strong>{{ roleBadgeKey() | translate }}</strong>
+      </div>
+    </div>
+
+    <!-- Editable contact info -->
+    <div class="staff-card surface">
+      <h3 class="staff-card-title">
+        <i class="fa-solid fa-address-book"></i>
+        {{ 'staff_profile.contact_title' | translate }}
+      </h3>
+      <form [formGroup]="contactForm" (ngSubmit)="saveContact()">
+        <label class="staff-label" for="staff-phone">{{ 'staff_profile.phone_label' | translate }}</label>
+        <input id="staff-phone" type="tel" class="staff-input" formControlName="phone" dir="ltr" />
+        <label class="staff-label" for="staff-whatsapp">{{ 'staff_profile.whatsapp_label' | translate }}</label>
+        <input id="staff-whatsapp" type="tel" class="staff-input" formControlName="whatsapp" dir="ltr" />
+        @if (contactError()) {
+        <p class="staff-error">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          {{ contactError() | translate }}
+        </p>
+        }
+        @if (contactDone()) {
+        <p class="staff-success">
+          <i class="fa-solid fa-circle-check"></i>
+          {{ 'staff_profile.save_success' | translate }}
+        </p>
+        }
+        <button type="submit" class="staff-btn" [disabled]="isSavingContact()">
+          @if (isSavingContact()) {
+          {{ 'staff_profile.saving' | translate }}
+          } @else {
+          <i class="fa-solid fa-floppy-disk"></i>
+          {{ 'staff_profile.save' | translate }}
+          }
+        </button>
+      </form>
+    </div>
+
+    <!-- Change password -->
+    <div class="staff-card surface">
+      <h3 class="staff-card-title">
+        <i class="fa-solid fa-key"></i>
+        {{ 'staff_profile.password_title' | translate }}
+      </h3>
+      <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+        <label class="staff-label" for="staff-current">{{ 'staff_profile.current_label' | translate }}</label>
+        <input id="staff-current" type="password" class="staff-input" formControlName="current_password"
+          autocomplete="current-password" dir="ltr" />
+        <label class="staff-label" for="staff-new">{{ 'staff_profile.new_label' | translate }}</label>
+        <input id="staff-new" type="password" class="staff-input" formControlName="new_password"
+          autocomplete="new-password" dir="ltr" />
+        <label class="staff-label" for="staff-confirm">{{ 'staff_profile.confirm_label' | translate }}</label>
+        <input id="staff-confirm" type="password" class="staff-input" formControlName="confirm_password"
+          autocomplete="new-password" dir="ltr" />
+        @if (passwordError()) {
+        <p class="staff-error">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          {{ passwordError() | translate }}
+        </p>
+        }
+        @if (passwordDone()) {
+        <p class="staff-success">
+          <i class="fa-solid fa-circle-check"></i>
+          {{ 'staff_profile.change_success' | translate }}
+        </p>
+        }
+        <button type="submit" class="staff-btn" [disabled]="isChangingPassword()">
+          @if (isChangingPassword()) {
+          {{ 'staff_profile.changing' | translate }}
+          } @else {
+          <i class="fa-solid fa-lock"></i>
+          {{ 'staff_profile.change_btn' | translate }}
+          }
+        </button>
+      </form>
+    </div>
+  </div>
+  }
+</section>

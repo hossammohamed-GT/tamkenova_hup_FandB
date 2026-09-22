@@ -45,7 +45,7 @@
                 translate }}</span>
             </a>
 
-            <a routerLink="/register/volunteer"
+            <a routerLink="/register/trainee"
               class="role-option">
               <span class="role-option-icon"><i
                   class="fa-solid fa-hand-holding-heart"></i></span>
@@ -86,33 +86,6 @@
 
         <!-- -- Username Field -- -->
         <div class="field"
-          [class.is-valid]="isFieldValid('username')"
-          [class.is-invalid]="isFieldInvalid('username')">
-          <label class="field-label" for="username">
-            {{ 'auth.fields.username' | translate }}
-            <span class="text-muted">({{ 'auth.optional' |
-              translate }})</span>
-          </label>
-          <div class="field-input-wrap">
-            <input id="username" type="text"
-              class="field-input" formControlName="username"
-              (input)="markTouched('username')"
-              autocomplete="username" dir="ltr" />
-            <i class="fa-solid fa-check field-status-icon is-valid"
-              [class.is-visible]="isFieldValid('username')"></i>
-            <i class="fa-solid fa-xmark field-status-icon is-invalid"
-              [class.is-visible]="isFieldInvalid('username')"></i>
-          </div>
-          <span class="field-hint"
-            [class.is-error]="isFieldInvalid('username')">
-            @if (isFieldInvalid('username')) {
-            {{ 'auth.errors.username' | translate }}
-            }
-          </span>
-        </div>
-
-        <!-- -- Email Field -- -->
-        <div class="field"
           [class.is-valid]="isFieldValid('email')"
           [class.is-invalid]="isFieldInvalid('email')">
           <label class="field-label" for="email">{{
@@ -136,6 +109,34 @@
         </div>
 
         <!-- -- Phone Field -- -->
+        <div class="field"
+          [class.is-valid]="isFieldValid('username')"
+          [class.is-invalid]="isFieldInvalid('username')">
+          <label class="field-label" for="username">
+            {{ 'auth.fields.username' | translate }}
+            <span class="text-muted">({{ 'auth.optional' |
+              translate }})</span>
+          </label>
+          <div class="field-input-wrap">
+            <input id="username" type="text"
+              class="field-input" formControlName="username"
+              (focus)="suggestUsername()"
+              (input)="markTouched('username')"
+              autocomplete="username" dir="ltr" />
+            <i class="fa-solid fa-check field-status-icon is-valid"
+              [class.is-visible]="isFieldValid('username')"></i>
+            <i class="fa-solid fa-xmark field-status-icon is-invalid"
+              [class.is-visible]="isFieldInvalid('username')"></i>
+          </div>
+          <span class="field-hint"
+            [class.is-error]="isFieldInvalid('username')">
+            @if (isFieldInvalid('username')) {
+            {{ 'auth.errors.username' | translate }}
+            }
+          </span>
+        </div>
+
+        <!-- -- Email Field -- -->
         <div class="field"
           [class.is-valid]="isFieldValid('phone')"
           [class.is-invalid]="isFieldInvalid('phone')">
@@ -205,6 +206,15 @@
             }
           </div>
           }
+        </div>
+
+
+        <div class="field" [class.is-invalid]="isFieldInvalid('confirm_password')">
+          <label class="field-label" for="confirm_password">{{ 'auth.fields.confirm_password' | translate }}</label>
+          <input id="confirm_password" type="password" class="field-input" formControlName="confirm_password" (input)="markTouched('confirm_password')" autocomplete="new-password" />
+          <span class="field-hint" [class.is-error]="isFieldInvalid('confirm_password')">
+            @if (isFieldInvalid('confirm_password')) { {{ 'auth.errors.password_mismatch' | translate }} }
+          </span>
         </div>
 
         @if (errorMessage()) {

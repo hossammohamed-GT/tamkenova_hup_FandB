@@ -42,3 +42,6 @@ __screenshots__/
 # note
 .DS_Store
 Thumbs.db
+
+/test-results/
+/playwright-report/

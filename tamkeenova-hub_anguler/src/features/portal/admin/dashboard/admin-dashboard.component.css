@@ -22,10 +22,4 @@
   to { opacity: 1; }
 }
 
-.btn-outline-sm {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  height: 42px;
-  padding-inline: 1rem;
-}
+

@@ -10,17 +10,22 @@
 
   <!-- -- Volunteer Sub Nav -- -->
   <nav class="staff-nav">
-    <a class="staff-nav-item is-active" routerLink="/portal/volunteer">
+    <a class="staff-nav-item is-active" routerLink="/portal/trainee">
       <i class="fa-solid fa-gauge-high"></i>
       <span>{{ 'volunteer_dashboard.nav_dashboard' | translate }}</span>
     </a>
-    <a class="staff-nav-item" routerLink="/portal/volunteer/tasks">
+    <a class="staff-nav-item" routerLink="/portal/trainee/tasks">
       <i class="fa-solid fa-list-check"></i>
       <span>{{ 'my_tasks.title' | translate }}</span>
     </a>
-    <a class="staff-nav-item" routerLink="/portal/volunteer/notifications">
+    <a class="staff-nav-item" routerLink="/portal/trainee/notifications">
       <i class="fa-solid fa-bell"></i>
       <span>{{ 'notifications.title' | translate }}</span>
+    </a>
+    <a class="staff-nav-item" routerLink="/portal/certificates"><i class="fa-solid fa-certificate"></i><span>{{ 'student_certificates.title' | translate }}</span></a>
+    <a class="staff-nav-item" routerLink="/portal/trainee/profile">
+      <i class="fa-solid fa-user"></i>
+      <span>{{ 'nav.my_profile' | translate }}</span>
     </a>
   </nav>
 
@@ -39,7 +44,7 @@
     <div class="dash-layout">
       <div class="stats-grid">
         @for (card of coreCards(); track card.labelKey) {
-          <a [routerLink]="card.route" class="stat-card staff-fade" [style.--stat-color]="card.color">
+          <a [routerLink]="card.route" class="stat-card staff-fade">
             <span class="stat-icon"><i class="fa-solid" [class]="card.icon"></i></span>
             <span class="stat-text">
               <span class="stat-value">{{ card.value }}</span>
@@ -60,7 +65,7 @@
               cy="60"
               r="52"
               fill="none"
-              stroke="var(--color-success)"
+              stroke="var(--color-primary)"
               stroke-width="10"
               stroke-linecap="round"
               [attr.stroke-dasharray]="circumference"
@@ -78,7 +83,7 @@
     <h2 class="section-title impact-title">{{ 'volunteer_dashboard.impact' | translate }}</h2>
     <div class="stats-grid impact-grid">
       @for (card of volunteerCards(); track card.labelKey) {
-        <div class="stat-card staff-fade" [style.--stat-color]="card.color">
+        <div class="stat-card staff-fade">
           <span class="stat-icon"><i class="fa-solid" [class]="card.icon"></i></span>
           <span class="stat-text">
             <span class="stat-value">{{ card.value }}@if (card.suffix) {{{card.suffix}}}</span>
@@ -130,8 +135,8 @@
 
     <!-- -- Quick actions -- -->
     <div class="quick-row">
-      <a routerLink="/portal/volunteer/tasks" class="quick-card surface staff-fade">
-        <span class="quick-icon" style="--stat-color: var(--color-primary)">
+      <a routerLink="/portal/trainee/tasks" class="quick-card surface staff-fade">
+        <span class="quick-icon">
           <i class="fa-solid fa-list-check"></i>
         </span>
         <span class="quick-text">
@@ -141,8 +146,8 @@
         <i class="fa-solid fa-arrow-left rtl-flip quick-arrow"></i>
       </a>
 
-      <a routerLink="/portal/volunteer/notifications" class="quick-card surface staff-fade">
-        <span class="quick-icon" style="--stat-color: var(--color-accent)">
+      <a routerLink="/portal/trainee/notifications" class="quick-card surface staff-fade">
+        <span class="quick-icon">
           <i class="fa-solid fa-bell"></i>
         </span>
         <span class="quick-text">

@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormArray,
@@ -29,6 +29,7 @@ export class TrainerProfileComponent implements OnInit {
   private fb = inject(FormBuilder);
   private trainerService = inject(TrainerService);
   private specializationService = inject(SpecializationService);
+  private cdr = inject(ChangeDetectorRef);
 
   readonly tabs: Array<{ id: TabId; icon: string; labelKey: string }> = [
     { id: 'general', icon: 'fa-user', labelKey: 'trainer_profile.tabs.general' },
@@ -154,12 +155,14 @@ export class TrainerProfileComponent implements OnInit {
         this.documents.markAsPristine();
         this.isLoading.set(false);
         this.hasLoaded.set(true);
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Trainer profile load error', err);
         this.isLoading.set(false);
         this.hasLoaded.set(true);
         this.errorMessage.set('auth.errors.generic');
+        this.cdr.detectChanges();
       },
     });
   }
@@ -167,6 +170,7 @@ export class TrainerProfileComponent implements OnInit {
   setTab(id: TabId): void {
     // ثبات تام - لا يعيد تحميل ولا يخفي المحتوى
     this.activeTab.set(id);
+    this.cdr.detectChanges();
   }
 
   triggerFileInput(): void {

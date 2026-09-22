@@ -15,14 +15,14 @@
 }
 
 .auth-title {
-  font-size: 1.5rem;
+  font-size: var(--text-2xl);
   font-weight: 700;
   color: var(--color-text);
 }
 
 .auth-subtitle {
   margin-block: 0.4rem 1.5rem;
-  font-size: 0.9rem;
+  font-size: var(--text-md);
 }
 
 .form-group {
@@ -33,14 +33,14 @@
 .form-group label {
   display: block;
   margin-bottom: 0.4rem;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   font-weight: 600;
 }
 
 .otp-input {
   text-align: center;
   letter-spacing: 0.5rem;
-  font-size: 1.2rem;
+  font-size: var(--text-xl);
   font-family: var(--font-numeric);
 }
 
@@ -63,7 +63,7 @@
 .form-error {
   display: block;
   margin-top: 0.4rem;
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
 }
 
 .auth-submit {
@@ -78,7 +78,7 @@
   border: none;
   color: var(--color-primary);
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   cursor: pointer;
 }
 

@@ -9,7 +9,6 @@
   justify-content: center;
   padding: 1.5rem;
   background: rgba(16, 30, 39, 0.6);
-  backdrop-filter: blur(6px);
   animation: backdrop-in 250ms ease;
 }
 
@@ -79,19 +78,19 @@
 .booking-eyebrow {
   display: block;
   color: var(--color-accent);
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   margin-block-end: 0.2rem;
 }
 
 .booking-trainer-name {
-  font-weight: 800;
+  font-weight: 700;
   color: var(--color-text);
 }
 
 .booking-trainer-spec {
   color: var(--color-text-muted);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 
@@ -104,29 +103,33 @@
 
 .form-field label {
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: var(--text-md);
   color: var(--color-text);
 }
 
 .required-mark { color: var(--color-danger); }
 
 .form-control {
-  padding: 0.9rem 1.1rem;
+  width: 100%;
+  min-height: var(--input-height);
+  padding: 0.7rem 1rem;
   border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
+  border: 1.5px solid var(--color-border-strong);
+  background: var(--color-surface-1);
   color: var(--color-text);
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   font-family: inherit;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--duration-fast) var(--ease-standard),
+    box-shadow var(--duration-fast) var(--ease-standard);
 }
 
-.form-control::placeholder { color: var(--color-text-muted); }
+.form-control::placeholder { color: var(--color-text-tertiary); }
 
 .form-control:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  border-color: var(--color-action);
+  box-shadow: var(--focus-ring);
 }
 
 .form-control-ltr { text-align: end; }
@@ -141,7 +144,7 @@ textarea.form-control {
 
 .field-error {
   color: var(--color-danger);
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
 }
 
 .contact-method-group {
@@ -160,7 +163,7 @@ textarea.form-control {
   border: 1px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text-muted);
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   cursor: pointer;
   transition: border-color var(--transition-fast), color var(--transition-fast), background var(--transition-fast);
 }
@@ -178,7 +181,7 @@ textarea.form-control {
   gap: 0.75rem;
   width: 100%;
   padding: 1.1rem 2rem;
-  font-size: 1.05rem;
+  font-size: var(--text-lg);
   cursor: pointer;
   margin-block-start: 0.5rem;
 }
@@ -228,8 +231,8 @@ textarea.form-control {
 @keyframes draw-check { to { stroke-dashoffset: 0; } }
 
 .success-title {
-  font-size: 1.4rem;
-  font-weight: 800;
+  font-size: var(--text-2xl);
+  font-weight: 700;
   color: var(--color-text);
   margin-block-end: 0.75rem;
 }
@@ -276,7 +279,7 @@ textarea.form-control {
   justify-content: center;
   background: var(--color-surface-alt);
   color: var(--color-text-muted);
-  font-size: 1.5rem;
+  font-size: var(--text-2xl);
 }
 
 .form-row {
@@ -296,7 +299,7 @@ textarea.form-control {
   border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--color-danger) 10%, transparent);
   color: var(--color-danger);
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   margin-bottom: 1rem;
 }
 
@@ -311,7 +314,7 @@ textarea.form-control {
 .success-actions .btn-ghost {
   padding: 0.75rem 1.5rem;
   font-weight: 700;
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   cursor: pointer;
 }
 

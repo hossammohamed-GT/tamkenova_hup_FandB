@@ -32,11 +32,15 @@ export class GalleryShowcaseComponent implements OnInit, OnDestroy {
   marqueeRowBottom = computed(() => this.buildMarqueeRow(1));
 
   // -- Build a Repeating Marquee Row --
+  // Two identical halves, each holding the row twice: the -50% loop point
+  // lands exactly on the duplicate boundary, and one half (~7m) always
+  // covers the viewport on any screen — the strip never runs empty.
   private buildMarqueeRow(offset: 0 | 1): string[] {
     const all = this.heroImages();
     const row = all.filter((_, i) => i % 2 === offset);
     if (!row.length) return [];
-    return [...row, ...row];
+    const half = [...row, ...row];
+    return [...half, ...half];
   }
 
   // -- Lightbox State --

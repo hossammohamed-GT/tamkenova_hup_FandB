@@ -189,37 +189,36 @@ GET /api/admin/users/:id/activity
 
 ## 7. Admin — Certificates
 
-| Method | Endpoint | الوصف |
-|--------|----------|-------|
-| `GET` | `/api/admin/certificates` | سجل كل الشهادات |
-| `POST` | `/api/admin/certificates` | إصدار شهادة لأي مستخدم |
-| `POST` | `/api/admin/certificates/:id/pdf` | رفع PDF الشهادة (multipart `file`) |
-| `PATCH` | `/api/admin/certificates/:id` | تعديل شهادة |
-| `PATCH` | `/api/admin/certificates/:id/revoke` | إلغاء الشهادة (`is_valid=false`) |
-| `DELETE` | `/api/admin/certificates/:id` | حذف الشهادة |
+Certificate studio **2026.3**. See the [full certificate contract](../../tamkeenova-hub_anguler/DOCS/CERTIFICATES.md). This follow-up changes no tables, role enums or Prisma schema relative to 2026.2.
 
-### Issue Certificate
-
-```
-POST /api/admin/certificates
-```
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/admin/certificates` | List certificate records |
+| POST | `/api/admin/certificates` | Issue one record with Arabic and English editions |
+| PATCH | `/api/admin/certificates/:id` | Edit bilingual snapshots, signature, hours/date or logos |
+| PATCH | `/api/admin/certificates/:id/revoke` | Revoke the shared credential (both editions) |
+| DELETE | `/api/admin/certificates/:id` | Delete certificate |
 
 ```json
 {
-  "user_id": "uuid",
-  "title": "شهادة تطوع",
-  "description": "إتمام 100 ساعة تطوع",
+  "user_id": "recipient-account-uuid",
+  "certificate_type": "VOLUNTEER",
+  "recipient_name_ar": "ليلى أحمد",
+  "recipient_name_en": "Layla Ahmed",
+  "signature_name": "Ahmed Hassan",
+  "partner_logos": [],
   "training_hours": 100,
-  "certificate_type": "VOLUNTEER"
+  "issued_at": "2026-09-22"
 }
 ```
 
-**Side Effects:**
-- توليد `verification_code` (مثل `TAM-1A2B3C4D`).
-- توليد رابط صورة QR (بدون أي مكتبة server-side) يرمّز رابط التحقق العام وتخزينه في `qr_code_url`.
-- 🔔 إشعار + ✉️ إيميل لصاحب الشهادة.
+`VOLUNTEER` remains the existing backend certificate enum but is displayed as **شهادة خبرة / Experience certificate**. The frontend presents the role as **متدرب / Trainee** without renaming database roles or endpoints. For `TRAINING`, both `program_name_ar` and `program_name_en` are required (up to 180 characters each). Experience certificates must have neither program name.
 
-> `trainer_id` و `program_id` اختياريين دلوقتي — شهادة التطوع أو أي شهادة عامة مش محتاجة برنامج أو مدرب.
+Every new issue requires both recipient names (up to 120 characters each) and one shared `signature_name` (up to 80). Hours/date are shared. No language selector can issue only one edition. One random `TAM-` verification code identifies both. Partner logos are up to four validated PNG snapshots. PATCH omission preserves the other language, signature and images; `partner_logos: []` clears images. Null cannot clear required names/signature. Ownership/code/revocation are not editable content.
+
+Bilingual values and the signature are stored in a versioned JSON envelope in the **existing `description` field**, not new columns. Clients must retain that envelope for rendering; public verification suppresses the raw JSON. Typed signature lettering is decorative, not a verified digital or handwritten signature. Fixed headings/descriptions remain artwork; arbitrary PDF uploads and remote image URLs are unsupported.
+
+The recipient gets separate Arabic/English PDF and PNG downloads; the admin gets a two-page PDF. Existing 2026.1/2026.2 editions stay unchanged until explicitly upgraded with complete bilingual data and signature. The earlier rebuild migration is still required only if deploying from a pre-rebuild schema; no further migration is added here.
 
 ---
 
@@ -500,7 +499,7 @@ Authorization: Volunteer
 
 الأدمن يصدر شهادة تطوع من:
 ```
-POST /api/admin/certificates   { "user_id": "volunteer-user-uuid", "title": "شهادة تطوع", "training_hours": 100, "certificate_type": "VOLUNTEER" }
+POST /api/admin/certificates   { "user_id": "volunteer-user-uuid", "recipient_name_ar": "ليلى أحمد", "recipient_name_en": "Layla Ahmed", "signature_name": "Ahmed Hassan", "partner_logos": [], "training_hours": 100, "issued_at": "2026-09-22", "certificate_type": "VOLUNTEER" }
 ```
 - شروط مقترحة: 100 ساعة → شهادة، 200 ساعة → شهادة أعلى (بتحددها الإدارة).
 - ساعات التطوع بتتحدث تلقائيًا لما الأدمن يعتمد مهمة.

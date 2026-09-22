@@ -87,13 +87,15 @@ enum certificate_type {
 
 
 model email_otps {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id    String   @db.Uuid
-  otp_code   String   @db.VarChar(255)
-  expires_at DateTime @db.Timestamptz(6)
-  is_used    Boolean  @default(false)
-  created_at DateTime @default(now()) @db.Timestamptz(6)
-  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_email_otp_user")
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String   @db.Uuid
+  otp_code      String   @db.VarChar(255)
+  purpose       String   @default("EMAIL_VERIFY") @db.VarChar(50)
+  attempt_count Int      @default(0)
+  expires_at    DateTime @db.Timestamptz(6)
+  is_used       Boolean  @default(false)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_email_otp_user")
 
   @@index([user_id], map: "idx_email_otps_user_id")
 }
@@ -230,6 +232,7 @@ model users {
   username                             String?                        @unique @db.VarChar(100)
   failed_login_attempts                Int                            @default(0)
   locked_until                         DateTime?                      @db.Timestamptz(6)
+  token_version                        Int                            @default(0)
 
   bio                                  String?                        @db.VarChar(500)
   location                             String?                        @db.VarChar(255)
@@ -341,6 +344,11 @@ model student_enrollments {
 }
 
 model certificates {
+  certificate_language String?      @db.VarChar(2)
+  partner_logos      Json?
+  recipient_name    String?          @db.VarChar(120)
+  program_name      String?          @db.VarChar(180)
+  template_version  String?          @db.VarChar(20)
   id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   student_id        String           @db.Uuid
   trainer_id        String?          @db.Uuid
@@ -348,9 +356,14 @@ model certificates {
   enrollment_id     String?          @db.Uuid
   verification_code String           @unique @db.VarChar(20)
   title             String           @db.VarChar(255)
+  title_ar          String?
+  title_en          String?
   description       String?
+  description_ar    String?
+  description_en    String?
   pdf_url           String?
   qr_code_url       String?
+  partner_ids       Json?
   issued_at         DateTime         @default(now()) @db.Timestamptz(6)
   is_valid          Boolean?         @default(true)
   training_hours    Int?             @default(0)
@@ -595,4 +608,17 @@ model activity_logs {
 
   @@index([user_id], map: "idx_activity_logs_user")
   @@index([created_at], map: "idx_activity_logs_created")
+}
+
+model strategic_partners {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name_ar       String   @db.VarChar(255)
+  name_en       String   @db.VarChar(255)
+  logo_url      String
+  website_url   String?
+  is_active     Boolean  @default(true)
+  display_order Int      @default(0)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+  @@index([is_active, display_order], map: "idx_strategic_partners_active_order")
 }

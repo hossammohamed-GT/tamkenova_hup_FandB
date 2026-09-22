@@ -1,10 +1,9 @@
 .notifications-page {
-  --glass-bg: color-mix(in srgb, var(--color-surface) 78%, transparent);
+  --glass-bg: var(--color-surface-1);
 }
 
 .glass-btn {
   background: var(--glass-bg);
-  backdrop-filter: blur(14px);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 
@@ -32,9 +31,8 @@
   margin-bottom: 1.5rem;
   padding: 0.6rem;
   background: var(--glass-bg);
-  backdrop-filter: blur(14px);
   border-radius: var(--radius-lg);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  border: 1px solid var(--color-border);
   width: fit-content;
 }
 
@@ -44,7 +42,7 @@
   border-radius: 999px;
   background: var(--color-surface);
   color: var(--color-text-muted);
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -80,8 +78,7 @@
   cursor: pointer;
   transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
   border-inline-start: 3px solid transparent;
-  background: color-mix(in srgb, var(--color-surface) 84%, transparent);
-  backdrop-filter: blur(14px) saturate(140%);
+  background: var(--color-surface-1);
   opacity: 0;
   transform: translateY(12px);
   animation: notif-enter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
@@ -145,8 +142,8 @@
 }
 
 .notif-title {
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
 }
 
 .notif-top-actions {
@@ -178,7 +175,7 @@
   border-radius: 50%;
   background: var(--color-surface-alt);
   color: var(--color-text-muted);
-  font-size: 0.7rem;
+  font-size: var(--text-micro);
   opacity: 0;
   transform: translateX(6px);
   transition: all var(--transition-fast);
@@ -190,14 +187,14 @@
 }
 
 .notif-message {
-  font-size: 0.86rem;
+  font-size: var(--text-sm);
   line-height: 1.7;
   color: var(--color-text-muted);
   margin: 0.35rem 0 0.6rem;
 }
 
 .notif-date {
-  font-size: 0.74rem;
+  font-size: var(--text-xs);
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
@@ -205,19 +202,16 @@
 
 .glass-empty {
   background: var(--glass-bg);
-  backdrop-filter: blur(16px);
 }
 
 /* Modal glass */
 .glass-backdrop {
   background: rgba(16, 30, 39, 0.45);
-  backdrop-filter: blur(6px) saturate(120%);
 }
 
 .glass-modal {
-  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
-  backdrop-filter: blur(26px) saturate(170%);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
   box-shadow: 0 24px 80px rgba(0,0,0,0.18);
   max-width: 640px;
   animation: modal-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -232,7 +226,7 @@
   display: flex;
   gap: 1rem;
   padding: 1.2rem 1.5rem;
-  background: color-mix(in srgb, var(--color-surface-alt) 65%, transparent);
+  background: var(--color-surface-2);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -250,19 +244,19 @@
 }
 
 .notif-detail-original h4 {
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
   margin-bottom: 0.3rem;
 }
 
 .notif-detail-original p {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   line-height: 1.6;
   margin-bottom: 0.5rem;
 }
 
 .notif-detail-date {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   color: var(--color-text-muted);
   display: inline-flex;
   align-items: center;
@@ -274,8 +268,8 @@
 }
 
 .notif-detail-section h4 {
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: 700;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -296,7 +290,7 @@
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
 }
 
 .detail-row.detail-col {
@@ -315,13 +309,13 @@
 .detail-person {
   margin-top: 1rem;
   padding: 1rem;
-  background: color-mix(in srgb, var(--color-surface-alt) 60%, transparent);
+  background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
 }
 
 .detail-person h5 {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   margin-bottom: 0.7rem;
   display: flex;
@@ -351,7 +345,7 @@
   justify-content: center;
   background: var(--color-surface-alt);
   color: var(--color-text-muted);
-  font-size: 1.1rem;
+  font-size: var(--text-xl);
 }
 
 .person-card div {
@@ -361,8 +355,8 @@
 }
 
 .person-card strong {
-  font-size: 0.9rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
 }
 
 .notif-detail-empty {
@@ -424,10 +418,10 @@
 
 .notif-detail-type {
   display: inline-block;
-  font-size: 0.66rem;
-  font-weight: 800;
+  font-size: var(--text-micro);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--tracking-wide);
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
   margin-bottom: 0.4rem;

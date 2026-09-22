@@ -24,7 +24,7 @@ export class App implements OnDestroy {
   constructor() {
     // إظهار لودر أولي للبراند ثم إخفاؤه - لا يظهر مرة أخرى عند التنقل لتجنب الوميض الجهنمي
     this.loader.show();
-    setTimeout(() => this.loader.hide(), 1800);
+    setTimeout(() => this.loader.hide(), 500);
 
     this.routerSub = this.router.events.subscribe((event) => {
       if (
@@ -32,7 +32,8 @@ export class App implements OnDestroy {
         event instanceof NavigationCancel ||
         event instanceof NavigationError
       ) {
-        // تأكد أن اللودر مخفي بعد كل تنقل - لا تظهره عند بداية التنقل لتجنب الوميض
+        // Keep the loader hidden after every navigation; never show it on
+        // navigation start to avoid flicker.
         this.loader.hide();
       }
     });

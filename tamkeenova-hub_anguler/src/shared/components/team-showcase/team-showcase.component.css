@@ -100,7 +100,7 @@
 }
 
 .team-card-name {
-  font-size: 1rem;
+  font-size: var(--text-lg);
   font-weight: 700;
   color: var(--color-text);
   white-space: nowrap;
@@ -110,7 +110,7 @@
 }
 
 .team-card-specialization {
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
   white-space: nowrap;
   overflow: hidden;

@@ -26,17 +26,15 @@ export class AiAssistantComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('shell') private shellRef?: ElementRef<HTMLDivElement>;
   @ViewChild('triggerMark') private markRef?: ElementRef<HTMLImageElement>;
-  @ViewChild('sparkLayer') private sparkLayerRef?: ElementRef<HTMLDivElement>;
   @ViewChild('messagesList') private messagesList?: ElementRef<HTMLDivElement>;
   @ViewChild('input') private inputRef?: ElementRef<HTMLTextAreaElement>;
 
   state = signal<AssistantState>('closed');
   draft = '';
 
-  private readonly FLY_MS = 1150;
-  private readonly CLOSE_MS = 340;
+  private readonly FLY_MS = 260;
+  private readonly CLOSE_MS = 200;
   private rafId?: number;
-  private sparkTimer?: ReturnType<typeof setInterval>;
 
   constructor() {
     this.translate.get('assistant.welcome').subscribe((text) => this.chat.setWelcomeMessage(text));
@@ -59,7 +57,6 @@ export class AiAssistantComponent implements AfterViewInit, OnDestroy {
   // -- Release Active Animation Resources --
   ngOnDestroy(): void {
     if (this.rafId) cancelAnimationFrame(this.rafId);
-    if (this.sparkTimer) clearInterval(this.sparkTimer);
   }
 
   // -- Open the Assistant from Its Trigger --
@@ -165,13 +162,12 @@ export class AiAssistantComponent implements AfterViewInit, OnDestroy {
     const endCx = end.x + end.w / 2;
     const endCy = end.y + end.h / 2;
     const midX = (startCx + endCx) / 2 + (Math.random() - 0.5) * 40;
-    const midY = Math.min(startCy, endCy) - 190;
+    const midY = Math.min(startCy, endCy) - 40;
 
     this.state.set('flying');
     if (mark) mark.style.transition = '';
 
     const startTime = performance.now();
-    this.sparkTimer = setInterval(() => this.spawnSpark(shell), 40);
 
     const tick = (now: number) => {
       const rawT = Math.min(1, (now - startTime) / this.FLY_MS);
@@ -190,8 +186,8 @@ export class AiAssistantComponent implements AfterViewInit, OnDestroy {
       shell.style.borderRadius = `${r}px`;
 
       if (mark) {
-        const spin = t * 640;
-        const scale = 1 + t * 1.1;
+        const spin = t * 90;
+        const scale = 1 + t * 0.1;
         const fadeStart = 0.55;
         const opacity = t < fadeStart ? 1 : Math.max(0, 1 - (t - fadeStart) / 0.3);
         mark.style.opacity = `${opacity}`;
@@ -201,7 +197,6 @@ export class AiAssistantComponent implements AfterViewInit, OnDestroy {
       if (rawT < 1) {
         this.rafId = requestAnimationFrame(tick);
       } else {
-        if (this.sparkTimer) clearInterval(this.sparkTimer);
         this.state.set('open');
         this.chat.open();
         setTimeout(() => this.inputRef?.nativeElement.focus(), 80);
@@ -249,27 +244,6 @@ export class AiAssistantComponent implements AfterViewInit, OnDestroy {
       shell.style.transition = '';
       this.state.set('closed');
     }, this.CLOSE_MS);
-  }
-  // -- Create a Transient Animation Spark --
-  private spawnSpark(shell: HTMLDivElement): void {
-    const layer = this.sparkLayerRef?.nativeElement;
-    if (!layer) return;
-
-    const rect = shell.getBoundingClientRect();
-    const x = rect.left + rect.width / 2 + (Math.random() - 0.5) * 18;
-    const y = rect.top + rect.height / 2 + (Math.random() - 0.5) * 18;
-
-    const el = document.createElement('span');
-    el.className = 'trail-spark';
-    el.style.left = `${x}px`;
-    el.style.top = `${y}px`;
-    el.style.setProperty('--dx', `${(Math.random() - 0.5) * 70}px`);
-    el.style.setProperty('--dy', `${(Math.random() - 0.5) * 70 - 24}px`);
-    el.style.setProperty('--size', `${4 + Math.random() * 6}px`);
-    el.style.setProperty('--spin', `${Math.random() > 0.5 ? 1 : -1}`);
-
-    layer.appendChild(el);
-    setTimeout(() => el.remove(), 760);
   }
   // -- Interpolate a Numeric Value --
   private lerp(a: number, b: number, t: number): number {

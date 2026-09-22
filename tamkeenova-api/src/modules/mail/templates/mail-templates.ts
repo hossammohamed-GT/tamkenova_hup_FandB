@@ -276,6 +276,37 @@ function wrapEmail(
 
 
 // Handle get otp email template
+export function getPasswordResetEmailTemplate(otp: string): string {
+  const p = PALETTE.primary;
+  const hero = heroSection(
+    'primary',
+    'TAMKEENOVA HUB',
+    'إعادة تعيين كلمة المرور',
+    'استخدم الكود ده عشان تعيّن كلمة مرور جديدة لحسابك',
+  );
+  const body = `
+          <tr>
+            <td align="center" class="email-padding" style="padding: 34px 40px 8px;">
+              <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%; background: linear-gradient(180deg, ${BASE.surfaceAlt} 0%, ${BASE.surface} 100%); border:1.5px solid ${p.dark}22; border-radius:16px;">
+                <tr>
+                  <td align="center" style="padding: 26px 16px;">
+                    <span class="otp-digits" style="display:inline-block; font-size:38px; font-weight:800; letter-spacing:14px; color:${p.dark}; direction:ltr; font-family:'Courier New', monospace;">
+                      ${esc(otp)}
+                    </span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding: 18px 40px 34px;">
+              ${ctaButton('تعيين كلمة مرور جديدة', `${APP_URL}/reset-password`)}
+              ${note('الكود هينتهي خلال 10 دقايق. لو مطلبتش إعادة التعيين، تجاهل الإيميل.')}
+            </td>
+          </tr>`;
+  return wrapEmail('primary', hero, body);
+}
+
 export function getOtpEmailTemplate(otp: string): string {
   const p = PALETTE.primary;
 
@@ -765,7 +796,7 @@ export function getCertificateIssuedEmailTemplate(
   }
 
   const verifyUrl = verificationCode
-    ? `${APP_URL}/verify/${verificationCode}`
+    ? `${APP_URL}/verify?code=${encodeURIComponent(verificationCode)}`
     : APP_URL;
 
   const body = `
@@ -778,9 +809,10 @@ export function getCertificateIssuedEmailTemplate(
 
           <tr>
             <td align="center" class="email-padding" style="padding: 26px 40px 0;">
+              ${ctaButton('تنزيل الشهادة بالعربية والإنجليزية', `${APP_URL}/portal/certificates`)}
               ${ctaButton('التحقق من الشهادة', verifyUrl)}
               ${note(
-                'الشهادة متاحة في حسابك ويمكن التحقق من صحتها في أي وقت عبر رمز التحقق',
+                'نسختا الشهادة العربية والإنجليزية متاحتان في حسابك بصيغتي PDF وPNG، بنفس رمز التحقق.',
               )}
             </td>
           </tr>

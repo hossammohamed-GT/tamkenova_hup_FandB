@@ -1,0 +1,17 @@
+<section class="portal-page">
+  <div class="portal-header"><div><h1>{{ 'admin_partners.title' | translate }}</h1><p class="text-muted">{{ 'admin_partners.subtitle' | translate }}</p></div><button class="btn-primary-sm" type="button" (click)="openCreate()">{{ 'admin_partners.add' | translate }}</button></div>
+  @if (actionErrorKey(); as errKey) {
+    <div class="form-error-banner" role="alert"><i class="fa-solid fa-triangle-exclamation"></i> <span>{{ errKey | translate }}</span>@for (detail of actionErrorDetails(); track detail) {<span class="banner-detail">{{ detail }}</span>}</div>
+  }
+  <app-admin-nav />
+  @if (showForm() || partners().length === 0) {
+    <form class="partner-form surface" [formGroup]="form" (ngSubmit)="save()">
+      <h3>{{ (editing() ? 'admin_partners.edit' : 'admin_partners.add') | translate }}</h3>
+      <div class="partner-fields"><label>{{ 'admin_partners.name_ar' | translate }}<input formControlName="name_ar"></label><label>{{ 'admin_partners.name_en' | translate }}<input formControlName="name_en" dir="ltr"></label><label class="wide">{{ 'admin_partners.logo_url' | translate }}<input formControlName="logo_url" dir="ltr" placeholder="https://..."></label><label class="wide">{{ 'admin_partners.website_url' | translate }}<input formControlName="website_url" dir="ltr" placeholder="https://..."></label><label>{{ 'admin_partners.order' | translate }}<input type="number" min="0" formControlName="display_order"></label><label class="check"><input type="checkbox" formControlName="is_active"> {{ 'admin_partners.active' | translate }}</label></div>
+      <div class="form-actions"><button class="btn-primary-sm" [disabled]="saving()" type="submit">{{ 'common.save' | translate }}</button><button class="btn-outline-sm" type="button" (click)="cancel()">{{ 'common.cancel' | translate }}</button></div>
+    </form>
+  }
+  @if (loading()) { <div class="staff-empty"><div class="loader-spinner"></div></div> } @else if (error()) { <div class="staff-empty">{{ 'admin_partners.load_error' | translate }}</div> } @else if (partners().length > 0) {
+    <div class="partners-admin-grid">@for (partner of partners(); track partner.id) {<article class="partner-admin-card surface"><img [src]="partner.logo_url" [alt]="partner.name_en"><div><h3>{{ partner.name_ar }} <small>{{ partner.name_en }}</small></h3><span>{{ partner.is_active ? ('admin_partners.active' | translate) : ('admin_partners.inactive' | translate) }}</span></div><div class="card-actions"><button class="btn-outline-sm" type="button" (click)="toggle(partner)">{{ (partner.is_active ? 'admin_partners.hide' : 'admin_partners.show') | translate }}</button><button class="btn-outline-sm" type="button" (click)="edit(partner)">{{ 'common.edit' | translate }}</button><button class="btn-danger-sm" type="button" (click)="remove(partner)">{{ 'common.delete' | translate }}</button></div></article>}</div>
+  }
+</section>

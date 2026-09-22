@@ -12,6 +12,27 @@
 
   <app-admin-nav />
 
+  <div class="template-gallery">
+    @for (template of templates; track template.artwork) {
+      <button
+        class="template-card"
+        type="button"
+        (click)="openIssue(template.type, template.language!)"
+        [attr.data-template]="template.type + '-' + template.language"
+      >
+        <img [src]="template.thumbnail" [alt]="'certificate_studio.' + template.type | translate" />
+        <span class="template-caption"
+          ><span
+            ><strong>{{ 'certificate_studio.' + template.type | translate }}</strong
+            ><small>{{
+              'certificate_studio.language_' + template.language | translate
+            }}</small></span
+          ><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i
+        ></span>
+      </button>
+    }
+  </div>
+  <p class="studio-intro">{{ 'certificate_studio.intro' | translate }}</p>
   <!-- -- Toolbar -- -->
   <div class="toolbar">
     <div class="toolbar-search">
@@ -65,8 +86,18 @@
               <td>
                 <div class="cert-title-cell">
                   <strong>{{ cert.title }}</strong>
+                  @if (cert.template_version !== version) {
+                    <small class="legacy-note">{{
+                      (canRender(cert)
+                        ? 'certificate_studio.previous_design'
+                        : 'certificate_studio.legacy_badge'
+                      ) | translate
+                    }}</small>
+                  }
                   @if (cert.issued_at) {
-                    <small class="text-muted">{{ cert.issued_at | date: 'yyyy/MM/dd' }}</small>
+                    <small class="text-muted">{{
+                      cert.issued_at | date: 'yyyy/MM/dd' : 'UTC'
+                    }}</small>
                   }
                 </div>
               </td>
@@ -80,7 +111,9 @@
                     }
                   </span>
                   <span class="table-user-main">
-                    <span class="table-user-name">{{ cert.users?.full_name ?? cert.user_id }}</span>
+                    <span class="table-user-name">{{
+                      cert.recipient_name ?? cert.users?.full_name ?? cert.student_id
+                    }}</span>
                   </span>
                 </div>
               </td>
@@ -88,6 +121,17 @@
                 @if (cert.certificate_type) {
                   <span class="badge" [class]="typeBadge(cert.certificate_type)">
                     {{ 'status.certificate_type.' + cert.certificate_type | translate }}
+                    @if (cert.certificate_language) {
+                      <span class="certificate-language-badge"
+                        >·
+                        {{
+                          (cert.template_version === version
+                            ? 'certificate_studio.both_languages'
+                            : 'certificate_studio.language_' + cert.certificate_language
+                          ) | translate
+                        }}</span
+                      >
+                    }
                   </span>
                 } @else {
                   <span class="table-muted">—</span>
@@ -95,40 +139,51 @@
               </td>
               <td class="table-muted">{{ cert.training_hours ?? '—' }}</td>
               <td>
-                <button type="button" class="code-chip" (click)="copyCode(cert.verification_code)" [title]="'common.copied' | translate">
+                <button
+                  type="button"
+                  class="code-chip"
+                  (click)="copyCode(cert.verification_code)"
+                  [title]="'common.copied' | translate"
+                >
                   <i class="fa-solid fa-barcode"></i>
                   {{ cert.verification_code }}
                 </button>
               </td>
               <td>
-                <span class="badge" [class.badge-approved]="cert.is_valid" [class.badge-rejected]="!cert.is_valid">
-                  {{ (cert.is_valid ? 'admin_certificates.valid' : 'admin_certificates.revoked_label') | translate }}
+                <span
+                  class="badge"
+                  [class.badge-approved]="cert.is_valid"
+                  [class.badge-rejected]="!cert.is_valid"
+                >
+                  {{
+                    (cert.is_valid
+                      ? 'admin_certificates.valid'
+                      : 'admin_certificates.revoked_label'
+                    ) | translate
+                  }}
                 </span>
               </td>
               <td>
                 <div class="cell-actions">
+                  @if (canRender(cert) && cert.is_valid) {
+                    <button
+                      type="button"
+                      class="btn-sm btn-outline-sm"
+                      (click)="download(cert)"
+                      [disabled]="!!downloadingId()"
+                    >
+                      <i class="fa-solid fa-file-pdf"></i>
+                      {{ 'certificate_studio.download_pdf' | translate }}
+                    </button>
+                  }
                   <button
                     type="button"
                     class="btn-sm btn-outline-sm"
-                    (click)="triggerPdfInput(cert.id)"
-                    [disabled]="uploadingId() === cert.id"
+                    (click)="openEdit(cert)"
+                    [attr.aria-label]="'admin_certificates.edit_title' | translate"
                   >
-                    @if (uploadingId() === cert.id) {
-                      <span class="loader-spinner-sm"></span>
-                    } @else {
-                      <i class="fa-solid fa-file-pdf"></i>
-                    }
-                    {{ 'admin_certificates.upload_pdf' | translate }}
-                  </button>
-                  <input
-                    hidden
-                    type="file"
-                    accept="application/pdf"
-                    [id]="'cert-pdf-input-' + cert.id"
-                    (change)="onPdfSelected($event, cert)"
-                  />
-                  <button type="button" class="btn-sm btn-outline-sm" (click)="openEdit(cert)">
-                    <i class="fa-solid fa-pen"></i>
+                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                    {{ 'common.edit' | translate }}
                   </button>
                   @if (cert.is_valid) {
                     <button type="button" class="btn-sm btn-danger-sm" (click)="revoke(cert)">
@@ -136,7 +191,12 @@
                       {{ 'admin_certificates.revoke' | translate }}
                     </button>
                   }
-                  <button type="button" class="btn-sm btn-danger-sm" (click)="askDelete(cert)">
+                  <button
+                    type="button"
+                    class="btn-sm btn-danger-sm"
+                    (click)="askDelete(cert)"
+                    [attr.aria-label]="'common.delete' | translate"
+                  >
                     <i class="fa-solid fa-trash"></i>
                   </button>
                 </div>
@@ -151,109 +211,390 @@
   <!-- -- Issue / Edit Modal -- -->
   @if (showIssueModal()) {
     <div class="modal-backdrop" (click)="closeIssue()">
-      <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
+      <div
+        class="modal-card surface chamfer-sm certificate-studio"
+        certificateDialog
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="certificate-dialog-title"
+        (keydown.escape)="closeIssue()"
+        (click)="$event.stopPropagation()"
+      >
         <div class="modal-head">
-          <h3>
-            {{ (editTarget() ? 'admin_certificates.edit_title' : 'admin_certificates.issue_title') | translate }}
+          <h3 id="certificate-dialog-title">
+            {{
+              (editTarget() ? 'admin_certificates.edit_title' : 'admin_certificates.issue_title')
+                | translate
+            }}
           </h3>
-          <button type="button" class="icon-btn" (click)="closeIssue()">
-            <i class="fa-solid fa-xmark"></i>
+          <button
+            type="button"
+            class="icon-btn"
+            (click)="closeIssue()"
+            [disabled]="isSaving()"
+            [attr.aria-label]="'common.cancel' | translate"
+          >
+            <span aria-hidden="true">×</span>
           </button>
         </div>
 
-        <form [formGroup]="issueForm" (ngSubmit)="save()">
-          <!-- -- User picker (only when issuing) -- -->
-          @if (!editTarget()) {
-            <div class="field">
-              <label class="field-label">{{ 'admin_certificates.recipient' | translate }}</label>
-              @if (selectedUser(); as user) {
-                <div class="picked-user">
-                  <span class="table-avatar">{{ initials(user.full_name) }}</span>
-                  <span class="picked-user-info">
-                    <strong>{{ user.full_name }}</strong>
-                    <small class="text-muted">{{ user.email }}</small>
-                  </span>
-                  <button type="button" class="icon-btn icon-btn-danger" (click)="clearUser()">
-                    <i class="fa-solid fa-xmark"></i>
-                  </button>
-                </div>
-              } @else {
-                <div class="user-picker">
-                  <input
-                    type="text"
-                    class="field-input"
-                    [placeholder]="'admin_certificates.search_user' | translate"
-                    (input)="searchUsers($any($event.target).value)"
-                  />
-                  @if (isSearchingUsers()) {
-                    <div class="user-picker-loading"><span class="loader-spinner-sm"></span></div>
-                  }
-                  @if (userSearchTerm().length === 1) {
-                    <div class="user-picker-hint">
-                      <i class="fa-solid fa-keyboard"></i>
-                      {{ 'admin_certificates.min_chars_hint' | translate }}
-                    </div>
-                  } @else if (userSearchTerm().length >= 2 && userResults().length === 0 && !isSearchingUsers()) {
-                    <div class="user-picker-empty">
-                      <i class="fa-solid fa-user-slash"></i>
-                      {{ 'admin_certificates.no_user_found' | translate }}
-                    </div>
-                  }
-                  @if (userResults().length > 0) {
-                    <ul class="user-picker-list">
-                      @for (user of userResults(); track user.id) {
-                        <li>
-                          <button type="button" class="user-picker-item" (click)="pickUser(user)">
-                            <span class="table-avatar">{{ initials(user.full_name) }}</span>
-                            <span class="picker-item-text">
-                              <strong>{{ user.full_name }}</strong>
-                              <small class="text-muted">{{ 'status.user_role.' + user.role | translate }} · {{ user.email }}</small>
-                            </span>
-                          </button>
-                        </li>
-                      }
-                    </ul>
-                  }
-                </div>
+        <form [formGroup]="issueForm" (ngSubmit)="save()" class="studio-layout">
+          <div class="studio-fields">
+            <fieldset class="template-switcher" [disabled]="isSaving()">
+              <legend>{{ 'certificate_studio.choose' | translate }}</legend>
+              @for (type of certificateTypes; track type) {
+                <button
+                  type="button"
+                  [class.active]="issueForm.controls.certificate_type.value === type"
+                  [attr.aria-pressed]="issueForm.controls.certificate_type.value === type"
+                  (click)="selectTemplate(type)"
+                >
+                  {{ 'certificate_studio.' + type | translate }}
+                </button>
               }
-            </div>
-          }
+            </fieldset>
+            <fieldset class="template-switcher language-switcher" [disabled]="isSaving()">
+              <legend>{{ 'certificate_studio.language' | translate }}</legend>
+              @for (language of languages; track language) {
+                <button
+                  type="button"
+                  [attr.data-language]="language"
+                  [class.active]="issueForm.controls.certificate_language.value === language"
+                  [attr.aria-pressed]="issueForm.controls.certificate_language.value === language"
+                  (click)="selectLanguage(language)"
+                >
+                  {{ 'certificate_studio.language_' + language | translate }}
+                </button>
+              }
+            </fieldset>
+            <p class="field-hint language-hint">
+              {{ 'certificate_studio.language_hint' | translate }}
+            </p>
+            @if (editTarget() && editTarget()?.template_version !== version) {
+              <p class="legacy-note">
+                {{
+                  (['2026.1', '2026.2'].includes(editTarget()?.template_version ?? '')
+                    ? 'certificate_studio.upgrade_notice'
+                    : 'certificate_studio.legacy'
+                  ) | translate
+                }}
+              </p>
+            }
 
-          <div class="field">
-            <label class="field-label" for="cert-title">{{ 'admin_certificates.f_title' | translate }}</label>
-            <input id="cert-title" type="text" class="field-input" formControlName="title" />
-          </div>
-
-          <div class="field">
-            <label class="field-label" for="cert-desc">{{ 'admin_certificates.f_description' | translate }}</label>
-            <textarea id="cert-desc" class="field-input field-textarea" formControlName="description" rows="2"></textarea>
-          </div>
-
-          <div class="form-grid">
-            <div class="field">
-              <label class="field-label" for="cert-hours">{{ 'admin_certificates.f_hours' | translate }}</label>
-              <input id="cert-hours" type="number" min="0" class="field-input" formControlName="training_hours" />
-            </div>
-
-            <div class="field">
-              <label class="field-label" for="cert-type">{{ 'admin_certificates.f_type' | translate }}</label>
-              <select id="cert-type" class="field-input" formControlName="certificate_type">
-                @for (type of certificateTypes; track type) {
-                  <option [ngValue]="type">{{ 'status.certificate_type.' + type | translate }}</option>
+            <!-- -- User picker (only when issuing) -- -->
+            @if (!editTarget()) {
+              <div class="field">
+                <label class="field-label">{{ 'admin_certificates.recipient' | translate }}</label>
+                @if (selectedUser(); as user) {
+                  <div class="picked-user">
+                    <span class="table-avatar">{{ initials(user.full_name) }}</span>
+                    <span class="picked-user-info">
+                      <strong>{{ user.full_name }}</strong>
+                      <small class="text-muted">{{ user.email }}</small>
+                    </span>
+                    <button
+                      type="button"
+                      class="icon-btn icon-btn-danger"
+                      (click)="clearUser()"
+                      [attr.aria-label]="'common.cancel' | translate"
+                    >
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  </div>
+                } @else {
+                  <div class="user-picker">
+                    <input
+                      type="text"
+                      class="field-input"
+                      [placeholder]="'admin_certificates.search_user' | translate"
+                      (input)="searchUsers($any($event.target).value)"
+                    />
+                    @if (isSearchingUsers()) {
+                      <div class="user-picker-loading"><span class="loader-spinner-sm"></span></div>
+                    }
+                    @if (userSearchTerm().length === 1) {
+                      <div class="user-picker-hint">
+                        <i class="fa-solid fa-keyboard"></i>
+                        {{ 'admin_certificates.min_chars_hint' | translate }}
+                      </div>
+                    } @else if (
+                      userSearchTerm().length >= 2 &&
+                      userResults().length === 0 &&
+                      !isSearchingUsers()
+                    ) {
+                      <div class="user-picker-empty">
+                        <i class="fa-solid fa-user-slash"></i>
+                        {{ 'admin_certificates.no_user_found' | translate }}
+                      </div>
+                    }
+                    @if (userResults().length > 0) {
+                      <ul class="user-picker-list">
+                        @for (user of userResults(); track user.id) {
+                          <li>
+                            <button type="button" class="user-picker-item" (click)="pickUser(user)">
+                              <span class="table-avatar">{{ initials(user.full_name) }}</span>
+                              <span class="picker-item-text">
+                                <strong>{{ user.full_name }}</strong>
+                                <small class="text-muted"
+                                  >{{ 'status.user_role.' + user.role | translate }} ·
+                                  {{ user.email }}</small
+                                >
+                              </span>
+                            </button>
+                          </li>
+                        }
+                      </ul>
+                    }
+                  </div>
                 }
-              </select>
+              </div>
+            }
+
+            <div class="field">
+              <label class="field-label" for="cert-recipient">{{
+                'certificate_studio.recipient_name_ar' | translate
+              }}</label>
+              <input
+                id="cert-recipient"
+                class="field-input"
+                formControlName="recipient_name"
+                maxlength="120"
+                dir="auto"
+                required
+              />
+              <small class="field-hint">{{ 'certificate_studio.snapshot' | translate }}</small>
             </div>
+            <div class="field">
+              <label class="field-label" for="cert-recipient-en">{{
+                'certificate_studio.recipient_name_en' | translate
+              }}</label>
+              <input
+                id="cert-recipient-en"
+                class="field-input"
+                formControlName="recipient_name_en"
+                maxlength="120"
+                dir="ltr"
+                required
+              />
+            </div>
+            @if (issueForm.controls.certificate_type.value === 'TRAINING') {
+              <div class="field">
+                <label class="field-label" for="cert-program">{{
+                  'certificate_studio.program_name_ar' | translate
+                }}</label>
+                <input
+                  id="cert-program"
+                  class="field-input"
+                  formControlName="program_name"
+                  maxlength="180"
+                  dir="auto"
+                  required
+                />
+                <label class="field-label" for="cert-program-en">{{
+                  'certificate_studio.program_name_en' | translate
+                }}</label>
+                <input
+                  id="cert-program-en"
+                  class="field-input"
+                  formControlName="program_name_en"
+                  maxlength="180"
+                  dir="ltr"
+                  required
+                />
+              </div>
+            }
+            <div class="field signature-editor">
+              <label class="field-label" for="cert-signature">{{
+                'certificate_studio.signature_name' | translate
+              }}</label>
+              <input
+                id="cert-signature"
+                class="field-input"
+                formControlName="signature_name"
+                maxlength="80"
+                dir="auto"
+                required
+              />
+              <small class="field-hint">{{
+                'certificate_studio.signature_hint' | translate
+              }}</small>
+            </div>
+            <div class="form-grid">
+              <div class="field">
+                <label class="field-label" for="cert-hours">{{
+                  'certificate_studio.hours' | translate
+                }}</label>
+                <input
+                  id="cert-hours"
+                  type="number"
+                  min="1"
+                  max="100000"
+                  step="1"
+                  class="field-input"
+                  formControlName="training_hours"
+                  required
+                />
+              </div>
+              <div class="field">
+                <label class="field-label" for="cert-date">{{
+                  'certificate_studio.date' | translate
+                }}</label>
+                <input
+                  id="cert-date"
+                  type="date"
+                  min="1900-01-01"
+                  max="2100-12-31"
+                  class="field-input"
+                  formControlName="issued_at"
+                  required
+                />
+              </div>
+            </div>
+            <p class="field-hint">
+              <i class="fa-solid fa-qrcode" aria-hidden="true"></i>
+              {{ 'certificate_studio.qr_hint' | translate }}
+            </p>
+            <fieldset class="partner-editor" [disabled]="isSaving() || logoBusy()">
+              <legend>
+                {{ 'certificate_studio.partners' | translate }}
+                <span>{{ selectedLogos().length }} / {{ maxLogos }}</span>
+              </legend>
+              <p class="field-hint">{{ 'certificate_studio.partners_hint' | translate }}</p>
+              <div class="partner-library">
+                @for (partner of partners(); track partner.id) {
+                  <button
+                    type="button"
+                    class="partner-choice"
+                    [class.selected]="isPartnerSelected(partner.id)"
+                    [attr.aria-pressed]="isPartnerSelected(partner.id)"
+                    [disabled]="
+                      !isPartnerSelected(partner.id) && selectedLogos().length >= maxLogos
+                    "
+                    (click)="togglePartner(partner)"
+                  >
+                    <img [src]="partner.logo_url" alt="" loading="lazy" />
+                    <span>{{
+                      issueForm.controls.certificate_language.value === 'ar'
+                        ? partner.name_ar
+                        : partner.name_en
+                    }}</span>
+                    <span aria-hidden="true">{{ isPartnerSelected(partner.id) ? '✓' : '+' }}</span>
+                  </button>
+                }
+              </div>
+              @if (partnersLoading()) {
+                <p class="field-hint">{{ 'certificate_studio.partners_loading' | translate }}</p>
+              }
+              @if (partnersError()) {
+                <p class="field-hint">
+                  {{ 'certificate_studio.partners_load_error' | translate }}
+                  <button type="button" class="btn-sm btn-outline-sm" (click)="loadPartners()">
+                    {{ 'common.retry' | translate }}
+                  </button>
+                </p>
+              }
+              <label class="upload-partner-label" for="certificate-partner-files">{{
+                'certificate_studio.upload_logos' | translate
+              }}</label>
+              <input
+                id="certificate-partner-files"
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                multiple
+                (change)="uploadLogos($event)"
+                [disabled]="selectedLogos().length >= maxLogos || logoBusy() || isSaving()"
+              />
+              <small class="field-hint">{{
+                'certificate_studio.logo_file_hint' | translate
+              }}</small>
+              <ol class="selected-partners">
+                @for (logo of selectedLogos(); track $index; let index = $index) {
+                  <li>
+                    <img [src]="logo.data_url" [alt]="logo.name" />
+                    <span>{{ logo.name }}</span>
+                    <div class="logo-actions">
+                      <button
+                        type="button"
+                        [disabled]="index === 0"
+                        (click)="moveLogo(index, -1)"
+                        [attr.aria-label]="
+                          ('certificate_studio.move_earlier' | translate) + ': ' + logo.name
+                        "
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        [disabled]="index === selectedLogos().length - 1"
+                        (click)="moveLogo(index, 1)"
+                        [attr.aria-label]="
+                          ('certificate_studio.move_later' | translate) + ': ' + logo.name
+                        "
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        (click)="removeLogo(index)"
+                        [attr.aria-label]="
+                          ('certificate_studio.remove_logo' | translate) + ': ' + logo.name
+                        "
+                      >
+                        ×
+                      </button>
+                    </div>
+                  </li>
+                }
+              </ol>
+            </fieldset>
+            @if (logoBusy()) {
+              <p class="field-hint" role="status">
+                {{ 'certificate_studio.logo_processing' | translate }}
+              </p>
+            }
+            @if (logoError(); as error) {
+              <div class="form-error-banner" role="alert">
+                {{ error | translate }}
+                <button type="button" class="btn-sm btn-outline-sm" (click)="logoError.set(null)">
+                  {{ 'certificate_studio.dismiss_logo_error' | translate }}
+                </button>
+              </div>
+            }
+            @if (formError(); as error) {
+              <div class="form-error-banner" role="alert">{{ error | translate }}</div>
+            }
           </div>
-
-          @if (formError(); as error) {
-            <div class="form-error-banner">{{ error | translate }}</div>
-          }
-
-          <div class="form-actions">
+          <aside class="studio-preview" aria-live="polite">
+            <div class="preview-heading">
+              <strong>{{ 'certificate_studio.preview' | translate }}</strong
+              ><span>A4 · 300 DPI</span>
+            </div>
+            @if (previewBusy()) {
+              <p class="field-hint">{{ 'certificate_studio.rendering' | translate }}</p>
+            }
+            @if (preview(); as image) {
+              <img [src]="image" [alt]="'certificate_studio.preview' | translate" />
+            }
+            @if (previewError(); as error) {
+              <p class="form-error-banner" role="alert">{{ error | translate }}</p>
+            }
+            <p>{{ 'certificate_studio.preview_hint' | translate }}</p>
+            <div class="locked-artwork">
+              <i class="fa-solid fa-lock" aria-hidden="true"></i>
+              {{ 'certificate_studio.locked' | translate }}
+            </div>
+          </aside>
+          <div class="form-actions studio-actions">
             <button type="button" class="btn-sm btn-outline-sm" (click)="closeIssue()">
               {{ 'common.cancel' | translate }}
             </button>
-            <button type="submit" class="btn-sm btn-primary-sm" [disabled]="isSaving()">
+            <button
+              type="submit"
+              class="btn-sm btn-primary-sm"
+              [disabled]="
+                isSaving() || logoBusy() || !!logoError() || previewBusy() || !!previewError()
+              "
+            >
               @if (isSaving()) {
                 <span class="loader-spinner-sm"></span>
               }
@@ -272,7 +613,7 @@
         <div class="modal-head">
           <h3>{{ 'admin_certificates.delete_title' | translate }}</h3>
           <button type="button" class="icon-btn" (click)="closeDelete()">
-            <i class="fa-solid fa-xmark"></i>
+            <span aria-hidden="true">×</span>
           </button>
         </div>
         <p class="confirm-text">
@@ -283,7 +624,12 @@
           <button type="button" class="btn-sm btn-outline-sm" (click)="closeDelete()">
             {{ 'common.cancel' | translate }}
           </button>
-          <button type="button" class="btn-sm btn-danger-sm" [disabled]="isDeleting()" (click)="confirmDelete()">
+          <button
+            type="button"
+            class="btn-sm btn-danger-sm"
+            [disabled]="isDeleting()"
+            (click)="confirmDelete()"
+          >
             @if (isDeleting()) {
               <span class="loader-spinner-sm"></span>
             }
@@ -296,7 +642,11 @@
 
   @if (toast(); as t) {
     <div class="staff-toast" [class.staff-toast-error]="t.error">
-      <i class="fa-solid" [class.fa-circle-check]="!t.error" [class.fa-circle-exclamation]="t.error"></i>
+      <i
+        class="fa-solid"
+        [class.fa-circle-check]="!t.error"
+        [class.fa-circle-exclamation]="t.error"
+      ></i>
       {{ t.key | translate }}
     </div>
   }

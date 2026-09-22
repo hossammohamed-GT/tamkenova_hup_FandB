@@ -4,7 +4,7 @@
       <h1>{{ 'admin_dashboard.title' | translate }}</h1>
       <p class="text-muted">{{ 'admin_dashboard.subtitle' | translate }}</p>
     </div>
-    <button type="button" class="btn-outline-sm" (click)="load()" [disabled]="isLoading()">
+    <button type="button" class="btn-secondary btn-sm" (click)="load()" [disabled]="isLoading()">
       <i class="fa-solid" [class.fa-spin]="isLoading()">&#xf2f1;</i>
       {{ 'common.retry' | translate }}
     </button>
@@ -30,7 +30,7 @@
         <a
           [routerLink]="card.route"
           class="stat-card staff-fade"
-          [style.--stat-color]="card.color"
+         
         >
           <span class="stat-icon"><i class="fa-solid" [class]="card.icon"></i></span>
           <span class="stat-text">

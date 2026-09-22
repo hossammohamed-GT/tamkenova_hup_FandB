@@ -77,6 +77,10 @@ export class AdminRepository {
 
 
   // Handle update user role
+  // NOTE: no token_version bump — JwtAuthGuard enforces the fresh DB role on
+  // every request, and the client seamlessly re-syncs (see syncSession).
+  // Version bumps stay reserved for true security events (password change,
+  // deactivation) which must force a re-login.
   updateUserRole(id: string, role: string) {
     return this.prisma.users.update({
       where: { id },
@@ -89,7 +93,9 @@ export class AdminRepository {
   updateUserActive(id: string, is_active: boolean) {
     return this.prisma.users.update({
       where: { id },
-      data: { is_active },
+      data: is_active
+        ? { is_active }
+        : { is_active, token_version: { increment: 1 } },
     });
   }
 
@@ -324,31 +330,9 @@ export class AdminRepository {
 
 
   // Handle create certificate
-  createCertificate(data: {
-    student_id: string;
-    trainer_id?: string | null;
-    program_id?: string | null;
-    verification_code: string;
-    title: string;
-    description?: string | null;
-    pdf_url?: string | null;
-    qr_code_url?: string | null;
-    training_hours?: number;
-    certificate_type?: string;
-  }) {
+  createCertificate(data: import('@prisma/client').Prisma.certificatesUncheckedCreateInput) {
     return this.prisma.certificates.create({
-      data: {
-        student_id: data.student_id,
-        trainer_id: data.trainer_id || null,
-        program_id: data.program_id || null,
-        verification_code: data.verification_code,
-        title: data.title,
-        description: data.description || null,
-        pdf_url: data.pdf_url || null,
-        qr_code_url: data.qr_code_url || null,
-        training_hours: data.training_hours || 0,
-        certificate_type: (data.certificate_type as any) || 'OTHER',
-      },
+      data,
       include: {
         users: {
           select: {
@@ -401,7 +385,7 @@ export class AdminRepository {
 
 
   // Handle update certificate
-  updateCertificate(id: string, data: any) {
+  updateCertificate(id: string, data: import('@prisma/client').Prisma.certificatesUncheckedUpdateInput) {
     return this.prisma.certificates.update({ where: { id }, data });
   }
 
@@ -591,6 +575,7 @@ export class AdminRepository {
       pendingCorporateRequestsCount,
       certificatesCount,
       tasksCount,
+      partnersCount,
     ] = await Promise.all([
       this.prisma.users.count(),
       this.prisma.users.count({ where: { role: { in: ['STUDENT', 'CLIENT'] } } }),
@@ -605,6 +590,7 @@ export class AdminRepository {
       this.prisma.corporate_requests.count({ where: { status: 'PENDING' } }),
       this.prisma.certificates.count(),
       this.prisma.tasks.count(),
+      this.prisma.strategic_partners.count(),
     ]);
 
     return {
@@ -621,6 +607,7 @@ export class AdminRepository {
       pending_corporate_requests_count: pendingCorporateRequestsCount,
       certificates_count: certificatesCount,
       tasks_count: tasksCount,
+      partners_count: partnersCount,
     };
   }
 }

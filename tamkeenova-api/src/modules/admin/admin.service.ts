@@ -1,3 +1,4 @@
+import { certificateData } from './certificate-data';
 import {
   BadRequestException,
   Injectable,
@@ -8,7 +9,6 @@ import * as crypto from 'crypto';
 import { AdminRepository } from './admin.repository';
 import { MailService } from '../mail/mail.service';
 import { NotificationsService } from '../notifications/notifications.service';
-import { StorageService } from '../storage/storage.service';
 
 import { ChangeRoleDto } from './dto/change-role.dto';
 import { SetUserActiveDto } from './dto/set-user-active.dto';
@@ -30,7 +30,6 @@ export class AdminService {
     private readonly adminRepo: AdminRepository,
     private readonly mailService: MailService,
     private readonly notificationsService: NotificationsService,
-    private readonly storageService: StorageService,
   ) {}
 
 
@@ -85,6 +84,15 @@ export class AdminService {
   async changeUserRole(adminId: string, id: string, dto: ChangeRoleDto) {
     const user = await this.adminRepo.getUserById(id);
     if (!user) throw new NotFoundException('User not found');
+
+    const actor = await this.adminRepo.getUserById(adminId);
+    const privileged = dto.role === 'ADMIN' || dto.role === 'SUPER_ADMIN';
+    if (privileged && actor?.role !== 'SUPER_ADMIN') {
+      throw new BadRequestException('Only a super admin can assign admin roles');
+    }
+    if (user.role === 'SUPER_ADMIN' && actor?.role !== 'SUPER_ADMIN') {
+      throw new BadRequestException('Only a super admin can change a super admin');
+    }
 
     const updated = await this.adminRepo.updateUserRole(id, dto.role);
 
@@ -483,25 +491,18 @@ export class AdminService {
     const holder = await this.adminRepo.getUserById(dto.user_id);
     if (!holder) throw new NotFoundException('User not found');
 
+    const data = certificateData(dto);
     const verificationCode = this.generateVerificationCode();
-    const qrCodeUrl = this.generateQrCode(verificationCode);
-
     const certificate = await this.adminRepo.createCertificate({
+      ...data,
       student_id: dto.user_id,
-      trainer_id: dto.trainer_id || null,
-      program_id: dto.program_id || null,
       verification_code: verificationCode,
-      title: dto.title,
-      description: dto.description || null,
-      training_hours: dto.training_hours || 0,
-      certificate_type: dto.certificate_type || 'OTHER',
-      qr_code_url: qrCodeUrl,
     });
 
     await this.notifyUser(
       dto.user_id,
       'شهادة جديدة',
-      `تم إصدار شهادة "${dto.title}" لك.`,
+      `تم إصدار شهادة "${data.title}" لك باللغتين العربية والإنجليزية.`,
       'CERTIFICATE_ISSUED',
       certificate.id,
       'CERTIFICATE',
@@ -512,7 +513,7 @@ export class AdminService {
         await this.mailService.sendCertificateIssuedEmail(
           holder.email,
           holder.full_name,
-          dto.title,
+          data.title,
           verificationCode,
         );
       }
@@ -521,11 +522,11 @@ export class AdminService {
     }
 
     await this.adminRepo.logActivity({
-      user_id: dto.user_id,
+      user_id: adminId,
       action: 'CERTIFICATE_ISSUED',
       entity_type: 'CERTIFICATE',
       entity_id: certificate.id,
-      details: `Issued certificate "${dto.title}"`,
+      details: `Issued certificate "${data.title}"`,
     });
 
     return { success: true, message: 'Certificate issued successfully', certificate };
@@ -537,7 +538,15 @@ export class AdminService {
     const existing = await this.adminRepo.getCertificateById(id);
     if (!existing) throw new NotFoundException('Certificate not found');
 
-    const updated = await this.adminRepo.updateCertificate(id, dto);
+    // Older records must be explicitly completed by an administrator before conversion.
+    const data = certificateData({
+      ...existing,
+      ...dto,
+      partner_logos: dto.partner_logos === undefined
+        ? (existing.partner_logos ?? [])
+        : dto.partner_logos,
+    });
+    const updated = await this.adminRepo.updateCertificate(id, data);
     return { success: true, message: 'Certificate updated', certificate: updated };
   }
 
@@ -576,38 +585,6 @@ export class AdminService {
 
     return { success: true, message: 'Certificate deleted' };
   }
-
-
-  // Handle upload certificate pdf
-  async uploadCertificatePdf(id: string, file: Express.Multer.File) {
-    const existing = await this.adminRepo.getCertificateById(id);
-    if (!existing) throw new NotFoundException('Certificate not found');
-
-    if (!file) throw new BadRequestException('No file provided');
-
-    if (file.mimetype !== 'application/pdf') {
-      throw new BadRequestException('Only PDF files are allowed');
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      throw new BadRequestException('File size must not exceed 10MB');
-    }
-
-    const result = await this.storageService.uploadFile(
-      'certificates',
-      file.originalname,
-      file.buffer,
-      file.mimetype,
-    );
-
-    const updated = await this.adminRepo.updateCertificate(id, {
-      pdf_url: result.url,
-    });
-
-    return { success: true, message: 'Certificate PDF uploaded', certificate: updated };
-  }
-
-
 
 
   // Handle list corporate requests
@@ -861,6 +838,15 @@ export class AdminService {
   }
 
 
+  async approveProgram(adminId: string, id: string) {
+    return this.setProgramVisibility(adminId, id, true);
+  }
+
+  async rejectProgram(adminId: string, id: string) {
+    return this.setProgramVisibility(adminId, id, false);
+  }
+
+
   // Handle delete program
   async deleteProgram(adminId: string, id: string) {
     const program = await this.adminRepo.getProgramById(id);
@@ -916,20 +902,9 @@ export class AdminService {
 
   // Handle generate verification code
   private generateVerificationCode() {
-    const code = crypto.randomBytes(4).toString('hex').toUpperCase();
+    const code = crypto.randomBytes(8).toString('hex').toUpperCase();
     return `TAM-${code}`;
   }
 
 
-  // Handle generate qr code
-  private generateQrCode(verificationCode: string): string {
-    const frontendUrl =
-      process.env.FRONTEND_URL || 'https://tamkeenova-hub.vercel.app';
-    const verifyUrl = `${frontendUrl}/verify/${verificationCode}`;
-
-
-
-
-    return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(verifyUrl)}`;
-  }
 }

@@ -7,7 +7,6 @@
   position: fixed;
   inset: 0;
   background: rgba(16, 30, 39, 0.55);
-  backdrop-filter: blur(4px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 320ms ease;
@@ -61,18 +60,12 @@
   position: absolute;
   inset: -7px;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, transparent 0%, var(--color-accent) 35%, transparent 55%);
+  border: 2px solid var(--color-accent);
   opacity: 0;
-  filter: blur(1.5px);
 }
 
 .state-closed .trigger-ring {
-  opacity: 0.6;
-  animation: ring-spin 3.6s linear infinite;
-}
-
-@keyframes ring-spin {
-  to { transform: rotate(360deg); }
+  opacity: 0.45;
 }
 
 .trigger-mark {
@@ -86,40 +79,6 @@
   filter: brightness(0) invert(1);
 }
 
-
-.spark-layer {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 999;
-}
-
-.trail-spark {
-  position: fixed;
-  width: var(--size);
-  height: var(--size);
-  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
-  border-radius: 50%;
-  background: var(--color-accent);
-  box-shadow: 0 0 10px 1px var(--color-accent);
-  opacity: 0;
-  animation: spark-life 760ms ease-out forwards;
-}
-
-@keyframes spark-life {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0) scale(0.4) rotate(0deg);
-  }
-  18% {
-    opacity: 1;
-    transform: translate(calc(var(--dx) * 0.2), calc(var(--dy) * 0.2)) scale(1) rotate(calc(var(--spin) * 40deg));
-  }
-  100% {
-    opacity: 0;
-    transform: translate(var(--dx), var(--dy)) scale(0.2) rotate(calc(var(--spin) * 140deg));
-  }
-}
 
 
 .panel-content {
@@ -173,12 +132,12 @@
 .panel-title {
   font-weight: 700;
   color: var(--color-text);
-  font-size: 0.95rem;
+  font-size: var(--text-md);
 }
 
 .panel-badge {
   color: var(--color-text-muted);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
 }
 
 .panel-close {
@@ -234,7 +193,7 @@
   max-width: 80%;
   padding: 0.65rem 1rem;
   border-radius: var(--radius-md);
-  font-size: 0.9rem;
+  font-size: var(--text-md);
   line-height: 1.7;
 }
 
@@ -296,7 +255,7 @@
   background: var(--color-background);
   color: var(--color-text);
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: var(--text-md);
   line-height: 1.5;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
@@ -355,11 +314,3 @@ html[dir='rtl'] .rtl-flip {
   transform: scaleX(-1);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .trigger-ring {
-    animation: none;
-  }
-  .trail-spark {
-    display: none;
-  }
-}

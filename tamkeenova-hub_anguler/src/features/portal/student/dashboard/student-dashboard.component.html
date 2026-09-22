@@ -8,8 +8,6 @@
   <div class="dashboard-content-stable" [class.is-loading]="isLoading() && hasLoaded()">
     <!-- -- Hero Section -- -->
     <div class="dashboard-hero chamfer-sm">
-      <div class="dashboard-hero-bg"></div>
-
       <div class="dashboard-hero-content">
         <div class="dashboard-hero-avatar">
           @if (avatar()) {
@@ -65,7 +63,6 @@
           <a
             [routerLink]="action.route"
             class="quick-action-card surface chamfer-sm"
-            [attr.data-color]="action.color"
           >
             <div class="quick-action-icon">
               <i class="fa-solid" [class]="action.icon"></i>
@@ -82,9 +79,9 @@
       <h2 class="section-title">{{ 'student_dashboard.overview' | translate }}</h2>
 
       <div class="sections-grid">
-        <a routerLink="/portal/student/enrollments" class="section-card surface chamfer-sm animate-in">
+        <a routerLink="/portal/student/enrollments" class="section-card surface chamfer-sm">
           <div class="section-card-header">
-            <div class="section-card-icon" style="--icon-color: var(--color-primary)">
+            <div class="section-card-icon">
               <i class="fa-solid fa-book"></i>
             </div>
             <div class="section-card-count">{{ activeEnrollments().length }}</div>
@@ -99,9 +96,9 @@
           </div>
         </a>
 
-        <a routerLink="/portal/student/consultations" class="section-card surface chamfer-sm animate-in" style="animation-delay: 0.1s">
+        <a routerLink="/portal/student/consultations" class="section-card surface chamfer-sm">
           <div class="section-card-header">
-            <div class="section-card-icon" style="--icon-color: var(--color-accent)">
+            <div class="section-card-icon">
               <i class="fa-solid fa-comments"></i>
             </div>
             <div class="section-card-count">{{ consultations().length }}</div>
@@ -116,9 +113,9 @@
           </div>
         </a>
 
-        <a routerLink="/portal/student/certificates" class="section-card surface chamfer-sm animate-in" style="animation-delay: 0.2s">
+        <a routerLink="/portal/student/certificates" class="section-card surface chamfer-sm">
           <div class="section-card-header">
-            <div class="section-card-icon" style="--icon-color: var(--color-success)">
+            <div class="section-card-icon">
               <i class="fa-solid fa-certificate"></i>
             </div>
             <div class="section-card-count">{{ profile()?.certificates_count ?? 0 }}</div>
@@ -133,9 +130,9 @@
           </div>
         </a>
 
-        <a routerLink="/portal/student/notifications" class="section-card surface chamfer-sm animate-in" style="animation-delay: 0.3s">
+        <a routerLink="/portal/student/notifications" class="section-card surface chamfer-sm">
           <div class="section-card-header">
-            <div class="section-card-icon" style="--icon-color: var(--color-text)">
+            <div class="section-card-icon">
               <i class="fa-solid fa-bell"></i>
             </div>
             @if (unreadCount() > 0) {

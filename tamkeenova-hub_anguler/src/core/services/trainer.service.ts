@@ -15,6 +15,17 @@ import {
   UpdateTrainerProfilePayload,
 } from '../models/trainer-profile.model';
 
+export interface ReviewSubmitResponse {
+  success: boolean;
+  message: string;
+  updated?: boolean;
+  data?: {
+    review: unknown;
+    average_rating: number;
+    ratings_count: number;
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class TrainerService {
   private http = inject(HttpClient);
@@ -117,9 +128,9 @@ export class TrainerService {
     );
   }
 
-  // -- Submit a Trainer Review --
+  // -- Submit a Trainer Review (re-rating updates the existing review) --
   createReview(trainerId: string, payload: { rating: number; comment: string }) {
-    return this.http.post<ApiSuccessMessage>(`${this.baseUrl}/${trainerId}/reviews`, payload);
+    return this.http.post<ReviewSubmitResponse>(`${this.baseUrl}/${trainerId}/reviews`, payload);
   }
 
   // -- Retrieve Trainer Dashboard Statistics --

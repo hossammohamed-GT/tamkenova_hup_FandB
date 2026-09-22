@@ -47,7 +47,10 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'register/volunteer',
+    path: 'register/volunteer', redirectTo: 'register/trainee', pathMatch: 'full',
+  },
+  {
+    path: 'register/trainee',
     canActivate: [guestGuard],
     loadComponent: () =>
       import('../features/auth/register-volunteer/volunteer-register.component').then(
@@ -66,7 +69,29 @@ export const routes: Routes = [
     loadComponent: () =>
       import('../features/auth/login/login.component').then((m) => m.LoginComponent),
   },
+  {
+    path: 'forgot-password',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('../features/auth/forgot-password/forgot-password.component').then(
+        (m) => m.ForgotPasswordComponent,
+      ),
+  },
+  {
+    path: 'reset-password',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('../features/auth/reset-password/reset-password.component').then(
+        (m) => m.ResetPasswordComponent,
+      ),
+  },
 
+  // All authenticated recipients, including volunteers, can access their own records.
+  {
+    path: 'portal/certificates',
+    canActivate: [authGuard],
+    loadComponent: () => import('../features/portal/student/certificates/student-certificates.component').then(m => m.StudentCertificatesComponent),
+  },
   // -- Student Portal Routes --
   {
     path: 'portal',
@@ -82,7 +107,7 @@ export const routes: Routes = [
         if (role === 'TRAINER') return '/portal/trainer';
         if (role === 'ADMIN' || role === 'SUPER_ADMIN') return '/portal/admin';
         if (role === 'EMPLOYEE') return '/portal/employee';
-        if (role === 'VOLUNTEER') return '/portal/volunteer';
+        if (role === 'VOLUNTEER') return '/portal/trainee';
         return '/portal/student';
       } catch {
         return '/login';
@@ -256,7 +281,10 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'volunteers',
+        path: 'volunteers', redirectTo: 'trainees', pathMatch: 'full',
+      },
+      {
+        path: 'trainees',
         loadComponent: () =>
           import('../features/portal/admin/volunteers/admin-volunteers.component').then(
             (m) => m.AdminVolunteersComponent,
@@ -282,6 +310,10 @@ export const routes: Routes = [
           import('../features/portal/admin/specializations/admin-specializations.component').then(
             (m) => m.AdminSpecializationsComponent,
           ),
+      },
+      {
+        path: 'partners',
+        loadComponent: () => import('../features/portal/admin/partners/admin-partners.component').then((m) => m.AdminPartnersComponent),
       },
       {
         path: 'programs',
@@ -326,12 +358,22 @@ export const routes: Routes = [
             '../features/portal/student/notifications/student-notifications.component'
           ).then((m) => m.StudentNotificationsComponent),
       },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('../features/portal/staff/profile/staff-profile.component').then(
+            (m) => m.StaffProfileComponent,
+          ),
+      },
     ],
   },
 
   // -- Volunteer Portal Routes --
   {
-    path: 'portal/volunteer',
+    path: 'portal/volunteer', redirectTo: 'portal/trainee',
+  },
+  {
+    path: 'portal/trainee',
     canActivate: [authGuard, roleGuard(['VOLUNTEER'])],
     children: [
       {
@@ -363,6 +405,13 @@ export const routes: Routes = [
           import(
             '../features/portal/student/notifications/student-notifications.component'
           ).then((m) => m.StudentNotificationsComponent),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('../features/portal/staff/profile/staff-profile.component').then(
+            (m) => m.StaffProfileComponent,
+          ),
       },
     ],
   },

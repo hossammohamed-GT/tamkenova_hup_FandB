@@ -78,7 +78,7 @@ export class StudentsController {
   // Handle upload avatar
   @UseGuards(JwtAuthGuard)
   @Patch('avatar')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
   async uploadAvatar(
     @CurrentUser() user: any,
     @UploadedFile() file: Express.Multer.File,
