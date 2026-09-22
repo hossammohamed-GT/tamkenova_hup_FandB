@@ -35,23 +35,23 @@
 
   <div class="partners-flip-grid">
     @for (slot of slots(); track $index) {
-      <a class="partner-box surface chamfer-sm" [href]="partners()[$index].website_url || null" [target]="partners()[$index].website_url ? '_blank' : null" rel="noopener">
+      <a class="partner-box surface chamfer-sm" [href]="slot.currentHref || null" [target]="slot.currentHref ? '_blank' : null" rel="noopener">
         <div class="partner-box-track">
           <img
             class="partner-img partner-img-current"
             [class.slide-out]="slot.sliding"
             [class.no-transition]="slot.resetting"
             [src]="slot.currentImg"
-            alt="partner logo"
-            loading="lazy"
+            [alt]="slot.currentAlt"
+            decoding="async"
           />
           <img
             class="partner-img partner-img-next"
             [class.slide-in]="slot.sliding"
             [class.no-transition]="slot.resetting"
             [src]="slot.nextImg"
-            alt="partner logo"
-            loading="lazy"
+            [alt]="slot.nextAlt"
+            decoding="async"
           />
         </div>
       </a>

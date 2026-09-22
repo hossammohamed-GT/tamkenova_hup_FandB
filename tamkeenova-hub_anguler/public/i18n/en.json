@@ -1550,7 +1550,13 @@
     "inactive": "Hidden",
     "hide": "Hide",
     "show": "Show",
-    "load_error": "Could not load partners"
+    "load_error": "Could not load partners",
+    "created": "Partner added successfully",
+    "updated": "Partner updated successfully",
+    "deleted": "Partner deleted",
+    "save_error": "Could not save partner",
+    "delete_error": "Could not delete partner",
+    "url_error": "Enter a valid URL starting with http(s)://"
   },
   "certificate_studio": {
     "TRAINING": "Training certificate",
