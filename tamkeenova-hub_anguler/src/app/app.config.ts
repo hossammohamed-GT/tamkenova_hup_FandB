@@ -13,6 +13,7 @@ import { authInterceptor } from '../core/interceptors/auth.interceptor';
 import { loadingInterceptor } from '../core/interceptors/loading.interceptor';
 import { routes } from './app.routes';
 import { ThemeService } from '../core/services/theme.service';
+import { TransitionLinksService } from '../core/services/transition-links.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -35,6 +36,9 @@ export const appConfig: ApplicationConfig = {
     }),
     provideAppInitializer(() => {
       inject(ThemeService);
+    }),
+    provideAppInitializer(() => {
+      inject(TransitionLinksService).init();
     }),
   ],
 };

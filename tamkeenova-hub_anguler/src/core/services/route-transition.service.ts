@@ -19,7 +19,7 @@ export class RouteTransitionService {
 
   private readonly EXPAND_MS = 1250;
   private readonly REVEAL_DELAY_MS = 120;
-  private readonly COLLAPSE_MS = 1050;
+  private readonly COLLAPSE_MS = 1200;
 
   private busy = false;
 
