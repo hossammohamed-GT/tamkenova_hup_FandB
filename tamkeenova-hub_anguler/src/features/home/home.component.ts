@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, signal, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, signal, inject, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PartnersService } from '../../core/services/partners.service';
@@ -38,7 +38,7 @@ interface PartnerCard {
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private partnersService = inject(PartnersService);
   heroImages = [
     '/images/gallery/gallery-01.jpg',
@@ -55,13 +55,20 @@ export class HomeComponent implements OnInit, OnDestroy {
     '/images/gallery/gallery-21.jpg',
   ];
 
-  stats = [
-    { value: 7, suffix: '+', labelKey: 'home.stats.trainees' },
-    { value: 6, suffix: '+', labelKey: 'home.stats.programs' },
-    { value: 155, suffix: '+', labelKey: 'home.stats.hours' },
-    { value: 5, suffix: '+', labelKey: 'home.stats.partnerships' },
-    { value: 20, suffix: '+', labelKey: 'home.stats.team' },
+  stats: { value: number; suffix: string; labelKey: string; icon: string }[] = [
+    { value: 7, suffix: '+', labelKey: 'home.stats.trainees', icon: 'fa-solid fa-user-graduate' },
+    { value: 6, suffix: '+', labelKey: 'home.stats.programs', icon: 'fa-solid fa-book-open' },
+    { value: 155, suffix: '+', labelKey: 'home.stats.hours', icon: 'fa-solid fa-clock' },
+    { value: 5, suffix: '+', labelKey: 'home.stats.partnerships', icon: 'fa-solid fa-handshake' },
+    { value: 20, suffix: '+', labelKey: 'home.stats.team', icon: 'fa-solid fa-users' },
   ];
+
+  statValues = signal<number[]>([0, 0, 0, 0, 0]);
+  statsVisible = signal(false);
+  statsSection = viewChild<ElementRef<HTMLElement>>('statsSection');
+  private statsObserver?: IntersectionObserver;
+  private statRafs: number[] = [];
+  private statsAnimated = false;
 
   services: ServiceCard[] = [
     {
@@ -160,13 +167,67 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngAfterViewInit(): void {
+    const el = this.statsSection()?.nativeElement;
+    const prefersReduced = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
+    if (!el || prefersReduced || typeof IntersectionObserver === 'undefined') {
+      this.revealStats(true);
+      return;
+    }
+    this.statsObserver = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          this.revealStats(false);
+          this.statsObserver?.disconnect();
+        }
+      },
+      { threshold: 0.25 },
+    );
+    this.statsObserver.observe(el);
+  }
+
   ngOnDestroy(): void {
     if (this.heroTimer) clearInterval(this.heroTimer);
     this.partnerTimers.forEach((t) => clearTimeout(t));
+    this.statsObserver?.disconnect();
     if (typeof cancelAnimationFrame !== 'undefined') {
       this.partnerRafs.forEach((id) => cancelAnimationFrame(id));
+      this.statRafs.forEach((id) => cancelAnimationFrame(id));
     }
     this.partnerRafs = [];
+    this.statRafs = [];
+  }
+
+  private revealStats(instant: boolean): void {
+    if (this.statsAnimated) return;
+    this.statsAnimated = true;
+    this.statsVisible.set(true);
+    if (instant) {
+      this.statValues.set(this.stats.map((stat) => stat.value));
+      return;
+    }
+    this.stats.forEach((_, i) => {
+      const t = setTimeout(() => this.animateStat(i), i * 130);
+      this.partnerTimers.push(t);
+    });
+  }
+
+  private animateStat(index: number): void {
+    const target = this.stats[index].value;
+    const duration = 1500;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      const current = Math.round(target * eased);
+      this.statValues.update((vals) => vals.map((v, i) => (i === index ? current : v)));
+      if (progress < 1) {
+        const raf = requestAnimationFrame(tick);
+        this.statRafs.push(raf);
+      }
+    };
+    const raf = requestAnimationFrame(tick);
+    this.statRafs.push(raf);
   }
 
   private preloadPartnerLogos(): void {

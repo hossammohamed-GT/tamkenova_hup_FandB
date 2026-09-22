@@ -60,15 +60,22 @@
 </section>
 
 
-<section class="stats">
-  @for (stat of stats; track stat.labelKey; let i = $index) {
-    <div class="stat-item" appScrollReveal>
-      <span class="stat-value display"
-        >{{ stat.value }}<span class="stat-suffix">{{ stat.suffix }}</span></span
-      >
-      <span class="stat-label">{{ stat.labelKey | translate }}</span>
-    </div>
-  }
+<section #statsSection class="stats" [class.is-visible]="statsVisible()">
+  <div class="stats-heading">
+    <span class="stats-eyebrow">{{ 'home.stats.eyebrow' | translate }}</span>
+    <h2 class="stats-title">{{ 'home.stats.title' | translate }}</h2>
+  </div>
+
+  <div class="stats-grid">
+    @for (stat of stats; track stat.labelKey; let i = $index) {
+      <div class="stat-item" [style.animation-delay]="i * 90 + 'ms'">
+        <span class="stat-beam" aria-hidden="true"></span>
+        <span class="stat-icon"><i [class]="stat.icon"></i></span>
+        <span class="stat-value">{{ statValues()[i] }}<span class="stat-suffix">{{ stat.suffix }}</span></span>
+        <span class="stat-label">{{ stat.labelKey | translate }}</span>
+      </div>
+    }
+  </div>
 </section>
 
 
