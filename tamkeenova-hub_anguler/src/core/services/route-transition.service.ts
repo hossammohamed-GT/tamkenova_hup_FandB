@@ -5,10 +5,10 @@ import { filter, take } from 'rxjs';
 export type TransitionPhase = 'idle' | 'expand' | 'hold' | 'collapse';
 
 /**
- * Fullscreen circular route transition: a brand-colored circle blooms from
- * the clicked element to the viewport center, expands to cover the screen,
- * the router navigates underneath, then the circle shrinks back to the
- * center revealing the new page.
+ * Spiral route transition: a brand-colored spiral draws itself from the
+ * center while spinning, its line thickening until the coils merge into
+ * full coverage; the router navigates underneath, then the spiral unwinds
+ * the same way revealing the new page.
  */
 @Injectable({ providedIn: 'root' })
 export class RouteTransitionService {
@@ -17,9 +17,9 @@ export class RouteTransitionService {
   readonly phase = signal<TransitionPhase>('idle');
   readonly origin = signal({ x: 0, y: 0 });
 
-  private readonly EXPAND_MS = 1050;
+  private readonly EXPAND_MS = 1250;
   private readonly REVEAL_DELAY_MS = 120;
-  private readonly COLLAPSE_MS = 650;
+  private readonly COLLAPSE_MS = 1050;
 
   private busy = false;
 
