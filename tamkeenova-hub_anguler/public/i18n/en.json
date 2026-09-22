@@ -1054,7 +1054,8 @@
     "consultations": "Consultations",
     "corporate_requests": "Corporate Requests",
     "certificates": "Issued Certificates",
-    "tasks": "Tasks"
+    "tasks": "Tasks",
+    "partners": "Success partners"
   },
   "admin_users": {
     "title": "Users Management",

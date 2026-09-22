@@ -48,6 +48,7 @@ export class AdminDashboardComponent implements OnInit {
         pending_corporate_requests_count: 0,
         certificates_count: 0,
         tasks_count: 0,
+        partners_count: 0,
       }
     );
   });
@@ -123,6 +124,12 @@ export class AdminDashboardComponent implements OnInit {
         value: s.tasks_count,
         icon: 'fa-list-check',
         route: '/portal/admin/tasks',
+      },
+      {
+        labelKey: 'admin_dashboard.partners',
+        value: s.partners_count,
+        icon: 'fa-handshake',
+        route: '/portal/admin/partners',
       },
     ];
   });

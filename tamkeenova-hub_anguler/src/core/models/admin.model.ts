@@ -222,6 +222,7 @@ export interface AdminDashboardStats {
   pending_corporate_requests_count: number;
   certificates_count: number;
   tasks_count: number;
+  partners_count: number;
 }
 
 export interface AdminTask extends Task {

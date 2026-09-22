@@ -575,6 +575,7 @@ export class AdminRepository {
       pendingCorporateRequestsCount,
       certificatesCount,
       tasksCount,
+      partnersCount,
     ] = await Promise.all([
       this.prisma.users.count(),
       this.prisma.users.count({ where: { role: { in: ['STUDENT', 'CLIENT'] } } }),
@@ -589,6 +590,7 @@ export class AdminRepository {
       this.prisma.corporate_requests.count({ where: { status: 'PENDING' } }),
       this.prisma.certificates.count(),
       this.prisma.tasks.count(),
+      this.prisma.strategic_partners.count(),
     ]);
 
     return {
@@ -605,6 +607,7 @@ export class AdminRepository {
       pending_corporate_requests_count: pendingCorporateRequestsCount,
       certificates_count: certificatesCount,
       tasks_count: tasksCount,
+      partners_count: partnersCount,
     };
   }
 }
