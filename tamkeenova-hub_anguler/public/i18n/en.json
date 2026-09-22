@@ -822,7 +822,9 @@
     "certificate_of": "Certificate of Achievement",
     "download_image": "Download certificate image",
     "download_ar": "Download Arabic image",
-    "download_en": "Download English image"
+    "download_en": "Download English image",
+    "template_preview": "Certificate design preview",
+    "download_options": "Choose your language and format"
   },
   "student_corporate": {
     "title": "Corporate Requests",

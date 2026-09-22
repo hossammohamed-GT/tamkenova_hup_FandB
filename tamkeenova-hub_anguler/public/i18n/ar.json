@@ -822,7 +822,9 @@
     "certificate_of": "شهادة إنجاز",
     "download_image": "تحميل صورة الشهادة",
     "download_ar": "تحميل النسخة العربية",
-    "download_en": "تحميل النسخة الإنجليزية"
+    "download_en": "تحميل النسخة الإنجليزية",
+    "template_preview": "معاينة تصميم الشهادة",
+    "download_options": "اختر اللغة وصيغة التنزيل"
   },
   "student_corporate": {
     "title": "طلبات الشركات",
