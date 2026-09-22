@@ -72,21 +72,21 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   services: ServiceCard[] = [
     {
-      icon: 'fa-solid fa-shield-halved',
+      icon: 'fa-solid fa-award',
       titleKey: 'home.services.portal.title',
       descKey: 'home.services.portal.desc',
       linkKey: 'home.services.portal.link',
       route: '/portal',
     },
     {
-      icon: 'fa-solid fa-graduation-cap',
+      icon: 'fa-solid fa-book-open',
       titleKey: 'home.services.programs.title',
       descKey: 'home.services.programs.desc',
       linkKey: 'home.services.programs.link',
       route: '/programs',
     },
     {
-      icon: 'fa-solid fa-handshake',
+      icon: 'fa-solid fa-briefcase',
       titleKey: 'home.services.consulting.title',
       descKey: 'home.services.consulting.desc',
       linkKey: 'home.services.consulting.link',
