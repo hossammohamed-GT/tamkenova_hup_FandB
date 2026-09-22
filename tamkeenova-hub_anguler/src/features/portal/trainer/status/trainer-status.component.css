@@ -162,17 +162,29 @@ li.is-current .tl-label {
 }
 .status-logout {
   margin-top: 1.5rem;
-  background: none;
-  border: none;
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-  cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 42px;
+  padding-inline: 1.25rem;
+  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
+  border: 1.5px solid color-mix(in srgb, var(--color-danger) 35%, transparent);
+  border-radius: var(--radius-sm);
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 .status-logout:hover {
-  color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 16%, transparent);
+  border-color: color-mix(in srgb, var(--color-danger) 60%, transparent);
+}
+.status-logout:focus-visible {
+  outline: 2px solid var(--color-action);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {

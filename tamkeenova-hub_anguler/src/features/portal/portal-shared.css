@@ -220,11 +220,19 @@
   font-weight: 700;
   font-size: var(--text-sm);
   cursor: pointer;
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .btn-outline:hover {
   border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
+}
+
+.btn-outline:focus-visible,
+.icon-btn:focus-visible {
+  outline: 2px solid var(--color-action);
+  outline-offset: 2px;
 }
 
 /* -- Dynamic Document Lists -- */
@@ -356,11 +364,13 @@
 .icon-btn:hover {
   border-color: var(--color-primary);
   color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 7%, var(--color-surface));
 }
 
 .icon-btn-danger:hover {
   border-color: var(--color-danger);
   color: var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 8%, var(--color-surface));
 }
 
 /* -- Empty States -- */

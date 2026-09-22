@@ -251,6 +251,7 @@
 
 .filter-pill:hover {
   border-color: var(--color-primary);
+  background-color: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
 }
 
 .filter-pill.is-active {

@@ -74,15 +74,33 @@
 
 .resend-btn {
   margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  min-height: 40px;
   background: none;
   border: none;
-  color: var(--color-primary);
+  border-radius: var(--radius-sm);
+  color: var(--color-action);
   font-weight: 700;
   font-size: var(--text-sm);
+  font-family: inherit;
   cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.resend-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-action) 10%, transparent);
+  color: var(--color-action-hover);
+}
+
+.resend-btn:focus-visible {
+  outline: 2px solid var(--color-action);
+  outline-offset: 2px;
 }
 
 .resend-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  text-decoration: none;
 }

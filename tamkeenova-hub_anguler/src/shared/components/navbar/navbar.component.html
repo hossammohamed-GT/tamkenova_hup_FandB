@@ -411,8 +411,8 @@
       @if (selectedNotification()?.reference_type === 'PROGRAM' && authService.isAdmin()) {
       <div class="notif-detail-actions">
         <button type="button" class="btn-accent" (click)="approveProgramFromNotification()">{{ 'notifications.approve_program' | translate }}</button>
-        <button type="button" class="btn-outline-sm" (click)="rejectProgramFromNotification()">{{ 'notifications.reject_program' | translate }}</button>
-        <button type="button" class="btn-outline-sm" (click)="goToProgramFromNotification()">{{ 'notifications.view_program' | translate }}</button>
+        <button type="button" class="btn-secondary btn-sm" (click)="rejectProgramFromNotification()">{{ 'notifications.reject_program' | translate }}</button>
+        <button type="button" class="btn-secondary btn-sm" (click)="goToProgramFromNotification()">{{ 'notifications.view_program' | translate }}</button>
       </div>
       }
     </div>

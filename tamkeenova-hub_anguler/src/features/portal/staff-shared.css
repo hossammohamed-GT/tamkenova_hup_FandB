@@ -371,44 +371,94 @@ a.stat-card {
   font-weight: 600;
 }
 
-/* ================= Buttons ================= */
-.btn-sm {
+/* ================= Buttons =================
+   NOTE: every *-sm variant carries the full base layout (not just .btn-sm),
+   so a variant used without the .btn-sm base class still renders as a
+   proper button instead of degrading to bare text. */
+.btn-sm,
+.btn-primary-sm,
+.btn-accent-sm,
+.btn-success-sm,
+.btn-danger-sm,
+.btn-outline-sm {
   height: 36px;
   padding-inline: 0.9rem;
   font-size: var(--text-xs);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
   border-radius: var(--radius-sm);
   font-weight: 700;
   font-family: inherit;
+  line-height: 1.2;
   cursor: pointer;
-  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+  text-decoration: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
 }
 
-.btn-sm:disabled {
+.btn-sm:disabled,
+.btn-primary-sm:disabled,
+.btn-accent-sm:disabled,
+.btn-success-sm:disabled,
+.btn-danger-sm:disabled,
+.btn-outline-sm:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-sm:focus-visible,
+.btn-primary-sm:focus-visible,
+.btn-accent-sm:focus-visible,
+.btn-success-sm:focus-visible,
+.btn-danger-sm:focus-visible,
+.btn-outline-sm:focus-visible,
+.page-btn:focus-visible {
+  outline: 2px solid var(--color-action);
+  outline-offset: 2px;
 }
 
 .btn-primary-sm {
   background: var(--color-primary);
-  border: none;
+  border: 1px solid var(--color-primary);
   color: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-primary-sm:hover:not(:disabled) {
   background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary-sm:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-accent-sm {
   background: var(--color-accent);
-  border: none;
+  border: 1px solid var(--color-accent);
   color: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-accent-sm:hover:not(:disabled) {
   background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-accent-sm:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-success-sm {
@@ -419,6 +469,7 @@ a.stat-card {
 
 .btn-success-sm:hover:not(:disabled) {
   background: color-mix(in srgb, var(--color-success) 22%, transparent);
+  border-color: color-mix(in srgb, var(--color-success) 65%, transparent);
 }
 
 .btn-danger-sm {
@@ -429,10 +480,11 @@ a.stat-card {
 
 .btn-danger-sm:hover:not(:disabled) {
   background: color-mix(in srgb, var(--color-danger) 20%, transparent);
+  border-color: color-mix(in srgb, var(--color-danger) 60%, transparent);
 }
 
 .btn-outline-sm {
-  background: transparent;
+  background: var(--color-surface);
   border: 1.5px solid var(--color-border);
   color: var(--color-text);
 }
@@ -440,6 +492,22 @@ a.stat-card {
 .btn-outline-sm:hover:not(:disabled) {
   border-color: var(--color-primary);
   color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-sm,
+  .btn-primary-sm,
+  .btn-accent-sm,
+  .btn-success-sm,
+  .btn-danger-sm,
+  .btn-outline-sm {
+    transition: none;
+  }
+  .btn-primary-sm:hover:not(:disabled),
+  .btn-accent-sm:hover:not(:disabled) {
+    transform: none;
+  }
 }
 
 /* ================= Modal (fade + subtle scale, no vertical slide) ================= */
