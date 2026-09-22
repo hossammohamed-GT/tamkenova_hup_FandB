@@ -827,3 +827,51 @@ html[dir='rtl'] .rtl-flip {
     animation: none;
   }
 }
+
+/* -- 14. Themed scrollbars (page + every scroll container) ------------------- */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border-strong)) transparent;
+}
+
+[data-theme='dark'] {
+  scrollbar-color: color-mix(in srgb, var(--color-action) 55%, var(--color-border-strong)) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-border-strong));
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--color-primary) 62%, var(--color-border-strong));
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background-color: color-mix(in srgb, var(--color-action) 42%, var(--color-border-strong));
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in srgb, var(--color-action) 68%, var(--color-border-strong));
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
