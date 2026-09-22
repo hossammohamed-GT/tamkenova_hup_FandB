@@ -3,7 +3,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.7rem 1.3rem;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   cursor: pointer;
 }
@@ -44,7 +44,7 @@
   border-radius: 999px;
   background: var(--color-surface);
   color: var(--color-text-muted);
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -65,7 +65,7 @@
   display: inline-block;
   margin-top: 1rem;
   padding: 0.7rem 1.4rem;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   cursor: pointer;
 }
@@ -95,12 +95,12 @@
 }
 
 .corp-title {
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: 700;
 }
 
 .corp-desc {
-  font-size: 0.84rem;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
   line-height: 1.6;
 }
@@ -109,7 +109,7 @@
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  font-size: 0.76rem;
+  font-size: var(--text-xs);
 }
 
 .corp-meta span {
@@ -125,7 +125,7 @@
 .btn-sm {
   height: 40px;
   padding-inline: 1rem;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -138,7 +138,7 @@
   gap: 0.5rem;
   min-height: 46px;
   padding: 0.5rem 1.4rem;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   cursor: pointer;
 }
@@ -157,18 +157,18 @@
 }
 
 .modal-head h3 {
-  font-size: 1.05rem;
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: 700;
 }
 
 .modal-title {
-  font-size: 1.1rem;
-  font-weight: 800;
+  font-size: var(--text-xl);
+  font-weight: 700;
   margin-bottom: 0.6rem;
 }
 
 .modal-desc {
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   line-height: 1.7;
   color: var(--color-text-muted);
   margin: 0.9rem 0;
@@ -189,7 +189,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .detail-col {
@@ -199,13 +199,13 @@
 }
 
 .attach-title {
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
   margin: 1.25rem 0 0.6rem;
 }
 
 .attach-empty {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .attach-list {
@@ -222,7 +222,7 @@
   padding: 0.7rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   transition: border-color var(--transition-fast);
 }

@@ -41,8 +41,7 @@
 .auth-visual-brand {
   font-family: var(--font-numeric);
   font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: 0.01em;
+  font-size: var(--text-lg);
 }
 
 .auth-visual-brand-accent {
@@ -57,14 +56,14 @@
 }
 
 .auth-visual-title {
-  font-size: 1.85rem;
+  font-size: var(--text-3xl);
   line-height: 1.25;
   font-weight: 700;
 }
 
 .auth-visual-subtitle {
   margin-top: 0.85rem;
-  font-size: 0.95rem;
+  font-size: var(--text-md);
   line-height: 1.6;
   color: color-mix(in srgb, #fff 72%, transparent);
 }
@@ -114,12 +113,12 @@
   border-radius: 50%;
   background: color-mix(in srgb, #fff 10%, transparent);
   border: 1px solid color-mix(in srgb, #fff 20%, transparent);
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   color: var(--color-accent);
 }
 
 .auth-visual-node-label {
-  font-size: 0.68rem;
+  font-size: var(--text-micro);
   text-align: center;
   color: color-mix(in srgb, #fff 65%, transparent);
   font-weight: 600;
@@ -131,7 +130,7 @@
   margin-top: 2.5rem;
   padding-top: 1.5rem;
   border-top: 1px solid color-mix(in srgb, #fff 15%, transparent);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   line-height: 1.6;
   color: color-mix(in srgb, #fff 68%, transparent);
 }

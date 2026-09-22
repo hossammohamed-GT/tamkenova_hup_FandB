@@ -60,9 +60,8 @@
 .brand-word-main {
   font-family: var(--font-numeric);
   font-weight: 700;
-  font-size: 1.15rem;
+  font-size: var(--text-xl);
   color: var(--color-text);
-  letter-spacing: 0.01em;
 }
 
 .brand-word-accent {
@@ -70,9 +69,9 @@
 }
 
 .brand-word-sub {
-  font-size: 0.68rem;
+  font-size: var(--text-micro);
   color: var(--color-text-muted);
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   margin-block-start: 0.15rem;
 }
@@ -91,7 +90,7 @@ html[dir='rtl'] .brand-word-sub {
   position: relative;
   color: var(--color-text-muted);
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: var(--text-md);
   font-weight: 600;
   padding-block: 0.4rem;
   transition: color var(--transition-fast);
@@ -140,7 +139,7 @@ html[dir='rtl'] .brand-word-sub {
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--color-surface-alt) 55%, transparent);
   color: var(--color-text);
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   cursor: pointer;
   transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
@@ -168,7 +167,7 @@ html[dir='rtl'] .brand-word-sub {
 
 .navbar-cta {
   padding: 0.65rem 1.4rem;
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   text-decoration: none;
   white-space: nowrap;
@@ -184,7 +183,7 @@ html[dir='rtl'] .brand-word-sub {
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--color-surface-alt) 55%, transparent);
   color: var(--color-text);
-  font-size: 1.05rem;
+  font-size: var(--text-lg);
   cursor: pointer;
 }
 
@@ -235,7 +234,7 @@ html[dir='rtl'] .mobile-panel {
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text);
   text-decoration: none;
-  font-size: 1.15rem;
+  font-size: var(--text-xl);
   font-weight: 700;
 }
 
@@ -354,16 +353,16 @@ html[dir='rtl'] .mobile-link-icon {
   border-radius: 50%;
   background: var(--color-primary);
   color: #fff;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: var(--tracking-wide);
   flex-shrink: 0;
 }
 
 .user-avatar-lg {
   width: 44px;
   height: 44px;
-  font-size: 0.9rem;
+  font-size: var(--text-md);
 }
 
 .user-avatar-img {
@@ -381,7 +380,7 @@ html[dir='rtl'] .mobile-link-icon {
 }
 
 .user-caret {
-  font-size: 0.7rem;
+  font-size: var(--text-micro);
   color: var(--color-text-muted);
   margin-inline-end: 0.3rem;
   transition: transform var(--transition-fast);
@@ -431,7 +430,7 @@ html[dir='rtl'] .mobile-link-icon {
 
 .user-name {
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: var(--text-md);
   color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;
@@ -439,7 +438,7 @@ html[dir='rtl'] .mobile-link-icon {
 }
 
 .user-email {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -449,10 +448,10 @@ html[dir='rtl'] .mobile-link-icon {
   align-self: flex-start;
   margin-top: 0.2rem;
   padding: 0.15rem 0.55rem;
-  font-size: 0.65rem;
+  font-size: var(--text-micro);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: var(--tracking-wide);
   color: var(--color-accent-text);
   background: color-mix(in srgb, var(--color-accent) 12%, transparent);
   border-radius: 999px;
@@ -474,7 +473,7 @@ html[dir='rtl'] .mobile-link-icon {
   background: none;
   border-radius: var(--radius-sm);
   color: var(--color-text);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   font-weight: 600;
   text-align: start;
   cursor: pointer;
@@ -527,8 +526,8 @@ html[dir='rtl'] .mobile-link-icon {
   border-radius: 999px;
   background: var(--color-danger);
   color: #fff;
-  font-size: 0.62rem;
-  font-weight: 800;
+  font-size: var(--text-micro);
+  font-weight: 700;
 }
 
 .notif-badge-inline {
@@ -542,8 +541,8 @@ html[dir='rtl'] .mobile-link-icon {
   border-radius: 999px;
   background: var(--color-danger);
   color: #fff;
-  font-size: 0.68rem;
-  font-weight: 800;
+  font-size: var(--text-micro);
+  font-weight: 700;
 }
 
 /* ===== Notifications Glass Dropdown ===== */
@@ -605,8 +604,8 @@ html[dir='rtl'] .mobile-link-icon {
 }
 
 .notif-glass-header h4 {
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
   color: var(--color-text);
 }
 
@@ -620,8 +619,8 @@ html[dir='rtl'] .mobile-link-icon {
   border-radius: 999px;
   background: var(--color-danger);
   color: #fff;
-  font-size: 0.7rem;
-  font-weight: 800;
+  font-size: var(--text-micro);
+  font-weight: 700;
 }
 
 .notif-glass-loading,
@@ -702,7 +701,7 @@ html[dir='rtl'] .mobile-link-icon {
 }
 
 .notif-glass-title {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-text);
   white-space: nowrap;
@@ -719,7 +718,7 @@ html[dir='rtl'] .mobile-link-icon {
 }
 
 .notif-glass-msg {
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   line-height: 1.5;
   color: var(--color-text-muted);
   margin: 0.2rem 0 0.35rem;
@@ -730,7 +729,7 @@ html[dir='rtl'] .mobile-link-icon {
 }
 
 .notif-glass-time {
-  font-size: 0.68rem;
+  font-size: var(--text-micro);
   color: var(--color-text-muted);
   display: inline-flex;
   align-items: center;
@@ -754,7 +753,7 @@ html[dir='rtl'] .mobile-link-icon {
   border-radius: var(--radius-md);
   background: var(--color-surface);
   color: var(--color-text);
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   cursor: pointer;
   transition: border-color var(--transition-fast), color var(--transition-fast);
@@ -821,8 +820,8 @@ html[dir='rtl'] .mobile-link-icon {
 }
 
 .notif-detail-header h3 {
-  font-size: 1.05rem;
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -902,10 +901,10 @@ html[dir='rtl'] .mobile-link-icon {
 
 .notif-detail-type {
   display: inline-block;
-  font-size: 0.66rem;
-  font-weight: 800;
+  font-size: var(--text-micro);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--tracking-wide);
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
   margin-bottom: 0.4rem;
@@ -919,19 +918,19 @@ html[dir='rtl'] .mobile-link-icon {
 .notif-detail-type.tone-neutral { background: color-mix(in srgb, var(--color-text-muted) 12%, transparent); color: var(--color-text-muted); }
 
 .notif-detail-original h4 {
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
   margin-bottom: 0.3rem;
 }
 
 .notif-detail-original p {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   line-height: 1.6;
   margin-bottom: 0.5rem;
 }
 
 .notif-detail-date {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   color: var(--color-text-muted);
   display: inline-flex;
   align-items: center;
@@ -943,8 +942,8 @@ html[dir='rtl'] .mobile-link-icon {
 }
 
 .notif-detail-section h4 {
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: 700;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
@@ -974,7 +973,7 @@ html[dir='rtl'] .mobile-link-icon {
 }
 
 .notif-detail-row p {
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   line-height: 1.7;
   color: var(--color-text);
   background: var(--color-surface-alt);
@@ -992,7 +991,7 @@ html[dir='rtl'] .mobile-link-icon {
 }
 
 .notif-detail-section-inner h5 {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   margin-bottom: 0.8rem;
   display: flex;
@@ -1024,7 +1023,7 @@ html[dir='rtl'] .mobile-link-icon {
   align-items: center;
   justify-content: center;
   color: var(--color-text-muted);
-  font-size: 1.3rem;
+  font-size: var(--text-2xl);
   border: 2px solid var(--color-border);
   flex-shrink: 0;
 }
@@ -1036,12 +1035,12 @@ html[dir='rtl'] .mobile-link-icon {
 }
 
 .notif-person-card strong {
-  font-size: 0.92rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
 }
 
 .notif-person-card span {
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
 }
 
 .notif-detail-actions {
@@ -1055,7 +1054,7 @@ html[dir='rtl'] .mobile-link-icon {
   padding-inline: 1.3rem;
   border-radius: var(--radius-md);
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;

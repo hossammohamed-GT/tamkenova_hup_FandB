@@ -5,13 +5,13 @@
   height: 46px;
   padding-inline: 1.3rem;
   font-weight: 700;
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   cursor: pointer;
 }
 
 .empty-state p {
   margin-bottom: 1.25rem;
-  font-size: 0.95rem;
+  font-size: var(--text-md);
 }
 
 /* -- Program Grid -- */
@@ -74,14 +74,14 @@
 }
 
 .program-card-title {
-  font-size: 1.02rem;
+  font-size: var(--text-lg);
   font-weight: 700;
   color: var(--color-text);
   line-height: 1.4;
 }
 
 .program-card-desc {
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   line-height: 1.55;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -96,7 +96,7 @@
   gap: 0.75rem;
   margin-top: auto;
   padding-top: 0.5rem;
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
@@ -108,12 +108,12 @@
 }
 
 .program-price strong {
-  font-size: 1.15rem;
+  font-size: var(--text-xl);
   color: var(--color-primary);
 }
 
 .program-price s {
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
 }
 
 .program-duration {
@@ -139,8 +139,8 @@
 }
 
 .modal-head h2 {
-  font-size: 1.15rem;
-  font-weight: 800;
+  font-size: var(--text-xl);
+  font-weight: 700;
   color: var(--color-text);
 }
 
@@ -163,13 +163,13 @@
 }
 
 .confirm-card h2 {
-  font-size: 1.1rem;
-  font-weight: 800;
+  font-size: var(--text-xl);
+  font-weight: 700;
   margin-bottom: 0.4rem;
 }
 
 .confirm-card p {
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   line-height: 1.6;
 }
 
@@ -185,7 +185,7 @@
   background: var(--color-danger);
   color: #fff;
   font-weight: 700;
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   cursor: pointer;
   transition: filter var(--transition-fast);
 }

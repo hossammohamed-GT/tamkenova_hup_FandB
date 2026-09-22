@@ -15,8 +15,8 @@
 }
 
 .portal-header h1 {
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-size: var(--text-3xl);
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 0.7rem;
@@ -36,7 +36,7 @@
   background: var(--color-surface-1);
   border: 1px solid var(--color-border);
   border-radius: 999px;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 700;
 }
 
@@ -63,7 +63,7 @@
   border-radius: 999px;
   background: var(--color-surface);
   color: var(--color-text-muted);
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -140,7 +140,7 @@
   background: var(--color-surface-alt);
   display: grid;
   place-items: center;
-  font-size: 1.3rem;
+  font-size: var(--text-2xl);
   color: var(--color-text-muted);
   border: 2px solid var(--color-border);
   flex-shrink: 0;
@@ -152,14 +152,14 @@
 }
 
 .consult-title {
-  font-size: 1.05rem;
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: 700;
   color: var(--color-text);
   margin-bottom: 0.25rem;
 }
 
 .consult-student-name {
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -168,7 +168,7 @@
 }
 
 .email-badge {
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   opacity: 0.8;
 }
 
@@ -179,7 +179,7 @@
   background: color-mix(in srgb, var(--color-primary) 10%, transparent);
   color: var(--color-primary);
   border-radius: 999px;
-  font-size: 0.7rem;
+  font-size: var(--text-micro);
   font-weight: 700;
 }
 
@@ -197,8 +197,8 @@
   gap: 0.3rem;
   padding: 0.3rem 0.75rem;
   border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 800;
+  font-size: var(--text-micro);
+  font-weight: 700;
   text-transform: uppercase;
 }
 
@@ -221,7 +221,7 @@
 }
 
 .consult-date {
-  font-size: 0.76rem;
+  font-size: var(--text-xs);
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
@@ -238,7 +238,7 @@
 
 .consult-desc {
   margin-top: 0.2rem;
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   line-height: 1.7;
   color: var(--color-text-muted);
   background: var(--color-surface-2);
@@ -262,7 +262,7 @@
   background: var(--color-surface-alt);
   border: 1px solid var(--color-border);
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   color: var(--color-text-muted);
 }
 
@@ -294,8 +294,8 @@
   color: #fff;
   border: none;
   border-radius: 10px;
-  font-size: 0.85rem;
-  font-weight: 800;
+  font-size: var(--text-sm);
+  font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 16px color-mix(in srgb, var(--color-primary) 25%, transparent);
   transition: all 0.25s ease;
@@ -313,7 +313,7 @@
 }
 
 .quick-action-chip {
-  font-size: 0.7rem;
+  font-size: var(--text-micro);
   padding: 0.3rem 0.65rem;
   border-radius: 999px;
   background: var(--color-surface-alt);
@@ -346,7 +346,7 @@
   height: 40px;
   padding-inline: 1.1rem;
   border-radius: 10px;
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -379,8 +379,8 @@
 .btn-accent.btn-update {
   height: 46px;
   padding-inline: 1.6rem;
-  font-size: 0.9rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
   background: var(--color-accent);
   border: none;
 }
@@ -393,7 +393,7 @@
 
 .btn-sm {
   height: 38px;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
 }
 
 /* Modal premium */
@@ -419,8 +419,8 @@
 }
 
 .modal-head h3 {
-  font-size: 1.15rem;
-  font-weight: 900;
+  font-size: var(--text-xl);
+  font-weight: 700;
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -458,8 +458,8 @@
 }
 
 .modal-title {
-  font-size: 1.25rem;
-  font-weight: 900;
+  font-size: var(--text-xl);
+  font-weight: 700;
   color: var(--color-text);
 }
 
@@ -468,8 +468,8 @@
 }
 
 .detail-section h5 {
-  font-size: 0.92rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
   margin-bottom: 0.8rem;
   display: flex;
   align-items: center;
@@ -482,7 +482,7 @@
 }
 
 .detail-desc {
-  font-size: 0.92rem;
+  font-size: var(--text-md);
   line-height: 1.8;
   background: var(--color-surface-alt);
   padding: 1.1rem;
@@ -519,7 +519,7 @@
   background: var(--color-surface-alt);
   display: grid;
   place-items: center;
-  font-size: 1.6rem;
+  font-size: var(--text-3xl);
   color: var(--color-text-muted);
   border: 3px solid var(--color-border);
   flex-shrink: 0;
@@ -533,12 +533,12 @@
 }
 
 .person-info strong {
-  font-size: 1.05rem;
-  font-weight: 900;
+  font-size: var(--text-lg);
+  font-weight: 700;
 }
 
 .person-info span {
-  font-size: 0.84rem;
+  font-size: var(--text-sm);
   display: flex;
   align-items: center;
   gap: 0.45rem;
@@ -552,7 +552,7 @@
 
 .person-bio {
   margin-top: 0.6rem;
-  font-size: 0.84rem;
+  font-size: var(--text-sm);
   line-height: 1.6;
   color: var(--color-text-muted);
   background: var(--color-surface);
@@ -579,7 +579,7 @@
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  font-size: 0.9rem;
+  font-size: var(--text-md);
   padding: 0.7rem 0;
   border-bottom: 1px dashed var(--color-border);
 }
@@ -595,7 +595,7 @@
   border-radius: 10px;
   border: 1px solid var(--color-border);
   line-height: 1.7;
-  font-size: 0.9rem;
+  font-size: var(--text-md);
 }
 
 .glass-update {
@@ -607,8 +607,8 @@
 }
 
 .glass-update h5 {
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
   margin-bottom: 1.1rem;
   display: flex;
   align-items: center;
@@ -629,7 +629,7 @@
   border: 1.5px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
-  font-size: 0.84rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
@@ -669,7 +669,7 @@
 .field-label {
   display: block;
   margin-bottom: 0.45rem;
-  font-size: 0.84rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-text);
 }
@@ -682,7 +682,7 @@
   border-radius: 10px;
   background: var(--color-surface);
   color: var(--color-text);
-  font-size: 0.9rem;
+  font-size: var(--text-md);
   transition: all 0.2s ease;
 }
 
@@ -703,7 +703,7 @@
   color: var(--color-danger);
   border: 1px solid color-mix(in srgb, var(--color-danger) 25%, transparent);
   border-radius: 10px;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -715,7 +715,7 @@
   background: color-mix(in srgb, var(--color-text-muted) 8%, transparent);
   border: 1px dashed var(--color-border);
   border-radius: 10px;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
   display: flex;
   align-items: center;

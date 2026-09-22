@@ -8,7 +8,7 @@
   margin-inline: auto;
 }
 .empty-hint {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   margin-top: 0.4rem;
 }
 .empty-cta {
@@ -41,7 +41,7 @@
 .preview-caption {
   display: block;
   color: #e4d0ad;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 600;
   margin-bottom: 0.8rem;
 }
@@ -69,7 +69,7 @@
   display: inline-flex;
   padding: 0.3rem 0.7rem;
   border-radius: 6px;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   line-height: 1.6;
   color: var(--color-text);
@@ -81,8 +81,8 @@
 .cert-title {
   margin: 0;
   color: var(--color-text);
-  font-size: 1.2rem;
-  font-weight: 800;
+  font-size: var(--text-xl);
+  font-weight: 700;
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
@@ -90,7 +90,7 @@
 .cert-program {
   margin-top: 0.4rem;
   color: var(--color-text-muted);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   line-height: 1.7;
   overflow-wrap: anywhere;
 }
@@ -105,13 +105,13 @@
 .cert-details dt,
 .detail-label {
   color: var(--color-text-muted);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   line-height: 1.7;
 }
 .cert-details dd {
   margin: 0.3rem 0 0;
   color: var(--color-text);
-  font-size: 0.95rem;
+  font-size: var(--text-md);
   font-weight: 700;
 }
 .cert-code-row {
@@ -128,7 +128,7 @@
 .cert-code {
   flex: 1;
   min-width: 0;
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   color: var(--color-text);
   overflow-wrap: anywhere;
   line-height: 1.7;
@@ -145,7 +145,7 @@
   border: 1px solid var(--color-border);
   border-radius: 6px;
   font: inherit;
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
   cursor: pointer;
 }
 .cert-actions {
@@ -154,7 +154,7 @@
   margin-top: 1.4rem;
 }
 .downloads-heading {
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   line-height: 1.6;
   font-weight: 700;
   color: var(--color-text);
@@ -173,7 +173,7 @@
   gap: 0.55rem;
   margin-bottom: 0.7rem;
   color: var(--color-text);
-  font-size: 0.83rem;
+  font-size: var(--text-sm);
   font-weight: 700;
 }
 .edition-code {
@@ -181,8 +181,8 @@
   border: 1px solid var(--color-border);
   border-radius: 5px;
   padding: 0.15rem 0.4rem;
-  font-size: 0.65rem;
-  letter-spacing: 0.06em;
+  font-size: var(--text-micro);
+  letter-spacing: var(--tracking-wide);
 }
 .edition-buttons {
   display: grid;
@@ -200,7 +200,7 @@
   border: 1px solid transparent;
   border-radius: 8px;
   font: inherit;
-  font-size: 0.83rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   line-height: 1.6;
   white-space: normal;
@@ -244,7 +244,7 @@
   border-radius: 0 0 19px 19px;
   color: var(--color-text);
   background: var(--color-surface-alt);
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   text-decoration: none;
 }
@@ -277,7 +277,7 @@
 }
 .legacy-note {
   color: var(--color-text-muted);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   line-height: 1.8;
   margin-top: 1rem;
 }
@@ -287,7 +287,7 @@
   gap: 0.5rem;
   margin-top: 0.9rem;
   color: var(--color-text);
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   line-height: 1.7;
 }
 .download-spinner {
@@ -312,7 +312,7 @@
     padding: 0.9rem 1.1rem 1.1rem;
   }
   .cert-title {
-    font-size: 1.05rem;
+    font-size: var(--text-lg);
   }
   .edition-downloads {
     padding: 0.7rem;
@@ -320,7 +320,7 @@
   .cert-download {
     gap: 0.3rem;
     padding-inline: 0.4rem;
-    font-size: 0.78rem;
+    font-size: var(--text-xs);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -359,6 +359,6 @@
     display: none;
   }
   .cert-code {
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
   }
 }

@@ -15,11 +15,11 @@
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-primary);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: var(--tracking-wide);
   margin-bottom: 1rem;
 }
 
@@ -29,15 +29,15 @@
 }
 
 .section-title {
-  font-size: clamp(1.75rem, 4vw, 2.5rem);
-  font-weight: 800;
+  font-size: var(--text-display-md);
+  font-weight: 700;
   color: var(--color-text);
   line-height: 1.2;
   margin-bottom: 0.75rem;
 }
 
 .section-subtitle {
-  font-size: 1rem;
+  font-size: var(--text-lg);
   line-height: 1.7;
   color: var(--color-text-muted);
 }
@@ -78,7 +78,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.9rem 1.75rem;
-  font-size: 0.95rem;
+  font-size: var(--text-md);
   font-weight: 700;
   color: var(--color-primary);
   text-decoration: none;
@@ -104,7 +104,7 @@ html[dir="rtl"] .view-all-btn:hover i {
   padding: 0.35rem 0.75rem;
   background: var(--color-surface-alt);
   border-radius: 999px;
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   color: var(--color-text-muted);
 }
 
@@ -164,14 +164,14 @@ html[dir="rtl"] .view-all-btn:hover i {
 }
 
 .empty-title {
-  font-size: 1.2rem;
+  font-size: var(--text-xl);
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: 0.5rem;
 }
 
 .empty-text {
-  font-size: 0.9rem;
+  font-size: var(--text-md);
   line-height: 1.6;
   color: var(--color-text-muted);
 }

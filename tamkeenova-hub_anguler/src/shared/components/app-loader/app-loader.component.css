@@ -58,9 +58,9 @@
   display: flex;
   margin-block-start: 1.5rem;
   font-family: var(--font-numeric, 'Space Grotesk', sans-serif);
-  font-size: 1.5rem;
+  font-size: var(--text-2xl);
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: var(--tracking-wide);
   direction: ltr;
 }
 
@@ -108,7 +108,7 @@
 
 .loader-status-text {
   color: var(--color-text-muted);
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 600;
 }
 

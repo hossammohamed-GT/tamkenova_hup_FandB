@@ -27,13 +27,13 @@
 }
 
 .gauge-title {
-  font-size: 0.9rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
   color: var(--color-text);
 }
 
 .gauge-hint {
-  font-size: 0.74rem;
+  font-size: var(--text-xs);
   max-width: 180px;
   text-align: center;
   line-height: 1.5;
@@ -100,12 +100,12 @@
 }
 
 .quick-text strong {
-  font-size: 0.9rem;
+  font-size: var(--text-md);
   color: var(--color-text);
 }
 
 .quick-text small {
-  font-size: 0.74rem;
+  font-size: var(--text-xs);
 }
 
 .quick-arrow {

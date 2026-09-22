@@ -27,13 +27,13 @@
 }
 
 .gauge-title {
-  font-size: 0.9rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
   color: var(--color-text);
 }
 
 .gauge-hint {
-  font-size: 0.74rem;
+  font-size: var(--text-xs);
   max-width: 180px;
   text-align: center;
   line-height: 1.5;
@@ -51,14 +51,14 @@
 .impact-title {
   margin-top: 1.75rem;
   margin-bottom: 1rem;
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: 700;
   color: var(--color-text);
 }
 
 .section-title {
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: 700;
   color: var(--color-text);
 }
 
@@ -67,7 +67,7 @@
 }
 
 .last-task-title {
-  font-size: 0.86rem;
+  font-size: var(--text-sm);
   color: var(--color-text);
 }
 
@@ -75,7 +75,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-accent);
 }
@@ -130,12 +130,12 @@
 }
 
 .quick-text strong {
-  font-size: 0.9rem;
+  font-size: var(--text-md);
   color: var(--color-text);
 }
 
 .quick-text small {
-  font-size: 0.74rem;
+  font-size: var(--text-xs);
 }
 
 .quick-arrow {
