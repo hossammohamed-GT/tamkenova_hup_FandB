@@ -85,10 +85,10 @@ export class AdminDashboardComponent implements OnInit {
         value: s.volunteers_count,
         icon: 'fa-people-group',
         color: 'var(--color-success)',
-        route: '/portal/admin/volunteers',
+        route: '/portal/admin/trainees',
         pending: s.pending_volunteers_count,
         pendingLabelKey: 'admin_dashboard.pending',
-        pendingRoute: '/portal/admin/volunteers',
+        pendingRoute: '/portal/admin/trainees',
       },
       {
         labelKey: 'admin_dashboard.employees',

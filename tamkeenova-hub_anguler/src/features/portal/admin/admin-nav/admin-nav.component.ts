@@ -26,7 +26,7 @@ export class AdminNavComponent {
     { labelKey: 'admin_nav.dashboard', route: '/portal/admin', icon: 'fa-gauge-high', exact: true },
     { labelKey: 'admin_nav.users', route: '/portal/admin/users', icon: 'fa-users' },
     { labelKey: 'admin_nav.trainers', route: '/portal/admin/trainers', icon: 'fa-chalkboard-user', badge: 'trainers' },
-    { labelKey: 'admin_nav.volunteers', route: '/portal/admin/volunteers', icon: 'fa-people-group', badge: 'volunteers' },
+    { labelKey: 'admin_nav.volunteers', route: '/portal/admin/trainees', icon: 'fa-people-group', badge: 'volunteers' },
     { labelKey: 'admin_nav.certificates', route: '/portal/admin/certificates', icon: 'fa-certificate' },
     { labelKey: 'admin_nav.corporate', route: '/portal/admin/corporate', icon: 'fa-building', badge: 'corporate' },
     { labelKey: 'admin_nav.specializations', route: '/portal/admin/specializations', icon: 'fa-layer-group' },

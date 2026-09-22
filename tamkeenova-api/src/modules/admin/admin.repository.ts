@@ -324,41 +324,9 @@ export class AdminRepository {
 
 
   // Handle create certificate
-  createCertificate(data: {
-    student_id: string;
-    trainer_id?: string | null;
-    program_id?: string | null;
-    verification_code: string;
-    title: string;
-    title_ar?: string | null;
-    title_en?: string | null;
-    description?: string | null;
-    description_ar?: string | null;
-    description_en?: string | null;
-    pdf_url?: string | null;
-    qr_code_url?: string | null;
-    partner_ids?: string[];
-    training_hours?: number;
-    certificate_type?: string;
-  }) {
+  createCertificate(data: import('@prisma/client').Prisma.certificatesUncheckedCreateInput) {
     return this.prisma.certificates.create({
-      data: {
-        student_id: data.student_id,
-        trainer_id: data.trainer_id || null,
-        program_id: data.program_id || null,
-        verification_code: data.verification_code,
-        title: data.title,
-        title_ar: data.title_ar || null,
-        title_en: data.title_en || null,
-        description: data.description || null,
-        description_ar: data.description_ar || null,
-        description_en: data.description_en || null,
-        pdf_url: data.pdf_url || null,
-        qr_code_url: data.qr_code_url || null,
-        partner_ids: data.partner_ids || [],
-        training_hours: data.training_hours || 0,
-        certificate_type: (data.certificate_type as any) || 'OTHER',
-      },
+      data,
       include: {
         users: {
           select: {
@@ -411,7 +379,7 @@ export class AdminRepository {
 
 
   // Handle update certificate
-  updateCertificate(id: string, data: any) {
+  updateCertificate(id: string, data: import('@prisma/client').Prisma.certificatesUncheckedUpdateInput) {
     return this.prisma.certificates.update({ where: { id }, data });
   }
 

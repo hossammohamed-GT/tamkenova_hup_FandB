@@ -341,6 +341,11 @@ model student_enrollments {
 }
 
 model certificates {
+  certificate_language String?      @db.VarChar(2)
+  partner_logos      Json?
+  recipient_name    String?          @db.VarChar(120)
+  program_name      String?          @db.VarChar(180)
+  template_version  String?          @db.VarChar(20)
   id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   student_id        String           @db.Uuid
   trainer_id        String?          @db.Uuid

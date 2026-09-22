@@ -106,7 +106,7 @@ export class NavbarComponent {
     if (role === 'TRAINER') return '/portal/trainer';
     if (role === 'ADMIN' || role === 'SUPER_ADMIN') return '/portal/admin';
     if (role === 'EMPLOYEE') return '/portal/employee';
-    if (role === 'VOLUNTEER') return '/portal/volunteer';
+    if (role === 'VOLUNTEER') return '/portal/trainee';
     return '/portal/student';
   });
 

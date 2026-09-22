@@ -24,7 +24,7 @@
     "notifications_dropdown_title": "Notifications",
     "notifications_view_all": "View all notifications",
     "role_employee": "Employee",
-    "role_volunteer": "Volunteer"
+    "role_volunteer": "Trainee"
   },
   "profile": {
     "title": "My Profile"
@@ -354,8 +354,8 @@
       "trainer_note": "Trainer accounts require admin approval before activation",
       "submit": "Create Account",
       "have_account": "Already have an account?",
-      "role_volunteer": "Volunteer",
-      "role_volunteer_desc": "Join training efforts, earn volunteer hours and a volunteer certificate"
+      "role_volunteer": "Trainee",
+      "role_volunteer_desc": "Gain practical skills, complete training hours and earn a certificate of experience"
     },
     "otp": {
       "title": "Verify Your Email",
@@ -411,13 +411,13 @@
       "new_specialization_en": "Specialization name in English"
     },
     "volunteer_register": {
-      "eyebrow": "Volunteer with us",
-      "title": "Join Tamkeenova as a Volunteer",
+      "eyebrow": "Train with us",
+      "title": "Join Tamkeenova as a Trainee",
       "subtitle": "Submit your application — once your email is verified and the admin approves, your journey starts.",
       "bio": "About you",
-      "bio_placeholder": "Write a short bio about your interests and volunteering experience...",
-      "submit": "Submit volunteer application",
-      "success_note": "Your volunteer application was submitted! Redirecting to email verification.",
+      "bio_placeholder": "Write a short bio about your interests and training experience...",
+      "submit": "Submit trainee application",
+      "success_note": "Your trainee application was submitted! Redirecting to email verification.",
       "error_generic": "Could not submit the application, please try again",
       "review_note": "Your account will stay under review until the admin approves it."
     }
@@ -658,7 +658,7 @@
     },
     "certificate_type": {
       "TRAINING": "Training",
-      "VOLUNTEER": "Volunteer",
+      "VOLUNTEER": "Experience certificate",
       "OTHER": "Other"
     },
     "user_role": {
@@ -668,7 +668,7 @@
       "EMPLOYEE": "Employee",
       "ADMIN": "Admin",
       "SUPER_ADMIN": "Super Admin",
-      "VOLUNTEER": "Volunteer"
+      "VOLUNTEER": "Trainee"
     }
   },
   "student_dashboard": {
@@ -822,7 +822,9 @@
     "certificate_of": "Certificate of Achievement",
     "download_image": "Download certificate image",
     "download_ar": "Download Arabic image",
-    "download_en": "Download English image"
+    "download_en": "Download English image",
+    "template_preview": "Certificate design preview",
+    "download_options": "Choose your language and format"
   },
   "student_corporate": {
     "title": "Corporate Requests",
@@ -909,10 +911,10 @@
       "trainer_approved_msg": "The trainer account has been approved.",
       "trainer_rejected": "Trainer application rejected",
       "trainer_rejected_msg": "The trainer application was rejected.",
-      "new_volunteer": "New volunteer application",
-      "new_volunteer_msg": "A new volunteer has applied and is awaiting admin review.",
-      "volunteer_update": "Volunteer status update",
-      "volunteer_update_msg": "The volunteer profile status has been updated.",
+      "new_volunteer": "New trainee application",
+      "new_volunteer_msg": "A new trainee has applied and is awaiting admin review.",
+      "volunteer_update": "Trainee status update",
+      "volunteer_update_msg": "The trainee profile status has been updated.",
       "new_task": "New task assigned to you",
       "new_task_msg": "A new task was assigned to you — review it from My Tasks.",
       "task_update": "Task update",
@@ -1000,7 +1002,7 @@
     "dashboard": "Dashboard",
     "users": "Users",
     "trainers": "Trainers",
-    "volunteers": "Volunteers",
+    "volunteers": "Trainees",
     "certificates": "Certificates",
     "corporate": "Corporate Requests",
     "specializations": "Specializations",
@@ -1017,7 +1019,7 @@
     "students": "Students & Clients",
     "trainers": "Trainers",
     "employees": "Employees",
-    "volunteers": "Volunteers",
+    "volunteers": "Trainees",
     "programs": "Training Programs",
     "consultations": "Consultations",
     "corporate_requests": "Corporate Requests",
@@ -1058,7 +1060,7 @@
       "TRAINER": "Trainer delivering programs and consultations",
       "CLIENT": "Client benefiting from our services",
       "EMPLOYEE": "Employee assigned tasks and corporate requests",
-      "VOLUNTEER": "Volunteer executing tasks and earning hours",
+      "VOLUNTEER": "Trainee executing tasks and earning hours",
       "ADMIN": "Full administration permissions",
       "SUPER_ADMIN": "Full permissions including managing admins"
     }
@@ -1109,29 +1111,29 @@
     "years_short": "yrs exp"
   },
   "admin_volunteers": {
-    "title": "Volunteers Management",
-    "subtitle": "Review volunteer applications and manage the volunteer team",
-    "col_volunteer": "Volunteer",
+    "title": "Trainees Management",
+    "subtitle": "Review trainee applications and manage the trainee team",
+    "col_volunteer": "Trainee",
     "col_status": "Status",
-    "col_hours": "Volunteer hours",
+    "col_hours": "Trainee hours",
     "col_joined": "Applied",
     "col_actions": "Actions",
     "approve": "Approve",
     "reject": "Reject",
-    "reject_title": "Reject volunteer application",
+    "reject_title": "Reject trainee application",
     "reject_reason": "Rejection reason",
     "reject_reason_placeholder": "Write the rejection reason (optional)...",
     "reject_confirm": "Confirm rejection",
     "action_error": "Could not perform the action, please retry",
     "email": "Email",
     "phone": "Phone",
-    "bio": "Volunteer bio",
-    "empty": "No volunteers with this status",
-    "load_error": "Could not load volunteers"
+    "bio": "Trainee bio",
+    "empty": "No trainees with this status",
+    "load_error": "Could not load trainees"
   },
   "admin_certificates": {
     "title": "Certificates Management",
-    "subtitle": "Issue certificates, upload PDFs and manage verification",
+    "subtitle": "Issue professionally designed Arabic or English certificates with your partner logos.",
     "issue": "Issue certificate",
     "issue_title": "Issue a new certificate",
     "edit_title": "Edit certificate",
@@ -1279,7 +1281,7 @@
   },
   "admin_tasks": {
     "title": "Tasks Management",
-    "subtitle": "Create tasks, assign them to employees and volunteers, review submissions",
+    "subtitle": "Create tasks, assign them to employees and trainees, review submissions",
     "create": "New task",
     "create_title": "Create a new task",
     "edit_title": "Edit task",
@@ -1294,7 +1296,7 @@
     "f_note": "Review note",
     "f_order": "Order",
     "add_assignees": "Assign to (ordered)",
-    "search_member": "Search an employee or volunteer by name...",
+    "search_member": "Search an employee or trainee by name...",
     "order_hint": "Execution order: the next task stays hidden until the previous one is completed.",
     "assignees_required": "Please assign the task to at least one user",
     "form_error": "Please complete the required task fields",
@@ -1327,7 +1329,7 @@
     "no_comments": "No comments yet",
     "comment_error": "Could not send the comment",
     "action_error": "Could not perform the action, please retry",
-    "no_member_found": "No employee or volunteer found with this name",
+    "no_member_found": "No employee or trainee found with this name",
     "min_chars_hint": "Type at least 2 characters to search",
     "submissions_error": "Could not load submissions, please retry"
   },
@@ -1346,8 +1348,8 @@
     "go_tasks_hint": "Start and submit your current tasks"
   },
   "volunteer_dashboard": {
-    "title": "Volunteer Dashboard",
-    "subtitle": "Your volunteer hours, scores and achievements",
+    "title": "Trainee Dashboard",
+    "subtitle": "Your training hours, scores and achievements",
     "nav_dashboard": "Dashboard",
     "load_error": "Could not load statistics",
     "total": "Total tasks",
@@ -1356,11 +1358,11 @@
     "delayed": "Delayed tasks",
     "completion": "Completion rate",
     "completion_hint": "Average completion across your tasks",
-    "impact": "Volunteering impact",
-    "hours": "Volunteer hours",
+    "impact": "Training impact",
+    "hours": "Training hours",
     "avg_score": "Average score",
     "on_time": "On-time rate",
-    "certificates": "Volunteer certificates",
+    "certificates": "Experience certificates",
     "last_tasks": "Latest tasks",
     "col_task": "Task",
     "col_status": "Status",
@@ -1412,13 +1414,13 @@
   },
   "volunteer_status": {
     "pending_badge": "Under review",
-    "pending_title": "Your volunteer application is under review",
-    "pending_text": "The Tamkeenova team is reviewing your application right now. You will be notified once approved — until then the volunteer dashboard stays locked.",
+    "pending_title": "Your trainee application is under review",
+    "pending_text": "The Tamkeenova team is reviewing your application right now. You will be notified once approved — until then the trainee dashboard stays locked.",
     "rejected_badge": "Rejected",
     "rejected_title": "Unfortunately your application was rejected",
     "rejected_text": "Check the rejection reason below, or contact the administration to reconsider.",
     "approved_badge": "Approved",
-    "approved_redirect": "Your application is approved! Redirecting to the volunteer dashboard...",
+    "approved_redirect": "Your application is approved! Redirecting to the trainee dashboard...",
     "timeline_submitted": "Application submitted",
     "timeline_review": "Under review",
     "timeline_decision": "Admin decision"
@@ -1467,7 +1469,7 @@
     "PROFILE_USER_NOT_FOUND": "No user found with this username. Please check the spelling.",
     "TRAINER_NOT_FOUND": "This trainer profile isn't available.",
     "TRAINER_UNAUTHORIZED": "You don't have permission to modify this content.",
-    "VOLUNTEER_NOT_FOUND": "This volunteer profile doesn't exist.",
+    "VOLUNTEER_NOT_FOUND": "This trainee profile doesn't exist.",
     "CONSULT_NOT_FOUND": "This consultation doesn't exist.",
     "CONSULT_NOT_YOURS": "This consultation belongs to another account.",
     "CONSULT_NO_ACCESS": "You don't have access to this consultation.",
@@ -1482,7 +1484,7 @@
     "SPEC_NOT_FOUND": "Specialization not found.",
     "TASK_NO_ASSIGNEES": "Add at least one assignee to this task.",
     "TASK_USER_NOT_FOUND": "The selected user doesn't exist. Search again.",
-    "TASK_BAD_ROLE": "This user isn't part of the execution team (employee or volunteer).",
+    "TASK_BAD_ROLE": "This user isn't part of the execution team (employee or trainee).",
     "TASK_NOT_FOUND": "This task no longer exists. It may have been deleted.",
     "TASK_ALREADY_ASSIGNED": "This user is already assigned to the task.",
     "TASK_ASSIGNMENT_NOT_FOUND": "This assignment doesn't exist.",
@@ -1515,5 +1517,57 @@
     "hide": "Hide",
     "show": "Show",
     "load_error": "Could not load partners"
+  },
+  "certificate_studio": {
+    "TRAINING": "Training certificate",
+    "VOLUNTEER": "Experience certificate",
+    "intro": "Tamkeenova training and experience certificates. Enter Arabic and English details once; each recipient receives both editions with one verification code.",
+    "choose": "01 / Choose your template",
+    "recipient_name": "Recipient name",
+    "program_name": "Program name",
+    "hours": "Number of hours",
+    "date": "Date of issue",
+    "snapshot": "The name is saved on this certificate, independently of future profile changes.",
+    "qr_hint": "A unique verification QR code is generated automatically when the certificate is issued. It cannot point to an arbitrary website.",
+    "preview": "02 / Certificate preview",
+    "rendering": "Preparing the artwork…",
+    "preview_hint": "Live preview of your selected edition. Empty fields show sample values. The final QR is assigned on issue; logos appear in their own band in your chosen order.",
+    "locked": "Branding, headings, descriptions and ornaments are fixed. Bilingual details, one signature name and bottom partner logos use precisely reserved areas.",
+    "download_pdf": "Download PDF",
+    "download_png": "Download PNG",
+    "legacy_badge": "Previous record · review required",
+    "legacy": "This historical certificate has no new template assigned. Confirm the recipient, template, program (training only), hours and date to convert it. Its verification code and validity will be preserved.",
+    "legacy_student": "This certificate predates the new artwork. Please contact an administrator to have it prepared with the new template. Verification remains available.",
+    "invalid": "Enter recipient and training program names in both Arabic and English, one signature name (up to 80 characters), valid whole hours and a valid date.",
+    "render_error": "The certificate could not be prepared. Check your connection and try again. No incomplete document has been downloaded.",
+    "too_long": "The name, program or signature is too wide for its reserved space. Use a shorter official form; text is never cut off.",
+    "language": "Preview language only",
+    "language_ar": "Arabic edition",
+    "language_en": "English edition",
+    "language_hint": "Both Arabic and English editions are issued together. Enter both sets of details; this switch changes only the preview, not what the recipient receives.",
+    "previous_design": "Previous edition — preserved",
+    "upgrade_notice": "Previous artwork remains unchanged. To upgrade, complete both language versions and the signature name. Saving adopts the new pair while preserving the verification code and validity.",
+    "partners": "Partner logos — optional",
+    "partners_hint": "Select up to 4 registered partners or upload logos from your device. Image snapshots are saved with the certificate, so later changes to the partner library cannot alter it.",
+    "partners_loading": "Loading partners…",
+    "partners_load_error": "The partner library is unavailable. Retry or upload logo files directly.",
+    "upload_logos": "Add logos from your device",
+    "logo_file_hint": "PNG, JPG or WebP, up to 2 MB each. Transparent backgrounds work best. Logos keep their proportions and are never cropped or stretched.",
+    "move_earlier": "Move logo earlier",
+    "move_later": "Move logo later",
+    "remove_logo": "Remove logo",
+    "logo_processing": "Preparing safe logo snapshots…",
+    "partner_limit": "A maximum of 4 logos keeps every partner clearly visible.",
+    "partner_invalid": "The logo image could not be read or exceeds the allowed limits. Use a PNG, JPG or WebP under 2 MB.",
+    "partner_load_error": "The partner logo could not be loaded. Its host may block cross-origin images; upload the logo file from your device instead.",
+    "partner_duplicate": "This logo is already included. Please choose a different image.",
+    "dismiss_logo_error": "Skip this image",
+    "both_languages": "Arabic & English included",
+    "recipient_name_ar": "Recipient name in Arabic",
+    "recipient_name_en": "Recipient name in English",
+    "program_name_ar": "Program name in Arabic",
+    "program_name_en": "Program name in English",
+    "signature_name": "Enter signature name",
+    "signature_hint": "One signature appears on both editions. The name uses decorative signature lettering, not a handwritten scan or verified digital signature. Latin names use cursive lettering; Arabic names use Arabic calligraphy."
   }
 }

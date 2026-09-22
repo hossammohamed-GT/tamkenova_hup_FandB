@@ -1,91 +1,155 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TranslatePipe } from '@ngx-translate/core';
-import { AdminService } from '../../../../core/services/admin.service';
-import { AdminCertificate, AdminUser, CertificateType } from '../../../../core/models/admin.model';
-import { AdminNavComponent } from '../admin-nav/admin-nav.component';
-import { apiErrorKey } from '../../../../core/utils/api-error';
+import { CertificateLogoService } from '../../../../core/certificates/certificate-logo.service';
 import { PartnersService } from '../../../../core/services/partners.service';
 import { StrategicPartner } from '../../../../core/models/partner.model';
+import { ThemeService } from '../../../../core/services/theme.service';
+import { CertificateDialogDirective } from '../../../../core/certificates/certificate-dialog.directive';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { CommonModule } from '@angular/common';
+import { FormsModule, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { debounceTime, firstValueFrom, tap } from 'rxjs';
+import { TranslatePipe } from '@ngx-translate/core';
+import { AdminService } from '../../../../core/services/admin.service';
+import {
+  AdminCertificate,
+  AdminUser,
+  IssueCertificatePayload,
+} from '../../../../core/models/admin.model';
+import { AdminNavComponent } from '../admin-nav/admin-nav.component';
+import { apiErrorKey } from '../../../../core/utils/api-error';
+import { CertificateRenderer } from '../../../../core/certificates/certificate-renderer.service';
+import {
+  CERTIFICATE_TEMPLATES,
+  bilingualData,
+  certificateLanguages,
+  CertificateLanguage,
+  PartnerLogo,
+  MAX_PARTNER_LOGOS,
+  canRenderCertificate,
+  CertificateValues,
+  TEMPLATE_VERSION,
+  TemplateType,
+  certificateValues,
+} from '../../../../core/certificates/certificate-template';
 
 @Component({
   selector: 'app-admin-certificates',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslatePipe, AdminNavComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    TranslatePipe,
+    AdminNavComponent,
+    CertificateDialogDirective,
+  ],
   templateUrl: './admin-certificates.component.html',
-  styleUrls: ['../../portal-shared.css', '../../staff-shared.css', './admin-certificates.component.css'],
+  styleUrls: [
+    '../../portal-shared.css',
+    '../../staff-shared.css',
+    './admin-certificates.component.css',
+  ],
 })
 export class AdminCertificatesComponent implements OnInit {
   private adminService = inject(AdminService);
-  private fb = inject(FormBuilder);
   private partnersService = inject(PartnersService);
-
-  readonly certificateTypes: CertificateType[] = ['TRAINING', 'VOLUNTEER', 'OTHER'];
-
+  private logoService = inject(CertificateLogoService);
+  private theme = inject(ThemeService);
+  readonly certificateTypes: TemplateType[] = ['TRAINING', 'VOLUNTEER'];
+  readonly languages: CertificateLanguage[] = ['ar', 'en'];
+  readonly maxLogos = MAX_PARTNER_LOGOS;
+  readonly canRender = canRenderCertificate;
+  partners = signal<StrategicPartner[]>([]);
+  partnersLoading = signal(false);
+  partnersError = signal(false);
+  selectedLogos = signal<PartnerLogo[]>([]);
+  logoBusy = signal(false);
+  logoError = signal<string | null>(null);
+  private logoRevision = 0;
+  private renderer = inject(CertificateRenderer);
+  private fb = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef);
+  readonly templates = CERTIFICATE_TEMPLATES;
+  readonly version = TEMPLATE_VERSION;
   isLoading = signal(true);
   hasError = signal(false);
   certificates = signal<AdminCertificate[]>([]);
   search = signal('');
-
-  // -- Issue / edit modal --
   showIssueModal = signal(false);
   editTarget = signal<AdminCertificate | null>(null);
   isSaving = signal(false);
   formError = signal<string | null>(null);
-
-  // -- User picker --
   userResults = signal<AdminUser[]>([]);
   userSearchTerm = signal('');
   isSearchingUsers = signal(false);
   selectedUser = signal<AdminUser | null>(null);
-  partners = signal<StrategicPartner[]>([]);
-  selectedPartnerIds = signal<string[]>([]);
-
-  // -- Delete confirm --
   deleteTarget = signal<AdminCertificate | null>(null);
   isDeleting = signal(false);
-
-  // -- Upload --
-  uploadingId = signal<string | null>(null);
-
+  downloadingId = signal<string | null>(null);
   toast = signal<{ key: string; error?: boolean } | null>(null);
+  preview = signal<string | null>(null);
+  previewError = signal<string | null>(null);
+  previewBusy = signal(false);
+  private previewRevision = 0;
+  private searchRevision = 0;
 
   issueForm = this.fb.nonNullable.group({
-    title: ['', Validators.required],
-    title_ar: [''],
-    title_en: [''],
-    description: [''],
-    description_ar: [''],
-    description_en: [''],
-    training_hours: this.fb.control<number | null>(null),
-    certificate_type: this.fb.nonNullable.control<CertificateType>('TRAINING'),
+    certificate_type: this.fb.nonNullable.control<TemplateType>('TRAINING'),
+    certificate_language: this.fb.nonNullable.control<CertificateLanguage>(this.theme.language()),
+    recipient_name: ['', [Validators.required, Validators.maxLength(120)]],
+    recipient_name_en: ['', [Validators.required, Validators.maxLength(120)]],
+    program_name: ['', Validators.maxLength(180)],
+    program_name_en: ['', Validators.maxLength(180)],
+    signature_name: ['', [Validators.required, Validators.maxLength(80)]],
+    training_hours: this.fb.control<number | null>(null, [
+      Validators.required,
+      Validators.min(1),
+      Validators.max(100000),
+      Validators.pattern(/^\d+$/),
+    ]),
+    issued_at: [this.today(), Validators.required],
   });
 
   filtered = computed(() => {
     const term = this.search().toLowerCase();
-    const list = this.certificates();
-    if (!term) return list;
-    return list.filter(
+    return this.certificates().filter(
       (c) =>
-        (c.title ?? '').toLowerCase().includes(term) ||
-        (c.verification_code ?? '').toLowerCase().includes(term) ||
-        (c.users?.full_name ?? '').toLowerCase().includes(term),
+        !term ||
+        [
+          c.title,
+          c.title_en,
+          c.recipient_name,
+          bilingualData(c)?.recipient_name_en,
+          c.verification_code,
+          c.users?.full_name,
+        ].some((v) => v?.toLowerCase().includes(term)),
     );
   });
 
-  typeBadge(type: string | null | undefined): string {
-    switch (type) {
-      case 'VOLUNTEER':
-        return 'badge-approved';
-      case 'TRAINING':
-        return 'badge-info';
-      default:
-        return 'badge-neutral';
-    }
+  constructor() {
+    this.issueForm.valueChanges
+      .pipe(
+        tap(() => {
+          if (this.showIssueModal()) {
+            this.previewRevision++;
+            this.previewBusy.set(true);
+          }
+        }),
+        debounceTime(250),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => {
+        if (this.showIssueModal()) void this.updatePreview();
+      });
   }
-
+  ngOnInit(): void {
+    this.loadPartners();
+    this.load();
+  }
+  private today(): string {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
   initials(name: string): string {
     return (name ?? '')
       .trim()
@@ -94,19 +158,14 @@ export class AdminCertificatesComponent implements OnInit {
       .map((p) => p.charAt(0).toUpperCase())
       .join('');
   }
-
-  ngOnInit(): void {
-    this.load();
-    this.partnersService.listAll().subscribe({ next: (list) => this.partners.set(list ?? []), error: () => undefined });
+  typeBadge(type: string | null | undefined): string {
+    return type === 'VOLUNTEER' ? 'badge-approved' : 'badge-info';
   }
-
-  // Silent re-fetch (no spinner) to reconcile with the server after mutations
-  refresh(): void {
-    this.load(false);
+  onSearch(value: string): void {
+    this.search.set(value);
   }
-
-  load(showSpinner = true): void {
-    if (showSpinner) this.isLoading.set(true);
+  load(): void {
+    this.isLoading.set(true);
     this.hasError.set(false);
     this.adminService.getCertificates().subscribe({
       next: (list) => {
@@ -119,215 +178,326 @@ export class AdminCertificatesComponent implements OnInit {
       },
     });
   }
-
-  onSearch(value: string): void {
-    this.search.set(value);
-  }
-
-  // ================= Issue / Edit =================
-
-  openIssue(): void {
+  openIssue(
+    type: TemplateType = 'TRAINING',
+    language: CertificateLanguage = this.theme.language(),
+  ): void {
+    this.resetLogos([]);
     this.editTarget.set(null);
     this.selectedUser.set(null);
     this.userResults.set([]);
     this.userSearchTerm.set('');
-    this.selectedPartnerIds.set([]);
     this.formError.set(null);
-    this.issueForm.reset({ certificate_type: 'TRAINING' });
-    this.showIssueModal.set(true);
-  }
-
-  openEdit(cert: AdminCertificate): void {
-    this.editTarget.set(cert);
-    this.selectedUser.set(
-      cert.users
-        ? {
-            id: cert.user_id,
-            full_name: cert.users.full_name,
-            username: cert.users.username ?? null,
-            email: cert.users.email,
-            phone: null,
-            role: 'STUDENT',
-            profile_image: cert.users.profile_image ?? null,
-            email_verified: true,
-            is_active: true,
-            created_at: cert.created_at,
-          }
-        : null,
-    );
-    this.formError.set(null);
-    this.selectedPartnerIds.set(cert.partner_ids ?? []);
     this.issueForm.reset({
-      title: cert.title,
-      title_ar: cert.title_ar ?? '',
-      title_en: cert.title_en ?? '',
-      description: cert.description ?? '',
-      description_ar: cert.description_ar ?? '',
-      description_en: cert.description_en ?? '',
-      training_hours: cert.training_hours ?? null,
-      certificate_type: cert.certificate_type ?? 'OTHER',
+      certificate_type: type,
+      certificate_language: language,
+      issued_at: this.today(),
     });
     this.showIssueModal.set(true);
+    void this.updatePreview();
   }
-
+  openEdit(cert: AdminCertificate): void {
+    this.resetLogos(cert.partner_logos ?? []);
+    const dual = bilingualData(cert);
+    this.editTarget.set(cert);
+    this.selectedUser.set(null);
+    this.formError.set(null);
+    this.issueForm.reset({
+      certificate_type: cert.certificate_type === 'VOLUNTEER' ? 'VOLUNTEER' : 'TRAINING',
+      certificate_language: cert.certificate_language ?? this.theme.language(),
+      recipient_name:
+        dual?.recipient_name_ar ??
+        (cert.certificate_language === 'ar' ? (cert.recipient_name ?? '') : ''),
+      recipient_name_en:
+        dual?.recipient_name_en ??
+        (cert.certificate_language !== 'ar' ? (cert.recipient_name ?? '') : ''),
+      program_name:
+        dual?.program_name_ar ??
+        (cert.certificate_language === 'ar' ? (cert.program_name ?? '') : ''),
+      program_name_en:
+        dual?.program_name_en ??
+        (cert.certificate_language !== 'ar' ? (cert.program_name ?? '') : ''),
+      signature_name: dual?.signature_name ?? '',
+      training_hours: cert.training_hours,
+      issued_at: cert.issued_at.slice(0, 10),
+    });
+    this.showIssueModal.set(true);
+    void this.updatePreview();
+  }
   closeIssue(): void {
+    if (this.isSaving()) return;
+    this.logoRevision++;
     this.showIssueModal.set(false);
+    this.previewRevision++;
+    this.preview.set(null);
     this.editTarget.set(null);
-    this.isSaving.set(false);
   }
-
+  selectTemplate(type: TemplateType): void {
+    this.issueForm.controls.certificate_type.setValue(type);
+    if (type === 'VOLUNTEER') {
+      this.issueForm.controls.program_name.setValue('');
+      this.issueForm.controls.program_name_en.setValue('');
+    }
+    void this.updatePreview();
+  }
   searchUsers(term: string): void {
+    const revision = ++this.searchRevision;
     const query = term.trim();
     this.userSearchTerm.set(query);
+    this.userResults.set([]);
     if (query.length < 2) {
-      this.userResults.set([]);
+      this.isSearchingUsers.set(false);
       return;
     }
     this.isSearchingUsers.set(true);
     this.adminService.getUsers({ search: query, limit: 6 }).subscribe({
       next: (res) => {
+        if (revision !== this.searchRevision) return;
         this.userResults.set(res?.data ?? []);
         this.isSearchingUsers.set(false);
       },
       error: () => {
-        this.isSearchingUsers.set(false);
+        if (revision === this.searchRevision) this.isSearchingUsers.set(false);
       },
     });
   }
-
   pickUser(user: AdminUser): void {
+    this.searchRevision++;
+    this.isSearchingUsers.set(false);
     this.selectedUser.set(user);
     this.userResults.set([]);
     this.userSearchTerm.set('');
+    const field = /[\u0600-\u06ff]/u.test(user.full_name) ? 'recipient_name' : 'recipient_name_en';
+    this.issueForm.controls[field].setValue(user.full_name);
   }
-
   clearUser(): void {
     this.selectedUser.set(null);
   }
 
-  togglePartner(id: string): void {
-    this.selectedPartnerIds.update((ids) => ids.includes(id) ? ids.filter((value) => value !== id) : ids.length >= 6 ? ids : [...ids, id]);
-  }
-
-  save(): void {
-    if (this.issueForm.invalid) {
-      this.issueForm.markAllAsTouched();
-      this.formError.set('admin_certificates.form_error');
-      return;
-    }
-
-    const raw = this.issueForm.getRawValue();
-    this.isSaving.set(true);
-    this.formError.set(null);
-
-    if (this.editTarget()) {
-      const cert = this.editTarget()!;
-      this.adminService
-        .updateCertificate(cert.id, {
-          title: raw.title,
-          title_ar: raw.title_ar || undefined,
-          title_en: raw.title_en || undefined,
-          description: raw.description || undefined,
-          description_ar: raw.description_ar || undefined,
-          description_en: raw.description_en || undefined,
-          training_hours: raw.training_hours ?? undefined,
-          certificate_type: raw.certificate_type,
-          partner_ids: this.selectedPartnerIds(),
-        })
-        .subscribe({
-          next: (updated) => {
-            if (updated?.id) {
-              this.certificates.update((list) => list.map((c) => (c.id === cert.id ? { ...c, ...updated } : c)));
-            } else {
-              this.load();
-            }
-            this.isSaving.set(false);
-            this.closeIssue();
-            this.showToast('admin_certificates.updated');
-            this.refresh();
-          },
-          error: (err) => {
-            this.isSaving.set(false);
-            this.formError.set(this.errorMessage(err, 'admin_certificates.save_error'));
-          },
-        });
-      return;
-    }
-
-    const user = this.selectedUser();
-    if (!user) {
-      this.isSaving.set(false);
-      this.formError.set('admin_certificates.user_required');
-      return;
-    }
-
-    this.adminService
-      .issueCertificate({
-        user_id: user.id,
-        title: raw.title,
-        title_ar: raw.title_ar || undefined,
-        title_en: raw.title_en || undefined,
-        description: raw.description || undefined,
-        description_ar: raw.description_ar || undefined,
-        description_en: raw.description_en || undefined,
-        training_hours: raw.training_hours ?? undefined,
-        certificate_type: raw.certificate_type,
-        partner_ids: this.selectedPartnerIds(),
-      })
-      .subscribe({
-        next: (created) => {
-          if (created) this.certificates.update((list) => [created, ...list]);
-          else this.load();
-          this.isSaving.set(false);
-          this.closeIssue();
-          this.showToast('admin_certificates.issued');
-          this.refresh();
-        },
-        error: (err) => {
-          this.isSaving.set(false);
-          this.formError.set(this.errorMessage(err, 'admin_certificates.save_error'));
-        },
-      });
-  }
-
-  // ================= PDF Upload =================
-
-  triggerPdfInput(certId: string): void {
-    if (typeof document === 'undefined') return;
-    const input = document.getElementById(`cert-pdf-input-${certId}`) as HTMLInputElement | null;
-    input?.click();
-  }
-
-  onPdfSelected(event: Event, cert: AdminCertificate): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    input.value = '';
-    if (!file) return;
-    if (file.type !== 'application/pdf') {
-      this.showToast('admin_certificates.pdf_only', true);
-      return;
-    }
-    this.uploadingId.set(cert.id);
-    this.adminService.uploadCertificatePdf(cert.id, file).subscribe({
-      next: (updated) => {
-        if (updated?.id) {
-          this.certificates.update((list) => list.map((c) => (c.id === cert.id ? { ...c, ...updated } : c)));
-        } else {
-          this.load();
-        }
-        this.uploadingId.set(null);
-        this.showToast('admin_certificates.pdf_uploaded');
-        this.refresh();
+  loadPartners(): void {
+    this.partnersLoading.set(true);
+    this.partnersError.set(false);
+    this.partnersService.listAll().subscribe({
+      next: (partners) => {
+        this.partners.set(partners.filter((p) => p.is_active));
+        this.partnersLoading.set(false);
       },
-      error: (err) => {
-        this.uploadingId.set(null);
-        this.showToast(apiErrorKey(err, 'admin_certificates.pdf_error'), true);
+      error: () => {
+        this.partnersError.set(true);
+        this.partnersLoading.set(false);
       },
     });
   }
+  selectLanguage(language: CertificateLanguage): void {
+    this.issueForm.controls.certificate_language.setValue(language);
+  }
+  private resetLogos(logos: PartnerLogo[]): void {
+    this.logoRevision++;
+    this.selectedLogos.set(logos.map((logo) => ({ ...logo })));
+    this.logoBusy.set(false);
+    this.logoError.set(null);
+  }
+  isPartnerSelected(id: string): boolean {
+    return this.selectedLogos().some((logo) => logo.source_id === id);
+  }
+  async togglePartner(partner: StrategicPartner): Promise<void> {
+    if (this.logoBusy() || this.isSaving()) return;
+    const existing = this.selectedLogos().findIndex((logo) => logo.source_id === partner.id);
+    if (existing >= 0) {
+      this.removeLogo(existing);
+      return;
+    }
+    if (this.selectedLogos().length >= this.maxLogos) {
+      this.logoError.set('certificate_studio.partner_limit');
+      return;
+    }
+    const revision = this.logoRevision;
+    this.logoBusy.set(true);
+    this.logoError.set(null);
+    try {
+      const name =
+        this.issueForm.controls.certificate_language.value === 'ar'
+          ? partner.name_ar
+          : partner.name_en;
+      const logo = await this.logoService.fromLibrary(partner.logo_url, name, partner.id);
+      if (revision === this.logoRevision) this.appendLogos([logo]);
+    } catch (error) {
+      if (revision === this.logoRevision)
+        this.logoError.set(
+          error instanceof Error && error.message === 'certificate_studio.partner_invalid'
+            ? error.message
+            : 'certificate_studio.partner_load_error',
+        );
+    } finally {
+      if (revision === this.logoRevision) this.logoBusy.set(false);
+    }
+  }
+  async uploadLogos(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    input.value = '';
+    if (!files.length || this.logoBusy() || this.isSaving()) return;
+    if (files.length + this.selectedLogos().length > this.maxLogos) {
+      this.logoError.set('certificate_studio.partner_limit');
+      return;
+    }
+    const revision = this.logoRevision;
+    this.logoBusy.set(true);
+    this.logoError.set(null);
+    try {
+      const logos = await Promise.all(files.map((file) => this.logoService.fromFile(file)));
+      if (revision === this.logoRevision) this.appendLogos(logos);
+    } catch {
+      if (revision === this.logoRevision) this.logoError.set('certificate_studio.partner_invalid');
+    } finally {
+      if (revision === this.logoRevision) this.logoBusy.set(false);
+    }
+  }
+  private appendLogos(logos: PartnerLogo[]): void {
+    const all = [...this.selectedLogos(), ...logos];
+    if (new Set(all.map((logo) => logo.data_url)).size !== all.length) {
+      this.logoError.set('certificate_studio.partner_duplicate');
+      return;
+    }
+    this.selectedLogos.set(all);
+    void this.updatePreview();
+  }
+  removeLogo(index: number): void {
+    if (this.logoBusy() || this.isSaving()) return;
+    this.selectedLogos.update((logos) => logos.filter((_, i) => i !== index));
+    this.logoError.set(null);
+    void this.updatePreview();
+  }
+  moveLogo(index: number, step: number): void {
+    if (
+      this.logoBusy() ||
+      this.isSaving() ||
+      index + step < 0 ||
+      index + step >= this.selectedLogos().length
+    )
+      return;
+    this.selectedLogos.update((logos) => {
+      const list = [...logos];
+      [list[index], list[index + step]] = [list[index + step], list[index]];
+      return list;
+    });
+    void this.updatePreview();
+  }
 
-  // ================= Revoke / Delete =================
-
+  private values(preview: boolean, language?: CertificateLanguage): CertificateValues {
+    const raw = this.issueForm.getRawValue();
+    const selected = language ?? raw.certificate_language;
+    return {
+      ...raw,
+      certificate_language: selected,
+      signature_name: raw.signature_name.trim() || (preview ? 'Ahmed Hassan' : ''),
+      template_version: TEMPLATE_VERSION,
+      partner_logos: this.selectedLogos(),
+      recipient_name:
+        (selected === 'ar' ? raw.recipient_name : raw.recipient_name_en).trim() ||
+        (preview ? (selected === 'ar' ? 'اسم المستلم' : 'Recipient name') : ''),
+      program_name:
+        raw.certificate_type === 'TRAINING'
+          ? (selected === 'ar' ? raw.program_name : raw.program_name_en).trim() ||
+            (preview ? (selected === 'ar' ? 'اسم البرنامج' : 'Program name') : '')
+          : null,
+      training_hours: raw.training_hours ?? (preview ? 1 : 0),
+      verification_code: this.editTarget()?.verification_code ?? 'PREVIEW-NOT-ISSUED',
+    };
+  }
+  async updatePreview(): Promise<void> {
+    const revision = ++this.previewRevision;
+    this.previewBusy.set(true);
+    this.previewError.set(null);
+    try {
+      const canvas = await this.renderer.render(this.values(true), 1400);
+      if (revision === this.previewRevision) this.preview.set(canvas.toDataURL('image/png'));
+    } catch (error) {
+      if (revision === this.previewRevision) {
+        this.preview.set(null);
+        this.previewError.set(this.renderError(error));
+      }
+    } finally {
+      if (revision === this.previewRevision) this.previewBusy.set(false);
+    }
+  }
+  async save(): Promise<void> {
+    if (this.isSaving() || this.logoBusy() || this.logoError()) return;
+    this.issueForm.markAllAsTouched();
+    if (this.issueForm.invalid) {
+      this.formError.set('certificate_studio.invalid');
+      return;
+    }
+    if (!this.editTarget() && !this.selectedUser()) {
+      this.formError.set('admin_certificates.user_required');
+      return;
+    }
+    this.isSaving.set(true);
+    this.formError.set(null);
+    try {
+      // Both editions must fit before one atomic issue/update request is sent.
+      await Promise.all(
+        this.languages.map((language) => this.renderer.render(this.values(false, language), 900)),
+      );
+      const raw = this.issueForm.getRawValue();
+      const training = raw.certificate_type === 'TRAINING';
+      const payload = {
+        certificate_type: raw.certificate_type,
+        recipient_name_ar: raw.recipient_name.trim(),
+        recipient_name_en: raw.recipient_name_en.trim(),
+        program_name_ar: training ? raw.program_name.trim() : null,
+        program_name_en: training ? raw.program_name_en.trim() : null,
+        signature_name: raw.signature_name.trim(),
+        training_hours: raw.training_hours!,
+        issued_at: raw.issued_at,
+        partner_logos: this.selectedLogos(),
+      };
+      const editing = this.editTarget();
+      const record = editing
+        ? await firstValueFrom(this.adminService.updateCertificate(editing.id, payload))
+        : await firstValueFrom(
+            this.adminService.issueCertificate({
+              ...payload,
+              user_id: this.selectedUser()!.id,
+            } as IssueCertificatePayload),
+          );
+      if (record?.id)
+        this.certificates.update((list) =>
+          editing
+            ? list.map((c) => (c.id === record.id ? { ...c, ...record } : c))
+            : [record, ...list],
+        );
+      else this.load();
+      this.isSaving.set(false);
+      this.closeIssue();
+      this.showToast(editing ? 'admin_certificates.updated' : 'admin_certificates.issued');
+    } catch (error) {
+      this.isSaving.set(false);
+      this.formError.set(
+        error instanceof Error && error.message.startsWith('certificate_studio.')
+          ? error.message
+          : apiErrorKey(error, 'admin_certificates.save_error'),
+      );
+    }
+  }
+  async download(cert: AdminCertificate): Promise<void> {
+    if (this.downloadingId()) return;
+    this.downloadingId.set(cert.id);
+    try {
+      await this.renderer.downloadPair(
+        certificateLanguages(cert).map((language) => certificateValues(cert, language)),
+      );
+    } catch (error) {
+      this.showToast(this.renderError(error), true);
+    } finally {
+      this.downloadingId.set(null);
+    }
+  }
+  private renderError(error: unknown): string {
+    return error instanceof Error && error.message.startsWith('certificate_studio.')
+      ? error.message
+      : 'certificate_studio.render_error';
+  }
   revoke(cert: AdminCertificate): void {
     this.adminService.revokeCertificate(cert.id).subscribe({
       next: () => {
@@ -335,24 +505,19 @@ export class AdminCertificatesComponent implements OnInit {
           list.map((c) => (c.id === cert.id ? { ...c, is_valid: false } : c)),
         );
         this.showToast('admin_certificates.revoked');
-        this.refresh();
       },
       error: (err) => this.showToast(apiErrorKey(err, 'admin_certificates.revoke_error'), true),
     });
   }
-
   askDelete(cert: AdminCertificate): void {
     this.deleteTarget.set(cert);
   }
-
   closeDelete(): void {
-    this.deleteTarget.set(null);
-    this.isDeleting.set(false);
+    if (!this.isDeleting()) this.deleteTarget.set(null);
   }
-
   confirmDelete(): void {
     const target = this.deleteTarget();
-    if (!target) return;
+    if (!target || this.isDeleting()) return;
     this.isDeleting.set(true);
     this.adminService.deleteCertificate(target.id).subscribe({
       next: () => {
@@ -360,7 +525,6 @@ export class AdminCertificatesComponent implements OnInit {
         this.isDeleting.set(false);
         this.closeDelete();
         this.showToast('admin_certificates.deleted');
-        this.refresh();
       },
       error: (err) => {
         this.isDeleting.set(false);
@@ -368,22 +532,16 @@ export class AdminCertificatesComponent implements OnInit {
       },
     });
   }
-
-  copyCode(code: string): void {
+  async copyCode(code: string): Promise<void> {
     try {
-      void navigator.clipboard?.writeText(code);
+      await navigator.clipboard.writeText(code);
       this.showToast('common.copied');
     } catch {
-      // clipboard unavailable
+      /* Optional clipboard. */
     }
   }
-
-  private errorMessage(err: unknown, fallbackKey: string): string {
-    return apiErrorKey(err, fallbackKey);
-  }
-
   private showToast(key: string, error = false): void {
     this.toast.set({ key, error });
-    setTimeout(() => this.toast.set(null), 3000);
+    setTimeout(() => this.toast.set(null), 4000);
   }
 }

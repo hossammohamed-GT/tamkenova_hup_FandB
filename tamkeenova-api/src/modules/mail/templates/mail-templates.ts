@@ -765,7 +765,7 @@ export function getCertificateIssuedEmailTemplate(
   }
 
   const verifyUrl = verificationCode
-    ? `${APP_URL}/verify/${verificationCode}`
+    ? `${APP_URL}/verify?code=${encodeURIComponent(verificationCode)}`
     : APP_URL;
 
   const body = `
@@ -778,9 +778,10 @@ export function getCertificateIssuedEmailTemplate(
 
           <tr>
             <td align="center" class="email-padding" style="padding: 26px 40px 0;">
+              ${ctaButton('تنزيل الشهادة بالعربية والإنجليزية', `${APP_URL}/portal/certificates`)}
               ${ctaButton('التحقق من الشهادة', verifyUrl)}
               ${note(
-                'الشهادة متاحة في حسابك ويمكن التحقق من صحتها في أي وقت عبر رمز التحقق',
+                'نسختا الشهادة العربية والإنجليزية متاحتان في حسابك بصيغتي PDF وPNG، بنفس رمز التحقق.',
               )}
             </td>
           </tr>

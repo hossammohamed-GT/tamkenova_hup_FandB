@@ -47,7 +47,10 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'register/volunteer',
+    path: 'register/volunteer', redirectTo: 'register/trainee', pathMatch: 'full',
+  },
+  {
+    path: 'register/trainee',
     canActivate: [guestGuard],
     loadComponent: () =>
       import('../features/auth/register-volunteer/volunteer-register.component').then(
@@ -67,6 +70,12 @@ export const routes: Routes = [
       import('../features/auth/login/login.component').then((m) => m.LoginComponent),
   },
 
+  // All authenticated recipients, including volunteers, can access their own records.
+  {
+    path: 'portal/certificates',
+    canActivate: [authGuard],
+    loadComponent: () => import('../features/portal/student/certificates/student-certificates.component').then(m => m.StudentCertificatesComponent),
+  },
   // -- Student Portal Routes --
   {
     path: 'portal',
@@ -82,7 +91,7 @@ export const routes: Routes = [
         if (role === 'TRAINER') return '/portal/trainer';
         if (role === 'ADMIN' || role === 'SUPER_ADMIN') return '/portal/admin';
         if (role === 'EMPLOYEE') return '/portal/employee';
-        if (role === 'VOLUNTEER') return '/portal/volunteer';
+        if (role === 'VOLUNTEER') return '/portal/trainee';
         return '/portal/student';
       } catch {
         return '/login';
@@ -260,7 +269,10 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'volunteers',
+        path: 'volunteers', redirectTo: 'trainees', pathMatch: 'full',
+      },
+      {
+        path: 'trainees',
         loadComponent: () =>
           import('../features/portal/admin/volunteers/admin-volunteers.component').then(
             (m) => m.AdminVolunteersComponent,
@@ -339,7 +351,10 @@ export const routes: Routes = [
 
   // -- Volunteer Portal Routes --
   {
-    path: 'portal/volunteer',
+    path: 'portal/volunteer', redirectTo: 'portal/trainee',
+  },
+  {
+    path: 'portal/trainee',
     canActivate: [authGuard, roleGuard(['VOLUNTEER'])],
     children: [
       {

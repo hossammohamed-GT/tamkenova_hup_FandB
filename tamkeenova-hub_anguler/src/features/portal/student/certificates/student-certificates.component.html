@@ -6,11 +6,19 @@
     </div>
   </div>
 
+  @if (downloadError(); as error) {
+    <p class="download-error page-message" role="alert">{{ error | translate }}</p>
+  }
   @if (isLoading()) {
     <div class="empty-state"><div class="loader-spinner"></div></div>
+  } @else if (hasError()) {
+    <div class="empty-state surface">
+      <p>{{ 'admin_certificates.load_error' | translate }}</p>
+      <button class="btn-accent" (click)="load()">{{ 'common.retry' | translate }}</button>
+    </div>
   } @else if (certificates().length === 0) {
     <div class="empty-state surface">
-      <i class="fa-solid fa-certificate"></i>
+      <i class="fa-solid fa-certificate" aria-hidden="true"></i>
       <p>{{ 'student_certificates.empty' | translate }}</p>
       <p class="text-muted empty-hint">{{ 'student_certificates.empty_hint' | translate }}</p>
       <a routerLink="/programs" class="btn-accent empty-cta">
@@ -20,78 +28,183 @@
   } @else {
     <div class="cert-grid">
       @for (cert of certificates(); track cert.id) {
-        <article class="cert-card surface chamfer-sm animate-in">
-          <div class="cert-ribbon">
-            <i class="fa-solid fa-award"></i>
-          </div>
-
-          <h3 class="cert-title">{{ cert.title }}</h3>
-
-          <div class="cert-info">
-            @if (cert.training_programs) {
-              <span class="cert-line">
-                <i class="fa-solid fa-book"></i>
-                {{ cert.training_programs.title }}
-              </span>
-            }
-            @if (cert.trainers) {
-              <span class="cert-line">
-                <i class="fa-solid fa-chalkboard-user"></i>
-                {{ cert.trainers.users.full_name }}
-              </span>
-            }
-            <span class="cert-line text-muted">
-              <i class="fa-regular fa-calendar"></i>
-              {{ cert.issued_at | date: 'yyyy/MM/dd' }}
-            </span>
-            @if (cert.training_hours) {
-              <span class="cert-line text-muted">
-                <i class="fa-regular fa-clock"></i>
-                {{ cert.training_hours }} {{ 'student_certificates.training_hours' | translate }}
-              </span>
-            }
-          </div>
-
-          <div class="cert-code-row">
-            <code class="cert-code" dir="ltr">{{ cert.verification_code }}</code>
-            <button
-              type="button"
-              class="icon-btn"
-              (click)="copyCode(cert.verification_code)"
-              [attr.aria-label]="'student_certificates.copy_code' | translate"
-              [attr.title]="'student_certificates.copy_code' | translate"
-            >
-              <i class="fa-solid" [class.fa-copy]="copiedCode() !== cert.verification_code" [class.fa-check]="copiedCode() === cert.verification_code"></i>
-            </button>
-          </div>
-
-          <div class="certificate-print" [id]="'certificate-' + cert.id">
-            <div class="certificate-brand">TAMKEENOVA</div>
-            <div class="certificate-kicker">{{ cert.certificate_type || 'CERTIFICATE' }}</div>
-            <h2>{{ 'student_certificates.certificate_of' | translate }}</h2>
-            <p class="certificate-recipient">{{ cert.trainers?.users?.full_name || cert.title }}</p>
-            <p>{{ cert.description || cert.title }}</p>
-            <strong>{{ cert.title }}</strong>
-            <div class="certificate-meta">{{ cert.issued_at | date:'yyyy/MM/dd' }} · {{ cert.verification_code }}</div>
-            <div class="certificate-partners">
-              @for (partnerId of (cert.partner_ids || []); track partnerId) { @if (partnerLogo(partnerId)) { <img [src]="partnerLogo(partnerId)" alt="Success partner" /> } }
+        <article class="cert-card" [attr.aria-labelledby]="'cert-title-' + cert.id">
+          @if (canRender(cert)) {
+            <div class="cert-visual">
+              <span class="preview-caption">{{
+                'student_certificates.template_preview' | translate
+              }}</span>
+              <img
+                class="certificate-artwork"
+                [src]="thumbnail(cert)"
+                [alt]="'certificate_studio.' + cert.certificate_type | translate"
+                loading="lazy"
+                width="900"
+                height="636"
+              />
             </div>
+          }
+
+          <div class="cert-body">
+            <div class="cert-badges">
+              @if (cert.certificate_type === 'TRAINING' || cert.certificate_type === 'VOLUNTEER') {
+                <span class="cert-type">{{
+                  'certificate_studio.' + cert.certificate_type | translate
+                }}</span>
+              }
+              @if (!cert.is_valid) {
+                <span class="cert-status is-revoked">{{
+                  'admin_certificates.revoked_label' | translate
+                }}</span>
+              }
+            </div>
+            <h2 class="cert-title" [id]="'cert-title-' + cert.id" dir="auto">{{ cert.title }}</h2>
+            @if (cert.certificate_language) {
+              <p class="cert-language-note">
+                {{
+                  (cert.template_version === '2026.3'
+                    ? 'certificate_studio.both_languages'
+                    : 'certificate_studio.language_' + cert.certificate_language
+                  ) | translate
+                }}
+              </p>
+            }
+            @if (cert.program_name && cert.program_name !== cert.title) {
+              <p class="cert-program" dir="auto">{{ cert.program_name }}</p>
+            } @else if (!cert.template_version && cert.training_programs) {
+              <p class="cert-program" dir="auto">{{ cert.training_programs.title }}</p>
+            }
+            @if (!cert.template_version && cert.trainers) {
+              <p class="cert-program" dir="auto">{{ cert.trainers.users.full_name }}</p>
+            }
+
+            <dl class="cert-details">
+              <div>
+                <dt>{{ 'student_certificates.issued_at' | translate }}</dt>
+                <dd>
+                  <time [attr.datetime]="cert.issued_at" dir="ltr">{{
+                    cert.issued_at | date: 'yyyy/MM/dd' : 'UTC'
+                  }}</time>
+                </dd>
+              </div>
+              @if (cert.training_hours) {
+                <div>
+                  <dt>{{ 'student_certificates.training_hours' | translate }}</dt>
+                  <dd>{{ cert.training_hours }}</dd>
+                </div>
+              }
+            </dl>
+
+            <div class="cert-code-section">
+              <span class="detail-label">{{
+                'student_certificates.verification_code' | translate
+              }}</span>
+              <div class="cert-code-row">
+                <code class="cert-code" dir="ltr">{{ cert.verification_code }}</code>
+                <button
+                  type="button"
+                  class="cert-copy"
+                  (click)="copyCode(cert.verification_code)"
+                  [attr.aria-label]="'student_certificates.copy_code' | translate"
+                  [attr.title]="'student_certificates.copy_code' | translate"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    @if (copiedCode() === cert.verification_code) {
+                      <path d="m5 12 4 4L19 6" />
+                    } @else {
+                      <rect x="8" y="8" width="12" height="12" rx="2" />
+                      <path d="M15 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3" />
+                    }
+                  </svg>
+                  <span>{{
+                    (copiedCode() === cert.verification_code
+                      ? 'common.copied'
+                      : 'student_certificates.copy_code'
+                    ) | translate
+                  }}</span>
+                </button>
+              </div>
+            </div>
+
+            @if (!canRender(cert)) {
+              <p class="legacy-note">{{ 'certificate_studio.legacy_student' | translate }}</p>
+            }
+            @if (canRender(cert) && cert.is_valid) {
+              <div class="cert-actions" [attr.aria-busy]="downloadingId() === cert.id">
+                <h3 class="downloads-heading">
+                  {{ 'student_certificates.download_options' | translate }}
+                </h3>
+                @for (language of languagesFor(cert); track language) {
+                  <div
+                    class="edition-downloads"
+                    role="group"
+                    [attr.aria-label]="'certificate_studio.language_' + language | translate"
+                  >
+                    <div class="edition-heading">
+                      <span class="edition-code" aria-hidden="true">{{
+                        language === 'ar' ? 'AR' : 'EN'
+                      }}</span>
+                      <span>{{ 'certificate_studio.language_' + language | translate }}</span>
+                    </div>
+                    <div class="edition-buttons">
+                      <button
+                        type="button"
+                        class="cert-download cert-download-primary"
+                        [disabled]="!!downloadingId()"
+                        [attr.aria-label]="
+                          ('certificate_studio.download_pdf' | translate) +
+                          ' · ' +
+                          ('certificate_studio.language_' + language | translate)
+                        "
+                        (click)="downloadCertificate(cert, 'pdf', language)"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                          <path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5" />
+                        </svg>
+                        <span>{{ 'certificate_studio.download_pdf' | translate }}</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="cert-download cert-download-secondary"
+                        [disabled]="!!downloadingId()"
+                        [attr.aria-label]="
+                          ('certificate_studio.download_png' | translate) +
+                          ' · ' +
+                          ('certificate_studio.language_' + language | translate)
+                        "
+                        (click)="downloadCertificate(cert, 'png', language)"
+                      >
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                          <rect x="3" y="3" width="18" height="18" rx="3" />
+                          <circle cx="8" cy="8" r="1" />
+                          <path d="m3 17 5-5 4 4 4-6 5 7" />
+                        </svg>
+                        <span>{{ 'certificate_studio.download_png' | translate }}</span>
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+            @if (downloadingId() === cert.id) {
+              <p class="download-progress" role="status">
+                <span class="download-spinner" aria-hidden="true"></span>
+                {{ 'certificate_studio.rendering' | translate }}
+              </p>
+            }
           </div>
 
-          <div class="cert-actions">
-            <button type="button" class="btn-accent btn-sm" (click)="downloadCertificate(cert, 'ar')"><i class="fa-solid fa-download"></i> {{ 'student_certificates.download_ar' | translate }}</button>
-            <button type="button" class="btn-outline btn-sm" (click)="downloadCertificate(cert, 'en')"><i class="fa-solid fa-download"></i> {{ 'student_certificates.download_en' | translate }}</button>
-            @if (cert.pdf_url) {
-              <a [href]="cert.pdf_url" target="_blank" rel="noopener" class="btn-outline btn-sm btn-link">
-                <i class="fa-solid fa-file-pdf"></i>
-                {{ 'student_certificates.view_pdf' | translate }}
-              </a>
-            }
-            <a [routerLink]="['/verify']" [queryParams]="{ code: cert.verification_code }" class="btn-accent btn-sm btn-link">
-              <i class="fa-solid fa-shield-halved"></i>
-              {{ 'student_certificates.verify' | translate }}
-            </a>
-          </div>
+          <a
+            [routerLink]="['/verify']"
+            [queryParams]="{ code: cert.verification_code }"
+            class="cert-verify"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6Z" />
+              <path d="m8 12 3 3 5-6" />
+            </svg>
+            {{ 'student_certificates.verify' | translate }}
+          </a>
         </article>
       }
     </div>

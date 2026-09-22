@@ -1,64 +1,96 @@
+import { Type } from 'class-transformer';
 import {
-  IsEnum,
-  IsInt,
-  IsOptional,
   IsArray,
   ArrayMaxSize,
+  ValidateNested,
+  IsIn,
+  IsInt,
+  IsOptional,
   IsString,
   IsUUID,
+  Matches,
+  Max,
   MaxLength,
   Min,
 } from 'class-validator';
 
+export class CertificatePartnerLogoDto {
+  @IsString()
+  @MaxLength(80)
+  @Matches(/\S/u)
+  name: string;
 
+  @IsString()
+  @MaxLength(90000)
+  @Matches(/^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/)
+  data_url: string;
+
+  @IsOptional()
+  @IsUUID()
+  source_id?: string;
+}
+
+// Fixed headings, descriptions and institutional signature remain uneditable.
 export class IssueCertificateDto {
-  @IsUUID()
-  user_id: string;
+  @IsString()
+  @MaxLength(120)
+  @Matches(/\S/u)
+  recipient_name_ar: string;
 
   @IsString()
-  @MaxLength(255)
-  title: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsString()
-  title_ar?: string;
+  @MaxLength(120)
+  @Matches(/\S/u)
+  recipient_name_en: string;
 
   @IsOptional()
   @IsString()
-  title_en?: string;
+  @MaxLength(180)
+  program_name_ar?: string | null;
 
   @IsOptional()
   @IsString()
-  description_ar?: string;
+  @MaxLength(180)
+  program_name_en?: string | null;
 
-  @IsOptional()
   @IsString()
-  description_en?: string;
+  @MaxLength(80)
+  @Matches(/\S/u)
+  signature_name: string;
 
   @IsOptional()
-  @IsInt()
-  @Min(0)
-  training_hours?: number;
-
-  @IsOptional()
-  @IsEnum(['TRAINING', 'VOLUNTEER', 'OTHER'])
-  certificate_type?: string;
-
-  @IsOptional()
-  @IsUUID()
-  trainer_id?: string;
-
-  @IsOptional()
-  @IsUUID()
-  program_id?: string;
+  @IsIn(['ar', 'en'])
+  certificate_language?: 'ar' | 'en';
 
   @IsOptional()
   @IsArray()
-  @ArrayMaxSize(6)
-  @IsUUID('4', { each: true })
-  partner_ids?: string[];
+  @ArrayMaxSize(4)
+  @ValidateNested({ each: true })
+  @Type(() => CertificatePartnerLogoDto)
+  partner_logos?: CertificatePartnerLogoDto[];
+
+  @IsUUID()
+  user_id: string;
+
+  @IsIn(['TRAINING', 'VOLUNTEER'])
+  certificate_type: 'TRAINING' | 'VOLUNTEER';
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  @Matches(/\S/u)
+  recipient_name?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(180)
+  program_name?: string | null;
+
+  @IsInt()
+  @Min(1)
+  @Max(100000)
+  training_hours: number;
+
+  @IsString()
+  @Matches(/^\d{4}-\d{2}-\d{2}$/)
+  issued_at: string;
 }

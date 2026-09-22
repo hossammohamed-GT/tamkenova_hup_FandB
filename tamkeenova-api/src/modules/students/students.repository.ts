@@ -616,32 +616,6 @@ export class StudentsRepository {
 
 
 
-  // Handle create certificate
-  async createCertificate(data: {
-    student_id: string;
-    trainer_id: string;
-    program_id: string;
-    enrollment_id: string;
-    verification_code: string;
-    title: string;
-    description?: string;
-    training_hours?: number;
-  }) {
-    return this.prisma.certificates.create({
-      data: {
-        student_id: data.student_id,
-        trainer_id: data.trainer_id,
-        program_id: data.program_id,
-        enrollment_id: data.enrollment_id,
-        verification_code: data.verification_code,
-        title: data.title,
-        description: data.description,
-        training_hours: data.training_hours || 0,
-      },
-    });
-  }
-
-
   // Handle get student certificates
   async getStudentCertificates(studentId: string) {
     return this.prisma.certificates.findMany({
@@ -654,6 +628,11 @@ export class StudentsRepository {
         title_ar: true,
         title_en: true,
         certificate_type: true,
+        recipient_name: true,
+        program_name: true,
+        template_version: true,
+        certificate_language: true,
+        partner_logos: true,
         description: true,
         description_ar: true,
         description_en: true,
@@ -693,6 +672,12 @@ export class StudentsRepository {
         id: true,
         verification_code: true,
         title: true,
+        recipient_name: true,
+        program_name: true,
+        template_version: true,
+        certificate_language: true,
+        partner_logos: true,
+        certificate_type: true,
         description: true,
         pdf_url: true,
         qr_code_url: true,

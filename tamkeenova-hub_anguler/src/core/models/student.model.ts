@@ -1,3 +1,4 @@
+import type { CertificateLanguage, PartnerLogo } from '../certificates/certificate-template';
 // -- Student Module Models (mirrors Tamkeenova Student API) --
 
 export type EnrollmentStatus = 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'SUSPENDED';
@@ -176,6 +177,11 @@ export interface EnrollResponse {
 }
 
 export interface StudentCertificate {
+  certificate_language?: CertificateLanguage | null;
+  partner_logos?: PartnerLogo[] | null;
+  recipient_name?: string | null;
+  program_name?: string | null;
+  template_version?: string | null;
   id: string;
   verification_code: string;
   title: string;
@@ -371,6 +377,10 @@ export interface VerifyCertificateResponse {
   verified: boolean;
   status: string;
   certificate: {
+    recipient_name_ar?: string | null;
+    recipient_name_en?: string | null;
+    title_ar?: string | null;
+    title_en?: string | null;
     id: string;
     verification_code: string;
     title: string;

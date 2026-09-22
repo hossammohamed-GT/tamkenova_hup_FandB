@@ -7,11 +7,8 @@ import {
   Patch,
   Post,
   Query,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -238,17 +235,6 @@ export class AdminController {
     @Body() dto: IssueCertificateDto,
   ) {
     return this.adminService.issueCertificate(admin.sub, dto);
-  }
-
-
-  // Handle upload certificate pdf
-  @Post('certificates/:id/pdf')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadCertificatePdf(
-    @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    return this.adminService.uploadCertificatePdf(id, file);
   }
 
 
