@@ -194,32 +194,46 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private startSlide(idx: number): void {
-    const current = this.slots();
-    if (!current[idx] || current[idx].sliding) return;
-    const nextImg = this.pickNextLogo(idx);
+    this.trySlide(idx, 0);
+  }
 
-    // Never slide in an unloaded image: it would pop in statically after the
-    // transition instead of riding it. Wait for decode (or fail fast).
-    const begin = () => {
+  // Slide only between decoded images: sliding an unloaded logo makes it pop
+  // in statically after the motion instead of riding it. Broken/slow URLs are
+  // skipped past so one bad logo never freezes a slot; the pointer advances
+  // only onto the logo that actually slides (no silent skips on overlap).
+  private trySlide(idx: number, attempts: number): void {
+    const slots = this.slots();
+    const total = this.partnersImages.length;
+    if (!slots[idx] || slots[idx].sliding || !total || attempts >= total) return;
+    const ptr = (this.slotPointers[idx] + 1) % total;
+    const candidate = this.partnersImages[ptr];
+
+    const go = () => {
       const live = this.slots();
       if (!live[idx] || live[idx].sliding) return;
+      this.slotPointers[idx] = ptr;
       const updated = [...live];
-      updated[idx] = { ...updated[idx], nextImg, sliding: true };
+      updated[idx] = { ...updated[idx], nextImg: candidate, sliding: true };
       this.slots.set(updated);
       const t = setTimeout(() => this.finishSlide(idx), this.slideDurationMs);
       this.partnerTimers.push(t);
     };
+    const skip = () => {
+      this.slotPointers[idx] = ptr;
+      this.trySlide(idx, attempts + 1);
+    };
 
-    if (typeof window === 'undefined') { begin(); return; }
-    let done = false;
-    const once = () => { if (!done) { done = true; begin(); } };
+    if (typeof window === 'undefined') { go(); return; }
+    let settled = false;
+    const timer = setTimeout(() => { if (!settled) { settled = true; skip(); } }, 2000);
+    this.partnerTimers.push(timer);
     const probe = new Image();
-    probe.onload = once;
-    probe.onerror = once;
-    probe.src = nextImg;
-    if (probe.complete && probe.naturalWidth) { once(); return; }
-    const fallback = setTimeout(once, 1500);
-    this.partnerTimers.push(fallback);
+    probe.onload = () => { if (!settled) { settled = true; clearTimeout(timer); go(); } };
+    probe.onerror = () => { if (!settled) { settled = true; clearTimeout(timer); skip(); } };
+    probe.src = candidate;
+    if (probe.complete) {
+      if (!settled) { settled = true; clearTimeout(timer); if (probe.naturalWidth) go(); else skip(); }
+    }
   }
 
   private finishSlide(idx: number): void {
