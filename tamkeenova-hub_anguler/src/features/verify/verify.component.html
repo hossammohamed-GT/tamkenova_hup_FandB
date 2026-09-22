@@ -96,7 +96,7 @@
             }
             <div class="result-item">
               <span class="result-label">{{ 'verify.issued_at' | translate }}</span>
-              <strong>{{ r.certificate.issued_at | date: 'yyyy/MM/dd' }}</strong>
+              <strong>{{ r.certificate.issued_at | date: 'yyyy/MM/dd' : 'UTC' }}</strong>
             </div>
             @if (r.certificate.training_hours) {
               <div class="result-item">

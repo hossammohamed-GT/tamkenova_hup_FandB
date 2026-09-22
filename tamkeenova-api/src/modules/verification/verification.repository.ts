@@ -24,6 +24,7 @@ export class VerificationRepository {
         recipient_name: true,
         program_name: true,
         template_version: true,
+        certificate_language: true,
         description: true,
         description_ar: true,
         description_en: true,

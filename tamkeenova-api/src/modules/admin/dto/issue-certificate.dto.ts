@@ -1,4 +1,8 @@
+import { Type } from 'class-transformer';
 import {
+  IsArray,
+  ArrayMaxSize,
+  ValidateNested,
   IsIn,
   IsInt,
   IsOptional,
@@ -10,8 +14,34 @@ import {
   Min,
 } from 'class-validator';
 
-// No editable headings, descriptions, logos, signatures or arbitrary QR URLs.
+export class CertificatePartnerLogoDto {
+  @IsString()
+  @MaxLength(80)
+  @Matches(/\S/u)
+  name: string;
+
+  @IsString()
+  @MaxLength(90000)
+  @Matches(/^data:image\/png;base64,[A-Za-z0-9+/]+={0,2}$/)
+  data_url: string;
+
+  @IsOptional()
+  @IsUUID()
+  source_id?: string;
+}
+
+// Fixed headings, descriptions and institutional signature remain uneditable.
 export class IssueCertificateDto {
+  @IsIn(['ar', 'en'])
+  certificate_language: 'ar' | 'en';
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(4)
+  @ValidateNested({ each: true })
+  @Type(() => CertificatePartnerLogoDto)
+  partner_logos?: CertificatePartnerLogoDto[];
+
   @IsUUID()
   user_id: string;
 

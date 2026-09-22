@@ -1,3 +1,4 @@
+import type { CertificateLanguage, PartnerLogo } from '../certificates/certificate-template';
 // -- Student Module Models (mirrors Tamkeenova Student API) --
 
 export type EnrollmentStatus = 'ACTIVE' | 'COMPLETED' | 'CANCELLED' | 'SUSPENDED';
@@ -176,6 +177,8 @@ export interface EnrollResponse {
 }
 
 export interface StudentCertificate {
+  certificate_language?: CertificateLanguage | null;
+  partner_logos?: PartnerLogo[] | null;
   recipient_name?: string | null;
   program_name?: string | null;
   template_version?: string | null;

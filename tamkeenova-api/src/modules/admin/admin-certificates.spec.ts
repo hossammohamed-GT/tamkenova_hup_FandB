@@ -5,6 +5,7 @@ describe('certificate issue and edit workflow', () => {
   const payload = {
     user_id: 'holder',
     certificate_type: 'TRAINING' as const,
+    certificate_language: 'en' as const,
     recipient_name: 'Snapshot Name',
     program_name: 'Leadership',
     training_hours: 12,
@@ -34,13 +35,19 @@ describe('certificate issue and edit workflow', () => {
       updateCertificate: jest
         .fn<(...args: any[]) => Promise<any>>()
         .mockImplementation((_id, data) => Promise.resolve(data)),
-      logActivity: jest.fn<(...args: any[]) => Promise<any>>().mockResolvedValue({}),
+      logActivity: jest
+        .fn<(...args: any[]) => Promise<any>>()
+        .mockResolvedValue({}),
     };
     const mail = {
-      sendCertificateIssuedEmail: jest.fn<(...args: any[]) => Promise<any>>().mockResolvedValue({}),
+      sendCertificateIssuedEmail: jest
+        .fn<(...args: any[]) => Promise<any>>()
+        .mockResolvedValue({}),
     };
     const notifications = {
-      createNotification: jest.fn<(...args: any[]) => Promise<any>>().mockResolvedValue({}),
+      createNotification: jest
+        .fn<(...args: any[]) => Promise<any>>()
+        .mockResolvedValue({}),
     };
     return {
       repository,
@@ -59,7 +66,7 @@ describe('certificate issue and edit workflow', () => {
     expect(repository.createCertificate).toHaveBeenCalledWith(
       expect.objectContaining({
         student_id: 'holder',
-        template_version: '2026.1',
+        template_version: '2026.2',
       }),
     );
     expect(repository.logActivity).toHaveBeenCalledWith(

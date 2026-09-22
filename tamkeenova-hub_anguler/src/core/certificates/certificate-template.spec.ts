@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  getCertificateTemplate,
+  partnerSlots,
   ARTBOARD,
   CERTIFICATE_TEMPLATES,
   CertificateValues,
@@ -10,6 +12,7 @@ import {
 
 const training: CertificateValues = {
   certificate_type: 'TRAINING',
+  certificate_language: 'en',
   recipient_name: 'ليلى أحمد محمد',
   program_name: 'Leadership & Professional Development',
   training_hours: 24,
@@ -17,21 +20,59 @@ const training: CertificateValues = {
   verification_code: 'TAM-1234567890ABCDEF',
 };
 describe('fixed certificate templates', () => {
-  it('has exactly two templates and only permitted dynamic field boxes', () => {
-    expect(CERTIFICATE_TEMPLATES.map((t) => t.type)).toEqual(['TRAINING', 'VOLUNTEER']);
+  it('has separate Arabic and English editions for both types', () => {
+    expect(CERTIFICATE_TEMPLATES.map((t) => `${t.type}-${t.language}`)).toEqual([
+      'TRAINING-ar',
+      'TRAINING-en',
+      'VOLUNTEER-ar',
+      'VOLUNTEER-en',
+    ]);
     expect(Object.keys(CERTIFICATE_TEMPLATES[0].fields).sort()).toEqual([
       'date',
       'hours',
+      'partners',
       'program',
       'qr',
       'recipient',
     ]);
-    expect(Object.keys(CERTIFICATE_TEMPLATES[1].fields).sort()).toEqual([
+    expect(Object.keys(CERTIFICATE_TEMPLATES[2].fields).sort()).toEqual([
       'date',
       'hours',
+      'partners',
       'qr',
       'recipient',
     ]);
+  });
+  it('mirrors Arabic field locations without mirroring content', () => {
+    const ar = CERTIFICATE_TEMPLATES[0],
+      en = CERTIFICATE_TEMPLATES[1];
+    expect(ar.fields.recipient.x).toBe(1800 - en.fields.recipient.x - en.fields.recipient.width);
+    expect(ar.fields.qr.x).toBe(1800 - en.fields.qr.x - en.fields.qr.width);
+  });
+  it.each([0, 1, 2, 3, 4])('fits %i logos in the partner band, in reading order', (count) => {
+    for (const template of CERTIFICATE_TEMPLATES) {
+      const slots = partnerSlots(template, count),
+        area = template.fields.partners!;
+      expect(slots).toHaveLength(count);
+      for (const slot of slots) {
+        expect(slot.x).toBeGreaterThanOrEqual(area.x);
+        expect(slot.x + slot.width).toBeLessThanOrEqual(area.x + area.width);
+        expect(slot.height).toBeLessThanOrEqual(area.height);
+      }
+      if (count > 1) expect(slots[0].x < slots[1].x).toBe(template.language === 'en');
+      expect(() => partnerSlots(template, 5)).toThrow();
+    }
+  });
+  it('retains the original bilingual layout for 2026.1 records', () => {
+    const value = certificateValues({
+      ...training,
+      template_version: '2026.1',
+      certificate_language: null,
+    });
+    const template = getCertificateTemplate(value);
+    expect(template.artwork).toBe('/certificates/training-v1.png');
+    expect(template.fields.recipient.y).toBe(533);
+    expect(() => validateValues(value)).not.toThrow();
   });
   it('keeps every editable rectangle inside the artboard without intersections', () => {
     for (const template of CERTIFICATE_TEMPLATES) {
@@ -71,6 +112,8 @@ describe('fixed certificate templates', () => {
     { issued_at: 'not-a-date' },
     { verification_code: 'https://evil.example' },
     { certificate_type: 'OTHER' },
+    { certificate_language: undefined },
+    { certificate_language: 'fr' },
     { certificate_type: 'VOLUNTEER', program_name: 'Not permitted' },
   ])('rejects invalid values: %j', (patch) => {
     expect(() => validateValues({ ...training, ...patch } as CertificateValues)).toThrow(

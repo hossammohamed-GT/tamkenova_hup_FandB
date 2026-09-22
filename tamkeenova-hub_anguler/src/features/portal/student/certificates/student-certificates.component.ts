@@ -7,7 +7,8 @@ import { StudentCertificate } from '../../../../core/models/student.model';
 import { CertificateRenderer } from '../../../../core/certificates/certificate-renderer.service';
 import {
   certificateValues,
-  TEMPLATE_VERSION,
+  canRenderCertificate,
+  getCertificateTemplate,
 } from '../../../../core/certificates/certificate-template';
 
 @Component({
@@ -20,7 +21,10 @@ import {
 export class StudentCertificatesComponent {
   private studentService = inject(StudentService);
   private renderer = inject(CertificateRenderer);
-  readonly version = TEMPLATE_VERSION;
+  readonly canRender = canRenderCertificate;
+  thumbnail(cert: StudentCertificate): string {
+    return getCertificateTemplate(certificateValues(cert)).thumbnail;
+  }
   isLoading = signal(true);
   hasError = signal(false);
   certificates = signal<StudentCertificate[]>([]);

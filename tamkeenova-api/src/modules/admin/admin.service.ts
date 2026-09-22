@@ -530,7 +530,13 @@ export class AdminService {
     if (!existing) throw new NotFoundException('Certificate not found');
 
     // Older records must be explicitly completed by an administrator before conversion.
-    const data = certificateData({ ...existing, ...dto });
+    const data = certificateData({
+      ...existing,
+      ...dto,
+      partner_logos: dto.partner_logos === undefined
+        ? (existing.partner_logos ?? [])
+        : dto.partner_logos,
+    });
     const updated = await this.adminRepo.updateCertificate(id, data);
     return { success: true, message: 'Certificate updated', certificate: updated };
   }

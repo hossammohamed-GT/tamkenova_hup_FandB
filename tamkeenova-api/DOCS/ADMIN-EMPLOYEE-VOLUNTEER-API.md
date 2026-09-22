@@ -189,7 +189,7 @@ GET /api/admin/users/:id/activity
 
 ## 7. Admin — Certificates
 
-Rebuilt in version **2026.1**. See the [certificate studio contract and deployment guide](../../tamkeenova-hub_anguler/DOCS/CERTIFICATES.md). Apply `npm run db:certificates` before deploying.
+Rebuilt in version **2026.2**. See the [certificate studio contract and deployment guide](../../tamkeenova-hub_anguler/DOCS/CERTIFICATES.md). Apply `npm run db:certificates` before deploying.
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -203,6 +203,8 @@ Rebuilt in version **2026.1**. See the [certificate studio contract and deployme
 {
   "user_id": "recipient-account-uuid",
   "certificate_type": "VOLUNTEER",
+  "certificate_language": "ar",
+  "partner_logos": [],
   "recipient_name": "ليلى أحمد",
   "training_hours": 100,
   "issued_at": "2026-09-21"
@@ -211,7 +213,7 @@ Rebuilt in version **2026.1**. See the [certificate studio contract and deployme
 
 For `TRAINING`, `program_name` is required (up to 180 characters). Volunteers must not have a non-empty program. The name, hours and date are required on issue. PATCH validates partial changes against the saved record; account ownership is not editable.
 
-The server assigns a random `TAM-` verification code and snapshots the name and template version. The frontend generates a local verification QR and exports matching PDF/PNG files from locked artwork. Custom titles, descriptions, partner logos, arbitrary QR URLs and the previous PDF upload endpoint are no longer supported. Historical records retain verification but require explicit admin review before new-artwork downloads.
+The server assigns a random `TAM-` verification code and snapshots the name and template version. The frontend generates a local verification QR and exports matching PDF/PNG files from locked artwork. Custom titles, descriptions, arbitrary QR URLs and the previous PDF upload endpoint are not supported. Separate Arabic/English editions are selected with required `certificate_language` (`ar` or `en`). Optional `partner_logos` accepts up to four normalized PNG snapshots (not remote URLs), including directly uploaded logos. Existing 2026.1 certificates retain their original bilingual design. Historical records retain verification but require explicit admin review before new-artwork downloads.
 
 ---
 
@@ -492,7 +494,7 @@ Authorization: Volunteer
 
 الأدمن يصدر شهادة تطوع من:
 ```
-POST /api/admin/certificates   { "user_id": "volunteer-user-uuid", "recipient_name": "ليلى أحمد", "training_hours": 100, "issued_at": "2026-09-21", "certificate_type": "VOLUNTEER" }
+POST /api/admin/certificates   { "user_id": "volunteer-user-uuid", "recipient_name": "ليلى أحمد", "certificate_language": "ar", "partner_logos": [], "training_hours": 100, "issued_at": "2026-09-21", "certificate_type": "VOLUNTEER" }
 ```
 - شروط مقترحة: 100 ساعة → شهادة، 200 ساعة → شهادة أعلى (بتحددها الإدارة).
 - ساعات التطوع بتتحدث تلقائيًا لما الأدمن يعتمد مهمة.

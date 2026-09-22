@@ -1,3 +1,4 @@
+import type { CertificateLanguage, PartnerLogo } from '../certificates/certificate-template';
 // -- Admin Module Models (mirrors Tamkeenova Admin API) --
 
 import { TaskAssignee, Task } from './tasks.model';
@@ -98,6 +99,8 @@ export interface AdminVolunteer {
 }
 
 export interface AdminCertificate {
+  certificate_language?: CertificateLanguage | null;
+  partner_logos?: PartnerLogo[] | null;
   student_id: string;
   recipient_name?: string | null;
   program_name?: string | null;
@@ -127,6 +130,8 @@ export interface AdminCertificate {
 }
 
 export interface IssueCertificatePayload {
+  certificate_language: CertificateLanguage;
+  partner_logos?: PartnerLogo[];
   user_id: string;
   certificate_type: 'TRAINING' | 'VOLUNTEER';
   recipient_name: string;

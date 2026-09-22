@@ -5,6 +5,7 @@ import { UpdateCertificateDto } from './dto/update-certificate.dto';
 
 const values = {
   certificate_type: 'TRAINING' as const,
+  certificate_language: 'en' as const,
   recipient_name: '  ليلى أحمد  ',
   program_name: 'Leadership Development',
   training_hours: 32,
@@ -19,7 +20,7 @@ const pipe = new ValidationPipe({
 describe('certificate data contract', () => {
   it('snapshots permitted values and resets obsolete static customizations', () => {
     expect(certificateData(values)).toMatchObject({
-      template_version: '2026.1',
+      template_version: '2026.2',
       recipient_name: 'ليلى أحمد',
       title: 'Leadership Development',
       issued_at: new Date('2026-09-21T00:00:00Z'),

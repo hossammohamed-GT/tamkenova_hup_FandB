@@ -1,7 +1,10 @@
+import { certificateLogos } from './certificate-logos';
 import { BadRequestException } from '@nestjs/common';
 
-export const CERTIFICATE_TEMPLATE_VERSION = '2026.1';
+export const CERTIFICATE_TEMPLATE_VERSION = '2026.2';
 export interface CertificateInput {
+  certificate_language?: string | null;
+  partner_logos?: unknown;
   certificate_type?: string | null;
   recipient_name?: string | null;
   program_name?: string | null;
@@ -9,6 +12,14 @@ export interface CertificateInput {
   issued_at?: string | Date | null;
 }
 export function certificateData(input: CertificateInput) {
+  if (
+    input.certificate_language !== 'ar' &&
+    input.certificate_language !== 'en'
+  )
+    throw new BadRequestException(
+      'Select Arabic or English certificate language',
+    );
+  const partner_logos = certificateLogos(input.partner_logos);
   const text = (value: unknown, max: number) => {
     if (
       typeof value !== 'string' ||
@@ -59,6 +70,8 @@ export function certificateData(input: CertificateInput) {
     throw new BadRequestException('Invalid certificate date');
   }
   return {
+    certificate_language: input.certificate_language,
+    partner_logos,
     certificate_type: input.certificate_type as 'TRAINING' | 'VOLUNTEER',
     template_version: CERTIFICATE_TEMPLATE_VERSION,
     recipient_name: recipient,
@@ -66,7 +79,11 @@ export function certificateData(input: CertificateInput) {
     training_hours: input.training_hours!,
     issued_at: new Date(`${date}T00:00:00.000Z`),
     // Compatibility metadata for lists/notifications, not artwork content.
-    title: program ?? 'Volunteer Recognition',
+    title:
+      program ??
+      (input.certificate_language === 'ar'
+        ? 'تقدير العمل التطوعي'
+        : 'Volunteer Recognition'),
     title_ar: null,
     title_en: null,
     description: null,
@@ -74,6 +91,8 @@ export function certificateData(input: CertificateInput) {
     description_en: null,
     pdf_url: null,
     qr_code_url: null,
-    partner_ids: [],
+    partner_ids: partner_logos.flatMap((logo) =>
+      logo.source_id ? [logo.source_id] : [],
+    ),
   };
 }

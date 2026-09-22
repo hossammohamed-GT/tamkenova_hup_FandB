@@ -27,6 +27,7 @@ export class VerificationService {
         title: certificate.title,
         certificate_type: certificate.certificate_type,
         template_version: certificate.template_version,
+        certificate_language: certificate.certificate_language,
         recipient_name: certificate.recipient_name,
         program_name: certificate.program_name,
         description: certificate.description,

@@ -34,6 +34,11 @@
           </div>
 
           <h3 class="cert-title">{{ cert.title }}</h3>
+          @if (cert.certificate_language) {
+            <p class="text-muted">
+              {{ 'certificate_studio.language_' + cert.certificate_language | translate }}
+            </p>
+          }
 
           <div class="cert-info">
             @if (cert.program_name || (!cert.template_version && cert.training_programs)) {
@@ -50,7 +55,7 @@
             }
             <span class="cert-line text-muted">
               <i class="fa-regular fa-calendar"></i>
-              {{ cert.issued_at | date: 'yyyy/MM/dd' }}
+              {{ cert.issued_at | date: 'yyyy/MM/dd' : 'UTC' }}
             </span>
             @if (cert.training_hours) {
               <span class="cert-line text-muted">
@@ -77,14 +82,10 @@
             </button>
           </div>
 
-          @if (cert.template_version === version) {
+          @if (canRender(cert)) {
             <img
               class="certificate-artwork"
-              [src]="
-                cert.certificate_type === 'VOLUNTEER'
-                  ? '/certificates/volunteer-v1-thumb.png'
-                  : '/certificates/training-v1-thumb.png'
-              "
+              [src]="thumbnail(cert)"
               [alt]="'certificate_studio.' + cert.certificate_type | translate"
             />
           } @else {
@@ -94,7 +95,7 @@
             <p class="download-error">{{ 'admin_certificates.revoked_label' | translate }}</p>
           }
           <div class="cert-actions">
-            @if (cert.template_version === version && cert.is_valid) {
+            @if (canRender(cert) && cert.is_valid) {
               <button
                 type="button"
                 class="btn-accent btn-sm"
