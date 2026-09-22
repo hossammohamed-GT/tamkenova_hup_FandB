@@ -33,6 +33,9 @@ const RULES: ErrRule[] = [
   { key: 'AUTH_INVALID_CREDENTIALS', msg: /Invalid email or password/i },
   { key: 'AUTH_EMAIL_NOT_VERIFIED', msg: /Email not verified/i },
   { key: 'AUTH_ACCOUNT_DISABLED', msg: /Account disabled/i },
+  { key: 'AUTH_RESET_SENT', msg: /If an account exists/i },
+  { key: 'AUTH_PASSWORD_POLICY', msg: /include upper, lower, and a number/i },
+  { key: 'AUTH_SUPER_ADMIN_ONLY', msg: /Only a super admin/i },
 
   // -- Student profile --
   { key: 'STUDENT_USERNAME_TAKEN', msg: /Username is already taken/i },

@@ -67,6 +67,14 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, payload);
   }
 
+  forgotPassword(payload: { email: string }) {
+    return this.http.post<ApiSuccessMessage>(`${this.baseUrl}/forgot-password`, payload);
+  }
+
+  resetPassword(payload: { email: string; otp: string; new_password: string; confirm_password: string }) {
+    return this.http.post<ApiSuccessMessage>(`${this.baseUrl}/reset-password`, payload);
+  }
+
   // -- Persist the Authenticated User Session --
   setSession(response: LoginResponse): void {
     const { access_token, user } = response.data;

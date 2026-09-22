@@ -1,4 +1,4 @@
-import { IsOptional, IsString, MaxLength, IsEmail } from 'class-validator';
+import { IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class UpdateContactInfoDto {
   @IsOptional()
@@ -10,11 +10,6 @@ export class UpdateContactInfoDto {
   @IsString()
   @MaxLength(30)
   whatsapp?: string;
-
-  @IsOptional()
-  @IsEmail()
-  @MaxLength(255)
-  email?: string;
 
   @IsOptional()
   @IsString()

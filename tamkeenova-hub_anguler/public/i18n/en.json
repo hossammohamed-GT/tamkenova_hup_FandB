@@ -420,6 +420,21 @@
       "success_note": "Your trainee application was submitted! Redirecting to email verification.",
       "error_generic": "Could not submit the application, please try again",
       "review_note": "Your account will stay under review until the admin approves it."
+    },
+    "forgot": {
+      "eyebrow": "Account recovery",
+      "title": "Forgot password",
+      "subtitle": "Enter your email and we will send a reset code if an account exists.",
+      "submit": "Send reset code",
+      "back": "Back to login",
+      "link": "Forgot password?"
+    },
+    "reset": {
+      "eyebrow": "New password",
+      "title": "Reset password",
+      "subtitle": "Enter the code sent to",
+      "submit": "Save new password",
+      "resend": "Request a new code"
     }
   },
   "dashboard": {

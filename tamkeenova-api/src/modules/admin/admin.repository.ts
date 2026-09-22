@@ -80,7 +80,7 @@ export class AdminRepository {
   updateUserRole(id: string, role: string) {
     return this.prisma.users.update({
       where: { id },
-      data: { role: role as any },
+      data: { role: role as any, token_version: { increment: 1 } },
     });
   }
 
@@ -89,7 +89,9 @@ export class AdminRepository {
   updateUserActive(id: string, is_active: boolean) {
     return this.prisma.users.update({
       where: { id },
-      data: { is_active },
+      data: is_active
+        ? { is_active }
+        : { is_active, token_version: { increment: 1 } },
     });
   }
 

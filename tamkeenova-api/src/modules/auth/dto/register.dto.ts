@@ -6,9 +6,12 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  Matches,
+  MaxLength,
   MinLength,
   ValidateNested,
 } from 'class-validator';
+import { PASSWORD_PATTERN } from '../../../common/security/password.util';
 
 import { Type } from 'class-transformer';
 
@@ -37,6 +40,11 @@ export class RegisterDto {
   phone: string;
 
   @MinLength(8)
+  @MaxLength(128)
+  @Matches(PASSWORD_PATTERN, {
+    message:
+      'Password must be 8-128 characters and include upper, lower, and a number',
+  })
   password: string;
 
   @IsString()

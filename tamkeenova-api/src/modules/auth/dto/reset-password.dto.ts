@@ -1,10 +1,13 @@
-import { IsString, MinLength, MaxLength, Matches } from 'class-validator';
+import { IsEmail, IsString, Length, Matches, MaxLength, MinLength } from 'class-validator';
 import { PASSWORD_PATTERN } from '../../../common/security/password.util';
 
-export class ChangePasswordDto {
+export class ResetPasswordDto {
+  @IsEmail()
+  email: string;
+
   @IsString()
-  @MinLength(1)
-  current_password: string;
+  @Length(6, 6)
+  otp: string;
 
   @IsString()
   @MinLength(8)
@@ -14,4 +17,8 @@ export class ChangePasswordDto {
       'Password must be 8-128 characters and include upper, lower, and a number',
   })
   new_password: string;
+
+  @IsString()
+  @MinLength(8)
+  confirm_password: string;
 }

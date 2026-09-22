@@ -80,6 +80,10 @@
         </div>
         }
 
+        <p class="auth-switch" style="margin-top:0;text-align:end;font-size:0.82rem;">
+          <a routerLink="/forgot-password">{{ 'auth.forgot.link' | translate }}</a>
+        </p>
+
         <button type="submit"
           class="btn-primary auth-submit"
           [disabled]="isLoading()">
