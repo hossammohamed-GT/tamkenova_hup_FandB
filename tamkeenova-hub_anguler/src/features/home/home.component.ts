@@ -31,18 +31,18 @@ interface PartnerSlot {
 export class HomeComponent implements OnInit, OnDestroy {
   private partnersService = inject(PartnersService);
   heroImages = [
-    '/images/hero/hero1.jpg',
-    '/images/hero/hero2.jpg',
-    '/images/hero/hero3.jpg',
-    '/images/hero/hero4.jpg',
+    '/images/gallery/gallery-01.jpg',
+    '/images/gallery/gallery-02.jpg',
+    '/images/gallery/gallery-03.jpg',
+    '/images/gallery/gallery-04.jpg',
   ];
   activeHeroIndex = signal(0);
   private heroTimer?: ReturnType<typeof setInterval>;
 
   galleryImages: string[] = [
-    '/images/events/hero1.jpg',
-    '/images/events/hero2.jpg',
-    '/images/events/hero3.jpg',
+    '/images/gallery/gallery-05.jpg',
+    '/images/gallery/gallery-06.jpg',
+    '/images/gallery/gallery-07.jpg',
   ];
 
   stats = [
