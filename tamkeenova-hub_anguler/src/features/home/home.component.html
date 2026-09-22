@@ -43,7 +43,8 @@
             [class.no-transition]="slot.resetting"
             [src]="slot.currentImg"
             alt="partner logo"
-            loading="lazy"
+            loading="eager"
+            decoding="async"
           />
           <img
             class="partner-img partner-img-next"
@@ -51,7 +52,8 @@
             [class.no-transition]="slot.resetting"
             [src]="slot.nextImg"
             alt="partner logo"
-            loading="lazy"
+            loading="eager"
+            decoding="async"
           />
         </div>
       </a>

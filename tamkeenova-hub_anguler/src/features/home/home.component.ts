@@ -152,6 +152,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   private initPartnersWave(): void {
     const count = Math.min(this.slotsCount, this.partnersImages.length);
     if (!count) { this.slots.set([]); return; }
+    // Warm the browser cache for every logo so slides never run on empty imgs.
+    if (typeof window !== 'undefined') {
+      for (const src of this.partnersImages) {
+        const warm = new Image();
+        warm.src = src;
+      }
+    }
     const initial = this.partnersImages.slice(0, count);
     this.slotPointers = initial.map((_, i) => i);
     this.slots.set(
@@ -188,18 +195,36 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private startSlide(idx: number): void {
     const current = this.slots();
+    if (!current[idx] || current[idx].sliding) return;
     const nextImg = this.pickNextLogo(idx);
 
-    const updated = [...current];
-    updated[idx] = { ...updated[idx], nextImg, sliding: true };
-    this.slots.set(updated);
+    // Never slide in an unloaded image: it would pop in statically after the
+    // transition instead of riding it. Wait for decode (or fail fast).
+    const begin = () => {
+      const live = this.slots();
+      if (!live[idx] || live[idx].sliding) return;
+      const updated = [...live];
+      updated[idx] = { ...updated[idx], nextImg, sliding: true };
+      this.slots.set(updated);
+      const t = setTimeout(() => this.finishSlide(idx), this.slideDurationMs);
+      this.partnerTimers.push(t);
+    };
 
-    const t = setTimeout(() => this.finishSlide(idx), this.slideDurationMs);
-    this.partnerTimers.push(t);
+    if (typeof window === 'undefined') { begin(); return; }
+    let done = false;
+    const once = () => { if (!done) { done = true; begin(); } };
+    const probe = new Image();
+    probe.onload = once;
+    probe.onerror = once;
+    probe.src = nextImg;
+    if (probe.complete && probe.naturalWidth) { once(); return; }
+    const fallback = setTimeout(once, 1500);
+    this.partnerTimers.push(fallback);
   }
 
   private finishSlide(idx: number): void {
     const s = this.slots();
+    if (!s[idx]) return;
     const updated = [...s];
     updated[idx] = {
       currentImg: updated[idx].nextImg,
