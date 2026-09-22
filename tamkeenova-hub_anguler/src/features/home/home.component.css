@@ -305,7 +305,40 @@
 
 
 .services {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
   padding: 6rem 6vw;
+}
+
+.services-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: url('/images/services/services-bg.jpg') center / cover;
+  opacity: 0.5;
+  pointer-events: none;
+  mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 82%, transparent 100%);
+}
+
+.services::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--color-surface-0) 88%, transparent),
+    color-mix(in srgb, var(--color-surface-0) 55%, transparent) 30%,
+    color-mix(in srgb, var(--color-surface-0) 55%, transparent) 70%,
+    color-mix(in srgb, var(--color-surface-0) 88%, transparent));
+  pointer-events: none;
+}
+
+.services .section-heading,
+.services-grid {
+  position: relative;
+  z-index: 1;
 }
 
 .services-grid {
@@ -333,12 +366,6 @@
     box-shadow var(--transition-base);
 }
 
-@property --service-ring-angle {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
-}
-
 .service-card:hover {
   border-color: color-mix(in srgb, var(--color-action) 55%, var(--color-border));
   box-shadow: var(--shadow-lg);
@@ -349,38 +376,36 @@
   outline-offset: 3px;
 }
 
-/* Traveling light strip around the whole card while hovered. */
-.service-card::before {
-  content: "";
+/* Light strip traveling around the whole card while hovered. SVG-based so
+   it works in every modern browser (no @property dependency). */
+.service-ring {
   position: absolute;
   inset: 0;
-  border-radius: inherit;
-  padding: 2px;
-  background: conic-gradient(from var(--service-ring-angle, 0deg),
-    transparent 0deg,
-    color-mix(in srgb, var(--color-action) 35%, transparent) 28deg,
-    var(--color-action) 48deg,
-    rgba(255, 255, 255, 0.95) 58deg,
-    var(--color-action) 68deg,
-    transparent 108deg);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity var(--transition-fast);
+  width: 100%;
+  height: 100%;
   pointer-events: none;
 }
 
-.service-card:hover::before,
-.service-card:focus-visible::before {
-  opacity: 1;
-  animation: service-ring-spin 1.5s linear infinite;
+.service-ring rect {
+  fill: none;
+  stroke: var(--color-action);
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+  stroke-dasharray: 16 84;
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--color-action) 80%, transparent));
 }
 
-@keyframes service-ring-spin {
+.service-card:hover .service-ring rect,
+.service-card:focus-visible .service-ring rect {
+  opacity: 1;
+  animation: service-ring-travel 1.5s linear infinite;
+}
+
+@keyframes service-ring-travel {
   to {
-    --service-ring-angle: 360deg;
+    stroke-dashoffset: -100;
   }
 }
 
@@ -427,9 +452,10 @@
 }
 
 [data-theme='dark'] .service-icon {
-  background: color-mix(in srgb, var(--color-action) 14%, transparent);
-  border-color: color-mix(in srgb, var(--color-action) 32%, transparent);
-  color: var(--color-action);
+  background: color-mix(in srgb, var(--color-action) 24%, transparent);
+  border-color: color-mix(in srgb, var(--color-action) 58%, transparent);
+  color: #cfe8f7;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--color-action) 28%, transparent);
 }
 
 [data-theme='dark'] .service-card:hover .service-icon {
@@ -505,13 +531,14 @@ html[dir='rtl'] .service-card:hover .service-arrow {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .service-card::before {
+  .service-ring rect {
     transition: none;
   }
 
-  .service-card:hover::before,
-  .service-card:focus-visible::before {
+  .service-card:hover .service-ring rect,
+  .service-card:focus-visible .service-ring rect {
     animation: none;
+    opacity: 0;
   }
 
   .service-card:hover .service-icon {
