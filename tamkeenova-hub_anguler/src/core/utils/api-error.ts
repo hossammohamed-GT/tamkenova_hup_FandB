@@ -58,6 +58,8 @@ const RULES: ErrRule[] = [
   { key: 'CERT_NOT_FOUND', msg: /Certificate not found/i },
   { key: 'REVIEW_NOT_FOUND', msg: /Review not found/i },
   { key: 'REVIEW_EMPTY', msg: /At least one field \(rating or comment\)/i },
+  { key: 'REVIEW_NOT_ELIGIBLE', msg: /Only students can rate trainers/i },
+  { key: 'REVIEW_SELF', msg: /cannot rate your own profile/i },
   { key: 'PROFILE_USER_NOT_FOUND', msg: /User not found or not verified/i },
 
   // -- Trainer --

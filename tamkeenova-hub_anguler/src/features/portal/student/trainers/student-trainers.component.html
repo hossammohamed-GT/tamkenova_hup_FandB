@@ -82,7 +82,7 @@
           <i class="fa-solid fa-spinner fa-spin rating-spin"></i>
           }
           @if (ratingSuccess()[t.id]) {
-          <span class="rating-success-msg"><i class="fa-solid fa-check"></i> {{ 'student_trainers.rating_success' | translate }}</span>
+          <span class="rating-success-msg"><i class="fa-solid fa-check"></i> {{ (ratingSuccessMsg()[t.id] ?? 'student_trainers.rating_success') | translate }}</span>
           }
         </div>
         @if (ratingErrors()[t.id]) {

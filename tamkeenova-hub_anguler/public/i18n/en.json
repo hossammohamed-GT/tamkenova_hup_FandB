@@ -969,7 +969,10 @@
     "rating_success": "Your rating was submitted successfully",
     "already_rated": "You've already rated this trainer",
     "rate_hint": "Click the stars to rate this trainer",
-    "average_rating": "Average Rating"
+    "average_rating": "Average Rating",
+    "rating_updated": "Your rating has been updated",
+    "login_to_rate": "Please log in to rate this trainer",
+    "only_students": "Only student accounts can submit ratings"
   },
   "program_details": {
     "back": "Back to Programs",
@@ -1513,7 +1516,9 @@
     "NOTIFICATION_NOT_FOUND": "This notification no longer exists.",
     "AUTH_PASSWORD_MISMATCH": "Passwords do not match",
     "AUTH_PASSWORD_POLICY": "Password must include an uppercase letter, a lowercase letter, and a number",
-    "AUTH_SUPER_ADMIN_ONLY": "Only a super admin can do this"
+    "AUTH_SUPER_ADMIN_ONLY": "Only a super admin can do this",
+    "REVIEW_NOT_ELIGIBLE": "Only students can rate trainers",
+    "REVIEW_SELF": "You cannot rate your own profile"
   },
   "trainer_consultations": {
     "update_error": "Could not update the consultation status, please retry",

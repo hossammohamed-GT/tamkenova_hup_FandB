@@ -44,7 +44,7 @@
         <span class="rating-loading"><i class="fa-solid fa-spinner fa-spin"></i></span>
         }
         @if (ratingSuccess()) {
-        <span class="rating-success"><i class="fa-solid fa-check"></i> {{ 'student_trainers.rating_success' | translate }}</span>
+        <span class="rating-success"><i class="fa-solid fa-check"></i> {{ ratingSuccessMsg() | translate }}</span>
         }
       </div>
 

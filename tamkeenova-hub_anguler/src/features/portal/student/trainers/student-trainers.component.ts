@@ -46,6 +46,7 @@ export class StudentTrainersComponent {
   userRatings = signal<Record<string, number>>({});
   ratingLoading = signal<Record<string, boolean>>({});
   ratingSuccess = signal<Record<string, boolean>>({});
+  ratingSuccessMsg = signal<Record<string, string>>({});
   ratingErrors = signal<Record<string, string | null>>({});
 
   private searchSubject = new Subject<string>();
@@ -149,26 +150,47 @@ export class StudentTrainersComponent {
   rateTrainer(trainer: TrainerListItem, star: number, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    if (!this.authService.isLoggedIn() || this.ratingLoading()[trainer.id]) return;
+    if (this.ratingLoading()[trainer.id]) return;
+
+    // Never fail silently: logged-out clicks get a visible message under the card.
+    if (!this.authService.isLoggedIn()) {
+      this.flashRatingError(trainer.id, 'student_trainers.login_to_rate');
+      return;
+    }
 
     this.ratingLoading.update((m) => ({ ...m, [trainer.id]: true }));
     this.ratingErrors.update((m) => ({ ...m, [trainer.id]: null }));
+    this.ratingSuccess.update((m) => {
+      const copy = { ...m };
+      delete copy[trainer.id];
+      return copy;
+    });
 
     this.trainerService.createReview(trainer.id, { rating: star, comment: '' }).subscribe({
-      next: () => {
+      next: (res) => {
         this.userRatings.update((m) => ({ ...m, [trainer.id]: star }));
+        this.ratingSuccessMsg.update((m) => ({
+          ...m,
+          [trainer.id]: res.updated
+            ? 'student_trainers.rating_updated'
+            : 'student_trainers.rating_success',
+        }));
         this.ratingSuccess.update((m) => ({ ...m, [trainer.id]: true }));
         this.ratingLoading.update((m) => ({ ...m, [trainer.id]: false }));
-        // update local average optimistically
+        // Use exact server stats (re-rates update without inflating the count).
         this.trainers.update((list) =>
           list.map((t) =>
             t.id === trainer.id
               ? {
                   ...t,
-                  average_rating: String(
-                    (Number(t.average_rating || 0) * t.ratings_count + star) / (t.ratings_count + 1),
-                  ),
-                  ratings_count: t.ratings_count + 1,
+                  average_rating:
+                    res.data != null
+                      ? String(res.data.average_rating)
+                      : String(
+                          (Number(t.average_rating || 0) * t.ratings_count + star) /
+                            (t.ratings_count + 1),
+                        ),
+                  ratings_count: res.data != null ? res.data.ratings_count : t.ratings_count + 1,
                 }
               : t,
           ),
@@ -184,19 +206,23 @@ export class StudentTrainersComponent {
       error: (err) => {
         this.ratingLoading.update((m) => ({ ...m, [trainer.id]: false }));
         if (err?.status === 409) {
-          this.ratingErrors.update((m) => ({ ...m, [trainer.id]: 'student_trainers.already_rated' }));
+          this.flashRatingError(trainer.id, 'student_trainers.already_rated');
         } else {
-          this.ratingErrors.update((m) => ({ ...m, [trainer.id]: apiErrorKey(err, 'auth.errors.generic') }));
+          this.flashRatingError(trainer.id, apiErrorKey(err, 'auth.errors.generic'));
         }
-        setTimeout(() => {
-          this.ratingErrors.update((m) => {
-            const copy = { ...m };
-            delete copy[trainer.id];
-            return copy;
-          });
-        }, 3000);
       },
     });
+  }
+
+  private flashRatingError(trainerId: string, key: string): void {
+    this.ratingErrors.update((m) => ({ ...m, [trainerId]: key }));
+    setTimeout(() => {
+      this.ratingErrors.update((m) => {
+        const copy = { ...m };
+        delete copy[trainerId];
+        return copy;
+      });
+    }, 3500);
   }
 
   bookConsultation(trainer: TrainerListItem, event: Event): void {

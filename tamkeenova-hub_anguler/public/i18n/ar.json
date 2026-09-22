@@ -969,7 +969,10 @@
     "rating_success": "تم إرسال تقييمك بنجاح",
     "already_rated": "لقد قيّمت هذا المدرب من قبل",
     "rate_hint": "اضغط على النجوم لتقييم المدرب",
-    "average_rating": "متوسط التقييم"
+    "average_rating": "متوسط التقييم",
+    "rating_updated": "تم تحديث تقييمك بنجاح",
+    "login_to_rate": "سجّل الدخول أولاً لتتمكن من تقييم المدرب",
+    "only_students": "التقييم متاح لحسابات الطلاب فقط"
   },
   "program_details": {
     "back": "رجوع للبرامج",
@@ -1513,7 +1516,9 @@
     "NOTIFICATION_NOT_FOUND": "الإشعار غير موجود.",
     "AUTH_PASSWORD_MISMATCH": "كلمتا المرور غير متطابقتين",
     "AUTH_PASSWORD_POLICY": "كلمة المرور لازم تكون 8 حروف على الأقل وفيها حرف كبير وحرف صغير ورقم",
-    "AUTH_SUPER_ADMIN_ONLY": "الأمر ده متاح للسوبر أدمن فقط"
+    "AUTH_SUPER_ADMIN_ONLY": "الأمر ده متاح للسوبر أدمن فقط",
+    "REVIEW_NOT_ELIGIBLE": "التقييم متاح للطلاب فقط",
+    "REVIEW_SELF": "لا يمكنك تقييم ملفك الشخصي"
   },
   "trainer_consultations": {
     "update_error": "تعذر تحديث حالة الاستشارة، حاول تاني",

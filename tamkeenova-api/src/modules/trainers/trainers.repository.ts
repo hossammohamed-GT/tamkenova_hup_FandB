@@ -311,6 +311,46 @@ export class TrainersRepository {
   }
 
 
+  // Handle find user by id (role check for reviews)
+  findUserById(id: string) {
+    return this.prisma.users.findUnique({
+      where: {
+        id,
+      },
+
+      select: {
+        id: true,
+        role: true,
+      },
+    });
+  }
+
+
+  // Handle find review by trainer and student
+  findReviewByTrainerAndStudent(trainerId: string, studentId: string) {
+    return this.prisma.trainer_reviews.findUnique({
+      where: {
+        trainer_id_student_id: {
+          trainer_id: trainerId,
+          student_id: studentId,
+        },
+      },
+    });
+  }
+
+
+  // Handle update review
+  updateReview(id: string, data: { rating?: number; comment?: string }) {
+    return this.prisma.trainer_reviews.update({
+      where: {
+        id,
+      },
+
+      data,
+    });
+  }
+
+
   // Handle get trainer reviews
   getTrainerReviews(trainerId: string) {
     return this.prisma.trainer_reviews.findMany({
@@ -360,6 +400,11 @@ export class TrainersRepository {
         ratings_count: ratingsCount,
       },
     });
+
+    return {
+      average_rating: averageRating,
+      ratings_count: ratingsCount,
+    };
   }
 
 

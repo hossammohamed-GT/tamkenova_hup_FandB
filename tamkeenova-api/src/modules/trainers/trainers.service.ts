@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 
 import { TrainersRepository } from './trainers.repository';
 
@@ -411,27 +415,108 @@ export class TrainersService {
 
 
 
-  // Handle create review
+  // Handle create review (upsert: rating again updates the existing review)
   async createReview(userId: string, trainerId: string, dto: CreateReviewDto) {
+    const user = await this.trainersRepository.findUserById(userId);
+
+    if (!user || (user.role !== 'STUDENT' && user.role !== 'CLIENT')) {
+      throw new ForbiddenException('Only students can rate trainers');
+    }
+
     const trainer = await this.trainersRepository.findTrainerById(trainerId);
 
-    if (!trainer) {
+    if (!trainer || trainer.trainer_status !== 'APPROVED') {
       throw new BadRequestException('Trainer not found');
     }
 
-    await this.trainersRepository.createReview({
-      trainer_id: trainerId,
-      student_id: userId,
-      rating: dto.rating,
-      comment: dto.comment,
-    });
+    if (trainer.user_id === userId) {
+      throw new BadRequestException('You cannot rate your own profile');
+    }
 
-    await this.trainersRepository.updateTrainerRating(trainerId);
+    const existing =
+      await this.trainersRepository.findReviewByTrainerAndStudent(
+        trainerId,
+        userId,
+      );
 
-    return {
-      success: true,
-      message: 'Review added successfully',
-    };
+    if (existing) {
+      const data: { rating: number; comment?: string } = {
+        rating: dto.rating,
+      };
+
+      // Star-only re-rates from cards must not wipe an existing written comment.
+      if (dto.comment !== undefined && dto.comment.trim() !== '') {
+        data.comment = dto.comment;
+      }
+
+      const review = await this.trainersRepository.updateReview(
+        existing.id,
+        data,
+      );
+      const stats = await this.trainersRepository.updateTrainerRating(trainerId);
+
+      return {
+        success: true,
+        message: 'Review updated successfully',
+        updated: true,
+
+        data: {
+          review,
+          ...stats,
+        },
+      };
+    }
+
+    try {
+      const review = await this.trainersRepository.createReview({
+        trainer_id: trainerId,
+        student_id: userId,
+        rating: dto.rating,
+        comment: dto.comment,
+      });
+      const stats = await this.trainersRepository.updateTrainerRating(trainerId);
+
+      return {
+        success: true,
+        message: 'Review added successfully',
+        updated: false,
+
+        data: {
+          review,
+          ...stats,
+        },
+      };
+    } catch (e) {
+      // Concurrent double-submit raced past the existence check — treat as update.
+      if ((e as { code?: string })?.code === 'P2002') {
+        const raced =
+          await this.trainersRepository.findReviewByTrainerAndStudent(
+            trainerId,
+            userId,
+          );
+
+        if (raced) {
+          const review = await this.trainersRepository.updateReview(raced.id, {
+            rating: dto.rating,
+          });
+          const stats =
+            await this.trainersRepository.updateTrainerRating(trainerId);
+
+          return {
+            success: true,
+            message: 'Review updated successfully',
+            updated: true,
+
+            data: {
+              review,
+              ...stats,
+            },
+          };
+        }
+      }
+
+      throw e;
+    }
   }
 
 
