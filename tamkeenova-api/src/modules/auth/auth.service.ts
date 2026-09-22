@@ -303,29 +303,42 @@ export class AuthService {
   async resendOtp(dto: { email: string }) {
     const user = await this.authRepository.findUserByEmail(dto.email);
 
-    if (!user) {
-      throw new BadRequestException('User not found');
+    if (!user || user.email_verified) {
+      return {
+        success: true,
+        message: 'OTP sent successfully',
+      };
     }
 
-    if (user.email_verified) {
-      throw new BadRequestException('Email already verified');
-    }
-
-    await this.authRepository.invalidateOldOtps(user.id);
-
-    const otp = generateOtp();
-
-    await this.authRepository.createOtp({
-      user_id: user.id,
-      otp_code: otp,
-      expires_at: new Date(Date.now() + 10 * 60 * 1000),
-    });
-
-    await this.mailService.sendOtp(user.email, otp);
+    await this.issueOtp(user.id, user.email, 'EMAIL_VERIFY');
 
     return {
       success: true,
       message: 'OTP sent successfully',
+    };
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const user = await this.authRepository.findUserByEmail(dto.email);
+    if (user?.is_active) {
+      await this.issueOtp(user.id, user.email, 'PASSWORD_RESET');
+    }
+    return {
+      success: true,
+      message: 'If an account exists, a reset code was sent',
+    };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    if (dto.new_password !== dto.confirm_password) {
+      throw new BadRequestException('Passwords do not match');
+    }
+    const otpRecord = await this.consumeOtp(dto.email, dto.otp, 'PASSWORD_RESET');
+    const hashedPassword = await bcrypt.hash(dto.new_password, 12);
+    await this.authRepository.updatePassword(otpRecord.user_id, hashedPassword);
+    return {
+      success: true,
+      message: 'Password reset successfully',
     };
   }
 
