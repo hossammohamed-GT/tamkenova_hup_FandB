@@ -84,7 +84,7 @@
 
   <div class="services-grid">
     @for (service of services; track service.route; let i = $index) {
-      <a [routerLink]="service.route" class="service-card">
+      <a [routerLink]="service.route" class="service-card" (click)="onServiceClick($event, service.route)">
         <svg class="service-ring" aria-hidden="true" focusable="false" preserveAspectRatio="none" viewBox="0 0 100 100">
           <rect x="0.5" y="0.5" width="99" height="99" rx="3.5" pathLength="100" vector-effect="non-scaling-stroke" />
         </svg>

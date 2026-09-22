@@ -1,0 +1,11 @@
+@if (phase() !== 'idle') {
+  <div class="wipe" aria-hidden="true">
+    <div
+      class="wipe-circle"
+      [class.grown]="grown() || phase() === 'hold'"
+      [class.collapse]="phase() === 'collapse'"
+      [style.--ox.px]="origin().x"
+      [style.--oy.px]="origin().y"
+    ></div>
+  </div>
+}

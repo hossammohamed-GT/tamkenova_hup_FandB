@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, signal, inject
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { PartnersService } from '../../core/services/partners.service';
+import { RouteTransitionService } from '../../core/services/route-transition.service';
 import { StrategicPartner } from '../../core/models/partner.model';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
 // import { TrainersShowcaseComponent } from '../trainers-showcase/trainers-showcase.component';
@@ -40,6 +41,7 @@ interface PartnerCard {
 })
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   private partnersService = inject(PartnersService);
+  private routeTransition = inject(RouteTransitionService);
   heroImages = [
     '/images/gallery/gallery-01.jpg',
     '/images/gallery/gallery-13.jpg',
@@ -93,6 +95,19 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
       route: '/consulting',
     },
   ];
+
+  // -- Service card click: spin the arrow, bloom the transition from it --
+  onServiceClick(event: MouseEvent, route: string): void {
+    if (!this.routeTransition.shouldAnimate()) return; // default routerLink navigation
+    event.preventDefault();
+    const anchor = event.currentTarget as HTMLElement | null;
+    const badge = anchor?.querySelector('.service-arrow') as HTMLElement | null;
+    const box = (badge ?? anchor)?.getBoundingClientRect();
+    badge?.classList.add('is-leaving');
+    const x = box ? box.left + box.width / 2 : window.innerWidth / 2;
+    const y = box ? box.top + box.height / 2 : window.innerHeight / 2;
+    this.routeTransition.go(x, y, route);
+  }
 
   private partnerCards: PartnerCard[] = [];
   partners = signal<StrategicPartner[]>([]);

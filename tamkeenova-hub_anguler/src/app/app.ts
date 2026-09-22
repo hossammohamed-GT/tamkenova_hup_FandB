@@ -5,11 +5,12 @@ import { NavbarComponent } from '../shared/components/navbar/navbar.component';
 import { AiAssistantComponent } from '../shared/components/ai-assistant/ai-assistant.component';
 import { BookingModalComponent } from '../shared/components/booking-modal/booking-modal.component';
 import { AppLoaderComponent } from '../shared/components/app-loader/app-loader.component';
+import { RouteTransitionComponent } from '../shared/components/route-transition/route-transition.component';
 import { LoaderService } from '../core/services/loader.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NavbarComponent, AiAssistantComponent, BookingModalComponent, AppLoaderComponent],
+  imports: [RouterOutlet, NavbarComponent, AiAssistantComponent, BookingModalComponent, AppLoaderComponent, RouteTransitionComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
