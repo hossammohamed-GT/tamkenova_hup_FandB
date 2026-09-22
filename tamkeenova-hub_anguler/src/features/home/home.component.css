@@ -39,7 +39,7 @@
   background: linear-gradient(180deg, rgba(16, 30, 39, 0.75) 0%, rgba(16, 30, 39, 0.55) 45%, rgba(16, 30, 39, 0.85) 100%);
 }
 
-[data-theme='dark'] .hero-media-overlay {
+:host-context([data-theme='dark']) .hero-media-overlay {
   background: linear-gradient(180deg, rgba(30, 31, 34, 0.8) 0%, rgba(30, 31, 34, 0.6) 45%, rgba(30, 31, 34, 0.9) 100%);
 }
 
@@ -248,8 +248,8 @@
   line-height: 1.75;
 }
 
-[data-theme='dark'] .stat-value,
-[data-theme='dark'] .stat-suffix {
+:host-context([data-theme='dark']) .stat-value,
+:host-context([data-theme='dark']) .stat-suffix {
   color: #ffffff;
 }
 
@@ -465,14 +465,14 @@
   box-shadow: 0 10px 24px color-mix(in srgb, var(--color-primary) 45%, transparent);
 }
 
-[data-theme='dark'] .service-icon {
+:host-context([data-theme='dark']) .service-icon {
   background: color-mix(in srgb, var(--color-action) 30%, transparent);
   border-color: color-mix(in srgb, var(--color-action) 70%, transparent);
   color: #e6f4fc;
   box-shadow: 0 0 20px color-mix(in srgb, var(--color-action) 38%, transparent);
 }
 
-[data-theme='dark'] .service-card:hover .service-icon {
+:host-context([data-theme='dark']) .service-card:hover .service-icon {
   background: var(--color-action);
   border-color: var(--color-action);
   color: var(--color-primary);
@@ -491,7 +491,7 @@
   color: var(--color-primary);
 }
 
-[data-theme='dark'] .service-card:hover .service-title {
+:host-context([data-theme='dark']) .service-card:hover .service-title {
   color: #ffffff;
 }
 
@@ -545,7 +545,7 @@ html[dir='rtl'] .service-card:hover .service-arrow {
   transform: translateX(-4px) scale(1.08);
 }
 
-[data-theme='dark'] .service-card {
+:host-context([data-theme='dark']) .service-card {
   background: linear-gradient(165deg,
     color-mix(in srgb, var(--color-primary) 42%, var(--color-surface-1)),
     color-mix(in srgb, var(--color-primary) 18%, var(--color-surface-1)));
@@ -555,14 +555,14 @@ html[dir='rtl'] .service-card:hover .service-arrow {
     0 0 28px color-mix(in srgb, var(--color-primary) 35%, transparent);
 }
 
-[data-theme='dark'] .service-card:hover {
+:host-context([data-theme='dark']) .service-card:hover {
   border-color: color-mix(in srgb, var(--color-action) 60%, transparent);
   box-shadow:
     0 30px 60px -12px rgba(0, 0, 0, 0.6),
     0 0 44px color-mix(in srgb, var(--color-action) 28%, transparent);
 }
 
-[data-theme='dark'] .service-card:hover .service-arrow {
+:host-context([data-theme='dark']) .service-card:hover .service-arrow {
   color: var(--color-primary);
 }
 
