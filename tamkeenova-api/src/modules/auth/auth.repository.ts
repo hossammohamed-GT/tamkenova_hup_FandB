@@ -33,19 +33,30 @@ export class AuthRepository {
 
 
   // Handle create otp
-  createOtp(data: any) {
+  createOtp(data: {
+    user_id: string;
+    otp_code: string;
+    expires_at: Date;
+    purpose?: string;
+  }) {
     return this.prisma.email_otps.create({
-      data,
+      data: {
+        user_id: data.user_id,
+        otp_code: data.otp_code,
+        expires_at: data.expires_at,
+        purpose: data.purpose || 'EMAIL_VERIFY',
+      },
     });
   }
 
 
   // Handle invalidate old otps
-  invalidateOldOtps(userId: string) {
+  invalidateOldOtps(userId: string, purpose = 'EMAIL_VERIFY') {
     return this.prisma.email_otps.updateMany({
       where: {
         user_id: userId,
         is_used: false,
+        purpose,
       },
       data: {
         is_used: true,
@@ -53,20 +64,50 @@ export class AuthRepository {
     });
   }
 
-
-  // Handle get valid otp
-  getValidOtp(email: string, otp: string) {
+  getLatestOtp(email: string, purpose = 'EMAIL_VERIFY') {
     return this.prisma.email_otps.findFirst({
       where: {
-        otp_code: otp,
         is_used: false,
-        users: {
-          email,
-        },
+        purpose,
+        users: { email },
       },
-      include: {
-        users: true,
-      },
+      orderBy: { created_at: 'desc' },
+      include: { users: true },
+    });
+  }
+
+  incrementOtpAttempts(id: string) {
+    return this.prisma.email_otps.update({
+      where: { id },
+      data: { attempt_count: { increment: 1 } },
+    });
+  }
+
+  bumpTokenVersion(userId: string) {
+    return this.prisma.users.update({
+      where: { id: userId },
+      data: { token_version: { increment: 1 } },
+    });
+  }
+
+  updatePassword(userId: string, password: string) {
+    return this.prisma.users.update({
+      where: { id: userId },
+      data: { password, token_version: { increment: 1 }, failed_login_attempts: 0, locked_until: null },
+    });
+  }
+
+  recordFailedLogin(userId: string, attempts: number, lockedUntil: Date | null) {
+    return this.prisma.users.update({
+      where: { id: userId },
+      data: { failed_login_attempts: attempts, locked_until: lockedUntil },
+    });
+  }
+
+  clearFailedLogin(userId: string) {
+    return this.prisma.users.update({
+      where: { id: userId },
+      data: { failed_login_attempts: 0, locked_until: null },
     });
   }
 
@@ -124,7 +165,7 @@ export class AuthRepository {
   findFirstAdmin() {
     return this.prisma.users.findFirst({
       where: {
-        role: 'ADMIN',
+        role: { in: ['ADMIN', 'SUPER_ADMIN'] },
         is_active: true,
       },
     });

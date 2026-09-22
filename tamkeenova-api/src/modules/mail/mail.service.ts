@@ -14,6 +14,7 @@ import {
   getTaskAssignedEmailTemplate,
   getTaskSubmittedAdminEmailTemplate,
   getCertificateIssuedEmailTemplate,
+  getPasswordResetEmailTemplate,
 } from './templates/mail-templates';
 
 
@@ -59,6 +60,15 @@ export class MailService {
 
 
   // Handle send otp
+  async sendPasswordResetOtp(email: string, otp: string) {
+    await this.sendEmail(
+      email,
+      'إعادة تعيين كلمة المرور — TamkeeNova HUB',
+      getPasswordResetEmailTemplate(otp),
+      `كود إعادة تعيين كلمة المرور: ${otp} — ينتهي خلال 10 دقايق.`,
+    );
+  }
+
   async sendOtp(email: string, otp: string) {
     await this.sendEmail(
       email,

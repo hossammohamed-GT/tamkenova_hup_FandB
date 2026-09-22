@@ -85,6 +85,15 @@ export class AdminService {
     const user = await this.adminRepo.getUserById(id);
     if (!user) throw new NotFoundException('User not found');
 
+    const actor = await this.adminRepo.getUserById(adminId);
+    const privileged = dto.role === 'ADMIN' || dto.role === 'SUPER_ADMIN';
+    if (privileged && actor?.role !== 'SUPER_ADMIN') {
+      throw new BadRequestException('Only a super admin can assign admin roles');
+    }
+    if (user.role === 'SUPER_ADMIN' && actor?.role !== 'SUPER_ADMIN') {
+      throw new BadRequestException('Only a super admin can change a super admin');
+    }
+
     const updated = await this.adminRepo.updateUserRole(id, dto.role);
 
 

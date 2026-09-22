@@ -69,6 +69,22 @@ export const routes: Routes = [
     loadComponent: () =>
       import('../features/auth/login/login.component').then((m) => m.LoginComponent),
   },
+  {
+    path: 'forgot-password',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('../features/auth/forgot-password/forgot-password.component').then(
+        (m) => m.ForgotPasswordComponent,
+      ),
+  },
+  {
+    path: 'reset-password',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('../features/auth/reset-password/reset-password.component').then(
+        (m) => m.ResetPasswordComponent,
+      ),
+  },
 
   // All authenticated recipients, including volunteers, can access their own records.
   {
@@ -195,10 +211,6 @@ export const routes: Routes = [
           import('../features/portal/trainer/profile/trainer-profile.component').then(
             (m) => m.TrainerProfileComponent,
           ),
-      },
-      {
-        path: 'partners',
-        loadComponent: () => import('../features/portal/admin/partners/admin-partners.component').then((m) => m.AdminPartnersComponent),
       },
       {
         path: 'programs',

@@ -6,8 +6,9 @@ import {
   UnauthorizedException,
   ForbiddenException,
 } from '@nestjs/common';
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
+import { assertSafeImage } from '../../common/security/file-upload';
 import { StudentsRepository } from './students.repository';
 import { StorageService } from '../storage/storage.service';
 import { MailService } from '../mail/mail.service';
@@ -77,32 +78,12 @@ export class StudentsService {
 
   // Handle upload avatar
   async uploadAvatar(userId: string, file: Express.Multer.File) {
-    if (!file) {
-      throw new BadRequestException('No file provided');
-    }
-
-    const allowedMimeTypes = [
-      'image/jpeg',
-      'image/png',
-      'image/webp',
-      'image/jpg',
-    ];
-    if (!allowedMimeTypes.includes(file.mimetype)) {
-      throw new BadRequestException(
-        'Only JPG, PNG, and WEBP images are allowed',
-      );
-    }
-
-    const maxSize = 5 * 1024 * 1024;
-    if (file.size > maxSize) {
-      throw new BadRequestException('File size must not exceed 5MB');
-    }
-
+    const mime = assertSafeImage(file);
     const result = await this.storageService.uploadFile(
       'avatars',
       file.originalname,
       file.buffer,
-      file.mimetype,
+      mime,
     );
 
     return this.studentsRepo.updateAvatar(userId, result.url);
@@ -134,8 +115,7 @@ export class StudentsService {
       );
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(dto.new_password, salt);
+    const hashedPassword = await bcrypt.hash(dto.new_password, 12);
 
     await this.studentsRepo.updatePassword(userId, hashedPassword);
 
@@ -153,13 +133,6 @@ export class StudentsService {
 
   // Handle update contact info
   async updateContactInfo(userId: string, dto: UpdateContactInfoDto) {
-    if (dto.email) {
-      const existingUser = await this.studentsRepo.findUserByEmail(dto.email);
-      if (existingUser && existingUser.id !== userId) {
-        throw new ConflictException('Email is already in use');
-      }
-    }
-
     if (dto.phone) {
       const existingPhone = await this.studentsRepo.findUserByPhone(dto.phone);
       if (existingPhone && existingPhone.id !== userId) {
@@ -491,6 +464,6 @@ export class StudentsService {
   // Handle generate verification code
   generateVerificationCode(): string {
 
-    return `TAM-${randomBytes(4).toString('hex').toUpperCase()}`;
+    return `TAM-${randomBytes(8).toString('hex').toUpperCase()}`;
   }
 }

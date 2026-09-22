@@ -4,9 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { MailModule } from './modules/mail/mail.module';
-import { TestModule } from './modules/test/test.module';
-
 import { AppController } from './app.controller';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { SecurityModule } from './common/security/security.module';
 
 import { TrainersModule } from './modules/trainers/trainers.module';
 
@@ -29,7 +30,10 @@ import { LoggerModule } from './common/logger/logger.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
+    ThrottlerModule.forRoot({
+      throttlers: [{ name: 'default', ttl: 60000, limit: 80 }],
+    }),
+    SecurityModule,
     PrismaModule,
 
     AuthModule,
@@ -51,5 +55,6 @@ import { LoggerModule } from './common/logger/logger.module';
     LoggerModule,
   ],
   controllers: [AppController],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule { }

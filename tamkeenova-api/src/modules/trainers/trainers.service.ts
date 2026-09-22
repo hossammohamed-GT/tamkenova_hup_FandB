@@ -16,6 +16,8 @@ import { UpdateBookingStatusDto } from './dto/update-booking-status.dto';
 
 import { CreateReviewDto } from './dto/create-review.dto';
 import { StorageService } from '../storage/storage.service';
+import { assertSafeImage } from '../../common/security/file-upload';
+import { randomInt } from 'crypto';
 
 import { Multer } from 'multer';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -105,7 +107,7 @@ export class TrainersService {
     const slug =
       dto.title.toLowerCase().replace(/\s+/g, '-') +
       '-' +
-      Math.floor(Math.random() * 100000);
+      randomInt(100000, 1000000);
 
     return this.trainersRepository.createProgram({
       trainer_id: trainer.id,
@@ -465,11 +467,12 @@ export class TrainersService {
       throw new BadRequestException('Trainer not found');
     }
 
+    const mime = assertSafeImage(file);
     const uploaded = await this.storageService.uploadFile(
       'profile-images',
       file.originalname,
       file.buffer,
-      file.mimetype,
+      mime,
     );
 
     await this.trainersRepository.updateUserProfileImage(userId, uploaded.url);

@@ -16,6 +16,8 @@ import {
 import { TrainersService } from './trainers.service';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 
 import { UpdateTrainerProfileDto } from './dto/update-trainer-profile.dto';
 
@@ -42,7 +44,8 @@ export class TrainersController {
 
 
   // Handle get my profile
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   @Get('me')
   async getMyProfile(@Req() req: any) {
     return this.trainersService.getMyProfile(req.user.sub);
@@ -51,7 +54,8 @@ export class TrainersController {
 
 
   // Handle update my profile
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   @Patch('me')
   async updateMyProfile(@Req() req: any, @Body() dto: UpdateTrainerProfileDto) {
     return this.trainersService.updateMyProfile(req.user.sub, dto);
@@ -61,7 +65,8 @@ export class TrainersController {
 
   // Handle create program
   @Post('programs')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   createProgram(@CurrentUser() user: any, @Body() dto: CreateProgramDto) {
     return this.trainersService.createProgram(user.sub, dto);
   }
@@ -70,7 +75,8 @@ export class TrainersController {
 
   // Handle get my programs
   @Get('programs')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   getMyPrograms(@CurrentUser() user: any) {
     return this.trainersService.getMyPrograms(user.sub);
   }
@@ -79,7 +85,8 @@ export class TrainersController {
 
   // Handle update program
   @Put('programs/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   updateProgram(
     @CurrentUser() user: any,
     @Param('id') id: string,
@@ -92,7 +99,8 @@ export class TrainersController {
 
   // Handle delete program
   @Delete('programs/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   deleteProgram(@CurrentUser() user: any, @Param('id') id: string) {
     return this.trainersService.deleteProgram(user.sub, id);
   }
@@ -101,7 +109,8 @@ export class TrainersController {
 
   // Handle get application status
   @Get('application-status')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   getApplicationStatus(@CurrentUser() user: any) {
     return this.trainersService.getApplicationStatus(user.sub);
   }
@@ -110,7 +119,8 @@ export class TrainersController {
 
   // Handle create availability
   @Post('availability')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   createAvailability(
     @CurrentUser() user: any,
     @Body() dto: CreateAvailabilityDto,
@@ -122,7 +132,8 @@ export class TrainersController {
 
   // Handle get availability
   @Get('availability')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   getAvailability(@CurrentUser() user: any) {
     return this.trainersService.getAvailability(user.sub);
   }
@@ -131,7 +142,8 @@ export class TrainersController {
 
   // Handle update availability
   @Patch('availability/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   updateAvailability(
     @CurrentUser() user: any,
     @Param('id') id: string,
@@ -144,7 +156,8 @@ export class TrainersController {
 
   // Handle delete availability
   @Delete('availability/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   deleteAvailability(@CurrentUser() user: any, @Param('id') id: string) {
     return this.trainersService.deleteAvailability(user.sub, id);
   }
@@ -153,7 +166,8 @@ export class TrainersController {
 
   // Handle get bookings
   @Get('bookings')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   getBookings(@CurrentUser() user: any) {
     return this.trainersService.getBookings(user.sub);
   }
@@ -162,7 +176,8 @@ export class TrainersController {
 
   // Handle get booking details
   @Get('bookings/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   getBookingDetails(@CurrentUser() user: any, @Param('id') id: string) {
     return this.trainersService.getBookingDetails(user.sub, id);
   }
@@ -171,7 +186,8 @@ export class TrainersController {
 
   // Handle update booking status
   @Patch('bookings/:id/status')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
   updateBookingStatus(
     @CurrentUser() user: any,
     @Param('id') id: string,
@@ -221,8 +237,9 @@ export class TrainersController {
 
   // Handle upload profile image
   @Post('upload-profile-image')
-  @UseGuards(JwtAuthGuard)
-  @UseInterceptors(FileInterceptor('image'))
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('TRAINER')
+  @UseInterceptors(FileInterceptor('image', { limits: { fileSize: 5 * 1024 * 1024 } }))
   uploadProfileImage(
     @CurrentUser() user: any,
     @UploadedFile() file: Express.Multer.File,

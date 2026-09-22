@@ -103,7 +103,7 @@ export class StudentsRepository {
   async updatePassword(userId: string, hashedPassword: string) {
     return this.prisma.users.update({
       where: { id: userId },
-      data: { password: hashedPassword },
+      data: { password: hashedPassword, token_version: { increment: 1 } },
       select: { id: true, updated_at: true },
     });
   }

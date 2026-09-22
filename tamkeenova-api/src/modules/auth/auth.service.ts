@@ -7,7 +7,10 @@ import { RegisterVolunteerDto } from './dto/register-volunteer.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 
 import { AuthRepository } from './auth.repository';
-import { generateOtp } from './utils/otp.util';
+import { generateOtp, hashOtp, otpMatches } from './utils/otp.util';
+import { randomInt } from 'crypto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { MailService } from '../mail/mail.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
@@ -97,7 +100,7 @@ export class AuthService {
       const trainer = await this.authRepository.createTrainer({
         user_id: user.id,
 
-        slug: dto.username + '-' + Math.floor(Math.random() * 100000),
+        slug: dto.username + '-' + randomInt(100000, 1000000),
 
         trainer_status: 'PENDING',
 
@@ -153,15 +156,7 @@ export class AuthService {
       }
     }
 
-    const otp = generateOtp();
-
-    await this.authRepository.createOtp({
-      user_id: user.id,
-      otp_code: otp,
-      expires_at: new Date(Date.now() + 10 * 60 * 1000),
-    });
-
-    await this.mailService.sendOtp(user.email, otp);
+    await this.issueOtp(user.id, user.email, 'EMAIL_VERIFY');
 
     return {
       success: true,
@@ -235,15 +230,7 @@ export class AuthService {
       });
     }
 
-    const otp = generateOtp();
-
-    await this.authRepository.createOtp({
-      user_id: user.id,
-      otp_code: otp,
-      expires_at: new Date(Date.now() + 10 * 60 * 1000),
-    });
-
-    await this.mailService.sendOtp(user.email, otp);
+    await this.issueOtp(user.id, user.email, 'EMAIL_VERIFY');
 
     return {
       success: true,
@@ -264,23 +251,46 @@ export class AuthService {
     return { success: true, data: { email_available: !email, username_available: !username, phone_available: !phone } };
   }
 
+  private async issueOtp(userId: string, email: string, purpose: 'EMAIL_VERIFY' | 'PASSWORD_RESET') {
+    await this.authRepository.invalidateOldOtps(userId, purpose);
+    const otp = generateOtp();
+    await this.authRepository.createOtp({
+      user_id: userId,
+      otp_code: hashOtp(otp),
+      expires_at: new Date(Date.now() + 10 * 60 * 1000),
+      purpose,
+    });
+    if (purpose === 'PASSWORD_RESET') {
+      await this.mailService.sendPasswordResetOtp(email, otp);
+    } else {
+      await this.mailService.sendOtp(email, otp);
+    }
+  }
 
-  // Handle verify email
-  async verifyEmail(dto: VerifyEmailDto) {
-    const otpRecord = await this.authRepository.getValidOtp(dto.email, dto.otp);
-
+  private async consumeOtp(email: string, otp: string, purpose: 'EMAIL_VERIFY' | 'PASSWORD_RESET') {
+    const otpRecord = await this.authRepository.getLatestOtp(email, purpose);
     if (!otpRecord) {
       throw new BadRequestException('Invalid OTP');
     }
-
     if (otpRecord.expires_at.getTime() < Date.now()) {
       throw new BadRequestException('OTP expired');
     }
-
-    await this.authRepository.verifyUser(otpRecord.user_id);
-
+    if ((otpRecord.attempt_count ?? 0) >= 5) {
+      throw new BadRequestException('Invalid OTP');
+    }
+    if (!otpMatches(otp, otpRecord.otp_code)) {
+      await this.authRepository.incrementOtpAttempts(otpRecord.id);
+      throw new BadRequestException('Invalid OTP');
+    }
     await this.authRepository.markOtpUsed(otpRecord.id);
+    return otpRecord;
+  }
 
+
+  // Handle verify email
+  async verifyEmail(dto: VerifyEmailDto) {
+    const otpRecord = await this.consumeOtp(dto.email, dto.otp, 'EMAIL_VERIFY');
+    await this.authRepository.verifyUser(otpRecord.user_id);
     return {
       success: true,
       message: 'Email verified successfully',
@@ -293,29 +303,42 @@ export class AuthService {
   async resendOtp(dto: { email: string }) {
     const user = await this.authRepository.findUserByEmail(dto.email);
 
-    if (!user) {
-      throw new BadRequestException('User not found');
+    if (!user || user.email_verified) {
+      return {
+        success: true,
+        message: 'OTP sent successfully',
+      };
     }
 
-    if (user.email_verified) {
-      throw new BadRequestException('Email already verified');
-    }
-
-    await this.authRepository.invalidateOldOtps(user.id);
-
-    const otp = generateOtp();
-
-    await this.authRepository.createOtp({
-      user_id: user.id,
-      otp_code: otp,
-      expires_at: new Date(Date.now() + 10 * 60 * 1000),
-    });
-
-    await this.mailService.sendOtp(user.email, otp);
+    await this.issueOtp(user.id, user.email, 'EMAIL_VERIFY');
 
     return {
       success: true,
       message: 'OTP sent successfully',
+    };
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const user = await this.authRepository.findUserByEmail(dto.email);
+    if (user?.is_active) {
+      await this.issueOtp(user.id, user.email, 'PASSWORD_RESET');
+    }
+    return {
+      success: true,
+      message: 'If an account exists, a reset code was sent',
+    };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    if (dto.new_password !== dto.confirm_password) {
+      throw new BadRequestException('Passwords do not match');
+    }
+    const otpRecord = await this.consumeOtp(dto.email, dto.otp, 'PASSWORD_RESET');
+    const hashedPassword = await bcrypt.hash(dto.new_password, 12);
+    await this.authRepository.updatePassword(otpRecord.user_id, hashedPassword);
+    return {
+      success: true,
+      message: 'Password reset successfully',
     };
   }
 
@@ -329,24 +352,30 @@ export class AuthService {
       throw new BadRequestException('Invalid email or password');
     }
 
-    if (!user.email_verified) {
-      throw new BadRequestException('Email not verified');
+    if (user.locked_until && user.locked_until.getTime() > Date.now()) {
+      throw new BadRequestException('Invalid email or password');
     }
 
-    if (!user.is_active) {
-      throw new BadRequestException('Account disabled');
+    if (!user.email_verified || !user.is_active) {
+      throw new BadRequestException('Invalid email or password');
     }
 
     const passwordMatched = await bcrypt.compare(dto.password, user.password);
 
     if (!passwordMatched) {
+      const attempts = (user.failed_login_attempts || 0) + 1;
+      const lockedUntil = attempts >= 5 ? new Date(Date.now() + 15 * 60 * 1000) : null;
+      await this.authRepository.recordFailedLogin(user.id, attempts, lockedUntil);
       throw new BadRequestException('Invalid email or password');
     }
+
+    await this.authRepository.clearFailedLogin(user.id);
 
     const payload = {
       sub: user.id,
       email: user.email,
       role: user.role,
+      tv: user.token_version ?? 0,
     };
 
     const accessToken = await this.jwtService.signAsync(payload);

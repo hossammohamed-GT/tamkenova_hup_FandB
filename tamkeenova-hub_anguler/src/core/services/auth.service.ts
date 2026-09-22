@@ -67,6 +67,14 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, payload);
   }
 
+  forgotPassword(payload: { email: string }) {
+    return this.http.post<ApiSuccessMessage>(`${this.baseUrl}/forgot-password`, payload);
+  }
+
+  resetPassword(payload: { email: string; otp: string; new_password: string; confirm_password: string }) {
+    return this.http.post<ApiSuccessMessage>(`${this.baseUrl}/reset-password`, payload);
+  }
+
   // -- Persist the Authenticated User Session --
   setSession(response: LoginResponse): void {
     const { access_token, user } = response.data;
@@ -137,13 +145,25 @@ export class AuthService {
     if (redirect) this.router.navigate(['/login']);
   }
 
-  private pendingEmail = signal<string | null>(null);
-  // -- Store the Email Awaiting Verification --
+  private pendingEmail = signal<string | null>(this.readPendingEmail());
+
   setPendingEmail(email: string): void {
     this.pendingEmail.set(email);
+    try {
+      if (typeof sessionStorage !== 'undefined') sessionStorage.setItem('pending_email', email);
+    } catch {}
   }
-  // -- Retrieve the Email Awaiting Verification --
+
   getPendingEmail(): string | null {
-    return this.pendingEmail();
+    return this.pendingEmail() ?? this.readPendingEmail();
+  }
+
+  private readPendingEmail(): string | null {
+    try {
+      if (typeof sessionStorage === 'undefined') return null;
+      return sessionStorage.getItem('pending_email');
+    } catch {
+      return null;
+    }
   }
 }

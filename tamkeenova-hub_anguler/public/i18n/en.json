@@ -420,6 +420,21 @@
       "success_note": "Your trainee application was submitted! Redirecting to email verification.",
       "error_generic": "Could not submit the application, please try again",
       "review_note": "Your account will stay under review until the admin approves it."
+    },
+    "forgot": {
+      "eyebrow": "Account recovery",
+      "title": "Forgot password",
+      "subtitle": "Enter your email and we will send a reset code if an account exists.",
+      "submit": "Send reset code",
+      "back": "Back to login",
+      "link": "Forgot password?"
+    },
+    "reset": {
+      "eyebrow": "New password",
+      "title": "Reset password",
+      "subtitle": "Enter the code sent to",
+      "submit": "Save new password",
+      "resend": "Request a new code"
     }
   },
   "dashboard": {
@@ -1496,7 +1511,9 @@
     "TASK_SUBMISSION_FAILED": "We couldn't save the submission. Please try again.",
     "TASK_NOT_ASSIGNED": "You aren't assigned to this task.",
     "NOTIFICATION_NOT_FOUND": "This notification no longer exists.",
-    "AUTH_PASSWORD_MISMATCH": "Passwords do not match."
+    "AUTH_PASSWORD_MISMATCH": "Passwords do not match",
+    "AUTH_PASSWORD_POLICY": "Password must include an uppercase letter, a lowercase letter, and a number",
+    "AUTH_SUPER_ADMIN_ONLY": "Only a super admin can do this"
   },
   "trainer_consultations": {
     "update_error": "Could not update the consultation status, please retry",
