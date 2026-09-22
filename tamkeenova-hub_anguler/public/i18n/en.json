@@ -42,12 +42,15 @@
     },
     "stats": {
       "trainees": "Trainees & Beneficiaries",
+      "trainees_desc": "Behind every number is a success story",
       "programs": "Training & Development Programs",
+      "programs_desc": "Practical programs built for the job market",
       "hours": "Certified Training Hours",
+      "hours_desc": "Hands-on learning with certified expert trainers",
       "partnerships": "Institutional Partnerships",
+      "partnerships_desc": "Growing alongside leading institutions",
       "team": "Advisory Team Members",
-      "eyebrow": "TamkeeNova in numbers",
-      "title": "Real impact, measured in numbers"
+      "team_desc": "Experts guiding you at every step"
     },
     "services": {
       "label": "Platform Extensions",

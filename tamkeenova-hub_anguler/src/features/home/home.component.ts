@@ -55,12 +55,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     '/images/gallery/gallery-21.jpg',
   ];
 
-  stats: { value: number; suffix: string; labelKey: string; icon: string }[] = [
-    { value: 7, suffix: '+', labelKey: 'home.stats.trainees', icon: 'fa-solid fa-user-graduate' },
-    { value: 6, suffix: '+', labelKey: 'home.stats.programs', icon: 'fa-solid fa-book-open' },
-    { value: 155, suffix: '+', labelKey: 'home.stats.hours', icon: 'fa-solid fa-clock' },
-    { value: 5, suffix: '+', labelKey: 'home.stats.partnerships', icon: 'fa-solid fa-handshake' },
-    { value: 20, suffix: '+', labelKey: 'home.stats.team', icon: 'fa-solid fa-users' },
+  stats: { value: number; suffix: string; labelKey: string; descKey: string }[] = [
+    { value: 7, suffix: '+', labelKey: 'home.stats.trainees', descKey: 'home.stats.trainees_desc' },
+    { value: 6, suffix: '+', labelKey: 'home.stats.programs', descKey: 'home.stats.programs_desc' },
+    { value: 155, suffix: '+', labelKey: 'home.stats.hours', descKey: 'home.stats.hours_desc' },
+    { value: 5, suffix: '+', labelKey: 'home.stats.partnerships', descKey: 'home.stats.partnerships_desc' },
+    { value: 20, suffix: '+', labelKey: 'home.stats.team', descKey: 'home.stats.team_desc' },
   ];
 
   statValues = signal<number[]>([0, 0, 0, 0, 0]);
