@@ -75,22 +75,27 @@
 
 
 <section class="services">
-  <div class="section-heading" appScrollReveal>
+  <div class="services-bg services-bg-light" aria-hidden="true"></div>
+  <div class="services-bg services-bg-dark" aria-hidden="true"></div>
+
+  <div class="section-heading">
     <span class="section-label">{{ 'home.services.label' | translate }}</span>
-    <h2 class="section-title display">{{ 'home.services.title' | translate }}</h2>
+    <h2 class="section-title">{{ 'home.services.title' | translate }}</h2>
   </div>
 
   <div class="services-grid">
     @for (service of services; track service.route; let i = $index) {
-      <a [routerLink]="service.route" class="service-card chamfer-sm surface" appScrollReveal>
-        <div class="service-icon">
+      <a [routerLink]="service.route" class="service-card">
+        <span class="service-index" aria-hidden="true">0{{ i + 1 }}</span>
+        <span class="service-beam" aria-hidden="true"></span>
+        <span class="service-icon">
           <i [class]="service.icon"></i>
-        </div>
+        </span>
         <h3 class="service-title">{{ service.titleKey | translate }}</h3>
         <p class="service-desc">{{ service.descKey | translate }}</p>
         <span class="service-link">
           {{ service.linkKey | translate }}
-          <i class="fa-solid fa-arrow-left rtl-flip"></i>
+          <span class="service-arrow"><i class="fa-solid fa-arrow-left rtl-flip"></i></span>
         </span>
       </a>
     }
