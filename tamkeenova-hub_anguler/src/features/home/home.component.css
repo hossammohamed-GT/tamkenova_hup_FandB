@@ -327,10 +327,12 @@
   inset: 0;
   z-index: 0;
   background: linear-gradient(180deg,
-    color-mix(in srgb, var(--color-primary) 88%, transparent),
-    color-mix(in srgb, var(--color-primary) 70%, transparent) 30%,
-    color-mix(in srgb, var(--color-primary) 70%, transparent) 70%,
-    color-mix(in srgb, var(--color-primary) 88%, transparent));
+    color-mix(in srgb, var(--color-surface-0) 94%, transparent),
+    color-mix(in srgb, var(--color-surface-0) 80%, transparent) 30%,
+    color-mix(in srgb, var(--color-surface-0) 80%, transparent) 70%,
+    color-mix(in srgb, var(--color-surface-0) 94%, transparent));
+  backdrop-filter: blur(2px) saturate(1.05);
+  -webkit-backdrop-filter: blur(2px) saturate(1.05);
   pointer-events: none;
 }
 
@@ -338,14 +340,6 @@
 .services-grid {
   position: relative;
   z-index: 1;
-}
-
-.services .section-label {
-  color: var(--color-accent);
-}
-
-.services .section-title {
-  color: #ffffff;
 }
 
 .services-grid {
