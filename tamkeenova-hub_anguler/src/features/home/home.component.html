@@ -75,8 +75,7 @@
 
 
 <section class="services">
-  <div class="services-bg services-bg-light" aria-hidden="true"></div>
-  <div class="services-bg services-bg-dark" aria-hidden="true"></div>
+  <div class="services-bg" aria-hidden="true"></div>
 
   <div class="section-heading">
     <span class="section-label">{{ 'home.services.label' | translate }}</span>
@@ -87,7 +86,6 @@
     @for (service of services; track service.route; let i = $index) {
       <a [routerLink]="service.route" class="service-card">
         <span class="service-index" aria-hidden="true">0{{ i + 1 }}</span>
-        <span class="service-beam" aria-hidden="true"></span>
         <span class="service-icon">
           <i [class]="service.icon"></i>
         </span>
