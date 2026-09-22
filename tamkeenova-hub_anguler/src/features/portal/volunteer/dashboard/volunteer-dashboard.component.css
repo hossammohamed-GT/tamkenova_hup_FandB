@@ -105,8 +105,8 @@
 }
 
 .quick-card:hover {
-  border-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-border));
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--color-primary) 8%, transparent);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .quick-icon {
@@ -117,8 +117,8 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
-  color: var(--stat-color, var(--color-primary));
-  background: color-mix(in srgb, var(--stat-color, var(--color-primary)) 12%, transparent);
+  color: var(--color-action);
+  background: var(--color-surface-2);
 }
 
 .quick-text {
@@ -144,5 +144,5 @@
 }
 
 .quick-card:hover .quick-arrow {
-  color: var(--color-primary);
+  color: var(--color-action);
 }

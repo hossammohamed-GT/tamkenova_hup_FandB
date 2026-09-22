@@ -115,7 +115,7 @@
   justify-content: center;
   font-size: 2.2rem;
   color: var(--color-border);
-  background: linear-gradient(135deg, var(--color-surface-alt), color-mix(in srgb, var(--color-primary) 12%, var(--color-surface-alt)));
+  background: var(--color-surface-2);
 }
 
 .enroll-badge {
@@ -163,7 +163,7 @@
 .progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  background: var(--color-primary);
   transition: width 0.4s ease;
 }
 

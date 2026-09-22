@@ -71,18 +71,10 @@
   position: relative;
   overflow: hidden;
   padding: 2rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--color-primary);
+  color: #fff;
+  border: 1px solid var(--color-primary);
   margin-bottom: 1.5rem;
-}
-
-.profile-hero-bg {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 85% 20%, color-mix(in srgb, var(--color-accent) 14%, transparent), transparent 55%),
-    radial-gradient(circle at 10% 90%, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 55%);
-  pointer-events: none;
 }
 
 .profile-hero-content {
@@ -104,7 +96,7 @@
   height: 96px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid var(--color-border);
+  border: 3px solid #fff;
 }
 
 .profile-avatar img {
@@ -119,8 +111,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-surface-alt);
-  color: var(--color-text-muted);
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.85);
   font-size: 2.2rem;
 }
 
@@ -143,16 +135,16 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--color-primary);
-  color: #fff;
-  border: 3px solid var(--color-surface);
+  background: #fff;
+  color: var(--color-primary);
+  border: 3px solid var(--color-primary);
   cursor: pointer;
   font-size: 0.8rem;
   transition: background var(--transition-fast);
 }
 
 .avatar-upload-btn:hover:not(:disabled) {
-  background: var(--color-primary-hover);
+  background: var(--color-surface-alt);
 }
 
 .avatar-upload-btn:disabled {
@@ -168,11 +160,12 @@
 .profile-hero-name {
   font-size: 1.6rem;
   font-weight: 800;
+  color: #fff;
 }
 
 .profile-hero-email {
   font-size: 0.88rem;
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.78);
   margin-top: 0.2rem;
 }
 
@@ -187,14 +180,16 @@
 .profile-hero-username {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--color-primary);
-  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: #fff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
   padding: 0.25rem 0.7rem;
   border-radius: 999px;
 }
 
 .profile-hero-date {
   font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.72);
 }
 
 .profile-hero-stats {
@@ -212,12 +207,12 @@
 .hero-mini-value {
   font-size: 1.35rem;
   font-weight: 800;
-  color: var(--color-primary);
+  color: #fff;
 }
 
 .hero-mini-label {
   font-size: 0.7rem;
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.72);
   text-align: center;
 }
 
@@ -226,7 +221,7 @@
   margin-top: 1rem;
   padding: 0.7rem 0.9rem;
   border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  background: #fff;
   color: var(--color-danger);
   font-size: 0.82rem;
   display: flex;

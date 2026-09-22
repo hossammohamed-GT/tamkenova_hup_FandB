@@ -185,14 +185,14 @@
   inset-inline: 0;
   top: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  background: var(--color-primary);
   opacity: 0;
   transition: opacity 0.35s ease;
 }
 
 .trainer-card:hover {
-  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
-  box-shadow: 0 12px 32px color-mix(in srgb, var(--color-primary) 14%, transparent);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .trainer-card:hover::before {
@@ -201,7 +201,7 @@
 
 .trainer-card.is-pending::before {
   opacity: 1;
-  background: linear-gradient(90deg, var(--color-accent), transparent 70%);
+  background: var(--color-accent);
 }
 
 /* subtle avatar shine on hover (no movement) */
@@ -214,8 +214,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 16%, transparent), color-mix(in srgb, var(--color-accent) 14%, transparent));
-  color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
   font-weight: 800;
   font-size: 0.95rem;
   flex-shrink: 0;

@@ -49,28 +49,24 @@ export class VolunteerDashboardComponent implements OnInit {
         labelKey: 'volunteer_dashboard.total',
         value: s.total_tasks,
         icon: 'fa-list-check',
-        color: 'var(--color-primary)',
         route: '/portal/trainee/tasks',
       },
       {
         labelKey: 'volunteer_dashboard.current',
         value: s.current_tasks,
         icon: 'fa-spinner',
-        color: 'var(--color-accent)',
         route: '/portal/trainee/tasks',
       },
       {
         labelKey: 'volunteer_dashboard.completed',
         value: s.completed_tasks,
         icon: 'fa-circle-check',
-        color: 'var(--color-success)',
         route: '/portal/trainee/tasks',
       },
       {
         labelKey: 'volunteer_dashboard.delayed',
         value: s.delayed_tasks,
         icon: 'fa-triangle-exclamation',
-        color: 'var(--color-danger)',
         route: '/portal/trainee/tasks',
       },
     ];
@@ -83,26 +79,22 @@ export class VolunteerDashboardComponent implements OnInit {
         labelKey: 'volunteer_dashboard.hours',
         value: s.total_hours ?? 0,
         icon: 'fa-hourglass-half',
-        color: '#0ea5a4',
       },
       {
         labelKey: 'volunteer_dashboard.avg_score',
         value: s.average_score ?? 0,
         icon: 'fa-star',
-        color: 'var(--color-accent)',
       },
       {
         labelKey: 'volunteer_dashboard.on_time',
         value: (s.on_time_rate ?? 0),
         suffix: '%',
         icon: 'fa-gauge-high',
-        color: '#2f7fbf',
       },
       {
         labelKey: 'volunteer_dashboard.certificates',
         value: s.certificates_count ?? 0,
         icon: 'fa-certificate',
-        color: 'var(--color-success)',
       },
     ];
   });

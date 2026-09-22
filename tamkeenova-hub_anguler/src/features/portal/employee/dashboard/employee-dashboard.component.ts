@@ -49,28 +49,24 @@ export class EmployeeDashboardComponent implements OnInit {
         labelKey: 'employee_dashboard.total',
         value: s.total_tasks,
         icon: 'fa-list-check',
-        color: 'var(--color-primary)',
         route: '/portal/employee/tasks',
       },
       {
         labelKey: 'employee_dashboard.current',
         value: s.current_tasks,
         icon: 'fa-spinner',
-        color: 'var(--color-accent)',
         route: '/portal/employee/tasks',
       },
       {
         labelKey: 'employee_dashboard.completed',
         value: s.completed_tasks,
         icon: 'fa-circle-check',
-        color: 'var(--color-success)',
         route: '/portal/employee/tasks',
       },
       {
         labelKey: 'employee_dashboard.delayed',
         value: s.delayed_tasks,
         icon: 'fa-triangle-exclamation',
-        color: 'var(--color-danger)',
         route: '/portal/employee/tasks',
       },
     ];

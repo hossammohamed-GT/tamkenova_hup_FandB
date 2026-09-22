@@ -8,7 +8,6 @@
     <div class="profile-content-stable">
       @if (displayProfile(); as p) {
         <div class="profile-hero chamfer-sm stable-hero">
-          <div class="profile-hero-bg"></div>
           <div class="profile-hero-content">
             <div class="profile-avatar-wrapper">
               <div class="profile-avatar" [class.is-uploading]="isUploadingImage()">
@@ -37,7 +36,7 @@
                 @if (p.username) {
                   <span class="profile-hero-username" dir="ltr">@{{ p.username }}</span>
                 }
-                <span class="profile-hero-date text-muted">
+                <span class="profile-hero-date">
                   {{ 'student_profile.member_since' | translate }} {{ p.created_at | date: 'yyyy/MM/dd' }}
                 </span>
               </div>

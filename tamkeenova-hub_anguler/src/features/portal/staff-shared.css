@@ -120,8 +120,8 @@
 }
 
 .stat-card:hover {
-  border-color: color-mix(in srgb, var(--stat-color, var(--color-primary)) 45%, var(--color-border));
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--stat-color, var(--color-primary)) 10%, transparent);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 a.stat-card {
@@ -137,8 +137,8 @@ a.stat-card {
   justify-content: center;
   border-radius: var(--radius-sm);
   font-size: 1.05rem;
-  color: var(--stat-color, var(--color-primary));
-  background: color-mix(in srgb, var(--stat-color, var(--color-primary)) 12%, transparent);
+  color: var(--color-action);
+  background: var(--color-surface-2);
 }
 
 .stat-value {
@@ -749,24 +749,16 @@ html[data-theme='dark'] .badge-medium {
   height: 52px;
   padding-inline: 1.5rem;
   border: none;
-  border-radius: 14px;
-  background:
-    linear-gradient(
-      135deg,
-      var(--color-primary) 0%,
-      var(--color-primary-hover) 55%,
-      color-mix(in srgb, var(--color-accent) 45%, var(--color-primary-hover)) 100%
-    );
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
   color: #fff;
   font-size: 0.95rem;
   font-weight: 800;
   font-family: inherit;
   cursor: pointer;
   white-space: nowrap;
-  box-shadow:
-    0 8px 20px color-mix(in srgb, var(--color-primary) 32%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  transition: filter var(--transition-fast), box-shadow var(--transition-base);
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition-fast);
 }
 
 .btn-hero .btn-hero-icon {
@@ -782,18 +774,7 @@ html[data-theme='dark'] .badge-medium {
 }
 
 .btn-hero:hover:not(:disabled) {
-  filter: brightness(1.08);
-  box-shadow:
-    0 10px 26px color-mix(in srgb, var(--color-primary) 42%, transparent),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
-
-.btn-hero:hover:not(:disabled) .btn-hero-icon {
-  scale: 1.12;
-}
-
-.btn-hero:active:not(:disabled) {
-  scale: 0.98;
+  background: var(--color-primary-hover);
 }
 
 .btn-hero:disabled {

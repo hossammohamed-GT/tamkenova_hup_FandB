@@ -11,7 +11,6 @@ interface DashCard {
   labelKey: string;
   value: number;
   icon: string;
-  color: string;
   route: string;
   pending?: number;
   pendingLabelKey?: string;
@@ -60,21 +59,18 @@ export class AdminDashboardComponent implements OnInit {
         labelKey: 'admin_dashboard.users',
         value: s.users_count,
         icon: 'fa-users',
-        color: 'var(--color-primary)',
         route: '/portal/admin/users',
       },
       {
         labelKey: 'admin_dashboard.students',
         value: s.students_count,
         icon: 'fa-graduation-cap',
-        color: '#2f7fbf',
         route: '/portal/admin/users',
       },
       {
         labelKey: 'admin_dashboard.trainers',
         value: s.trainers_count,
         icon: 'fa-chalkboard-user',
-        color: 'var(--color-accent)',
         route: '/portal/admin/trainers',
         pending: s.pending_trainers_count,
         pendingLabelKey: 'admin_dashboard.pending',
@@ -84,7 +80,6 @@ export class AdminDashboardComponent implements OnInit {
         labelKey: 'admin_dashboard.volunteers',
         value: s.volunteers_count,
         icon: 'fa-people-group',
-        color: 'var(--color-success)',
         route: '/portal/admin/trainees',
         pending: s.pending_volunteers_count,
         pendingLabelKey: 'admin_dashboard.pending',
@@ -94,28 +89,24 @@ export class AdminDashboardComponent implements OnInit {
         labelKey: 'admin_dashboard.employees',
         value: s.employees_count,
         icon: 'fa-id-badge',
-        color: 'var(--color-primary)',
         route: '/portal/admin/users',
       },
       {
         labelKey: 'admin_dashboard.programs',
         value: s.programs_count,
         icon: 'fa-book-open',
-        color: '#8b5cf6',
         route: '/portal/admin/programs',
       },
       {
         labelKey: 'admin_dashboard.consultations',
         value: s.consultations_count,
         icon: 'fa-comments',
-        color: '#0ea5a4',
         route: '/portal/admin/consultations',
       },
       {
         labelKey: 'admin_dashboard.corporate_requests',
         value: s.corporate_requests_count,
         icon: 'fa-building',
-        color: 'var(--color-accent)',
         route: '/portal/admin/corporate',
         pending: s.pending_corporate_requests_count,
         pendingLabelKey: 'admin_dashboard.pending',
@@ -125,14 +116,12 @@ export class AdminDashboardComponent implements OnInit {
         labelKey: 'admin_dashboard.certificates',
         value: s.certificates_count,
         icon: 'fa-certificate',
-        color: 'var(--color-success)',
         route: '/portal/admin/certificates',
       },
       {
         labelKey: 'admin_dashboard.tasks',
         value: s.tasks_count,
         icon: 'fa-list-check',
-        color: 'var(--color-danger)',
         route: '/portal/admin/tasks',
       },
     ];

@@ -124,17 +124,18 @@
 
 /* -- 2. Dark theme: designed, not inverted -------------------------------- */
 [data-theme='dark'] {
-  --color-text: #ecedee;
-  --color-text-muted: #a7abad;
-  --color-text-tertiary: #7e8287;
+  --color-text: #ece9e4;
+  --color-text-muted: #a8a49b;
+  --color-text-tertiary: #7f7b72;
 
-  --color-surface-0: #1e1f22;
-  --color-surface-1: #26282b;
-  --color-surface-2: #303235;
-  --color-surface-3: #3a3d40;
+  /* Warm charcoal ramp — calm on the eyes, elevates lighter. */
+  --color-surface-0: #2b2a28;
+  --color-surface-1: #353431;
+  --color-surface-2: #403f3a;
+  --color-surface-3: #4c4b45;
 
-  --color-border: #3a3d40;
-  --color-border-strong: #4c5054;
+  --color-border: #4c4b45;
+  --color-border-strong: #5f5e55;
 
   /* Primary stays deep navy ONLY for filled buttons (white text on it
      passes contrast). Interactive text/icons use the lightened ramp. */

@@ -39,7 +39,7 @@
       <!-- -- Stats -- -->
       <div class="stats-grid">
         @for (card of cards(); track card.labelKey) {
-          <a [routerLink]="card.route" class="stat-card staff-fade" [style.--stat-color]="card.color">
+          <a [routerLink]="card.route" class="stat-card staff-fade">
             <span class="stat-icon"><i class="fa-solid" [class]="card.icon"></i></span>
             <span class="stat-text">
               <span class="stat-value">{{ card.value }}</span>
@@ -78,7 +78,7 @@
     <!-- -- Quick actions -- -->
     <div class="quick-row">
       <a routerLink="/portal/employee/tasks" class="quick-card surface staff-fade">
-        <span class="quick-icon" style="--stat-color: var(--color-primary)">
+        <span class="quick-icon">
           <i class="fa-solid fa-list-check"></i>
         </span>
         <span class="quick-text">
@@ -89,7 +89,7 @@
       </a>
 
       <a routerLink="/portal/employee/notifications" class="quick-card surface staff-fade">
-        <span class="quick-icon" style="--stat-color: var(--color-accent)">
+        <span class="quick-icon">
           <i class="fa-solid fa-bell"></i>
         </span>
         <span class="quick-text">

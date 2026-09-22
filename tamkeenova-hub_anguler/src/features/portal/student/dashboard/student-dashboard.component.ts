@@ -45,25 +45,21 @@ export class StudentDashboardComponent {
       icon: 'fa-book-open',
       labelKey: 'student_dashboard.actions.browse_programs',
       route: '/programs',
-      color: 'primary',
     },
     {
       icon: 'fa-chalkboard-user',
       labelKey: 'student_dashboard.actions.find_trainer',
       route: '/portal/student/trainers',
-      color: 'accent',
     },
     {
       icon: 'fa-comments',
       labelKey: 'student_dashboard.actions.my_consultations',
       route: '/portal/student/consultations',
-      color: 'success',
     },
     {
       icon: 'fa-building',
       labelKey: 'student_dashboard.actions.corporate_request',
       route: '/portal/student/corporate-requests',
-      color: 'dark',
     },
   ];
 

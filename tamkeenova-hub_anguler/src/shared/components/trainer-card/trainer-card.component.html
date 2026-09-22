@@ -28,7 +28,7 @@
         @for (star of starsArray; track star) {
         <button type="button" class="rating-star-btn" [class.is-active]="isStarActive(star)"
           [class.is-hovered]="isStarHovered(star)" [class.is-user-rated]="userRating() >= star"
-          [style.--star-delay]="(star - 1) * 0.06 + 's'" (mouseenter)="onStarEnter(star)"
+          (mouseenter)="onStarEnter(star)"
           (click)="onStarClick(star, $event)" [disabled]="isRating() || !interactiveRating()"
           [attr.aria-label]="'Rate ' + star">
           <i class="fa-solid fa-star star-icon" [class.is-filled]="isStarActive(star)"></i>
