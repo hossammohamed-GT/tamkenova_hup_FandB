@@ -50,12 +50,13 @@
   /* Focus */
   --focus-ring: 0 0 0 3px rgba(0, 66, 101, 0.22);
 
-  /* Typography: one superfamily (IBM Plex), one stack per script, one mono for numerics.
-     AR: Plex Sans Arabic — institutional Naskh, dashboard-grade legibility.
-     EN: Plex Sans — same design DNA, matched voice across the lang switch.
+  /* Typography: Plex Sans (EN) + Alexandria (AR) + Plex Mono (numerics).
+     AR: Alexandria — contemporary Arabic, soft monolinear forms; compact like
+     Plex but warmer; one voice for headings and body.
+     EN: Plex Sans — neutral-humanist, matched rhythm with Alexandria.
      NUM: Plex Mono — fixed advance is tabular by construction; metrics/stats/codes. */
   --font-sans: 'IBM Plex Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --font-arabic: 'IBM Plex Sans Arabic', 'IBM Plex Sans', 'Segoe UI', Tahoma, sans-serif;
+  --font-arabic: 'Alexandria', 'IBM Plex Sans', 'Segoe UI', Tahoma, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   --font-numeric: var(--font-mono);
   --font-display: var(--font-sans);
