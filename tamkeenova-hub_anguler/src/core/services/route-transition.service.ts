@@ -46,24 +46,32 @@ export class RouteTransitionService {
     setTimeout(() => {
       this.phase.set('hold');
       if (this.router.url === url) {
-        this.reveal();
+        this.reveal(false);
         return;
       }
-      settled$.subscribe(() => this.reveal());
+      settled$.subscribe((e) => this.reveal(e instanceof NavigationEnd));
       void this.router.navigateByUrl(url);
     }, this.EXPAND_MS);
   }
 
-  private reveal(): void {
-    // Let the new view paint under the cover, then shrink back to center.
+  private reveal(navigated: boolean): void {
+    // Let the new view paint under the cover, then unwind the spiral while
+    // the new page glides in from the right beneath it.
     requestAnimationFrame(() => {
       setTimeout(() => {
         this.phase.set('collapse');
+        this.setEnterClass(navigated);
         setTimeout(() => {
+          this.setEnterClass(false);
           this.phase.set('idle');
           this.busy = false;
         }, this.COLLAPSE_MS);
       }, this.REVEAL_DELAY_MS);
     });
+  }
+
+  private setEnterClass(on: boolean): void {
+    if (typeof document === 'undefined') return;
+    document.body.classList.toggle('route-enter', on);
   }
 }

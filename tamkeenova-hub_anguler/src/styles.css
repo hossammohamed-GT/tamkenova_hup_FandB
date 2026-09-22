@@ -875,3 +875,25 @@ html {
   border: 2px solid transparent;
   background-clip: padding-box;
 }
+
+/* -- 15. Route transition: new page glides in from the right ----------- */
+/* Applied via body.route-enter only while the spiral unwinds above it. */
+body.route-enter {
+  overflow-x: clip;
+}
+
+body.route-enter router-outlet + * {
+  display: block;
+  animation: route-page-in 1000ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@keyframes route-page-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
