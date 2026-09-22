@@ -17,9 +17,9 @@ export class RouteTransitionService {
   readonly phase = signal<TransitionPhase>('idle');
   readonly origin = signal({ x: 0, y: 0 });
 
-  private readonly EXPAND_MS = 650;
+  private readonly EXPAND_MS = 1050;
   private readonly REVEAL_DELAY_MS = 120;
-  private readonly COLLAPSE_MS = 550;
+  private readonly COLLAPSE_MS = 650;
 
   private busy = false;
 
