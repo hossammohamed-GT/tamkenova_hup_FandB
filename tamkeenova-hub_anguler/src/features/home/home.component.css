@@ -361,7 +361,7 @@
   overflow: hidden;
   isolation: isolate;
   padding: 6rem 6vw;
-  background: linear-gradient(155deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+  background: var(--color-primary);
 }
 
 .contact-inner {
@@ -420,16 +420,15 @@
   align-items: center;
   gap: 1rem;
   padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.07);
+  background: color-mix(in srgb, #000 18%, var(--color-primary));
   border: 1px solid rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(10px);
   transition: transform var(--transition-base), background var(--transition-base), border-color var(--transition-base);
 }
 
 .contact-card:hover {
-  transform: translateY(-6px);
-  background: rgba(255, 255, 255, 0.13);
-  border-color: var(--color-accent);
+  transform: translateY(-2px);
+  background: color-mix(in srgb, #000 10%, var(--color-primary));
+  border-color: rgba(255, 255, 255, 0.35);
 }
 
 .contact-card-icon {

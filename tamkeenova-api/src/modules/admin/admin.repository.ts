@@ -77,10 +77,14 @@ export class AdminRepository {
 
 
   // Handle update user role
+  // NOTE: no token_version bump — JwtAuthGuard enforces the fresh DB role on
+  // every request, and the client seamlessly re-syncs (see syncSession).
+  // Version bumps stay reserved for true security events (password change,
+  // deactivation) which must force a re-login.
   updateUserRole(id: string, role: string) {
     return this.prisma.users.update({
       where: { id },
-      data: { role: role as any, token_version: { increment: 1 } },
+      data: { role: role as any },
     });
   }
 

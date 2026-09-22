@@ -9,7 +9,6 @@
   justify-content: center;
   padding: 1.5rem;
   background: rgba(16, 30, 39, 0.6);
-  backdrop-filter: blur(6px);
   animation: backdrop-in 250ms ease;
 }
 

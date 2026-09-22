@@ -344,11 +344,10 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.35);
   color: #ffffff;
   font-size: 1.2rem;
-  backdrop-filter: blur(6px);
   transform: scale(0.6) translateY(10px);
   transition: transform 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -366,8 +365,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: rgba(0, 0, 0, 0.82);
-  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.9);
   animation: glightbox-backdrop-in 300ms ease;
 }
 
@@ -466,14 +464,13 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.55);
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  backdrop-filter: blur(8px);
   transition:
     background var(--transition-fast),
     transform var(--transition-fast);

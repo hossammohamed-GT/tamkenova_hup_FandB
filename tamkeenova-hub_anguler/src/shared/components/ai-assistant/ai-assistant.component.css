@@ -7,7 +7,6 @@
   position: fixed;
   inset: 0;
   background: rgba(16, 30, 39, 0.55);
-  backdrop-filter: blur(4px);
   opacity: 0;
   pointer-events: none;
   transition: opacity 320ms ease;
