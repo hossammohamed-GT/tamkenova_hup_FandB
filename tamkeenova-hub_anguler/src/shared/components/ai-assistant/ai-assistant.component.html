@@ -30,7 +30,7 @@
           </span>
           <div class="panel-header-text">
             <span class="panel-title">{{ 'assistant.name' | translate }}</span>
-            <span class="panel-badge">{{ 'assistant.badge' | translate }}</span>
+            <span class="panel-badge">{{ (comingSoon ? 'assistant.soonBadge' : 'assistant.badge') | translate }}</span>
           </div>
         </div>
         <button type="button" class="panel-close" (click)="onClose()" [attr.aria-label]="'assistant.close' | translate">
@@ -39,18 +39,26 @@
       </header>
 
       <div class="panel-messages" #messagesList>
-        @for (msg of chat.messages(); track msg.id) {
-          @if (msg.text) {
-            <div class="message" [class.message-user]="msg.role === 'user'" [class.message-assistant]="msg.role === 'assistant'">
-              {{ msg.text }}
+        @if (comingSoon) {
+          <div class="soon-card">
+            <span class="soon-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+            <p class="soon-title">{{ 'assistant.soonTitle' | translate }}</p>
+            <p class="soon-text">{{ 'assistant.soonText' | translate }}</p>
+          </div>
+        } @else {
+          @for (msg of chat.messages(); track msg.id) {
+            @if (msg.text) {
+              <div class="message" [class.message-user]="msg.role === 'user'" [class.message-assistant]="msg.role === 'assistant'">
+                {{ msg.text }}
+              </div>
+            }
+          }
+
+          @if (chat.isTyping()) {
+            <div class="message message-assistant message-typing">
+              <span></span><span></span><span></span>
             </div>
           }
-        }
-
-        @if (chat.isTyping()) {
-          <div class="message message-assistant message-typing">
-            <span></span><span></span><span></span>
-          </div>
         }
       </div>
 
@@ -62,9 +70,10 @@
           name="draft"
           (input)="autoResize()"
           (keydown)="onKeydown($event)"
-          [placeholder]="'assistant.placeholder' | translate"
+          [disabled]="comingSoon"
+          [placeholder]="(comingSoon ? 'assistant.soonPlaceholder' : 'assistant.placeholder') | translate"
         ></textarea>
-        <button type="submit" class="panel-send" [disabled]="!draft.trim()" [attr.aria-label]="'assistant.send' | translate">
+        <button type="submit" class="panel-send" [disabled]="comingSoon || !draft.trim()" [attr.aria-label]="'assistant.send' | translate">
           <i class="fa-solid fa-paper-plane rtl-flip"></i>
         </button>
       </form>

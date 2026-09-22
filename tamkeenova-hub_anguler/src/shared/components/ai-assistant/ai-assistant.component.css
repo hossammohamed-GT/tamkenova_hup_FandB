@@ -283,6 +283,12 @@
   border-color: var(--color-primary);
 }
 
+.panel-input textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--color-surface-1);
+}
+
 .panel-send {
   width: 40px;
   height: 40px;
@@ -312,5 +318,43 @@
 }
 html[dir='rtl'] .rtl-flip {
   transform: scaleX(-1);
+}
+
+/* Coming-soon card shown while the assistant is not live yet. */
+.soon-card {
+  margin: 2.5rem auto;
+  max-width: 260px;
+  text-align: center;
+  padding: 1.75rem 1.25rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-1);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+}
+
+.soon-icon {
+  width: 56px;
+  height: 56px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 18px;
+  font-size: 1.35rem;
+  color: var(--color-accent-text);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+  margin-block-end: 1rem;
+}
+
+.soon-title {
+  margin: 0 0 0.5rem;
+  color: var(--color-text);
+  font-size: var(--text-lg);
+  font-weight: 800;
+}
+
+.soon-text {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.7;
 }
 

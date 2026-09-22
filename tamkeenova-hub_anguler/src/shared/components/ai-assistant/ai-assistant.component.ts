@@ -31,6 +31,7 @@ export class AiAssistantComponent implements AfterViewInit, OnDestroy {
 
   state = signal<AssistantState>('closed');
   draft = '';
+  readonly comingSoon = true;
 
   private readonly FLY_MS = 260;
   private readonly CLOSE_MS = 200;
@@ -78,6 +79,7 @@ export class AiAssistantComponent implements AfterViewInit, OnDestroy {
 
   // -- Submit the Current Chat Draft --
   onSend(): void {
+    if (this.comingSoon) return;
     const text = this.draft;
     this.draft = '';
     this.autoResize();

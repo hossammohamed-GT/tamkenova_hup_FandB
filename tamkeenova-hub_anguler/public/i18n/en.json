@@ -110,7 +110,11 @@
     "placeholder": "Type your question...",
     "open": "Open AI assistant",
     "close": "Close chat",
-    "send": "Send"
+    "send": "Send",
+    "soonBadge": "Soon",
+    "soonTitle": "Coming soon",
+    "soonText": "The TamkeeNova AI assistant is coming soon. Stay tuned.",
+    "soonPlaceholder": "Chat is unavailable right now…"
   },
   "programs": {
     "header": {

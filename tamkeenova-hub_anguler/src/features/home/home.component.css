@@ -537,15 +537,11 @@ html[dir='rtl'] .service-card:hover .service-arrow {
 }
 
 :host-context([data-theme='dark']) .service-card {
-  background: linear-gradient(165deg,
-    color-mix(in srgb, var(--color-primary) 42%, var(--color-surface-1)),
-    color-mix(in srgb, var(--color-primary) 18%, var(--color-surface-1)));
-  border-color: color-mix(in srgb, var(--color-action) 40%, var(--color-border));
+  background: var(--color-surface-1);
   box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
 }
 
 :host-context([data-theme='dark']) .service-card:hover {
-  border-color: color-mix(in srgb, var(--color-action) 60%, transparent);
   box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
 }
 
