@@ -1603,5 +1603,37 @@
     "program_name_en": "Program name in English",
     "signature_name": "Enter signature name",
     "signature_hint": "One signature appears on both editions. The name uses decorative signature lettering, not a handwritten scan or verified digital signature. Latin names use cursive lettering; Arabic names use Arabic calligraphy."
+  },
+  "staff_profile": {
+    "title": "My Profile",
+    "subtitle": "Your personal data and account settings",
+    "member_since": "Member since",
+    "data_title": "Personal Data",
+    "full_name_label": "Full name",
+    "username_label": "Username",
+    "email_label": "Email",
+    "role_label": "Role",
+    "contact_title": "Contact Info",
+    "phone_label": "Phone",
+    "whatsapp_label": "WhatsApp",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "save_success": "Contact info saved successfully",
+    "password_title": "Change Password",
+    "current_label": "Current password",
+    "new_label": "New password",
+    "confirm_label": "Confirm new password",
+    "change_btn": "Change password",
+    "changing": "Changing...",
+    "change_success": "Password changed successfully",
+    "change_image": "Change profile image",
+    "errors": {
+      "invalid_image_type": "Please choose a JPG, PNG or WEBP image",
+      "image_too_large": "Image is too large (max 5 MB)",
+      "phone_taken": "This phone number is already in use",
+      "password_mismatch": "New password and confirmation do not match",
+      "password_same": "New password must be different from the current one",
+      "password_weak": "Password must be at least 8 characters"
+    }
   }
 }

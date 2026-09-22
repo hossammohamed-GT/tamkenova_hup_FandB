@@ -358,6 +358,13 @@ export const routes: Routes = [
             '../features/portal/student/notifications/student-notifications.component'
           ).then((m) => m.StudentNotificationsComponent),
       },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('../features/portal/staff/profile/staff-profile.component').then(
+            (m) => m.StaffProfileComponent,
+          ),
+      },
     ],
   },
 
@@ -398,6 +405,13 @@ export const routes: Routes = [
           import(
             '../features/portal/student/notifications/student-notifications.component'
           ).then((m) => m.StudentNotificationsComponent),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('../features/portal/staff/profile/staff-profile.component').then(
+            (m) => m.StaffProfileComponent,
+          ),
       },
     ],
   },

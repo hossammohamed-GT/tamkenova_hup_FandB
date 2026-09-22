@@ -23,6 +23,10 @@
       <span>{{ 'notifications.title' | translate }}</span>
     </a>
     <a class="staff-nav-item" routerLink="/portal/certificates"><i class="fa-solid fa-certificate"></i><span>{{ 'student_certificates.title' | translate }}</span></a>
+    <a class="staff-nav-item" routerLink="/portal/trainee/profile">
+      <i class="fa-solid fa-user"></i>
+      <span>{{ 'nav.my_profile' | translate }}</span>
+    </a>
   </nav>
 
   @if (isLoading()) {

@@ -42,6 +42,12 @@ export class JwtAuthGuard implements CanActivate {
         is_active: true,
         email_verified: true,
         token_version: true,
+        full_name: true,
+        username: true,
+        phone: true,
+        whatsapp: true,
+        profile_image: true,
+        created_at: true,
       },
     });
 
@@ -54,11 +60,19 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Invalid or expired token');
     }
 
+    // Full profile (same query, no extra round-trip) so /auth/me returns a
+    // complete user and clients never clobber the cached session.
     request.user = {
       sub: user.id,
       id: user.id,
       email: user.email,
       role: user.role,
+      full_name: user.full_name,
+      username: user.username,
+      phone: user.phone,
+      whatsapp: user.whatsapp,
+      profile_image: user.profile_image,
+      created_at: user.created_at,
     };
 
     return true;

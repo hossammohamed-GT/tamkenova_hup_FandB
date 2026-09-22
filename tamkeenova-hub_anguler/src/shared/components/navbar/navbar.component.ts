@@ -392,6 +392,8 @@ export class NavbarComponent {
   profileRoute = computed(() => {
     const role = this.authService.role();
     if (role === 'TRAINER') return '/portal/trainer/profile';
+    if (role === 'EMPLOYEE') return '/portal/employee/profile';
+    if (role === 'VOLUNTEER') return '/portal/trainee/profile';
     return '/portal/student/profile';
   });
 
@@ -404,6 +406,8 @@ export class NavbarComponent {
   notificationsRoute = computed(() => {
     const role = this.authService.role();
     if (role === 'TRAINER') return '/portal/trainer/notifications';
+    if (role === 'EMPLOYEE') return '/portal/employee/notifications';
+    if (role === 'VOLUNTEER') return '/portal/trainee/notifications';
     return '/portal/student/notifications';
   });
 

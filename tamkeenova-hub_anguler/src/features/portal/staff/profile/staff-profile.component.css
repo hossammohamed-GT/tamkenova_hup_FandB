@@ -1,0 +1,331 @@
+/* ==========================================================================
+   Staff Profile (employee + volunteer) — calm system, navy hero identity.
+   ========================================================================== */
+
+/* -- Hero: solid navy band -- */
+.staff-hero {
+  position: relative;
+  padding: 2.2rem;
+  margin-bottom: 1.4rem;
+  background: var(--color-primary);
+  color: #fff;
+  border: 1px solid var(--color-primary);
+  overflow: hidden;
+}
+
+.staff-hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+  flex-wrap: wrap;
+}
+
+.staff-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.staff-avatar {
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.staff-avatar.is-uploading {
+  opacity: 0.75;
+}
+
+.staff-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.staff-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 2.6rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.staff-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: grid;
+  place-items: center;
+}
+
+.avatar-upload-btn {
+  position: absolute;
+  bottom: 4px;
+  inset-inline-end: 4px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--color-primary);
+  background: #fff;
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background var(--transition-fast);
+}
+
+.avatar-upload-btn:hover:not(:disabled) {
+  background: var(--color-surface-alt);
+}
+
+.avatar-upload-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.staff-hero-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.staff-hero-name {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.25rem;
+  line-height: 1.25;
+}
+
+.staff-hero-email {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.78);
+  margin-bottom: 0.9rem;
+}
+
+.staff-hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.staff-role-badge {
+  padding: 0.25rem 0.7rem;
+  background: #fff;
+  color: #101e27;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.staff-username {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  padding: 0.25rem 0.7rem;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 999px;
+}
+
+.staff-date {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.staff-image-error {
+  margin-top: 1.2rem;
+  padding: 0.7rem 1rem;
+  background: #fff;
+  color: var(--color-danger);
+  border-radius: var(--radius-sm);
+  border-inline-start: 3px solid var(--color-danger);
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* -- Cards -- */
+.staff-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.2rem;
+}
+
+.staff-card {
+  padding: 1.6rem;
+}
+
+.staff-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 1.2rem;
+}
+
+.staff-card-title i {
+  color: var(--color-action);
+}
+
+.data-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.data-row:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.data-row:last-child {
+  padding-bottom: 0;
+}
+
+.data-row span {
+  font-size: 0.84rem;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.data-row strong {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: end;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* -- Forms -- */
+.staff-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.staff-label:not(:first-of-type) {
+  margin-top: 1rem;
+}
+
+.staff-input {
+  width: 100%;
+  height: 46px;
+  padding-inline: 1rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-1);
+  color: var(--color-text);
+  font-size: 0.92rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.staff-input:focus {
+  outline: none;
+  border-color: var(--color-action);
+  box-shadow: var(--focus-ring);
+}
+
+.staff-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  height: 46px;
+  width: 100%;
+  margin-top: 1.2rem;
+  padding-inline: 1.5rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.staff-btn:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.staff-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.staff-error,
+.staff-success {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.staff-error {
+  background: var(--status-danger-bg);
+  color: var(--color-danger);
+  border-inline-start: 3px solid var(--color-danger);
+}
+
+.staff-success {
+  background: var(--status-success-bg);
+  color: var(--color-success);
+  border-inline-start: 3px solid var(--color-success);
+}
+
+/* -- Local loader (small) -- */
+.loader-spinner-sm {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .staff-hero {
+    padding: 1.6rem 1.3rem;
+  }
+
+  .staff-hero-name {
+    font-size: 1.35rem;
+  }
+
+  .staff-card {
+    padding: 1.3rem;
+  }
+}
