@@ -34,7 +34,7 @@ export class VolunteerStatusComponent {
         this.isLoading.set(false);
         if (res?.status === 'APPROVED') {
           this.volunteersService.isApprovedCached = true;
-          setTimeout(() => this.router.navigate(['/portal/volunteer']), 900);
+          setTimeout(() => this.router.navigate(['/portal/trainee']), 900);
         }
       },
       error: (err) => {

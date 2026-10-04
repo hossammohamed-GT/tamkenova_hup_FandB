@@ -38,6 +38,8 @@ export function notificationTone(type: string | null | undefined): NotificationT
 // fallback when the backend title/message are empty).
 export function notificationTypeKey(type: string | null | undefined): string {
   const t = (type ?? '').toUpperCase();
+  if (t.includes('PROGRAM')) return 'program_submitted';
+  if (t.includes('SPECIALIZATION')) return 'specialization_request';
   if (t.includes('TRAINER') && (t.includes('NEW') || t.includes('REGISTER') || t.includes('PENDING') || t.includes('REQUEST'))) {
     return 'new_trainer';
   }

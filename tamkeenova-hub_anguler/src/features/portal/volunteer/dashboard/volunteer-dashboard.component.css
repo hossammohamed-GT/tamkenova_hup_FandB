@@ -23,17 +23,17 @@
   gap: 0.75rem;
   padding: 1.5rem 2rem;
   border-radius: var(--radius-md);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  border: 1px solid var(--color-border);
 }
 
 .gauge-title {
-  font-size: 0.9rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
   color: var(--color-text);
 }
 
 .gauge-hint {
-  font-size: 0.74rem;
+  font-size: var(--text-xs);
   max-width: 180px;
   text-align: center;
   line-height: 1.5;
@@ -51,14 +51,14 @@
 .impact-title {
   margin-top: 1.75rem;
   margin-bottom: 1rem;
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: 700;
   color: var(--color-text);
 }
 
 .section-title {
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: 700;
   color: var(--color-text);
 }
 
@@ -67,7 +67,7 @@
 }
 
 .last-task-title {
-  font-size: 0.86rem;
+  font-size: var(--text-sm);
   color: var(--color-text);
 }
 
@@ -75,7 +75,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-accent);
 }
@@ -100,13 +100,13 @@
   gap: 0.9rem;
   padding: 1.1rem 1.2rem;
   border-radius: var(--radius-md);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  border: 1px solid var(--color-border);
   transition: border-color var(--transition-fast), box-shadow var(--transition-base);
 }
 
 .quick-card:hover {
-  border-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-border));
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--color-primary) 8%, transparent);
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .quick-icon {
@@ -117,8 +117,8 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
-  color: var(--stat-color, var(--color-primary));
-  background: color-mix(in srgb, var(--stat-color, var(--color-primary)) 12%, transparent);
+  color: var(--color-action);
+  background: var(--color-surface-2);
 }
 
 .quick-text {
@@ -130,12 +130,12 @@
 }
 
 .quick-text strong {
-  font-size: 0.9rem;
+  font-size: var(--text-md);
   color: var(--color-text);
 }
 
 .quick-text small {
-  font-size: 0.74rem;
+  font-size: var(--text-xs);
 }
 
 .quick-arrow {
@@ -144,5 +144,5 @@
 }
 
 .quick-card:hover .quick-arrow {
-  color: var(--color-primary);
+  color: var(--color-action);
 }

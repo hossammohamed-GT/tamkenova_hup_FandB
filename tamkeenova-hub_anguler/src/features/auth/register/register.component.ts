@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
@@ -34,7 +34,8 @@ export class RegisterComponent {
     email: ['', [Validators.required, Validators.email]],
     phone: ['', [Validators.required, Validators.pattern(/^01[0125]\d{8}$/)]],
     password: ['', [Validators.required, Validators.minLength(8)]],
-  });
+    confirm_password: ['', [Validators.required, Validators.minLength(8)]],
+  }, { validators: (group: AbstractControl) => group.get('password')?.value === group.get('confirm_password')?.value ? null : { passwordMismatch: true } });
 
   passwordScore = computed(() => passwordScore(this.passwordValue()));
 
@@ -66,7 +67,7 @@ export class RegisterComponent {
 
   isFieldInvalid(field: string): boolean {
     const control = this.form.get(field);
-    return !!control && control.invalid && this.isTouched(field);
+    return !!control && (control.invalid || (field === 'confirm_password' && this.form.hasError('passwordMismatch'))) && this.isTouched(field);
   }
 
   onPasswordInput(value: string): void {
@@ -76,6 +77,15 @@ export class RegisterComponent {
 
   togglePasswordVisibility(): void {
     this.showPassword.update((v) => !v);
+  }
+
+  suggestUsername(): void {
+    const username = this.form.controls.username.value;
+    const email = this.form.controls.email.value;
+    if (!username && email.includes('@')) {
+      this.form.controls.username.setValue(email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '').slice(0, 20));
+      this.markTouched('username');
+    }
   }
 
   submit(): void {
@@ -92,6 +102,7 @@ export class RegisterComponent {
     const cleanPayload = {
       ...payload,
       username: payload.username || undefined,
+      confirm_password: payload.confirm_password,
       role: 'STUDENT' as const,
     };
 

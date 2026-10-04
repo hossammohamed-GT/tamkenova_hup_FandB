@@ -32,7 +32,7 @@
 .footer-word {
   font-family: var(--font-numeric);
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: var(--text-lg);
   color: var(--color-text);
 }
 
@@ -72,7 +72,7 @@
 
 .footer-col-title {
   color: var(--color-text);
-  font-size: 0.95rem;
+  font-size: var(--text-md);
   font-weight: 700;
   margin-block-end: 1.25rem;
 }
@@ -86,7 +86,7 @@
 
 .footer-links a {
   color: var(--color-text-muted);
-  font-size: 0.9rem;
+  font-size: var(--text-md);
   transition: color var(--transition-fast);
 }
 
@@ -102,7 +102,7 @@
 
 .footer-bottom p {
   color: var(--color-text-muted);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 @media (max-width: 760px) {
@@ -121,7 +121,7 @@
   padding-block-start: 1.5rem;
   border-block-start: 1px solid var(--color-border);
   color: var(--color-text-muted);
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .footer-credit {

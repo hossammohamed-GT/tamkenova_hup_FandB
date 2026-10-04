@@ -1,5 +1,4 @@
 <app-page-header
-  [eyebrowKey]="'verify.title'"
   [titleKey]="'verify.title'"
   [subtitleKey]="'verify.subtitle'"
 ></app-page-header>
@@ -41,7 +40,12 @@
           [(ngModel)]="code"
           (keyup.enter)="verifyCertificate()"
         />
-        <button type="button" class="btn-accent verify-btn" (click)="verifyCertificate()" [disabled]="isVerifying() || !code().trim()">
+        <button
+          type="button"
+          class="btn-accent verify-btn"
+          (click)="verifyCertificate()"
+          [disabled]="isVerifying() || !code().trim()"
+        >
           @if (isVerifying()) {
             <div class="loader-spinner-sm"></div>
             {{ 'verify.verifying' | translate }}
@@ -74,12 +78,18 @@
             }
             <div>
               <span class="result-label">{{ 'verify.holder' | translate }}</span>
-              <h3>{{ r.certificate.holder.name }}</h3>
+              <h3>{{ r.certificate.recipient_name_ar ?? r.certificate.holder.name }}</h3>
+              @if (r.certificate.recipient_name_en) {
+                <p dir="ltr" lang="en">{{ r.certificate.recipient_name_en }}</p>
+              }
               <code dir="ltr">{{ r.certificate.verification_code }}</code>
             </div>
           </div>
 
           <h4 class="cert-result-title">{{ r.certificate.title }}</h4>
+          @if (r.certificate.title_en && r.certificate.title_en !== r.certificate.title) {
+            <p dir="ltr" lang="en">{{ r.certificate.title_en }}</p>
+          }
 
           <div class="result-grid">
             @if (r.certificate.program) {
@@ -96,7 +106,7 @@
             }
             <div class="result-item">
               <span class="result-label">{{ 'verify.issued_at' | translate }}</span>
-              <strong>{{ r.certificate.issued_at | date: 'yyyy/MM/dd' }}</strong>
+              <strong>{{ r.certificate.issued_at | date: 'yyyy/MM/dd' : 'UTC' }}</strong>
             </div>
             @if (r.certificate.training_hours) {
               <div class="result-item">
@@ -107,7 +117,12 @@
           </div>
 
           @if (r.certificate.pdf_url) {
-            <a [href]="r.certificate.pdf_url" target="_blank" rel="noopener" class="btn-outline btn-view">
+            <a
+              [href]="r.certificate.pdf_url"
+              target="_blank"
+              rel="noopener"
+              class="btn-outline btn-view"
+            >
               <i class="fa-solid fa-file-pdf"></i>
               {{ 'verify.view_pdf' | translate }}
             </a>
@@ -120,7 +135,9 @@
   <!-- -- User Tab -- -->
   @if (activeTab() === 'user') {
     <div class="verify-card surface chamfer-sm animate-in">
-      <label class="field-label" for="verify-username">{{ 'verify.username_label' | translate }}</label>
+      <label class="field-label" for="verify-username">{{
+        'verify.username_label' | translate
+      }}</label>
       <div class="verify-input-row">
         <input
           id="verify-username"
@@ -131,7 +148,12 @@
           [(ngModel)]="username"
           (keyup.enter)="verifyUser()"
         />
-        <button type="button" class="btn-accent verify-btn" (click)="verifyUser()" [disabled]="isVerifying() || !username().trim()">
+        <button
+          type="button"
+          class="btn-accent verify-btn"
+          (click)="verifyUser()"
+          [disabled]="isVerifying() || !username().trim()"
+        >
           @if (isVerifying()) {
             <div class="loader-spinner-sm"></div>
             {{ 'verify.verifying' | translate }}

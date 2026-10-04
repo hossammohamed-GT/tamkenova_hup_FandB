@@ -15,14 +15,14 @@
 }
 
 .auth-title {
-  font-size: 1.5rem;
+  font-size: var(--text-2xl);
   font-weight: 700;
   color: var(--color-text);
 }
 
 .auth-subtitle {
   margin-block: 0.4rem 1.5rem;
-  font-size: 0.9rem;
+  font-size: var(--text-md);
 }
 
 .form-group {
@@ -33,14 +33,14 @@
 .form-group label {
   display: block;
   margin-bottom: 0.4rem;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   font-weight: 600;
 }
 
 .otp-input {
   text-align: center;
   letter-spacing: 0.5rem;
-  font-size: 1.2rem;
+  font-size: var(--text-xl);
   font-family: var(--font-numeric);
 }
 
@@ -63,7 +63,7 @@
 .form-error {
   display: block;
   margin-top: 0.4rem;
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
 }
 
 .auth-submit {
@@ -74,15 +74,33 @@
 
 .resend-btn {
   margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  min-height: 40px;
   background: none;
   border: none;
-  color: var(--color-primary);
+  border-radius: var(--radius-sm);
+  color: var(--color-action);
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
+  font-family: inherit;
   cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.resend-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-action) 10%, transparent);
+  color: var(--color-action-hover);
+}
+
+.resend-btn:focus-visible {
+  outline: 2px solid var(--color-action);
+  outline-offset: 2px;
 }
 
 .resend-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  text-decoration: none;
 }

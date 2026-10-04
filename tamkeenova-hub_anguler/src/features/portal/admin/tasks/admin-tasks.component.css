@@ -19,7 +19,7 @@
   border-radius: 999px;
   background: var(--color-surface);
   color: var(--color-text-muted);
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
@@ -48,8 +48,8 @@
   justify-content: center;
   padding-inline: 0.3rem;
   border-radius: 999px;
-  font-size: 0.66rem;
-  font-weight: 800;
+  font-size: var(--text-micro);
+  font-weight: 700;
   background: var(--color-accent);
   color: #fff;
 }
@@ -67,7 +67,7 @@
   gap: 0.75rem;
   padding: 1.15rem 1.25rem;
   border-radius: var(--radius-md);
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  border: 1px solid var(--color-border);
 }
 
 .task-card-top {
@@ -82,7 +82,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.74rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   color: var(--color-text-muted);
 }
@@ -96,14 +96,14 @@
 }
 
 .task-title {
-  font-size: 1rem;
-  font-weight: 800;
+  font-size: var(--text-lg);
+  font-weight: 700;
   color: var(--color-text);
   line-height: 1.4;
 }
 
 .task-desc {
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   line-height: 1.55;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -121,7 +121,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  font-size: 0.76rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   color: var(--color-text-muted);
 }
@@ -137,8 +137,8 @@
 }
 
 .assignee-dot {
-  font-size: 0.62rem;
-  font-weight: 800;
+  font-size: var(--text-micro);
+  font-weight: 700;
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
 }
@@ -166,15 +166,15 @@
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
   background: color-mix(in srgb, var(--color-primary) 6%, var(--color-surface));
-  font-size: 0.76rem;
+  font-size: var(--text-xs);
   font-weight: 700;
   color: var(--color-text);
 }
 
 .picked-chip em {
   font-style: normal;
-  font-size: 0.66rem;
-  font-weight: 800;
+  font-size: var(--text-micro);
+  font-weight: 700;
   color: var(--color-primary);
 }
 
@@ -188,7 +188,7 @@
   border-radius: 50%;
   background: color-mix(in srgb, var(--color-danger) 14%, transparent);
   color: var(--color-danger);
-  font-size: 0.6rem;
+  font-size: var(--text-micro);
   cursor: pointer;
   transition: background-color var(--transition-fast);
 }
@@ -203,7 +203,7 @@
 }
 
 .confirm-text {
-  font-size: 0.88rem;
+  font-size: var(--text-sm);
   line-height: 1.6;
   color: var(--color-text);
 }
@@ -223,17 +223,17 @@
 }
 
 .desc-text {
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
   line-height: 1.7;
   color: var(--color-text-muted);
-  background: color-mix(in srgb, var(--color-surface-alt) 60%, transparent);
+  background: var(--color-surface-2);
   border-radius: var(--radius-sm);
   padding: 0.75rem 0.9rem;
 }
 
 .detail-subtitle {
-  font-size: 0.9rem;
-  font-weight: 800;
+  font-size: var(--text-md);
+  font-weight: 700;
   margin-top: 1.25rem;
   margin-bottom: 0.6rem;
   color: var(--color-text);
@@ -251,10 +251,10 @@
 }
 
 .review-card {
-  border: 1px solid color-mix(in srgb, var(--color-border) 60%, transparent);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 0.9rem 1rem;
-  background: color-mix(in srgb, var(--color-surface-alt) 40%, transparent);
+  background: var(--color-surface-2);
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
@@ -276,8 +276,8 @@
 
 .order-tag {
   font-style: normal;
-  font-size: 0.66rem;
-  font-weight: 800;
+  font-size: var(--text-micro);
+  font-weight: 700;
   color: var(--color-primary);
   margin-inline-start: 0.35rem;
 }
@@ -288,12 +288,12 @@
   gap: 0.5rem;
   padding: 0.7rem 0.85rem;
   border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  background: var(--color-surface-1);
   border: 1px dashed var(--color-border);
 }
 
 .submission-text {
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
   line-height: 1.6;
   color: var(--color-text);
   white-space: pre-wrap;
@@ -307,14 +307,14 @@
 }
 
 .submitted-at {
-  font-size: 0.7rem;
+  font-size: var(--text-micro);
 }
 
 .score-row {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-text);
 }
@@ -324,7 +324,7 @@
 }
 
 .review-note {
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
   line-height: 1.55;
   color: var(--color-text-muted);
   display: flex;
@@ -361,7 +361,7 @@
 
 /* -- Comments -- */
 .no-comments {
-  font-size: 0.82rem;
+  font-size: var(--text-sm);
 }
 
 .comment-form {

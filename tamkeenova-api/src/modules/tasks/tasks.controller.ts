@@ -142,7 +142,7 @@ export class TasksController {
   // Handle submit task
   @Post(':id/submit')
   @Roles('EMPLOYEE', 'VOLUNTEER')
-  @UseInterceptors(FilesInterceptor('files', 10))
+  @UseInterceptors(FilesInterceptor('files', 10, { limits: { fileSize: 10 * 1024 * 1024 } }))
   submitTask(
     @CurrentUser() user: any,
     @Param('id') id: string,

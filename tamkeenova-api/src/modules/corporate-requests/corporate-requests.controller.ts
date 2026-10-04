@@ -47,7 +47,7 @@ export class CorporateRequestsController {
   // Handle upload attachment
   @UseGuards(JwtAuthGuard)
   @Post(':id/attachments')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }))
   async uploadAttachment(
     @CurrentUser() user: any,
     @Param('id') id: string,

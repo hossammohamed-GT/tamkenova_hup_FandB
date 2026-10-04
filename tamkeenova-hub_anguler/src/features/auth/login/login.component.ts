@@ -76,7 +76,7 @@ export class LoginComponent {
         } else if (role === 'EMPLOYEE') {
           this.router.navigate(['/portal/employee']);
         } else if (role === 'VOLUNTEER') {
-          this.router.navigate(['/portal/volunteer']);
+          this.router.navigate(['/portal/trainee']);
         } else {
           this.router.navigate(['/portal/student']);
         }

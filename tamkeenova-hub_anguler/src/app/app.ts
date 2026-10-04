@@ -5,11 +5,12 @@ import { NavbarComponent } from '../shared/components/navbar/navbar.component';
 import { AiAssistantComponent } from '../shared/components/ai-assistant/ai-assistant.component';
 import { BookingModalComponent } from '../shared/components/booking-modal/booking-modal.component';
 import { AppLoaderComponent } from '../shared/components/app-loader/app-loader.component';
+import { RouteTransitionComponent } from '../shared/components/route-transition/route-transition.component';
 import { LoaderService } from '../core/services/loader.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NavbarComponent, AiAssistantComponent, BookingModalComponent, AppLoaderComponent],
+  imports: [RouterOutlet, NavbarComponent, AiAssistantComponent, BookingModalComponent, AppLoaderComponent, RouteTransitionComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -24,7 +25,7 @@ export class App implements OnDestroy {
   constructor() {
     // إظهار لودر أولي للبراند ثم إخفاؤه - لا يظهر مرة أخرى عند التنقل لتجنب الوميض الجهنمي
     this.loader.show();
-    setTimeout(() => this.loader.hide(), 1800);
+    setTimeout(() => this.loader.hide(), 500);
 
     this.routerSub = this.router.events.subscribe((event) => {
       if (
@@ -32,7 +33,8 @@ export class App implements OnDestroy {
         event instanceof NavigationCancel ||
         event instanceof NavigationError
       ) {
-        // تأكد أن اللودر مخفي بعد كل تنقل - لا تظهره عند بداية التنقل لتجنب الوميض
+        // Keep the loader hidden after every navigation; never show it on
+        // navigation start to avoid flicker.
         this.loader.hide();
       }
     });

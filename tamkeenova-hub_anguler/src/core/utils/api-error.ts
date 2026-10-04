@@ -22,6 +22,7 @@ const RULES: ErrRule[] = [
 
   // -- Auth --
   { key: 'AUTH_EMAIL_EXISTS', msg: /Email already exists/i },
+  { key: 'AUTH_PASSWORD_MISMATCH', msg: /Passwords do not match/i },
   { key: 'AUTH_USERNAME_EXISTS', msg: /Username already exists/i },
   { key: 'AUTH_PHONE_EXISTS', msg: /Phone number already exists/i },
   { key: 'AUTH_SPECIALIZATION_NOT_FOUND', msg: /Specialization not found/i, path: /\/auth\// },
@@ -32,6 +33,9 @@ const RULES: ErrRule[] = [
   { key: 'AUTH_INVALID_CREDENTIALS', msg: /Invalid email or password/i },
   { key: 'AUTH_EMAIL_NOT_VERIFIED', msg: /Email not verified/i },
   { key: 'AUTH_ACCOUNT_DISABLED', msg: /Account disabled/i },
+  { key: 'AUTH_RESET_SENT', msg: /If an account exists/i },
+  { key: 'AUTH_PASSWORD_POLICY', msg: /include upper, lower, and a number/i },
+  { key: 'AUTH_SUPER_ADMIN_ONLY', msg: /Only a super admin/i },
 
   // -- Student profile --
   { key: 'STUDENT_USERNAME_TAKEN', msg: /Username is already taken/i },
@@ -54,6 +58,8 @@ const RULES: ErrRule[] = [
   { key: 'CERT_NOT_FOUND', msg: /Certificate not found/i },
   { key: 'REVIEW_NOT_FOUND', msg: /Review not found/i },
   { key: 'REVIEW_EMPTY', msg: /At least one field \(rating or comment\)/i },
+  { key: 'REVIEW_NOT_ELIGIBLE', msg: /Only students can rate trainers/i },
+  { key: 'REVIEW_SELF', msg: /cannot rate your own profile/i },
   { key: 'PROFILE_USER_NOT_FOUND', msg: /User not found or not verified/i },
 
   // -- Trainer --

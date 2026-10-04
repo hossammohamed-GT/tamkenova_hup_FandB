@@ -155,46 +155,6 @@
     </div>
 
     <form class="consulting-form b2c-form" (ngSubmit)="submit()" novalidate>
-      <!-- Trainer Selector -->
-      <div class="form-field" [class.has-error]="touched() && !b2c.trainer_id()">
-        <label>{{ 'consultingPage.form.select_trainer' | translate }} *</label>
-        <div class="trainer-selector">
-          <div class="trainer-search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" class="form-control" [placeholder]="'consultingPage.form.trainer_placeholder' | translate"
-              [ngModel]="b2c.trainer_search()" (ngModelChange)="b2c.trainer_search.set($event)" name="trainer_search" />
-          </div>
-          @if (b2c.trainer_search() || !b2c.trainer_id()) {
-          <div class="trainer-dropdown surface">
-            @for (tr of filteredTrainers(); track tr.id) {
-            <button type="button" class="trainer-option" [class.is-selected]="b2c.trainer_id() === tr.id" (click)="selectTrainer(tr)">
-              @if (tr.users.profile_image) {
-              <img [src]="tr.users.profile_image" [alt]="tr.users.full_name" />
-              } @else {
-              <div class="trainer-option-fallback"><i class="fa-solid fa-user"></i></div>
-              }
-              <div>
-                <strong>{{ tr.users.full_name }}</strong>
-                @if (tr.specializations) { <span class="text-muted">{{ isArabic ? tr.specializations.name_ar : tr.specializations.name_en }}</span> }
-              </div>
-              @if (tr.average_rating) {
-              <span class="trainer-option-rating"><i class="fa-solid fa-star"></i> {{ tr.average_rating | number:'1.1-1' }}</span>
-              }
-            </button>
-            }
-          </div>
-          }
-          @if (selectedTrainer(); as st) {
-          <div class="selected-trainer-card">
-            @if (st.users.profile_image) { <img [src]="st.users.profile_image" [alt]="st.users.full_name" /> }
-            <span>{{ st.users.full_name }}</span>
-            <button type="button" class="icon-btn-sm" (click)="b2c.trainer_id.set(''); b2c.trainer_search.set('')"><i class="fa-solid fa-xmark"></i></button>
-          </div>
-          }
-        </div>
-        @if (touched() && !b2c.trainer_id()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
-      </div>
-
       <div class="form-grid">
         <div class="form-field field-full" [class.has-error]="touched() && !b2c.title()">
           <label>{{ 'consultingPage.form.consultation_title' | translate }} *</label>
@@ -288,15 +248,9 @@
       }
 
       <div class="success-actions">
-        @if (audience() === 'b2b') {
         <button type="button" class="btn-primary" (click)="goToMyRequests()">
           <i class="fa-solid fa-building"></i> {{ 'consultingPage.form.view_my_requests' | translate }}
         </button>
-        } @else {
-        <button type="button" class="btn-primary" (click)="goToMyConsultations()">
-          <i class="fa-solid fa-comments"></i> {{ 'consultingPage.form.view_my_consultations' | translate }}
-        </button>
-        }
         <button type="button" class="btn-accent" (click)="resetForm()">
           {{ 'consultingPage.success.cta' | translate }}
         </button>

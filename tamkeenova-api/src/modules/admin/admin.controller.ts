@@ -7,11 +7,8 @@ import {
   Patch,
   Post,
   Query,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -241,17 +238,6 @@ export class AdminController {
   }
 
 
-  // Handle upload certificate pdf
-  @Post('certificates/:id/pdf')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadCertificatePdf(
-    @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    return this.adminService.uploadCertificatePdf(id, file);
-  }
-
-
   // Handle update certificate
   @Patch('certificates/:id')
   updateCertificate(
@@ -380,6 +366,17 @@ export class AdminController {
     @Body() dto: UpdateProgramDto,
   ) {
     return this.adminService.updateProgram(admin.sub, id, dto);
+  }
+
+
+  @Patch('programs/:id/approve')
+  approveProgram(@CurrentUser() admin: any, @Param('id') id: string) {
+    return this.adminService.approveProgram(admin.sub, id);
+  }
+
+  @Patch('programs/:id/reject')
+  rejectProgram(@CurrentUser() admin: any, @Param('id') id: string) {
+    return this.adminService.rejectProgram(admin.sub, id);
   }
 
 

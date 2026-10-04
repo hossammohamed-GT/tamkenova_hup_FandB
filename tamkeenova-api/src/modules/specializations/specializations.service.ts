@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 
 import { SpecializationsRepository } from './specializations.repository';
+import { NotificationsService } from '../notifications/notifications.service';
 
 import { RequestSpecializationDto } from './dto/request-specialization.dto';
 
@@ -15,6 +16,7 @@ export class SpecializationsService {
   // Initialize instance
   constructor(
     private readonly specializationsRepository: SpecializationsRepository,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
 
@@ -58,10 +60,19 @@ export class SpecializationsService {
       );
     }
 
-    return this.specializationsRepository.createRequest({
+    const request = await this.specializationsRepository.createRequest({
       user_id: userId,
       name_ar: dto.name_ar,
       name_en: dto.name_en,
     });
+    const admins = await this.notificationsService.getAdminUsers();
+    await this.notificationsService.createBulkNotifications(admins.map((admin) => admin.id), {
+      title: 'New specialization request',
+      message: `A trainer requested the specialization ${dto.name_ar}.`,
+      type: 'SPECIALIZATION_REQUEST',
+      reference_id: request.id,
+      reference_type: 'SPECIALIZATION_REQUEST',
+    });
+    return request;
   }
 }

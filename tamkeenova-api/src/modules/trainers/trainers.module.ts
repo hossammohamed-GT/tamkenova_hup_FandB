@@ -7,8 +7,9 @@ import { TrainersRepository } from './trainers.repository';
 import { AuthModule } from '../auth/auth.module';
 
 import { StorageModule } from '../storage/storage.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 @Module({
-  imports: [AuthModule, StorageModule],
+  imports: [AuthModule, StorageModule, NotificationsModule],
 
   controllers: [TrainersController],
 

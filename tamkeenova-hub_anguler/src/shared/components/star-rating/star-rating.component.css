@@ -4,7 +4,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.2rem;
-  font-size: 0.85rem;
+  font-size: var(--text-sm);
 }
 
 .star-rating i {
@@ -18,5 +18,5 @@
 .star-rating-value {
   margin-inline-start: 0.35rem;
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: var(--text-sm);
 }

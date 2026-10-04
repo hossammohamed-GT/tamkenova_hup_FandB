@@ -1,3 +1,4 @@
+import { bilingualMetadata } from '../admin/certificate-data';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { VerificationRepository } from './verification.repository';
 
@@ -25,24 +26,36 @@ export class VerificationService {
         id: certificate.id,
         verification_code: certificate.verification_code,
         title: certificate.title,
-        description: certificate.description,
+        title_ar: certificate.title_ar,
+        title_en: certificate.title_en,
+        certificate_type: certificate.certificate_type,
+        template_version: certificate.template_version,
+        certificate_language: certificate.certificate_language,
+        recipient_name: certificate.recipient_name,
+        program_name: certificate.program_name,
+        description: certificate.template_version === '2026.3' ? null : certificate.description,
+        available_languages: certificate.template_version === '2026.3' ? ['ar', 'en'] : [certificate.certificate_language].filter(Boolean),
+        recipient_name_ar: bilingualMetadata(certificate)?.recipient_name_ar ?? null,
+        recipient_name_en: bilingualMetadata(certificate)?.recipient_name_en ?? null,
         issued_at: certificate.issued_at,
         training_hours: certificate.training_hours,
         pdf_url: certificate.pdf_url,
         qr_code_url: certificate.qr_code_url,
         holder: {
-          name: certificate.users.full_name,
+          name: certificate.recipient_name ?? certificate.users.full_name,
           username: certificate.users.username,
           image: certificate.users.profile_image,
         },
-        program: certificate.training_programs
+        program: certificate.template_version
+          ? (certificate.program_name ? { title: certificate.program_name, duration_hours: certificate.training_hours, level: null } : null)
+          : certificate.training_programs
           ? {
               title: certificate.training_programs.title,
               duration_hours: certificate.training_programs.duration_hours,
               level: certificate.training_programs.level,
             }
           : null,
-        trainer: certificate.trainers
+        trainer: !certificate.template_version && certificate.trainers
           ? {
               name: certificate.trainers.users.full_name,
               image: certificate.trainers.users.profile_image,
@@ -101,7 +114,7 @@ export class VerificationService {
         id: c.id,
         verification_code: c.verification_code,
         title: c.title,
-        description: c.description,
+        description: c.template_version === '2026.3' ? null : c.description,
         issued_at: c.issued_at,
         training_hours: c.training_hours,
         pdf_url: c.pdf_url,

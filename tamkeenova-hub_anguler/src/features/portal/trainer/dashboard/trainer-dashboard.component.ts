@@ -45,22 +45,15 @@ export class TrainerDashboardComponent implements OnInit {
     const s = this.displayStats();
     const avg = typeof s.average_rating === 'string' ? parseFloat(s.average_rating as any) : (s.average_rating ?? 0);
     return [
-      { key: 'profile', label: 'الملف الشخصي', icon: 'fa-user-pen', done: true, route: '/portal/trainer/profile' },
-      { key: 'programs', label: 'إضافة برامج', icon: 'fa-book', done: (s.programs_count ?? 0) > 0, route: '/portal/trainer/programs', count: s.programs_count },
-      { key: 'availability', label: 'تحديد المواعيد', icon: 'fa-calendar-days', done: (s.availability_count ?? 0) > 0, route: '/portal/trainer/availability', count: s.availability_count },
-      { key: 'reviews', label: 'الحصول على تقييمات', icon: 'fa-star', done: (s.reviews_count ?? 0) > 0, route: '/portal/trainer/reviews', count: s.reviews_count },
-      { key: 'rating', label: 'متوسط التقييم', icon: 'fa-chart-line', done: avg > 0, route: '/portal/trainer/reviews', count: avg },
-      { key: 'consultations', label: 'إدارة الاستشارات', icon: 'fa-comments', done: true, route: '/portal/trainer/consultations' },
+      { key: 'profile', labelKey: 'trainer_dashboard.steps_profile', icon: 'fa-user-pen', done: true, route: '/portal/trainer/profile' },
+      { key: 'programs', labelKey: 'trainer_dashboard.steps_programs', icon: 'fa-book', done: (s.programs_count ?? 0) > 0, route: '/portal/trainer/programs', count: s.programs_count },
+      { key: 'availability', labelKey: 'trainer_dashboard.steps_availability', icon: 'fa-calendar-days', done: (s.availability_count ?? 0) > 0, route: '/portal/trainer/availability', count: s.availability_count },
+      { key: 'reviews', labelKey: 'trainer_dashboard.steps_reviews', icon: 'fa-star', done: (s.reviews_count ?? 0) > 0, route: '/portal/trainer/reviews', count: s.reviews_count },
+      { key: 'rating', labelKey: 'trainer_dashboard.steps_rating', icon: 'fa-chart-line', done: avg > 0, route: '/portal/trainer/reviews', count: avg },
+      { key: 'consultations', labelKey: 'trainer_dashboard.steps_consultations', icon: 'fa-comments', done: true, route: '/portal/trainer/consultations' },
     ];
   });
 
-  // للـ SVG
-  readonly circumference = 2 * Math.PI * 54; // 339.292
-
-  progressOffset = computed(() => {
-    const pct = this.profileCompletion();
-    return this.circumference - (pct / 100) * this.circumference;
-  });
 
   // fallback دائم لمنع اختفاء الأقسام
   displayStats = computed(() => {
@@ -80,25 +73,21 @@ export class TrainerDashboardComponent implements OnInit {
       icon: 'fa-comments',
       labelKey: 'trainer_dashboard.actions.manage_consultations',
       route: '/portal/trainer/consultations',
-      color: 'primary',
     },
     {
       icon: 'fa-user-pen',
       labelKey: 'trainer_dashboard.actions.edit_profile',
       route: '/portal/trainer/profile',
-      color: 'accent',
     },
     {
       icon: 'fa-book-medical',
       labelKey: 'trainer_dashboard.actions.add_program',
       route: '/portal/trainer/programs',
-      color: 'success',
     },
     {
       icon: 'fa-calendar-plus',
       labelKey: 'trainer_dashboard.actions.set_availability',
       route: '/portal/trainer/availability',
-      color: 'dark',
     },
   ];
 

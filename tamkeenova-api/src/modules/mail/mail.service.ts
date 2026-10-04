@@ -14,6 +14,7 @@ import {
   getTaskAssignedEmailTemplate,
   getTaskSubmittedAdminEmailTemplate,
   getCertificateIssuedEmailTemplate,
+  getPasswordResetEmailTemplate,
 } from './templates/mail-templates';
 
 
@@ -48,12 +49,26 @@ export class MailService {
       subject,
       html,
       text,
+      replyTo: this.configService.get('MAIL_USER'),
+      headers: {
+        'X-Auto-Response-Suppress': 'All',
+        'List-Unsubscribe': `<mailto:${this.configService.get('MAIL_USER')}?subject=unsubscribe>`,
+      },
     });
   }
 
 
 
   // Handle send otp
+  async sendPasswordResetOtp(email: string, otp: string) {
+    await this.sendEmail(
+      email,
+      'إعادة تعيين كلمة المرور — TamkeeNova HUB',
+      getPasswordResetEmailTemplate(otp),
+      `كود إعادة تعيين كلمة المرور: ${otp} — ينتهي خلال 10 دقايق.`,
+    );
+  }
+
   async sendOtp(email: string, otp: string) {
     await this.sendEmail(
       email,

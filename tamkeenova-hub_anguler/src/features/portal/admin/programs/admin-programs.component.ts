@@ -48,8 +48,8 @@ export class AdminProgramsComponent implements OnInit {
     const term = this.search().toLowerCase().trim();
     const visibility = this.visibilityFilter();
     return this.programs().filter((p) => {
-      if (visibility === 'VISIBLE' && p.is_hidden) return false;
-      if (visibility === 'HIDDEN' && !p.is_hidden) return false;
+      if (visibility === 'VISIBLE' && !this.isVisible(p)) return false;
+      if (visibility === 'HIDDEN' && this.isVisible(p)) return false;
       if (!term) return true;
       return (
         (p.title ?? '').toLowerCase().includes(term) ||
@@ -100,7 +100,7 @@ export class AdminProgramsComponent implements OnInit {
   }
 
   isVisible(program: AdminProgram): boolean {
-    return !program.is_hidden && program.is_published !== false;
+    return program.is_active === true || (program.is_active === undefined && !program.is_hidden && program.is_published !== false);
   }
 
   // ================= Hide / Show =================
@@ -116,7 +116,7 @@ export class AdminProgramsComponent implements OnInit {
       next: (updated) => {
         this.programs.update((list) =>
           list.map((p) =>
-            p.id === program.id ? { ...p, ...(updated ?? {}), is_hidden: currentlyVisible } : p,
+            p.id === program.id ? { ...p, ...(updated ?? {}), is_active: !currentlyVisible, is_hidden: currentlyVisible } : p,
           ),
         );
         this.busyId.set(null);

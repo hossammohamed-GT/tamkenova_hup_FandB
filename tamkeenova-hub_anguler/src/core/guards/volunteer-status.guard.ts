@@ -19,7 +19,7 @@ export const volunteerStatusGuard: CanActivateFn = () => {
         volunteersService.isApprovedCached = true;
         return true;
       }
-      return router.createUrlTree(['/portal/volunteer/status']);
+      return router.createUrlTree(['/portal/trainee/status']);
     }),
     catchError((err) => {
       // 401 is handled by the auth interceptor (logout + redirect).

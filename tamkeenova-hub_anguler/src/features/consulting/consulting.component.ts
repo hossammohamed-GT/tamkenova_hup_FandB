@@ -107,7 +107,6 @@ export class ConsultingComponent {
 
   isB2CValid = computed(() => {
     return (
-      this.b2c.trainer_id().trim() !== '' &&
       this.b2c.title().trim() !== '' &&
       this.b2c.description().trim() !== ''
     );
@@ -193,34 +192,29 @@ export class ConsultingComponent {
   }
 
   private submitB2C(): void {
-    if (!this.isStudent()) {
-      this.submitError.set('booking.trainer_notice');
-      return;
-    }
     this.submitting.set(true);
     this.submitError.set(null);
-
-    this.consultationService
-      .create({
-        trainer_id: this.b2c.trainer_id(),
-        title: this.b2c.title().trim(),
-        description: this.b2c.description().trim(),
-        preferred_date: this.b2c.preferred_date() || undefined,
-        preferred_time: this.b2c.preferred_time() || undefined,
-        contact_phone: this.b2c.contact_phone().trim() || undefined,
-        preferred_contact_method: this.b2c.contact_method(),
-        student_notes: this.b2c.student_notes().trim() || undefined,
-      })
-      .subscribe({
-        next: () => {
-          this.submitting.set(false);
-          this.submitted.set(true);
-        },
-        error: (err) => {
-          this.submitting.set(false);
-          this.submitError.set(apiErrorKey(err, 'auth.errors.generic'));
-        },
-      });
+    const user = this.currentUser();
+    this.corporateService.create({
+      contact_name: user?.full_name || this.b2c.title().trim(),
+      contact_email: user?.email || '',
+      contact_phone: this.b2c.contact_phone().trim() || undefined,
+      company_name: user?.full_name ? `Individual client - ${user.full_name}` : 'Individual client',
+      service_type: 'INDIVIDUAL_CONSULTING',
+      service_description: `${this.b2c.title().trim()}\n\n${this.b2c.description().trim()}\n\n${this.b2c.student_notes().trim()}`,
+      project_duration: this.b2c.preferred_date() || undefined,
+      expected_budget: this.b2c.preferred_time() || undefined,
+    }).subscribe({
+      next: (res) => {
+        this.submitting.set(false);
+        this.submitted.set(true);
+        this.submittedRequestId.set(res.request?.id ?? null);
+      },
+      error: (err) => {
+        this.submitting.set(false);
+        this.submitError.set(apiErrorKey(err, 'auth.errors.generic'));
+      },
+    });
   }
 
   onAttachmentSelected(event: Event): void {

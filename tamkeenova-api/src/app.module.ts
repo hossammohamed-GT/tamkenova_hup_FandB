@@ -4,9 +4,10 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { MailModule } from './modules/mail/mail.module';
-import { TestModule } from './modules/test/test.module';
-
 import { AppController } from './app.controller';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { SecurityModule } from './common/security/security.module';
 
 import { TrainersModule } from './modules/trainers/trainers.module';
 
@@ -21,13 +22,18 @@ import { CorporateRequestsModule } from './modules/corporate-requests/corporate-
 import { VerificationModule } from './modules/verification/verification.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { PartnersModule } from './modules/partners/partners.module';
+import { LoggerModule } from './common/logger/logger.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-
+    ThrottlerModule.forRoot({
+      throttlers: [{ name: 'default', ttl: 60000, limit: 80 }],
+    }),
+    SecurityModule,
     PrismaModule,
 
     AuthModule,
@@ -45,7 +51,10 @@ import { TasksModule } from './modules/tasks/tasks.module';
 
     AdminModule,
     TasksModule,
+    PartnersModule,
+    LoggerModule,
   ],
   controllers: [AppController],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule { }

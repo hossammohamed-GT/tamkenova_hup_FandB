@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { traineeWording } from '../utils/trainee-wording';
+import { Observable, map, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AppNotification, NotificationsResponse } from '../models/student.model';
 
@@ -13,9 +14,17 @@ export class NotificationsService {
 
   // -- Get All Notifications --
   getAll(): Observable<NotificationsResponse> {
-    return this.http
-      .get<NotificationsResponse>(this.baseUrl)
-      .pipe(tap((res) => this.unreadCount.set(res.unread_count ?? 0)));
+    return this.http.get<NotificationsResponse>(this.baseUrl).pipe(
+      map((res) => ({
+        ...res,
+        data: (res.data ?? []).map((item) => ({
+          ...item,
+          title: traineeWording(item.title),
+          message: traineeWording(item.message),
+        })),
+      })),
+      tap((res) => this.unreadCount.set(res.unread_count ?? 0)),
+    );
   }
 
   // -- Refresh Unread Count --

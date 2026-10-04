@@ -35,60 +35,68 @@
 
   <div class="partners-flip-grid">
     @for (slot of slots(); track $index) {
-      <div class="partner-box surface chamfer-sm">
+      <a class="partner-box surface chamfer-sm" [href]="slot.currentHref || null" [target]="slot.currentHref ? '_blank' : null" rel="noopener">
         <div class="partner-box-track">
           <img
             class="partner-img partner-img-current"
             [class.slide-out]="slot.sliding"
             [class.no-transition]="slot.resetting"
             [src]="slot.currentImg"
-            alt="partner logo"
-            loading="lazy"
+            [alt]="slot.currentAlt"
+            decoding="async"
           />
           <img
             class="partner-img partner-img-next"
             [class.slide-in]="slot.sliding"
             [class.no-transition]="slot.resetting"
             [src]="slot.nextImg"
-            alt="partner logo"
-            loading="lazy"
+            [alt]="slot.nextAlt"
+            decoding="async"
           />
         </div>
+      </a>
+    }
+  </div>
+</section>
+
+
+<section #statsSection class="stats" [class.is-visible]="statsVisible()">
+  <div class="stats-grid">
+    @for (stat of stats; track stat.labelKey; let i = $index) {
+      <div class="stat-item" [style.animation-delay]="i * 100 + 'ms'">
+        <span class="stat-value">{{ statValues()[i] }}<span class="stat-suffix">{{ stat.suffix }}</span></span>
+        <span class="stat-rule" aria-hidden="true"></span>
+        <h3 class="stat-label">{{ stat.labelKey | translate }}</h3>
+        <p class="stat-desc">{{ stat.descKey | translate }}</p>
       </div>
     }
   </div>
 </section>
 
 
-<section class="stats">
-  @for (stat of stats; track stat.labelKey; let i = $index) {
-    <div class="stat-item" appScrollReveal>
-      <span class="stat-value display"
-        >{{ stat.value }}<span class="stat-suffix">{{ stat.suffix }}</span></span
-      >
-      <span class="stat-label">{{ stat.labelKey | translate }}</span>
-    </div>
-  }
-</section>
-
-
 <section class="services">
-  <div class="section-heading" appScrollReveal>
+  <div class="services-bg" aria-hidden="true"></div>
+
+  <div class="section-heading">
     <span class="section-label">{{ 'home.services.label' | translate }}</span>
-    <h2 class="section-title display">{{ 'home.services.title' | translate }}</h2>
+    <h2 class="section-title">{{ 'home.services.title' | translate }}</h2>
   </div>
 
   <div class="services-grid">
     @for (service of services; track service.route; let i = $index) {
-      <a [routerLink]="service.route" class="service-card chamfer-sm surface" appScrollReveal>
-        <div class="service-icon">
+      <a [routerLink]="service.route" class="service-card">
+        <svg class="service-ring" aria-hidden="true" focusable="false" preserveAspectRatio="none" viewBox="0 0 100 100">
+          <rect x="0.5" y="0.5" width="99" height="99" rx="3.5" pathLength="100" vector-effect="non-scaling-stroke" />
+        </svg>
+        <span class="service-index" aria-hidden="true">0{{ i + 1 }}</span>
+        <span class="service-icon">
           <i [class]="service.icon"></i>
-        </div>
+        </span>
         <h3 class="service-title">{{ service.titleKey | translate }}</h3>
         <p class="service-desc">{{ service.descKey | translate }}</p>
         <span class="service-link">
           {{ service.linkKey | translate }}
-          <i class="fa-solid fa-arrow-left rtl-flip"></i>
+          <span class="service-arrow"><i class="fa-solid fa-arrow-left rtl-flip"></i></span>
         </span>
       </a>
     }

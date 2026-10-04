@@ -1,0 +1,25 @@
+.wipe {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+/* Center-stage spiral: draws itself while spinning, the line thickens
+   until the coils merge into full coverage, then unwinds the same way. */
+.wipe-spiral {
+  position: absolute;
+  left: 50vw;
+  top: 50vh;
+  width: 220vmax;
+  height: 220vmax;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  overflow: visible;
+  will-change: transform, opacity;
+}
+
+.wipe-spiral path {
+  stroke: var(--color-action);
+}

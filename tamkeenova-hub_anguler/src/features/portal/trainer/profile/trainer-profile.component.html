@@ -9,13 +9,13 @@
   <!-- حتى لو فشل التحميل، اعرض واجهة مستقرة -->
   @if (displayProfile(); as p) {
   <!-- Profile Header - ثابت لا يختفي -->
-  <div class="profile-hero chamfer-sm glass-hero-stable">
+  <div class="profile-hero chamfer-sm">
     <div class="profile-hero-bg"></div>
     <div class="profile-hero-content">
       <div class="profile-avatar-wrapper">
         <div class="profile-avatar" [class.is-uploading]="isUploadingImage()">
           @if (profileImage()) {
-          <img [src]="profileImage()!" [alt]="p.users.full_name" />
+          <img [src]="profileImage()!" [alt]="p.users?.full_name" />
           } @else {
           <div class="profile-avatar-placeholder">
             <i class="fa-solid fa-user"></i>
@@ -33,15 +33,15 @@
         </button>
       </div>
       <div class="profile-hero-info">
-        <h1 class="profile-hero-name">{{ p.users.full_name }}</h1>
-        <p class="profile-hero-email">{{ p.users.email }}</p>
+        <h1 class="profile-hero-name">{{ p.users?.full_name }}</h1>
+        <p class="profile-hero-email">{{ p.users?.email }}</p>
         <div class="profile-hero-meta">
           <span class="badge" [class.badge-pending]="p.trainer_status === 'PENDING'" [class.badge-approved]="p.trainer_status === 'APPROVED'" [class.badge-rejected]="p.trainer_status === 'REJECTED'">
             {{ 'trainer_status.' + (p.trainer_status | lowercase) + '_badge' | translate }}
           </span>
           <span class="profile-hero-spec">
             <i class="fa-solid fa-briefcase"></i>
-            {{ p.specializations.name_ar }}
+            {{ p.specializations?.name_ar }}
           </span>
         </div>
       </div>
@@ -55,7 +55,7 @@
   </div>
   } @else {
   <!-- Fallback hero لو profile null -->
-  <div class="profile-hero chamfer-sm glass-hero-stable">
+  <div class="profile-hero chamfer-sm">
     <div class="profile-hero-bg"></div>
     <div class="profile-hero-content">
       <div class="profile-avatar-wrapper">
@@ -72,7 +72,7 @@
   }
 
   <!-- Tab Navigation - ثابت دائما -->
-  <nav class="profile-tabs surface glass-tabs-stable">
+  <nav class="profile-tabs surface">
     @for (tab of tabs; track tab.id) {
     <button type="button" class="profile-tab" [class.is-active]="activeTab() === tab.id" (click)="setTab(tab.id)">
       <i class="fa-solid" [class]="tab.icon"></i>
@@ -113,8 +113,8 @@
       <div class="spec-current surface-alt">
         <div class="spec-icon"><i class="fa-solid fa-briefcase"></i></div>
         <div>
-          <h3>{{ p.specializations.name_ar }}</h3>
-          <p class="text-muted">{{ p.specializations.name_en }}</p>
+          <h3>{{ p.specializations?.name_ar }}</h3>
+          <p class="text-muted">{{ p.specializations?.name_en }}</p>
         </div>
       </div>
       }
