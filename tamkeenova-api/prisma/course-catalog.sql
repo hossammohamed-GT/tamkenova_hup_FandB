@@ -266,21 +266,22 @@ CREATE INDEX IF NOT EXISTS idx_learning_program_courses_course
 
 -- Seed the nine top-level catalog categories discovered during the site review.
 -- Child categories can be added later by setting parent_id to one of these rows.
-INSERT INTO course_categories (slug, name_ar, name_en, display_order)
+INSERT INTO course_categories (slug, name_ar, name_en, display_order, image_url)
 VALUES
-  ('business-professional-skills', 'المهارات المهنية والأعمال', 'Business & Professional Skills', 1),
-  ('technology-innovation', 'التكنولوجيا والابتكار', 'Technology & Innovation', 2),
-  ('arts-design-media', 'الفنون والتصميم والإعلام', 'Arts, Design & Media', 3),
-  ('wellbeing', 'الصحة النفسية والجسدية', 'Wellbeing', 4),
-  ('lifestyle', 'أسلوب الحياة', 'Lifestyle', 5),
-  ('education-academics', 'التعليم والدراسات الأكاديمية', 'Education & Academics', 6),
-  ('family-relationships', 'الأسرة والعلاقات', 'Family & Relationships', 7),
-  ('languages', 'اللغات', 'Languages', 8),
-  ('soft-skills', 'المهارات الشخصية', 'Soft Skills', 9)
+  ('business-professional-skills', 'المهارات المهنية والأعمال', 'Business & Professional Skills', 1, '/assets/course-categories/business-professional-skills.jpg'),
+  ('technology-innovation', 'التكنولوجيا والابتكار', 'Technology & Innovation', 2, '/assets/course-categories/technology-innovation.jpg'),
+  ('arts-design-media', 'الفنون والتصميم والإعلام', 'Arts, Design & Media', 3, '/assets/course-categories/arts-design-media.jpg'),
+  ('wellbeing', 'الصحة النفسية والجسدية', 'Wellbeing', 4, '/assets/course-categories/wellbeing.jpg'),
+  ('lifestyle', 'أسلوب الحياة', 'Lifestyle', 5, '/assets/course-categories/lifestyle.jpg'),
+  ('education-academics', 'التعليم والدراسات الأكاديمية', 'Education & Academics', 6, '/assets/course-categories/education-academics.jpg'),
+  ('family-relationships', 'الأسرة والعلاقات', 'Family & Relationships', 7, '/assets/course-categories/family-relationships.jpg'),
+  ('languages', 'اللغات', 'Languages', 8, '/assets/course-categories/languages.jpg'),
+  ('soft-skills', 'المهارات الشخصية', 'Soft Skills', 9, '/assets/course-categories/soft-skills.jpg')
 ON CONFLICT (slug) DO UPDATE SET
   name_ar = EXCLUDED.name_ar,
   name_en = EXCLUDED.name_en,
   display_order = EXCLUDED.display_order,
+  image_url = COALESCE(course_categories.image_url, EXCLUDED.image_url),
   updated_at = now();
 
 -- Empty, ordered shelves are ready for course cards to be assigned in the admin/API.

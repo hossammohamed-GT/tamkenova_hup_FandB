@@ -103,11 +103,20 @@
             [class.is-selected]="selectedCategory() === category.slug"
             (click)="selectCategory(category.slug)"
           >
-            <span class="category-icon"
-              ><i class="fa-solid" [class]="'fa-solid ' + categoryIcon(category.slug)"></i
-            ></span>
-            <span class="category-name">{{ categoryName(category) }}</span>
-            <i class="fa-solid fa-arrow-up category-arrow" aria-hidden="true"></i>
+            @if (category.image_url) {
+              <img class="category-image" [src]="category.image_url" alt="" loading="lazy" />
+            } @else {
+              <span class="category-image-placeholder">
+                <i class="fa-solid" [class]="'fa-solid ' + categoryIcon(category.slug)"></i>
+              </span>
+            }
+            <span class="category-overlay" aria-hidden="true"></span>
+            <span class="category-content">
+              <span class="category-name">{{ categoryName(category) }}</span>
+              <span class="category-arrow" aria-hidden="true">
+                <i class="fa-solid fa-arrow-up"></i>
+              </span>
+            </span>
           </button>
         }
       </div>

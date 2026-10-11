@@ -4,7 +4,7 @@ This is an additive foundation for the public, self-paced catalog inspired by al
 
 ## New catalog concepts
 
-- `course_categories` and `course_category_links`: bilingual, ordered category tree. The SQL seeds the nine top-level categories; `parent_id` allows child categories.
+- `course_categories` and `course_category_links`: bilingual, ordered category tree. The SQL seeds the nine top-level categories with local photo paths for the category cards; `parent_id` allows child categories.
 - `courses` and `course_lessons`: bilingual course cards, language, level, video/podcourse type, free flag, publication state, lesson order, and catalog summary fields.
 - `course_instructors`: connects a course to one or more existing `trainers` without duplicating trainer accounts.
 - `course_enrollments` and `course_reviews`: course-specific learner progress and course-specific ratings; separate from existing program enrollments and trainer reviews.
