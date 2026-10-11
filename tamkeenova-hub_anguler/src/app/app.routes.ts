@@ -475,6 +475,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'programs/course/:slug',
+    data: { seo: { titleKey: 'seo.courseDetails.title', descriptionKey: 'seo.courseDetails.description', index: true, ogType: 'article' } },
+    loadComponent: () =>
+      import('../features/programs/course-details/course-details.component').then(
+        (m) => m.CourseDetailsComponent,
+      ),
+  },
+  {
     path: 'programs/:id',
     data: { seo: { titleKey: 'seo.programDetails.title', descriptionKey: 'seo.programDetails.description', index: true, ogType: 'article' } },
     loadComponent: () =>

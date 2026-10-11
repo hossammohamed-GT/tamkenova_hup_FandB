@@ -24,6 +24,7 @@ import { AdminModule } from './modules/admin/admin.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { PartnersModule } from './modules/partners/partners.module';
 import { LoggerModule } from './common/logger/logger.module';
+import { CoursesModule } from './modules/courses/courses.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { LoggerModule } from './common/logger/logger.module';
     TasksModule,
     PartnersModule,
     LoggerModule,
+    CoursesModule,
   ],
   controllers: [AppController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

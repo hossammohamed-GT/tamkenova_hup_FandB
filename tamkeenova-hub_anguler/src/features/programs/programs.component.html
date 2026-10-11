@@ -1,293 +1,419 @@
-<section class="programs-page">
-
-  <div class="programs-hero">
-    <div class="programs-hero-bg">
-      <div class="hero-shape hero-shape-1"></div>
-      <div class="hero-shape hero-shape-2"></div>
-      <div class="hero-shape hero-shape-3"></div>
+<main class="programs-page">
+  <section class="catalog-hero">
+    <div class="hero-art" aria-hidden="true">
+      <span class="hero-orbit hero-orbit-one"></span>
+      <span class="hero-orbit hero-orbit-two"></span>
+      <span class="hero-glow"></span>
+      <span class="hero-dot hero-dot-one"></span>
+      <span class="hero-dot hero-dot-two"></span>
     </div>
 
-    <div class="programs-hero-content">
-      <span class="programs-eyebrow animate-in">
-        <i class="fa-solid fa-graduation-cap"></i>
-        {{ 'programs.header.eyebrow' | translate }}
-      </span>
+    <div class="hero-content">
+      <div class="hero-copy">
+        <span class="eyebrow"
+          ><i class="fa-solid fa-sparkles"></i> {{ 'programs.catalog.eyebrow' | translate }}</span
+        >
+        <h1>{{ 'programs.catalog.title' | translate }}</h1>
+        <p class="hero-description">{{ 'programs.catalog.subtitle' | translate }}</p>
 
-      <h1 class="programs-title animate-in">
-        {{ 'programs.header.title' | translate }}
-      </h1>
-
-      <p class="programs-subtitle animate-in">
-        {{ 'programs.header.subtitle' | translate }}
-      </p>
-
-      <div class="hero-search-box animate-in">
-        <i
-          class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" class="search-input"
-          [placeholder]="'programs.search_placeholder' | translate"
-          [ngModel]="searchTerm()"
-          (ngModelChange)="searchTerm.set($event)" />
-        @if (searchTerm()) {
-        <button type="button" class="search-clear"
-          (click)="searchTerm.set('')">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-        }
-      </div>
-
-      @if (!isLoading() && hasAnyPrograms()) {
-      <div class="hero-stats animate-in">
-        <div class="hero-stat">
-          <span class="hero-stat-value">{{
-            allPrograms().length }}</span>
-          <span class="hero-stat-label">{{
-            'programs.stats.total_programs' | translate
-            }}</span>
-        </div>
-        <div class="hero-stat-divider"></div>
-        <div class="hero-stat">
-          <span class="hero-stat-value">{{
-            categories().length - 1 }}</span>
-          <span class="hero-stat-label">{{
-            'programs.stats.categories' | translate
-            }}</span>
-        </div>
-      </div>
-      }
-    </div>
-  </div>
-
-  <div class="filters animate-in">
-
-
-
-    @if (categories().length > 1) {
-    <div class="filter-group">
-      <span class="filter-label">
-        <i class="fa-solid fa-filter"></i>
-        {{ 'programs.filter.category' | translate }}
-      </span>
-      <div class="filter-pills">
-        @for (cat of categories(); track cat) {
-        <button type="button" class="filter-pill"
-          [class.is-active]="selectedCategory() === cat"
-          (click)="setCategory(cat)">
-          <span>{{ cat === 'all' ?
-            ('programs.filter.all_categories' | translate) :
-            cat }}</span>
-          @if (selectedCategory() === cat && cat !== 'all')
-          {
-          <i class="fa-solid fa-xmark pill-close"></i>
+        <form class="hero-search" (ngSubmit)="submitSearch()">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+          <input
+            type="search"
+            name="courseSearch"
+            [(ngModel)]="searchInput"
+            [placeholder]="'programs.catalog.search_placeholder' | translate"
+            [attr.aria-label]="'programs.catalog.search_placeholder' | translate"
+          />
+          @if (searchInput) {
+            <button
+              class="search-reset"
+              type="button"
+              (click)="searchInput = ''; submitSearch()"
+              [attr.aria-label]="'programs.catalog.clear_search' | translate"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           }
+          <button type="submit" class="search-submit">
+            {{ 'programs.catalog.search' | translate }}
+          </button>
+        </form>
+
+        <div class="hero-highlights">
+          <span
+            ><i class="fa-solid fa-circle-check"></i>
+            {{ 'programs.catalog.self_paced' | translate }}</span
+          >
+          <span
+            ><i class="fa-solid fa-circle-check"></i>
+            {{ 'programs.catalog.learn_anywhere' | translate }}</span
+          >
+          <span
+            ><i class="fa-solid fa-circle-check"></i>
+            {{ 'programs.catalog.expert_led' | translate }}</span
+          >
+        </div>
+      </div>
+
+      <div class="hero-art-card" aria-hidden="true">
+        <div class="art-card-top"><span></span><span></span><span></span></div>
+        <div class="art-card-icon"><i class="fa-solid fa-book-open-reader"></i></div>
+        <div class="art-card-lines"><span></span><span></span><span></span></div>
+        <div class="art-card-progress"><span></span></div>
+        <div class="art-floating-badge">
+          <i class="fa-solid fa-play"></i
+          ><span>{{ 'programs.catalog.learn_at_your_pace' | translate }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-bottom">
+      <span
+        ><strong>{{ categories().length || 9 }}</strong>
+        {{ 'programs.catalog.explore_fields' | translate }}</span
+      >
+      <span class="hero-bottom-divider"></span>
+      <span
+        ><strong>{{ totalCourses() }}</strong>
+        {{ 'programs.catalog.courses_ready' | translate }}</span
+      >
+    </div>
+  </section>
+
+  @if (categories().length) {
+    <section class="category-section content-width" aria-labelledby="category-heading">
+      <div class="section-heading category-heading">
+        <div>
+          <span class="section-kicker">{{
+            'programs.catalog.browse_by_interest' | translate
+          }}</span>
+          <h2 id="category-heading">{{ 'programs.catalog.category_title' | translate }}</h2>
+        </div>
+        <button type="button" class="text-link" (click)="selectCategory('')">
+          {{ 'programs.catalog.view_all' | translate }} <i class="fa-solid fa-arrow-right"></i>
         </button>
+      </div>
+
+      <div class="category-grid">
+        @for (category of categories(); track category.id) {
+          <button
+            class="category-tile"
+            type="button"
+            [class.is-selected]="selectedCategory() === category.slug"
+            (click)="selectCategory(category.slug)"
+          >
+            <span class="category-icon"
+              ><i class="fa-solid" [class]="'fa-solid ' + categoryIcon(category.slug)"></i
+            ></span>
+            <span class="category-name">{{ categoryName(category) }}</span>
+            <i class="fa-solid fa-arrow-up category-arrow" aria-hidden="true"></i>
+          </button>
         }
       </div>
-    </div>
-    }
-
-    <div class="filter-group">
-      <span class="filter-label">
-        <i class="fa-solid fa-layer-group"></i>
-        {{ 'programs.filter.level' | translate }}
-      </span>
-      <div class="filter-pills">
-        @for (lvl of levels; track lvl.value) {
-        <button type="button" class="filter-pill"
-          [class.is-active]="selectedLevel() === lvl.value"
-          (click)="setLevel(lvl.value)">
-          <span>{{ lvl.labelKey | translate }}</span>
-          @if (selectedLevel() === lvl.value && lvl.value
-          !== 'all') {
-          <i class="fa-solid fa-xmark pill-close"></i>
-          }
-        </button>
-        }
-      </div>
-    </div>
-
-    <div class="filter-actions">
-      @if (filteredPrograms().length > 0) {
-      <span class="results-count">
-        <i class="fa-solid fa-check-circle"></i>
-        {{ 'programs.results_count' | translate: { count:
-        filteredPrograms().length } }}
-      </span>
-      }
-
-      @if (activeFiltersCount() > 0) {
-      <button type="button" class="btn-clear-filters"
-        (click)="clearFilters()">
-        <i class="fa-solid fa-rotate-left"></i>
-        {{ 'programs.filter.clear' | translate }}
-      </button>
-      }
-    </div>
-  </div>
-
-  <!-- Loading state -->
-  @if (isLoading()) {
-  <div class="programs-grid">
-    @for (i of [1,2,3,4,5,6]; track i) {
-    <div class="program-card-skeleton surface chamfer-sm">
-      <div class="skeleton-cover shimmer"></div>
-      <div class="skeleton-body">
-        <div class="skeleton-avatar shimmer"></div>
-        <div class="skeleton-line shimmer"
-          style="width: 70%; height: 12px;"></div>
-        <div class="skeleton-line shimmer"
-          style="width: 90%; height: 10px;"></div>
-        <div class="skeleton-line shimmer"
-          style="width: 60%; height: 10px;"></div>
-      </div>
-    </div>
-    }
-  </div>
+    </section>
   }
 
-  @else if (hasAnyPrograms()) {
-  @if (filteredPrograms().length > 0) {
-  <div class="programs-grid">
-    @for (program of filteredPrograms(); track program.id;
-    let i = $index) {
-    <article class="program-card surface chamfer-sm"
-      [style.--delay]="i * 0.05 + 's'">
-
-      <div class="program-cover"
-        [style.background-image]="program.image_url ? 'url(' + program.image_url + ')' : 'none'">
-        @if (!program.image_url) {
-        <div class="program-cover-placeholder">
-          <i class="fa-solid fa-book-open"></i>
+  @for (collection of visibleCollections(); track collection.id) {
+    <section class="shelf-section content-width">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">{{ 'programs.catalog.curated_for_you' | translate }}</span>
+          <h2>{{ collectionTitle(collection) }}</h2>
         </div>
-        }
-
-        <div class="program-badges">
-          <span class="program-badge badge-level"
-            [attr.data-level]="program.level.toLowerCase()">
-            {{ levelLabelKey(program.level) | translate }}
-          </span>
-
-          @if (program.is_open === false) {
-          <span class="program-badge badge-closed">
-            {{ 'programs.status.closed' | translate }}
-          </span>
-          }
-        </div>
-
-        <div class="program-cover-overlay"></div>
+        <a class="text-link" href="#course-list"
+          >{{ 'programs.catalog.explore_courses' | translate }}
+          <i class="fa-solid fa-arrow-right"></i
+        ></a>
       </div>
-
-      <div class="program-body">
-
-        <div class="program-trainer">
-          <div class="trainer-avatar">
-            @if (program.trainer.avatar) {
-            <img [src]="program.trainer.avatar"
-              [alt]="program.trainer.name"
-              loading="lazy" decoding="async" />
-            } @else {
-            <div class="trainer-avatar-placeholder">
-              <i class="fa-solid fa-user"></i>
-            </div>
-            }
-          </div>
-          <div class="trainer-info">
-            <span class="trainer-name">{{
-              program.trainer.name }}</span>
-            <span class="trainer-spec">{{
-              program.trainer.specialization }}</span>
-          </div>
-        </div>
-
-        <h2 class="program-title">{{ program.title ||
-          'Untitled Program' }}</h2>
-
-        @if (program.short_description) {
-        <p class="program-desc">{{ program.short_description
-          }}</p>
+      <div class="course-row">
+        @for (course of collection.courses; track course.id) {
+          <ng-container
+            *ngTemplateOutlet="courseCard; context: { $implicit: course }"
+          ></ng-container>
         }
+      </div>
+    </section>
+  }
 
-        <div class="program-meta">
-          @if (program.duration_hours) {
-          <span>
-            <i class="fa-regular fa-clock"></i>
-            {{ program.duration_hours }} {{
-            'programs.hours_unit' | translate }}
-          </span>
-          }
-
-          @if (program.average_rating) {
-          <span class="meta-rating">
-            <i class="fa-solid fa-star"></i>
-            {{ program.average_rating | number: '1.1-1' }}
-          </span>
-          }
-
-          @if (program.enrollments_count) {
-          <span>
-            <i class="fa-solid fa-users"></i>
-            {{ program.enrollments_count }}
-          </span>
+  @if (featuredPrograms().length) {
+    <section class="learning-path-section">
+      <div class="content-width">
+        <div class="section-heading light-heading">
+          <div>
+            <span class="section-kicker">{{ 'programs.catalog.learning_paths' | translate }}</span>
+            <h2>{{ 'programs.catalog.programs_title' | translate }}</h2>
+            <p>{{ 'programs.catalog.programs_subtitle' | translate }}</p>
+          </div>
+        </div>
+        <div class="learning-path-grid">
+          @for (program of featuredPrograms(); track program.id) {
+            <article class="learning-path-card">
+              @if (program.cover_image_url) {
+                <img
+                  class="learning-path-image"
+                  [src]="program.cover_image_url"
+                  [alt]="learningProgramTitle(program)"
+                  loading="lazy"
+                />
+              } @else {
+                <div class="learning-path-image learning-path-placeholder">
+                  <i class="fa-solid fa-route"></i>
+                </div>
+              }
+              <div class="learning-path-content">
+                @if (program.partner_name_en || program.partner_name_ar) {
+                  <span class="partner-label">{{
+                    isEnglish() ? program.partner_name_en : program.partner_name_ar
+                  }}</span>
+                }
+                <h3>{{ learningProgramTitle(program) }}</h3>
+                @if (learningProgramDescription(program)) {
+                  <p>{{ learningProgramDescription(program) }}</p>
+                }
+                <div class="path-meta">
+                  <span
+                    ><i class="fa-solid fa-book-open"></i> {{ program.courses.length }}
+                    {{ 'programs.catalog.courses' | translate }}</span
+                  >
+                  @if (program.is_free) {
+                    <span class="free-label">{{ 'programs.catalog.free' | translate }}</span>
+                  }
+                </div>
+                @if (program.courses.length) {
+                  <a class="path-link" [routerLink]="['/programs/course', program.courses[0].slug]">
+                    {{ 'programs.catalog.explore_path' | translate }}
+                    <i class="fa-solid fa-arrow-right"></i>
+                  </a>
+                } @else {
+                  <span class="path-link is-disabled">{{
+                    'programs.catalog.explore_path' | translate
+                  }}</span>
+                }
+              </div>
+            </article>
           }
         </div>
+      </div>
+    </section>
+  }
 
-        <div class="program-price">
-          @if (program.discount_price) {
-          <span class="price-old">{{ program.price }}</span>
-          <span class="price-current">{{
-            program.discount_price }}</span>
+  <section class="catalog-section content-width" id="course-list" aria-labelledby="catalog-heading">
+    <div class="section-heading catalog-heading">
+      <div>
+        <span class="section-kicker">{{ 'programs.catalog.learn_something_new' | translate }}</span>
+        <h2 id="catalog-heading">{{ 'programs.catalog.all_courses' | translate }}</h2>
+        <p>{{ 'programs.catalog.results_summary' | translate: { count: totalCourses() } }}</p>
+      </div>
+      <label class="sort-control">
+        <span>{{ 'programs.catalog.sort_by' | translate }}</span>
+        <select [value]="selectedSort()" (change)="selectSort($event)">
+          <option value="newest">{{ 'programs.catalog.sort_newest' | translate }}</option>
+          <option value="popular">{{ 'programs.catalog.sort_popular' | translate }}</option>
+          <option value="rating">{{ 'programs.catalog.sort_rating' | translate }}</option>
+          <option value="duration">{{ 'programs.catalog.sort_duration' | translate }}</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="filter-bar">
+      <label class="filter-select">
+        <i class="fa-solid fa-signal"></i>
+        <select
+          [value]="selectedLevel()"
+          (change)="selectLevel($event)"
+          [attr.aria-label]="'programs.catalog.filter_level' | translate"
+        >
+          @for (level of levels; track level.value) {
+            <option [value]="level.value">{{ level.label | translate }}</option>
+          }
+        </select>
+      </label>
+      <label class="filter-select">
+        <i class="fa-solid fa-photo-film"></i>
+        <select
+          [value]="selectedType()"
+          (change)="selectType($event)"
+          [attr.aria-label]="'programs.catalog.filter_format' | translate"
+        >
+          <option value="">{{ 'programs.catalog.all_formats' | translate }}</option>
+          <option value="VIDEO">{{ 'programs.catalog.video_courses' | translate }}</option>
+          <option value="PODCOURSE">{{ 'programs.catalog.podcourses' | translate }}</option>
+        </select>
+      </label>
+      <label class="filter-select">
+        <i class="fa-solid fa-globe"></i>
+        <select
+          [value]="selectedLanguage()"
+          (change)="selectLanguage($event)"
+          [attr.aria-label]="'programs.catalog.filter_language' | translate"
+        >
+          <option value="">{{ 'programs.catalog.all_languages' | translate }}</option>
+          <option value="ar">{{ 'programs.catalog.language_arabic' | translate }}</option>
+          <option value="en">{{ 'programs.catalog.language_english' | translate }}</option>
+        </select>
+      </label>
+      @if (selectedCategory()) {
+        <button type="button" class="active-filter" (click)="selectCategory(selectedCategory())">
+          {{ selectedCategoryName() }} <i class="fa-solid fa-xmark"></i>
+        </button>
+      }
+      @if (activeFilterCount) {
+        <button type="button" class="clear-filters" (click)="clearFilters()">
+          <i class="fa-solid fa-rotate-left"></i> {{ 'programs.catalog.clear_filters' | translate }}
+        </button>
+      }
+    </div>
+
+    @if (isLoading()) {
+      <div class="course-grid" aria-label="{{ 'programs.catalog.loading' | translate }}">
+        @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+          <div class="course-card-skeleton">
+            <span></span>
+            <div><i></i><i></i><i></i></div>
+          </div>
+        }
+      </div>
+    } @else if (catalogUnavailable()) {
+      <div class="catalog-state error-state">
+        <span class="state-icon"><i class="fa-solid fa-cloud-arrow-down"></i></span>
+        <h3>{{ 'programs.catalog.connection_title' | translate }}</h3>
+        <p>{{ 'programs.catalog.connection_text' | translate }}</p>
+        <button type="button" class="button-primary" (click)="retry()">
+          {{ 'programs.catalog.try_again' | translate }}
+        </button>
+      </div>
+    } @else if (courses().length) {
+      <div class="course-grid">
+        @for (course of courses(); track course.id) {
+          <ng-container
+            *ngTemplateOutlet="courseCard; context: { $implicit: course }"
+          ></ng-container>
+        }
+      </div>
+      @if (hasMore()) {
+        <div class="load-more-wrap">
+          <button
+            type="button"
+            class="button-secondary"
+            [disabled]="isLoadingMore()"
+            (click)="loadCourses(false)"
+          >
+            @if (isLoadingMore()) {
+              <i class="fa-solid fa-spinner fa-spin"></i>
+            }
+            {{
+              isLoadingMore()
+                ? ('programs.catalog.loading_more' | translate)
+                : ('programs.catalog.load_more' | translate)
+            }}
+          </button>
+        </div>
+      }
+    } @else {
+      <div class="catalog-state empty-state">
+        <span class="state-icon"><i class="fa-solid fa-book-open"></i></span>
+        <h3>{{ 'programs.catalog.empty_title' | translate }}</h3>
+        <p>{{ 'programs.catalog.empty_text' | translate }}</p>
+        @if (activeFilterCount) {
+          <button type="button" class="button-secondary" (click)="clearFilters()">
+            {{ 'programs.catalog.clear_filters' | translate }}
+          </button>
+        }
+      </div>
+    }
+  </section>
+
+  <ng-template #courseCard let-course>
+    <article class="course-card">
+      <a
+        class="course-cover-link"
+        [routerLink]="['/programs/course', course.slug]"
+        [attr.aria-label]="courseTitle(course)"
+      >
+        @if (course.cover_image_url) {
+          <img
+            class="course-cover"
+            [src]="course.cover_image_url"
+            [alt]="courseTitle(course)"
+            loading="lazy"
+          />
+        } @else {
+          <div class="course-cover course-cover-placeholder">
+            <i
+              class="fa-solid"
+              [class]="
+                'fa-solid ' +
+                categoryIcon(course.category_links?.[0]?.course_categories?.slug || '')
+              "
+            ></i>
+          </div>
+        }
+        <div class="cover-shade"></div>
+        <div class="cover-badges">
+          @if (course.content_type === 'PODCOURSE') {
+            <span class="cover-badge"
+              ><i class="fa-solid fa-headphones"></i>
+              {{ 'programs.catalog.podcourse' | translate }}</span
+            >
+          }
+          @if (course.is_free) {
+            <span class="cover-badge badge-free">{{ 'programs.catalog.free' | translate }}</span>
+          }
+        </div>
+        <span class="cover-play"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+      </a>
+      <div class="course-card-body">
+        @if (courseCategoryName(course)) {
+          <span class="course-category-label">{{ courseCategoryName(course) }}</span>
+        }
+        <a class="course-title-link" [routerLink]="['/programs/course', course.slug]"
+          ><h3>{{ courseTitle(course) }}</h3></a
+        >
+        @if (courseSummary(course)) {
+          <p class="course-summary">{{ courseSummary(course) }}</p>
+        }
+        <div class="course-instructor">
+          @if (courseInstructorImage(course)) {
+            <img
+              [src]="courseInstructorImage(course)"
+              [alt]="courseInstructorName(course)"
+              loading="lazy"
+            />
           } @else {
-          <span class="price-current">{{ program.price
-            }}</span>
+            <span class="instructor-placeholder"><i class="fa-solid fa-user"></i></span>
           }
-          <span class="price-currency">{{
-            'trainer_programs.currency' | translate
-            }}</span>
+          <span>{{ courseInstructorName(course) }}</span>
         </div>
-
-        <a [routerLink]="['/programs', program.id]"
-          class="program-cta btn-primary">
-          {{ 'programs.view_details' | translate }}
-          <i class="fa-solid fa-arrow-left rtl-flip"></i>
-        </a>
-
+        <div class="course-card-meta">
+          @if (course.lessons_count) {
+            <span
+              ><i class="fa-regular fa-circle-play"></i> {{ course.lessons_count }}
+              {{ 'programs.catalog.lessons' | translate }}</span
+            >
+          }
+          @if (course.duration_minutes) {
+            <span
+              ><i class="fa-regular fa-clock"></i>
+              {{ formatDuration(course.duration_minutes) }}</span
+            >
+          }
+        </div>
+        <div class="course-card-footer">
+          @if (hasRatings(course)) {
+            <span class="course-rating"
+              ><i class="fa-solid fa-star"></i> {{ formatRating(course.average_rating) }}
+              <small>({{ course.ratings_count }})</small></span
+            >
+          }
+          <a
+            [routerLink]="['/programs/course', course.slug]"
+            class="course-arrow"
+            [attr.aria-label]="'programs.catalog.view_course' | translate"
+            ><i class="fa-solid fa-arrow-right"></i
+          ></a>
+        </div>
       </div>
     </article>
-    }
-  </div>
-  } @else {
-  <!-- No results -->
-  <div class="no-results surface chamfer-sm animate-in">
-    <div class="no-results-icon">
-      <i class="fa-solid fa-magnifying-glass"></i>
-    </div>
-    <h2>{{ 'programs.no_results' | translate }}</h2>
-    <button type="button" class="btn-outline"
-      (click)="clearFilters()">
-      <i class="fa-solid fa-rotate-left"></i>
-      {{ 'programs.filter.clear' | translate }}
-    </button>
-  </div>
-  }
-  }
-
-  <!-- Empty state -->
-  @else {
-  <div class="coming-soon">
-    <div
-      class="coming-soon-card surface chamfer-sm animate-in">
-      <div class="coming-soon-icon">
-        <i class="fa-solid fa-rocket"></i>
-      </div>
-      <h2 class="coming-soon-title">{{
-        'programs.empty.title' | translate }}</h2>
-      <p class="coming-soon-text">{{ 'programs.empty.text' |
-        translate }}</p>
-      <a href="#contact" class="btn-primary">
-        {{ 'programs.empty.cta' | translate }}
-      </a>
-    </div>
-  </div>
-  }
-
-</section>
+  </ng-template>
+</main>

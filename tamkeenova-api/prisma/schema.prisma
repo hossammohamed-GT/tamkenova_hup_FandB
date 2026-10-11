@@ -85,6 +85,30 @@ enum certificate_type {
   OTHER
 }
 
+enum course_level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  ALL_LEVELS
+}
+
+enum course_content_type {
+  VIDEO
+  PODCOURSE
+}
+
+enum course_status {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum course_enrollment_status {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
 
 model email_otps {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -207,6 +231,7 @@ model trainers {
   consultations                     consultations[]
   certificates                      certificates[]
   training_programs                 training_programs[]
+  course_instructors               course_instructors[]
   users_trainers_approved_byTousers users?                 @relation("trainers_approved_byTousers", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_trainer_approved_by")
   specializations                   specializations?       @relation(fields: [specialization_id], references: [id], onUpdate: NoAction, map: "fk_trainers_specialization")
   users                             users                  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_trainers_user")
@@ -249,6 +274,8 @@ model users {
   trainers_trainers_approved_byTousers trainers[]                     @relation("trainers_approved_byTousers")
   trainers                             trainers?
   student_enrollments                  student_enrollments[]
+  course_enrollments                   course_enrollments[]
+  course_reviews                       course_reviews[]
   certificates                         certificates[]
   consultations_student_idTousers      consultations[]                @relation("consultations_student_idTousers")
   consultation_reviews                 consultation_reviews[]
@@ -621,4 +648,239 @@ model strategic_partners {
   created_at    DateTime @default(now()) @db.Timestamptz(6)
   updated_at    DateTime @default(now()) @db.Timestamptz(6)
   @@index([is_active, display_order], map: "idx_strategic_partners_active_order")
+}
+
+/// Editorial taxonomy for the self-paced course catalog. parent_id supports
+/// the large category + subcategory structure used by the reference catalog.
+model course_categories {
+  id             String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  parent_id      String?             @db.Uuid
+  slug           String              @unique @db.VarChar(180)
+  name_ar        String              @db.VarChar(180)
+  name_en        String              @db.VarChar(180)
+  description_ar String?
+  description_en String?
+  image_url      String?
+  icon_name      String?             @db.VarChar(80)
+  display_order  Int                 @default(0)
+  is_active      Boolean             @default(true)
+  created_at     DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime            @default(now()) @updatedAt @db.Timestamptz(6)
+
+  parent              course_categories?     @relation("course_category_tree", fields: [parent_id], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_course_category_parent")
+  children            course_categories[]    @relation("course_category_tree")
+  course_links        course_category_links[]
+  learning_programs   learning_programs[]
+
+  @@index([parent_id, display_order], map: "idx_course_categories_parent_order")
+  @@index([is_active, display_order], map: "idx_course_categories_active_order")
+}
+
+/// Self-paced, subscription-style courses; kept separate from the existing
+/// trainer-led training_programs table so current enrollments/certificates remain intact.
+model courses {
+  id                   String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug                 String               @unique @db.VarChar(255)
+  title_ar             String               @db.VarChar(255)
+  title_en             String               @db.VarChar(255)
+  short_description_ar String?
+  short_description_en String?
+  description_ar       String?
+  description_en       String?
+  cover_image_url      String?
+  preview_video_url    String?
+  language             String               @default("ar") @db.VarChar(12)
+  level                course_level?
+  content_type         course_content_type  @default(VIDEO)
+  status               course_status        @default(DRAFT)
+  is_free              Boolean              @default(false)
+  duration_minutes     Int                  @default(0)
+  lessons_count        Int                  @default(0)
+  average_rating       Decimal              @default(0) @db.Decimal(3, 2)
+  ratings_count        Int                  @default(0)
+  enrollments_count    Int                  @default(0)
+  published_at         DateTime?            @db.Timestamptz(6)
+  created_at           DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
+
+  lessons          course_lessons[]
+  category_links   course_category_links[]
+  instructors      course_instructors[]
+  enrollments      course_enrollments[]
+  reviews          course_reviews[]
+  collection_items course_collection_items[]
+  program_links    learning_program_courses[]
+
+  @@index([status, published_at], map: "idx_courses_status_published")
+  @@index([content_type, status], map: "idx_courses_type_status")
+  @@index([is_free, status], map: "idx_courses_free_status")
+  @@index([enrollments_count], map: "idx_courses_enrollments_count")
+}
+
+model course_lessons {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  course_id        String    @db.Uuid
+  title_ar         String    @db.VarChar(255)
+  title_en         String    @db.VarChar(255)
+  description_ar   String?
+  description_en   String?
+  media_url        String?
+  duration_minutes Int       @default(0)
+  position         Int       @default(0)
+  is_preview       Boolean   @default(false)
+  is_active        Boolean   @default(true)
+  created_at       DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  courses courses @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_lesson_course")
+
+  @@unique([course_id, position], map: "course_lessons_course_position_unique")
+  @@index([course_id, is_active, position], map: "idx_course_lessons_course_active_order")
+}
+
+model course_instructors {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  course_id     String   @db.Uuid
+  trainer_id    String   @db.Uuid
+  display_order Int      @default(0)
+  is_primary    Boolean  @default(false)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  courses  courses  @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_instructor_course")
+  trainers trainers @relation(fields: [trainer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_instructor_trainer")
+
+  @@unique([course_id, trainer_id], map: "course_instructors_course_trainer_unique")
+  @@index([trainer_id, display_order], map: "idx_course_instructors_trainer_order")
+}
+
+model course_category_links {
+  course_id     String   @db.Uuid
+  category_id   String   @db.Uuid
+  is_primary    Boolean  @default(false)
+  display_order Int      @default(0)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  courses          courses          @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_category_link_course")
+  course_categories course_categories @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_category_link_category")
+
+  @@id([course_id, category_id], map: "course_category_links_pkey")
+  @@index([category_id, display_order], map: "idx_course_category_links_category_order")
+}
+
+model course_enrollments {
+  id                 String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id            String                    @db.Uuid
+  course_id          String                    @db.Uuid
+  status             course_enrollment_status  @default(ACTIVE)
+  progress           Int                       @default(0)
+  enrolled_at        DateTime                  @default(now()) @db.Timestamptz(6)
+  completed_at       DateTime?                 @db.Timestamptz(6)
+  last_accessed_at   DateTime?                 @db.Timestamptz(6)
+  created_at         DateTime                  @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime                  @default(now()) @updatedAt @db.Timestamptz(6)
+
+  users   users   @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_enrollment_user")
+  courses courses @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_enrollment_course")
+
+  @@unique([user_id, course_id], map: "course_enrollments_user_course_unique")
+  @@index([course_id, status], map: "idx_course_enrollments_course_status")
+  @@index([user_id, status], map: "idx_course_enrollments_user_status")
+}
+
+model course_reviews {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  course_id  String   @db.Uuid
+  student_id String   @db.Uuid
+  rating     Int      @db.SmallInt
+  comment    String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  courses courses @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_review_course")
+  users   users   @relation(fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_review_student")
+
+  @@unique([course_id, student_id], map: "course_reviews_course_student_unique")
+  @@index([student_id], map: "idx_course_reviews_student")
+}
+
+/// Reusable, manually ordered shelves such as Top Courses of the Week,
+/// Trending, Newly Released, Free Courses, and Podcourses.
+model course_collections {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug           String   @unique @db.VarChar(160)
+  title_ar       String   @db.VarChar(180)
+  title_en       String   @db.VarChar(180)
+  description_ar String?
+  description_en String?
+  display_order  Int      @default(0)
+  is_active      Boolean  @default(true)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  items course_collection_items[]
+
+  @@index([is_active, display_order], map: "idx_course_collections_active_order")
+}
+
+model course_collection_items {
+  collection_id String   @db.Uuid
+  course_id     String   @db.Uuid
+  position      Int      @default(0)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  course_collections course_collections @relation(fields: [collection_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_collection_item_collection")
+  courses            courses            @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_collection_item_course")
+
+  @@id([collection_id, course_id], map: "course_collection_items_pkey")
+  @@unique([collection_id, position], map: "course_collection_items_collection_position_unique")
+  @@index([course_id], map: "idx_course_collection_items_course")
+}
+
+/// Bundle of individual self-paced courses; deliberately distinct from the
+/// existing trainer-led training_programs used for registrations and certificates.
+model learning_programs {
+  id                   String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  category_id          String?     @db.Uuid
+  slug                 String      @unique @db.VarChar(255)
+  title_ar             String      @db.VarChar(255)
+  title_en             String      @db.VarChar(255)
+  short_description_ar String?
+  short_description_en String?
+  description_ar       String?
+  description_en       String?
+  cover_image_url      String?
+  partner_name_ar      String?     @db.VarChar(255)
+  partner_name_en      String?     @db.VarChar(255)
+  partner_logo_url     String?
+  certificate_label_ar String?     @db.VarChar(255)
+  certificate_label_en String?     @db.VarChar(255)
+  level                course_level?
+  is_free              Boolean     @default(false)
+  is_featured          Boolean     @default(false)
+  is_active            Boolean     @default(true)
+  display_order        Int         @default(0)
+  published_at         DateTime?   @db.Timestamptz(6)
+  created_at           DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at           DateTime    @default(now()) @updatedAt @db.Timestamptz(6)
+
+  course_categories course_categories?          @relation(fields: [category_id], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_learning_program_category")
+  course_links      learning_program_courses[]
+
+  @@index([is_active, is_featured, display_order], map: "idx_learning_programs_active_featured_order")
+  @@index([category_id], map: "idx_learning_programs_category")
+  @@index([published_at], map: "idx_learning_programs_published")
+}
+
+model learning_program_courses {
+  learning_program_id String   @db.Uuid
+  course_id           String   @db.Uuid
+  position            Int      @default(0)
+  created_at          DateTime @default(now()) @db.Timestamptz(6)
+
+  learning_programs learning_programs @relation(fields: [learning_program_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_learning_program_course_program")
+  courses           courses           @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_learning_program_course_course")
+
+  @@id([learning_program_id, course_id], map: "learning_program_courses_pkey")
+  @@unique([learning_program_id, position], map: "learning_program_courses_program_position_unique")
+  @@index([course_id], map: "idx_learning_program_courses_course")
 }

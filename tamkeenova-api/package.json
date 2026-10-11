@@ -24,6 +24,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prisma:generate": "prisma generate",
     "db:partners": "prisma db execute --file prisma/add-strategic-partners.sql --schema prisma/schema.prisma",
+    "db:course-catalog": "prisma db execute --file prisma/course-catalog.sql --schema prisma/schema.prisma",
     "test:certificates": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.certificates.config.mjs --runInBand",
     "test:runtime": "node --test test/runtime-compatibility.test.cjs",
     "test:logger": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.logger.config.mjs --runInBand",
