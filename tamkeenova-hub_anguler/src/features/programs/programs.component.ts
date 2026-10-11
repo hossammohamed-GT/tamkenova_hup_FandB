@@ -12,6 +12,20 @@ import {
 } from '../../core/models/course-catalog.model';
 import { CourseCatalogService } from '../../core/services/course-catalog.service';
 
+// Category records still come from the API; this only supplies local artwork if
+// the database row has not been seeded with image_url yet.
+const CATEGORY_CARD_IMAGE_FALLBACKS: Readonly<Record<string, string>> = {
+  'business-professional-skills': '/assets/course-categories/business-professional-skills.jpg',
+  'technology-innovation': '/assets/course-categories/technology-innovation.jpg',
+  'arts-design-media': '/assets/course-categories/arts-design-media.jpg',
+  wellbeing: '/assets/course-categories/wellbeing.jpg',
+  lifestyle: '/assets/course-categories/lifestyle.jpg',
+  'education-academics': '/assets/course-categories/education-academics.jpg',
+  'family-relationships': '/assets/course-categories/family-relationships.jpg',
+  languages: '/assets/course-categories/languages.jpg',
+  'soft-skills': '/assets/course-categories/soft-skills.jpg',
+};
+
 @Component({
   selector: 'app-programs',
   standalone: true,
@@ -187,6 +201,10 @@ export class ProgramsComponent {
 
   categoryName(category: CourseCategory): string {
     return this.isEnglish() ? category.name_en : category.name_ar;
+  }
+
+  categoryCardImage(category: CourseCategory): string | null {
+    return category.image_url?.trim() || CATEGORY_CARD_IMAGE_FALLBACKS[category.slug] || null;
   }
 
   courseTitle(course: Course): string {

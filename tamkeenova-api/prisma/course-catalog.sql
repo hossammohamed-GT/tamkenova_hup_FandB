@@ -281,7 +281,10 @@ ON CONFLICT (slug) DO UPDATE SET
   name_ar = EXCLUDED.name_ar,
   name_en = EXCLUDED.name_en,
   display_order = EXCLUDED.display_order,
-  image_url = COALESCE(course_categories.image_url, EXCLUDED.image_url),
+  image_url = CASE
+    WHEN NULLIF(BTRIM(course_categories.image_url), '') IS NULL THEN EXCLUDED.image_url
+    ELSE course_categories.image_url
+  END,
   updated_at = now();
 
 -- Empty, ordered shelves are ready for course cards to be assigned in the admin/API.

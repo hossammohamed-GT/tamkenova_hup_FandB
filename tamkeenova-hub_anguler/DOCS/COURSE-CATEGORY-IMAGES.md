@@ -1,6 +1,6 @@
 # Course category card images
 
-The category cards use locally bundled stock photos so the catalog does not depend on third-party image hosts at runtime. The SQL seed stores the corresponding `/assets/course-categories/...` paths in `course_categories.image_url`.
+The category cards use locally bundled stock photos so the catalog does not depend on third-party image hosts at runtime. Category records still come from the database; if a row has no `image_url` yet, the frontend uses the matching local image for these known slugs. The SQL seed also stores the corresponding `/assets/course-categories/...` paths in `course_categories.image_url`.
 
 | Category | Local asset | Source |
 | --- | --- | --- |

@@ -103,8 +103,9 @@
             [class.is-selected]="selectedCategory() === category.slug"
             (click)="selectCategory(category.slug)"
           >
-            @if (category.image_url) {
-              <img class="category-image" [src]="category.image_url" alt="" loading="lazy" />
+            @let imageUrl = categoryCardImage(category);
+            @if (imageUrl) {
+              <img class="category-image" [src]="imageUrl" alt="" loading="lazy" />
             } @else {
               <span class="category-image-placeholder">
                 <i class="fa-solid" [class]="'fa-solid ' + categoryIcon(category.slug)"></i>
