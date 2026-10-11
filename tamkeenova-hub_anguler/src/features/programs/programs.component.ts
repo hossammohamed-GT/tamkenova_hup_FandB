@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { catchError, forkJoin, of } from 'rxjs';
 import {
@@ -36,6 +37,7 @@ const CATEGORY_CARD_IMAGE_FALLBACKS: Readonly<Record<string, string>> = {
 export class ProgramsComponent {
   private readonly catalogService = inject(CourseCatalogService);
   private readonly translate = inject(TranslateService);
+  private readonly route = inject(ActivatedRoute);
 
   readonly isEnglish = computed(() => this.translate.currentLang() === 'en');
   readonly categories = signal<CourseCategory[]>([]);
@@ -82,7 +84,19 @@ export class ProgramsComponent {
 
   constructor() {
     this.loadLandingContent();
-    this.loadCourses(true);
+    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
+      const sort = params.get('sort') ?? 'newest';
+      const contentType = params.get('content_type') ?? '';
+      const allowedSorts = ['newest', 'popular', 'rating', 'duration'];
+
+      this.selectedSort.set(allowedSorts.includes(sort) ? sort : 'newest');
+      this.selectedType.set(contentType === 'VIDEO' || contentType === 'PODCOURSE' ? contentType : '');
+      this.searchInput = '';
+      this.selectedCategory.set('');
+      this.selectedLevel.set('');
+      this.selectedLanguage.set('');
+      this.loadCourses(true);
+    });
   }
 
   retry(): void {

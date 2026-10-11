@@ -20,6 +20,7 @@ import { TranslateService } from '@ngx-translate/core';
 interface NavLink {
   labelKey: string;
   route: string;
+  queryParams?: Record<string, string>;
 }
 
 @Component({
@@ -42,6 +43,8 @@ export class NavbarComponent {
 
   isScrolled = signal(false);
   isMobileMenuOpen = signal(false);
+  isProgramsDropdownOpen = signal(false);
+  isMoreDropdownOpen = signal(false);
   isUserMenuOpen = signal(false);
   isNotifDropdownOpen = signal(false);
   isNotifHovering = signal(false);
@@ -110,14 +113,61 @@ export class NavbarComponent {
     return '/portal/student';
   });
 
+  programMenuLinks: NavLink[] = [
+    { labelKey: 'nav.popular_courses', route: '/programs', queryParams: { sort: 'popular' } },
+    { labelKey: 'nav.new_courses', route: '/programs', queryParams: { sort: 'newest' } },
+    {
+      labelKey: 'programs.catalog.podcourses',
+      route: '/programs',
+      queryParams: { content_type: 'PODCOURSE' },
+    },
+  ];
+
   navLinks: NavLink[] = [
-    { labelKey: 'nav.home', route: '/' },
-    { labelKey: 'nav.programs', route: '/programs' },
-    { labelKey: 'nav.portal', route: '/verify' },
+    { labelKey: 'nav.instructors', route: '/team' },
     { labelKey: 'nav.consulting', route: '/consulting' },
-    { labelKey: 'nav.team', route: '/team' },
+  ];
+
+  moreMenuLinks: NavLink[] = [
+    { labelKey: 'nav.portal', route: '/verify' },
     { labelKey: 'nav.gallery', route: '/gallery' },
   ];
+
+  onProgramsMenuEnter(): void {
+    this.isProgramsDropdownOpen.set(true);
+    this.isMoreDropdownOpen.set(false);
+  }
+
+  onProgramsMenuLeave(): void {
+    this.isProgramsDropdownOpen.set(false);
+  }
+
+  toggleProgramsDropdown(): void {
+    this.isProgramsDropdownOpen.update((isOpen) => !isOpen);
+    if (this.isProgramsDropdownOpen()) this.isMoreDropdownOpen.set(false);
+  }
+
+  closeProgramsDropdown(): void {
+    this.isProgramsDropdownOpen.set(false);
+  }
+
+  onMoreMenuEnter(): void {
+    this.isMoreDropdownOpen.set(true);
+    this.isProgramsDropdownOpen.set(false);
+  }
+
+  onMoreMenuLeave(): void {
+    this.isMoreDropdownOpen.set(false);
+  }
+
+  toggleMoreDropdown(): void {
+    this.isMoreDropdownOpen.update((isOpen) => !isOpen);
+    if (this.isMoreDropdownOpen()) this.isProgramsDropdownOpen.set(false);
+  }
+
+  closeMoreDropdown(): void {
+    this.isMoreDropdownOpen.set(false);
+  }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
@@ -131,11 +181,15 @@ export class NavbarComponent {
     if (!target || typeof (target as any).closest !== 'function') {
       // Non-element click
       this.isUserMenuOpen.set(false);
+      this.closeProgramsDropdown();
+      this.closeMoreDropdown();
       if (!this.isNotifHovering()) {
         this.isNotifDropdownOpen.set(false);
       }
       return;
     }
+    if (!target.closest('.programs-nav-menu')) this.closeProgramsDropdown();
+    if (!target.closest('.more-nav-menu')) this.closeMoreDropdown();
     const clickedInside = this.elementRef.nativeElement.contains(target);
     const isNotifArea = target.closest('.notif-dropdown-wrapper') || target.closest('.notif-glass-dropdown') || target.closest('.notif-detail-modal');
     if (!clickedInside && !isNotifArea) {
@@ -155,6 +209,8 @@ export class NavbarComponent {
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.isUserMenuOpen.set(false);
+    this.closeProgramsDropdown();
+    this.closeMoreDropdown();
     this.isNotifDropdownOpen.set(false);
     this.showNotifDetailModal.set(false);
   }
@@ -375,6 +431,8 @@ export class NavbarComponent {
 
   closeMobileMenu(): void {
     this.isMobileMenuOpen.set(false);
+    this.isProgramsDropdownOpen.set(false);
+    this.isMoreDropdownOpen.set(false);
     this.isUserMenuOpen.set(false);
     this.isNotifDropdownOpen.set(false);
     if (typeof document !== 'undefined') document.body.style.overflow = '';
