@@ -1,79 +1,40 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import * as winston from 'winston';
 
 import { AuthLogData, ErrorLogData, SecurityLogData } from './logger.types';
-
+import { createLoggerConfig } from './winston.config';
 
 @Injectable()
-export class LoggerService {
-  private authLogger: winston.Logger;
+export class LoggerService implements OnModuleDestroy {
+  private readonly authLogger: winston.Logger;
+  private readonly errorLogger: winston.Logger;
+  private readonly securityLogger: winston.Logger;
 
-  private errorLogger: winston.Logger;
-
-  private securityLogger: winston.Logger;
-
-
-  // Initialize instance
   constructor() {
-    this.authLogger = winston.createLogger({
-      transports: [
-        new winston.transports.File({
-          filename: 'logs/auth/auth.log',
-        }),
-      ],
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json(),
-      ),
-    });
-
-    this.errorLogger = winston.createLogger({
-      transports: [
-        new winston.transports.File({
-          filename: 'logs/errors/errors.log',
-        }),
-      ],
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json(),
-      ),
-    });
-
-    this.securityLogger = winston.createLogger({
-      transports: [
-        new winston.transports.File({
-          filename: 'logs/security/security.log',
-        }),
-      ],
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json(),
-      ),
-    });
+    this.authLogger = winston.createLogger(createLoggerConfig('auth'));
+    this.errorLogger = winston.createLogger(createLoggerConfig('errors'));
+    this.securityLogger = winston.createLogger(createLoggerConfig('security'));
   }
 
-
-
-  // Handle log auth
   logAuth(data: AuthLogData) {
     this.authLogger.info(data);
   }
 
-
-
-  // Handle log security
   logSecurity(data: SecurityLogData) {
     this.securityLogger.warn(data);
   }
 
-
-
-  // Handle log error
   logError(data: ErrorLogData) {
     this.errorLogger.error({
       ...data,
       stack: data.error?.stack,
       message: data.error?.message,
     });
+  }
+
+  onModuleDestroy() {
+    this.authLogger.close();
+    this.errorLogger.close();
+    this.securityLogger.close();
   }
 }

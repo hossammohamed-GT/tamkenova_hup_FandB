@@ -5,7 +5,7 @@
       <div
         class="hero-media-slide"
         [class.is-active]="activeHeroIndex() === i"
-        [style.background-image]="'url(' + img + ')'"
+        [style.background-image]="heroSlideBg(i)"
       ></div>
     }
     <div class="hero-media-overlay"></div>
@@ -43,7 +43,7 @@
             [class.no-transition]="slot.resetting"
             [src]="slot.currentImg"
             [alt]="slot.currentAlt"
-            decoding="async"
+            loading="lazy" decoding="async"
           />
           <img
             class="partner-img partner-img-next"
@@ -51,7 +51,7 @@
             [class.no-transition]="slot.resetting"
             [src]="slot.nextImg"
             [alt]="slot.nextAlt"
-            decoding="async"
+            loading="lazy" decoding="async"
           />
         </div>
       </a>
@@ -66,7 +66,7 @@
       <div class="stat-item" [style.animation-delay]="i * 100 + 'ms'">
         <span class="stat-value">{{ statValues()[i] }}<span class="stat-suffix">{{ stat.suffix }}</span></span>
         <span class="stat-rule" aria-hidden="true"></span>
-        <h3 class="stat-label">{{ stat.labelKey | translate }}</h3>
+        <p class="stat-label">{{ stat.labelKey | translate }}</p>
         <p class="stat-desc">{{ stat.descKey | translate }}</p>
       </div>
     }

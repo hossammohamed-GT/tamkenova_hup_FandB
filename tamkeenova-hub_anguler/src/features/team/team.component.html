@@ -10,7 +10,7 @@
       translate }}</p>
   </div>
 
-  <!-- Loading State -->
+  <!-- Loading state -->
   @if (isLoading()) {
   <div class="team-grid">
     @for (i of [1,2,3,4,5,6,7,8]; track i) {
@@ -31,7 +31,6 @@
   </div>
   }
 
-  <!-- Trainers Grid -->
   @else if (trainers().length > 0) {
   <div class="team-grid">
     @for (trainer of trainers(); track trainer.id; let i =
@@ -45,14 +44,14 @@
   </div>
   }
 
-  <!-- Empty State -->
+  <!-- Empty state -->
   @else {
   <div class="empty-state surface chamfer-sm animate-in">
     <div class="empty-icon">
       <i class="fa-solid fa-users"></i>
     </div>
-    <h3 class="empty-title">{{ 'team.empty_title' |
-      translate }}</h3>
+    <h2 class="empty-title">{{ 'team.empty_title' |
+      translate }}</h2>
     <p class="empty-text">{{ 'team.empty_text' | translate
       }}</p>
   </div>

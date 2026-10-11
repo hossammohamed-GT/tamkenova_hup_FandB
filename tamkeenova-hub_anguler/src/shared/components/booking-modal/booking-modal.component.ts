@@ -64,7 +64,6 @@ export class BookingModalComponent {
   isValid = computed(() => this.title().trim() !== '' && this.topic().trim() !== '');
 
   constructor() {
-    // -- Pre-fill the contact phone from the logged-in user --
     effect(() => {
       const user = this.currentUser();
       const isOpen = this.isOpen();

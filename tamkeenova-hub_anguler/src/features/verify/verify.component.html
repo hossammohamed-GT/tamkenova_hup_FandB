@@ -4,7 +4,6 @@
 ></app-page-header>
 
 <section class="verify-page">
-  <!-- -- Tabs -- -->
   <div class="verify-tabs surface">
     <button
       type="button"
@@ -26,7 +25,6 @@
     </button>
   </div>
 
-  <!-- -- Certificate Tab -- -->
   @if (activeTab() === 'certificate') {
     <div class="verify-card surface chamfer-sm animate-in">
       <label class="field-label" for="verify-code">{{ 'verify.code_label' | translate }}</label>
@@ -72,13 +70,13 @@
         <div class="cert-result">
           <div class="cert-result-head">
             @if (r.certificate.holder.image) {
-              <img [src]="r.certificate.holder.image" [alt]="r.certificate.holder.name" />
+              <img [src]="r.certificate.holder.image" [alt]="r.certificate.holder.name" loading="lazy" decoding="async" />
             } @else {
               <div class="cert-result-avatar"><i class="fa-solid fa-user"></i></div>
             }
             <div>
               <span class="result-label">{{ 'verify.holder' | translate }}</span>
-              <h3>{{ r.certificate.recipient_name_ar ?? r.certificate.holder.name }}</h3>
+              <h2>{{ r.certificate.recipient_name_ar ?? r.certificate.holder.name }}</h2>
               @if (r.certificate.recipient_name_en) {
                 <p dir="ltr" lang="en">{{ r.certificate.recipient_name_en }}</p>
               }
@@ -86,7 +84,7 @@
             </div>
           </div>
 
-          <h4 class="cert-result-title">{{ r.certificate.title }}</h4>
+          <h3 class="cert-result-title">{{ r.certificate.title }}</h3>
           @if (r.certificate.title_en && r.certificate.title_en !== r.certificate.title) {
             <p dir="ltr" lang="en">{{ r.certificate.title_en }}</p>
           }
@@ -132,7 +130,6 @@
     </div>
   }
 
-  <!-- -- User Tab -- -->
   @if (activeTab() === 'user') {
     <div class="verify-card surface chamfer-sm animate-in">
       <label class="field-label" for="verify-username">{{
@@ -175,12 +172,12 @@
         <div class="cert-result animate-in">
           <div class="cert-result-head">
             @if (u.user.image) {
-              <img [src]="u.user.image" [alt]="u.user.name" />
+              <img [src]="u.user.image" [alt]="u.user.name" loading="lazy" decoding="async" />
             } @else {
               <div class="cert-result-avatar"><i class="fa-solid fa-user"></i></div>
             }
             <div>
-              <h3>{{ u.user.name }}</h3>
+              <h2>{{ u.user.name }}</h2>
               @if (u.user.username) {
                 <code dir="ltr">&#64;{{ u.user.username }}</code>
               }

@@ -23,7 +23,7 @@
   align-items: start;
   gap: 1.75rem;
 }
-/* Local overrides only: no chamfer/clip-path and no overflowing single action row. */
+/* Local overrides only */
 .portal-page .cert-card {
   min-width: 0;
   background: var(--color-surface) !important;
@@ -332,7 +332,6 @@
   }
 }
 
-/* A single certificate uses the desktop width without making its preview oversized. */
 @media (min-width: 1100px) {
   .portal-page .cert-card:only-child:has(.cert-visual) {
     grid-column: 1 / -1;

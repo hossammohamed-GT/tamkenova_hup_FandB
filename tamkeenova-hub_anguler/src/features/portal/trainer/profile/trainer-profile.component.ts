@@ -49,7 +49,6 @@ export class TrainerProfileComponent implements OnInit {
   errorMessage = signal<string | null>(null);
   profile = signal<TrainerProfile | null>(null);
 
-  // fallback لمنع اختفاء الصفحة بالكامل لو الـ API فشل
   displayProfile = computed(() => this.profile());
 
   isUploadingImage = signal(false);
@@ -99,7 +98,6 @@ export class TrainerProfileComponent implements OnInit {
 
     this.trainerService.getMyProfile().subscribe({
       next: (res: any) => {
-        // يدعم { data: {...} } أو مباشرة {...}
         const profile: TrainerProfile = res?.data ?? res;
         if (!profile || !profile.users) {
           console.warn('Trainer profile unexpected shape', res);
@@ -168,7 +166,6 @@ export class TrainerProfileComponent implements OnInit {
   }
 
   setTab(id: TabId): void {
-    // ثبات تام - لا يعيد تحميل ولا يخفي المحتوى
     this.activeTab.set(id);
     this.cdr.detectChanges();
   }

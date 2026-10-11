@@ -1,5 +1,4 @@
 <section class="dashboard-page stable-dashboard">
-  <!-- Loader فقط عند التحميل الأولي وقبل hasLoaded -->
   @if (isLoading() && !hasLoaded()) {
   <div class="dashboard-loader stable-loader">
     <div class="loader-spinner"></div>
@@ -7,10 +6,8 @@
   </div>
   }
 
-  <!-- المحتوى ثابت دائما - لا يختفي أبدا -->
   <div class="dashboard-content-stable" [class.is-loading]="isLoading() && hasLoaded()">
 
-    <!-- Hero Section - always visible stable -->
     <div class="dashboard-hero chamfer-sm stable-hero">
       <div class="dashboard-hero-content">
         <div class="dashboard-hero-avatar">
@@ -49,7 +46,6 @@
       </div>
     </div>
 
-    <!-- Profile Completion -->
     <div class="profile-completion-card stable-card" [class.is-complete]="profileCompletion() >= 100">
       <div class="completion-photo">
         <img src="/images/gallery/gallery-02.jpg" [alt]="'trainer_dashboard.complete_profile' | translate" />
@@ -108,7 +104,6 @@
       </div>
     </div>
 
-    <!-- Quick Actions - ثابت دائما -->
     <div class="quick-actions-section stable-section">
       <h2 class="section-title">{{ 'trainer_dashboard.quick_actions' | translate }}</h2>
       <div class="quick-actions-grid">
@@ -124,7 +119,6 @@
       </div>
     </div>
 
-    <!-- Dashboard Sections - ثابت دائما مع fallback -->
     <div class="dashboard-sections stable-section">
       <h2 class="section-title">{{ 'trainer_dashboard.overview' | translate }}</h2>
       <div class="sections-grid">

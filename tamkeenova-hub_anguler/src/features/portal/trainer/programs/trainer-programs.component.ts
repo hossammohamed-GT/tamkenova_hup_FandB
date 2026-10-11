@@ -52,7 +52,6 @@ export class TrainerProgramsComponent {
     this.load();
   }
 
-  // -- Load Trainer Programs --
   load(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
@@ -78,7 +77,6 @@ export class TrainerProgramsComponent {
     return !!c && c.invalid && (c.touched || c.dirty);
   }
 
-  // -- Open the Form for a New Program --
   openCreate(): void {
     this.editing.set(null);
     this.form.reset({ level: 'BEGINNER' });
@@ -86,7 +84,6 @@ export class TrainerProgramsComponent {
     this.showModal.set(true);
   }
 
-  // -- Open the Form for an Existing Program --
   openEdit(program: TrainerProgram): void {
     this.editing.set(program);
     this.form.reset({
@@ -109,7 +106,6 @@ export class TrainerProgramsComponent {
     this.editing.set(null);
   }
 
-  // -- Create or Update a Trainer Program --
   save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -156,18 +152,15 @@ export class TrainerProgramsComponent {
     });
   }
 
-  // -- Request Program Deletion Confirmation --
   askDelete(id: string): void {
     this.confirmDeleteId.set(id);
   }
 
-  // -- Dismiss the Program Deletion Confirmation --
   cancelDelete(): void {
     if (this.isDeleting()) return;
     this.confirmDeleteId.set(null);
   }
 
-  // -- Delete the Confirmed Program --
   confirmDelete(): void {
     const id = this.confirmDeleteId();
     if (!id) return;

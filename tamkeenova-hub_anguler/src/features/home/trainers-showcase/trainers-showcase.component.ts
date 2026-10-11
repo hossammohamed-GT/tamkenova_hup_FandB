@@ -18,7 +18,6 @@ export class TrainersShowcaseComponent implements OnInit {
   private trainersService = inject(TrainersService);
   private bookingService = inject(BookingService);
 
-  // -- Open the Booking Modal for a Trainer --
   onBook(trainer: Trainer): void {
     this.bookingService.open(trainer);
   }

@@ -39,12 +39,10 @@ export class MyTasksComponent implements OnInit {
 
   busy = signal(false);
 
-  // -- Details modal --
   selected = signal<MyTaskItem | null>(null);
   comments = signal<TaskComment[]>([]);
   isLoadingComments = signal(false);
 
-  // -- Submit form --
   isSubmitting = signal(false);
   submitError = signal<string | null>(null);
   selectedFiles = signal<File[]>([]);
@@ -60,7 +58,6 @@ export class MyTasksComponent implements OnInit {
     link_url: [''],
   });
 
-  // -- Comments --
   commentForm = this.fb.nonNullable.group({ body: ['', Validators.required] });
   isSendingComment = signal(false);
 
@@ -129,7 +126,6 @@ export class MyTasksComponent implements OnInit {
     this.activeFilter.set(filter);
   }
 
-  // Silent re-fetch (no spinner) to reconcile with the server after mutations
   refresh(): void {
     this.load(false);
   }
@@ -139,14 +135,14 @@ export class MyTasksComponent implements OnInit {
     this.hasError.set(false);
     this.tasksService.getMyTasks().subscribe({
       next: (list) => {
-        // ترتيب المجموعة: غير المنتهية أولاً ثم حسب ترتيب الإسناد
+        // Unfinished first, then order
         const sorted = [...list].sort((a, b) => {
           const done = (t: MyTaskItem) => t.status === 'APPROVED';
           if (done(a) !== done(b)) return done(a) ? 1 : -1;
           return (a.task_order ?? 0) - (b.task_order ?? 0);
         });
         this.tasks.set(sorted);
-        // Keep the open details modal in sync with the fresh server data
+        // Sync open modal
         const openId = this.selected()?.id;
         if (openId) {
           const fresh = sorted.find((t) => t.id === openId);
@@ -161,7 +157,6 @@ export class MyTasksComponent implements OnInit {
     });
   }
 
-  // ================= Details =================
 
   openDetails(item: MyTaskItem): void {
     this.selected.set(item);
@@ -188,7 +183,6 @@ export class MyTasksComponent implements OnInit {
     });
   }
 
-  // ================= Start =================
 
   startTask(item: MyTaskItem): void {
     this.busy.set(true);
@@ -206,7 +200,6 @@ export class MyTasksComponent implements OnInit {
     });
   }
 
-  // ================= Submit =================
 
   onFilesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -277,7 +270,6 @@ export class MyTasksComponent implements OnInit {
       });
   }
 
-  // ================= Comments =================
 
   sendComment(): void {
     const item = this.selected();
@@ -300,7 +292,6 @@ export class MyTasksComponent implements OnInit {
     });
   }
 
-  // ================= Timeline =================
 
   timelineSteps(item: MyTaskItem): { key: string; state: 'done' | 'current' | 'todo' | 'rejected' }[] {
     const status = item.status;

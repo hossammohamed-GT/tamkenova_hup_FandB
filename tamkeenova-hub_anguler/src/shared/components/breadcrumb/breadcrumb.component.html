@@ -1,0 +1,13 @@
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <ol>
+    @for (item of items(); track $index; let last = $last) {
+      <li>
+        @if (!last && item.route) {
+          <a [routerLink]="item.route">{{ item.labelKey ? (item.labelKey | translate) : item.label }}</a>
+        } @else {
+          <span aria-current="page">{{ item.labelKey ? (item.labelKey | translate) : item.label }}</span>
+        }
+      </li>
+    }
+  </ol>
+</nav>

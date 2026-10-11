@@ -44,7 +44,6 @@
   color: var(--color-primary);
 }
 
-/* -- User picker -- */
 .user-picker {
   position: relative;
 }
@@ -143,7 +142,6 @@
   line-height: 1.6;
   color: var(--color-text);
 }
-/* Certificate studio: fixed artwork, five editable values. */
 .template-gallery {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -317,7 +315,6 @@
   z-index: 1500;
 }
 
-/* Language-specific editions and certificate-scoped partner snapshots. */
 .language-switcher {
   margin-bottom: 0.6rem;
 }

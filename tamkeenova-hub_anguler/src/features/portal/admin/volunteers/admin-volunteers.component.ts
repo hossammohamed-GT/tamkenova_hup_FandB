@@ -28,7 +28,7 @@ export class AdminVolunteersComponent implements OnInit {
   volunteers = signal<AdminVolunteer[]>([]);
   activeFilter = signal<VolunteerFilter>('ALL');
 
-  // The API may expose the status as `volunteer_status` (like trainers) or `status`
+  // Status key varies
   statusOf(v: AdminVolunteer): VolunteerStatus {
     return ((v as AdminVolunteer).volunteer_status ?? v.status ?? 'PENDING') as VolunteerStatus;
   }
@@ -39,12 +39,10 @@ export class AdminVolunteersComponent implements OnInit {
 
   busyId = signal<string | null>(null);
 
-  // -- Reject modal --
   rejectTarget = signal<AdminVolunteer | null>(null);
   rejectForm = this.fb.nonNullable.group({ reason: [''] });
   isRejecting = signal(false);
 
-  // -- Details modal --
   details = signal<AdminVolunteer | null>(null);
   isLoadingDetails = signal(false);
 
@@ -83,7 +81,6 @@ export class AdminVolunteersComponent implements OnInit {
     this.activeFilter.set(filter);
   }
 
-  // Silent re-fetch (no spinner) to reconcile with the server after mutations
   refresh(): void {
     this.load(false);
   }
@@ -163,7 +160,6 @@ export class AdminVolunteersComponent implements OnInit {
     this.details.set(null);
   }
 
-  // Re-fetch the open details modal content from the server
   private refreshDetailsIfOpen(volunteerId: string): void {
     const current = this.details();
     if (!current || current.id !== volunteerId) return;

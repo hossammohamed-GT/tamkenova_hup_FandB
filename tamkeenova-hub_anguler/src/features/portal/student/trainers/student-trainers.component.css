@@ -132,7 +132,6 @@
   color: var(--color-text-muted);
 }
 
-/* Interactive rating */
 .trainer-rating-interactive {
   display: flex;
   flex-direction: column;
@@ -186,10 +185,6 @@
 .star-btn.is-active i,
 .star-btn.is-hovered i {
   color: var(--color-accent);
-}
-
-}
-
 }
 
 .star-glow {

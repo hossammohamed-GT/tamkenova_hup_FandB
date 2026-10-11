@@ -11,12 +11,11 @@
       <a routerLink="/" class="btn-accent not-found-cta">{{ 'notfound.cta_home' | translate }}</a>
     </div>
   } @else if (data(); as d) {
-    <!-- -- Header Card -- -->
     <div class="public-hero surface chamfer-sm">
       <div class="public-hero-bg"></div>
       <div class="public-hero-content">
         @if (d.user.image) {
-          <img [src]="d.user.image" [alt]="d.user.name" class="public-avatar" />
+          <img [src]="d.user.image" [alt]="d.user.name" class="public-avatar" fetchpriority="high" decoding="async" />
         } @else {
           <div class="public-avatar public-avatar-fallback">
             <i class="fa-solid fa-user"></i>
@@ -55,7 +54,6 @@
     </div>
 
     <div class="public-grid">
-      <!-- -- Certificates -- -->
       <div class="public-section surface chamfer-sm">
         <h2><i class="fa-solid fa-certificate"></i> {{ 'verify.certificates' | translate }}</h2>
         @if (d.certificates.length === 0) {
@@ -85,7 +83,6 @@
         }
       </div>
 
-      <!-- -- Completed Programs -- -->
       <div class="public-section surface chamfer-sm">
         <h2><i class="fa-solid fa-book-open"></i> {{ 'verify.completed_programs' | translate }}</h2>
         @if (d.completed_programs.length === 0) {
@@ -108,7 +105,6 @@
       </div>
     </div>
 
-    <!-- -- Skills -- -->
     @if (d.skills.length > 0) {
       <div class="public-section surface chamfer-sm">
         <h2><i class="fa-solid fa-lightbulb"></i> {{ 'verify.skills' | translate }}</h2>
@@ -120,7 +116,6 @@
       </div>
     }
 
-    <!-- -- Trainers -- -->
     @if (d.trainers.length > 0) {
       <div class="public-section surface chamfer-sm">
         <h2><i class="fa-solid fa-chalkboard-user"></i> {{ 'nav.team' | translate }}</h2>
@@ -128,7 +123,7 @@
           @for (t of d.trainers; track t.id) {
             <a [routerLink]="['/team', t.slug]" class="mini-trainer">
               @if (t.image) {
-                <img [src]="t.image" [alt]="t.name" />
+                <img [src]="t.image" [alt]="t.name" loading="lazy" decoding="async" />
               } @else {
                 <div class="mini-avatar"><i class="fa-solid fa-user"></i></div>
               }

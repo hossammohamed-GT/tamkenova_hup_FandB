@@ -43,7 +43,7 @@ export class AdminPartnersComponent implements OnInit {
       name_ar: v.name_ar.trim(),
       name_en: v.name_en.trim(),
       logo_url: v.logo_url.trim(),
-      // Omit when empty: the API treats a missing value as "no website".
+      // Missing means no website
       website_url: website ? website : undefined,
       display_order: v.display_order,
       is_active: v.is_active,

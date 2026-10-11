@@ -164,7 +164,7 @@
   font-size: var(--text-2xl);
 }
 
-.cert-result-head h3 {
+.cert-result-head h2 {
   font-size: var(--text-lg);
   font-weight: 700;
 }

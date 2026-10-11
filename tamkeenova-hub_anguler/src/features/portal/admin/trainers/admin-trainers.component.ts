@@ -36,12 +36,10 @@ export class AdminTrainersComponent implements OnInit {
     () => this.trainers().filter((t) => (t.trainer_status ?? 'PENDING') === 'PENDING').length,
   );
 
-  // -- Reject modal --
   rejectTarget = signal<AdminTrainer | null>(null);
   rejectForm = this.fb.nonNullable.group({ reason: [''] });
   isRejecting = signal(false);
 
-  // -- Details modal --
   details = signal<AdminTrainer | null>(null);
   isLoadingDetails = signal(false);
   detailsTab = signal<'info' | 'certificates' | 'documents'>('info');
@@ -64,7 +62,6 @@ export class AdminTrainersComponent implements OnInit {
   toastError = signal<string | null>(null);
   toastSuccess = signal<string | null>(null);
 
-  // -- Edit trainer form --
   editTarget = signal<AdminTrainer | null>(null);  isSavingTrainer = signal(false);
 
   editForm = this.fb.nonNullable.group({
@@ -110,7 +107,6 @@ export class AdminTrainersComponent implements OnInit {
     this.activeFilter.set(filter);
   }
 
-  // Silent re-fetch (no spinner) to reconcile with the server after mutations
   refresh(): void {
     this.load(false);
   }
@@ -131,7 +127,6 @@ export class AdminTrainersComponent implements OnInit {
     });
   }
 
-  // ================= Status Actions =================
 
   act(trainer: AdminTrainer, action: 'approve' | 'suspend' | 'activate'): void {
     this.busyId.set(trainer.id);
@@ -155,7 +150,6 @@ export class AdminTrainersComponent implements OnInit {
     });
   }
 
-  // Re-fetch the open details modal content from the server
   private refreshDetailsIfOpen(trainerId: string): void {
     const current = this.details();
     if (!current || current.id !== trainerId) return;
@@ -186,7 +180,6 @@ export class AdminTrainersComponent implements OnInit {
     }
   }
 
-  // ================= Reject =================
 
   askReject(trainer: AdminTrainer): void {
     this.rejectTarget.set(trainer);
@@ -216,7 +209,6 @@ export class AdminTrainersComponent implements OnInit {
     });
   }
 
-  // ================= Details =================
 
   openDetails(trainer: AdminTrainer): void {
     this.details.set(trainer);
@@ -231,7 +223,6 @@ export class AdminTrainersComponent implements OnInit {
     });
   }
 
-  // ================= Edit trainer =================
 
   openEdit(trainer: AdminTrainer): void {
     this.editTarget.set(trainer);

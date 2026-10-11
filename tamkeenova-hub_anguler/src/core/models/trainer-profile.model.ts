@@ -6,7 +6,6 @@ export interface TrainerDocument {
   file_type: string;
 }
 
-// -- Additional Trainer Registration Fields --
 export interface TrainerRegisterExtra {
   specialization_id: string;
   bio_ar?: string;

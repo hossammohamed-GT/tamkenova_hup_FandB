@@ -1,10 +1,3 @@
-/* ==========================================================================
-   Trainer Dashboard — calm professional system.
-   One ink, one interactive navy, success only for done states. No gradients,
-   no glows, no per-card rainbow. photo: real training-room photography.
-   ========================================================================== */
-
-/* -- Page Layout -- */
 .dashboard-page {
   min-height: 100vh;
   padding: 8rem 6vw 4rem;
@@ -32,7 +25,6 @@
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* -- Hero: solid navy band -- */
 .dashboard-hero {
   position: relative;
   padding: 2.4rem 2.2rem;
@@ -185,7 +177,6 @@
   .hero-stat-divider { display: none; }
 }
 
-/* -- Profile Completion: photo + checklist -- */
 .profile-completion-card {
   display: grid;
   grid-template-columns: 250px 1fr;
@@ -378,7 +369,6 @@
   color: var(--color-text-muted);
 }
 
-/* -- Section Titles -- */
 .quick-actions-section {
   margin-bottom: 2.4rem;
 }
@@ -401,7 +391,6 @@
   background: var(--color-primary);
 }
 
-/* -- Quick Actions: uniform -- */
 .quick-actions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -459,7 +448,6 @@ html[dir='ltr'] .quick-action-card:hover .quick-action-arrow {
   transform: translateX(4px);
 }
 
-/* -- Dashboard Grid: uniform -- */
 .dashboard-sections {
   margin-top: 1rem;
 }
@@ -566,7 +554,6 @@ html[dir='ltr'] .section-card:hover .section-card-footer i {
   .sections-grid { grid-template-columns: 1fr; }
 }
 
-/* -- Stable Overrides لمنع الاختفاء الجهنمي -- */
 .stable-dashboard,
 .stable-hero,
 .stable-section,

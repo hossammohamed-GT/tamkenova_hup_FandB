@@ -43,14 +43,12 @@ export class ProgramsService {
   private translate = inject(TranslateService);
   private baseUrl = `${environment.apiUrl}/trainers/programs`;
 
-  // -- Retrieve and Normalize Public Programs --
   getAllPublic(): Observable<Program[]> {
     return this.http
       .get<RawProgramsResponse>(`${this.baseUrl}/all`)
       .pipe(map((res) => (res.data ?? []).map((item) => this.mapProgram(item))));
   }
 
-  // -- Map an API Program to the Application Model --
   private mapProgram(item: RawProgram): Program {
     const isArabic = this.translate.currentLang() !== 'en';
     const specialization = item.trainers

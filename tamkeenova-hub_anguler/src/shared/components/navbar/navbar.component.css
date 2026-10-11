@@ -322,7 +322,6 @@ html[dir='rtl'] .mobile-link-icon {
   }
 }
 
-/* -- User Menu -- */
 .user-menu {
   position: relative;
 }
@@ -545,7 +544,6 @@ html[dir='rtl'] .mobile-link-icon {
   font-weight: 700;
 }
 
-/* ===== Notifications Glass Dropdown ===== */
 .notif-dropdown-wrapper {
   position: relative;
 }
@@ -764,7 +762,6 @@ html[dir='rtl'] .mobile-link-icon {
   color: var(--color-primary);
 }
 
-/* ===== Notification Detail Modal Glass ===== */
 .notif-detail-backdrop {
   position: fixed;
   inset: 0;
@@ -862,7 +859,6 @@ html[dir='rtl'] .mobile-link-icon {
   font-size: 1.1rem;
 }
 
-/* ================= Notification tones ================= */
 .notif-glass-icon.tone-primary,
 .notif-detail-original-icon.tone-primary {
   background: color-mix(in srgb, var(--color-primary) 13%, transparent);
@@ -1075,7 +1071,6 @@ html[dir='rtl'] .mobile-link-icon {
   color: var(--color-border);
 }
 
-/* loader */
 .loader-spinner-sm {
   width: 20px;
   height: 20px;

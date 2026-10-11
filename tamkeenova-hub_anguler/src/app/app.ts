@@ -23,7 +23,7 @@ export class App implements OnDestroy {
   private routerSub: Subscription;
 
   constructor() {
-    // إظهار لودر أولي للبراند ثم إخفاؤه - لا يظهر مرة أخرى عند التنقل لتجنب الوميض الجهنمي
+    // Initial brand splash
     this.loader.show();
     setTimeout(() => this.loader.hide(), 500);
 
@@ -33,8 +33,7 @@ export class App implements OnDestroy {
         event instanceof NavigationCancel ||
         event instanceof NavigationError
       ) {
-        // Keep the loader hidden after every navigation; never show it on
-        // navigation start to avoid flicker.
+        // Keep hidden after navigation
         this.loader.hide();
       }
     });

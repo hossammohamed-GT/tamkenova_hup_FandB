@@ -7,7 +7,7 @@ export const trainerStatusGuard: CanActivateFn = (route) => {
   const trainerService = inject(TrainerService);
   const router = inject(Router);
 
-  // ✅ لو الحالة محفوظة في الـ cache (APPROVED)
+  // Cached approval
   if (trainerService.isApprovedCached) {
     return true;
   }
@@ -15,22 +15,19 @@ export const trainerStatusGuard: CanActivateFn = (route) => {
   return trainerService.getApplicationStatus().pipe(
     map((res) => {
       const status = res.data?.status ?? (res as any).status;
-      // ✅ لو معتمد، يدخل عادي
       if (status === 'APPROVED') {
         return true;
       }
-      // ✅ لو مش معتمد (PENDING أو REJECTED)، يروح لصفحة الحالة
-      console.log(`🚫 Trainer status: ${status} - Redirecting to status page`);
+      console.log(`Trainer status: ${status}, redirecting`);
       return router.createUrlTree(['/portal/trainer/status']);
     }),
     catchError((err) => {
-      console.error('❌ Error checking trainer status:', err);
-      // على خطأ شبكة أو 401، اسمح بالدخول لتجنب loop جهنمي كل ثانية
-      // authInterceptor سيتولى الـ logout لو 401
+      console.error('Error checking trainer status:', err);
+      // Interceptor handles 401
       if (err?.status === 401) {
         return of(true);
       }
-      // لو خطأ آخر، اسمح بالدخول مع تحذير لتجنب loop
+      // Fail open, avoid lockout
       return of(true);
     }),
   );

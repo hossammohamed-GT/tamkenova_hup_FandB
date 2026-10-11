@@ -33,7 +33,7 @@ export class RouteTransitionComponent {
 
   private play(from: number, to: number, ms: number): void {
     this.stop();
-    // The @if block may not have rendered yet — wait a few frames for refs.
+    // Wait for @if render
     let attempts = 0;
     const wait = () => {
       const pathEl = this.path()?.nativeElement;
@@ -55,17 +55,14 @@ export class RouteTransitionComponent {
       const raw = Math.min(1, (now - t0) / ms);
       const p = from + (to - from) * this.easeInOutCubic(raw);
 
-      // Draw the spiral from the center outward during the first 75%.
       const draw = this.clamp01(p / 0.75);
       pathEl.style.strokeDasharray = '100 100';
       pathEl.style.strokeDashoffset = `${100 * (1 - draw)}`;
 
-      // Thicken the line until the coils merge into full coverage.
       const thick = this.clamp01((p - 0.45) / 0.55);
       const w = this.THIN_W + (this.THICK_W - this.THIN_W) * thick * thick;
       pathEl.style.strokeWidth = `${w}`;
 
-      // Slow majestic spin + gentle fade at the very start.
       svgEl.style.transform = `translate(-50%, -50%) rotate(${this.SPIN_DEG * p}deg)`;
       svgEl.style.opacity = `${this.clamp01(p / 0.08)}`;
 

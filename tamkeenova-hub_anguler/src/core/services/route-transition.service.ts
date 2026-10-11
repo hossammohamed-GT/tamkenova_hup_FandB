@@ -4,12 +4,6 @@ import { filter, take } from 'rxjs';
 
 export type TransitionPhase = 'idle' | 'expand' | 'hold' | 'collapse';
 
-/**
- * Spiral route transition: a brand-colored spiral draws itself from the
- * center while spinning, its line thickening until the coils merge into
- * full coverage; the router navigates underneath, then the spiral unwinds
- * the same way revealing the new page.
- */
 @Injectable({ providedIn: 'root' })
 export class RouteTransitionService {
   private router = inject(Router);
@@ -55,8 +49,7 @@ export class RouteTransitionService {
   }
 
   private reveal(navigated: boolean): void {
-    // Let the new view paint under the cover, then unwind the spiral while
-    // the new page glides in from the right beneath it.
+    // Paint first, then unwind
     requestAnimationFrame(() => {
       setTimeout(() => {
         this.phase.set('collapse');

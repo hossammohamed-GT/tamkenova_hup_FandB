@@ -24,7 +24,6 @@ export class TrainerDashboardComponent implements OnInit {
   stats = signal<TrainerDashboardStats | null>(null);
   hasError = signal(false);
 
-  // ثبات الاكتمال - لا يختفي فجأة
   profileCompletion = computed(() => {
     const s = this.stats();
     if (!s) return 0;
@@ -33,14 +32,13 @@ export class TrainerDashboardComponent implements OnInit {
     if ((s.programs_count ?? 0) > 0) completed++;
     if ((s.availability_count ?? 0) > 0) completed++;
     if ((s.reviews_count ?? 0) > 0) completed++;
-    completed++; // بروفايل أساسي
+    completed++; // Profile always done
     const avg = typeof s.average_rating === 'string' ? parseFloat(s.average_rating as any) : (s.average_rating ?? 0);
     if (avg > 0) completed++;
-    completed++; // استشارات
+    completed++; // Consultations always done
     return Math.round((completed / total) * 100);
   });
 
-  // خطوات الاكتمال التفصيلية للعرض المبهر
   completionSteps = computed(() => {
     const s = this.displayStats();
     const avg = typeof s.average_rating === 'string' ? parseFloat(s.average_rating as any) : (s.average_rating ?? 0);
@@ -55,7 +53,7 @@ export class TrainerDashboardComponent implements OnInit {
   });
 
 
-  // fallback دائم لمنع اختفاء الأقسام
+  // Zeros when empty
   displayStats = computed(() => {
     const s = this.stats();
     if (s) return s;
@@ -101,9 +99,8 @@ export class TrainerDashboardComponent implements OnInit {
     this.trainerService.getDashboardStats().subscribe({
       next: (res) => {
         const data = (res as any).data ?? res;
-        // تأكد أن data هي الإحصائيات وليس wrapper
+        // Unwrap nested responses
         const statsData = (data as any).data ?? data;
-        // لو statsData لسه wrapper، استخدمه مباشرة
         const finalStats = statsData && typeof statsData.programs_count !== 'undefined' ? statsData : data;
         this.stats.set(finalStats as TrainerDashboardStats);
         this.isLoading.set(false);
@@ -114,7 +111,7 @@ export class TrainerDashboardComponent implements OnInit {
         this.hasError.set(true);
         this.isLoading.set(false);
         this.hasLoaded.set(true);
-        // fallback يمنع الاختفاء
+        // Zeros on error
         if (!this.stats()) {
           this.stats.set({
             programs_count: 0,

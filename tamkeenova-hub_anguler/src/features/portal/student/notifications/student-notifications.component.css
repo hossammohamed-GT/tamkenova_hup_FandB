@@ -204,7 +204,6 @@
   background: var(--glass-bg);
 }
 
-/* Modal glass */
 .glass-backdrop {
   background: rgba(16, 30, 39, 0.45);
 }
@@ -379,7 +378,6 @@
   }
 }
 
-/* ================= Notification tones ================= */
 .notif-icon.tone-primary,
 .notif-detail-original-icon.tone-primary {
   background: color-mix(in srgb, var(--color-primary) 13%, transparent);

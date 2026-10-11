@@ -30,7 +30,6 @@
 .picked-remove:hover {
   background: color-mix(in srgb, var(--color-danger) 26%, transparent);
 }
-/*  */
 .filter-pills {
   display: flex;
   gap: 0.5rem;
@@ -65,7 +64,6 @@
   color: #fff;
 }
 
-/* -- Task cards -- */
 .my-task-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -185,7 +183,6 @@
   align-self: flex-start;
 }
 
-/* -- Modal -- */
 .modal-wide {
   max-width: 760px;
 }
@@ -218,7 +215,6 @@
   padding: 0.9rem 0;
 }
 
-/* -- File drop -- */
 .file-drop {
   display: flex;
   align-items: center;
@@ -250,7 +246,6 @@
   flex-wrap: wrap;
 }
 
-/* -- Submission -- */
 .submission-box {
   display: flex;
   flex-direction: column;
@@ -269,7 +264,6 @@
   word-break: break-word;
 }
 
-/* -- Result banners -- */
 .result-banner {
   display: flex;
   gap: 0.8rem;
@@ -302,7 +296,6 @@
   color: var(--color-danger);
 }
 
-/* -- Comments -- */
 .no-comments {
   font-size: var(--text-sm);
 }

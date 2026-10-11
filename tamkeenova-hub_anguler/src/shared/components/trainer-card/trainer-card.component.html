@@ -20,8 +20,8 @@
     <p class="trainer-card-bio">{{ bio() }}</p>
     }
 
-    <!-- Rating with 5 stars + animation -->
     <div class="trainer-card-rating" [class.is-interactive]="interactiveRating() && isStudent()"
+      (click)="onRatingZoneClick($event)"
       (mouseleave)="onStarLeave(); showRatingHint.set(false)" (mouseenter)="showRatingHint.set(true)">
 
       <div class="rating-stars-row">

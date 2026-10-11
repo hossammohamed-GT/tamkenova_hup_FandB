@@ -1,4 +1,3 @@
-// -- Tasks System Models (mirrors Tamkeenova Tasks API) --
 
 export type TaskStatus = 'PENDING' | 'IN_PROGRESS' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
@@ -116,7 +115,6 @@ export interface TasksDashboardStats {
   completed_tasks: number;
   delayed_tasks: number;
   average_completion: number;
-  // -- Volunteer Extras --
   total_hours?: number;
   average_score?: number;
   on_time_rate?: number;

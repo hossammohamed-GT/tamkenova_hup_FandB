@@ -100,7 +100,6 @@
   </div>
   }
 
-  <!-- -- Program Create and Edit Modal -- -->
   @if (showModal()) {
   <div class="modal-backdrop" (click)="closeModal()">
     <div class="modal-card surface" role="dialog"
@@ -242,7 +241,6 @@
   </div>
   }
 
-  <!-- -- Program Deletion Confirmation -- -->
   @if (confirmDeleteId()) {
   <div class="modal-backdrop" (click)="cancelDelete()">
     <div class="modal-card surface confirm-card"

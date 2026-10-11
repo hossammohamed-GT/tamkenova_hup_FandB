@@ -61,7 +61,6 @@
     </div>
   }
 
-  <!-- -- Edit Modal -- -->
   @if (editTarget(); as t) {
     <div class="modal-backdrop" (click)="closeEdit()">
       <div class="modal-card modal-card-sm surface chamfer-sm" (click)="$event.stopPropagation()">
@@ -104,7 +103,6 @@
     </div>
   }
 
-  <!-- -- Delete Confirm Modal -- -->
   @if (deleteTarget()) {
     <div class="modal-backdrop" (click)="closeDelete()">
       <div class="modal-card modal-card-sm surface chamfer-sm" (click)="$event.stopPropagation()">

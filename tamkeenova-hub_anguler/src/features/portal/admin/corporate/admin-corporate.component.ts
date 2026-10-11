@@ -43,12 +43,10 @@ export class AdminCorporateComponent implements OnInit {
     () => this.requests().filter((r) => (r.status ?? 'PENDING') === 'PENDING').length,
   );
 
-  // -- Details modal --
   details = signal<AdminCorporateRequest | null>(null);
   isLoadingDetails = signal(false);
   isUpdating = signal(false);
 
-  // -- Employees picker --
   employees = signal<AdminUser[]>([]);
   isLoadingEmployees = signal(false);
   selectedEmployee = signal<AdminUser | null>(null);
@@ -92,7 +90,6 @@ export class AdminCorporateComponent implements OnInit {
     this.activeFilter.set(filter);
   }
 
-  // Silent re-fetch (no spinner) to reconcile with the server after mutations
   refresh(): void {
     this.load(false);
   }
@@ -115,7 +112,6 @@ export class AdminCorporateComponent implements OnInit {
     });
   }
 
-  // ================= Details =================
 
   openDetails(request: AdminCorporateRequest): void {
     this.details.set(request);
@@ -209,7 +205,7 @@ export class AdminCorporateComponent implements OnInit {
           this.isUpdating.set(false);
           this.showToast('admin_corporate.updated');
           this.refresh();
-          // Refresh the open modal with authoritative server data
+          // Sync open modal
           this.adminService.getCorporateRequest(current.id).subscribe({
             next: (full) => {
               if (this.details()?.id === current.id && full) this.details.set(full);

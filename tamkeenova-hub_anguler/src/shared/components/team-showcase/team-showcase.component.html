@@ -3,7 +3,6 @@
   <div class="team-card-wrapper">
     <div class="team-card-track">
 
-      <!-- Current Trainer -->
       <div
         class="team-card surface chamfer-sm team-card-current"
         [class.slide-out]="slot.sliding"
@@ -12,7 +11,8 @@
           @if (getTrainerAvatar(slot.currentTrainer)) {
           <img
             [src]="getTrainerAvatar(slot.currentTrainer)!"
-            [alt]="getTrainerName(slot.currentTrainer)" />
+            [alt]="getTrainerName(slot.currentTrainer)"
+            loading="lazy" decoding="async" />
           } @else {
           <div class="team-card-avatar-placeholder">
             <i class="fa-solid fa-user"></i>
@@ -31,7 +31,6 @@
         </div>
       </div>
 
-      <!-- Next Trainer -->
       <div
         class="team-card surface chamfer-sm team-card-next"
         [class.slide-in]="slot.sliding"
@@ -39,7 +38,8 @@
         <div class="team-card-avatar">
           @if (getTrainerAvatar(slot.nextTrainer)) {
           <img [src]="getTrainerAvatar(slot.nextTrainer)!"
-            [alt]="getTrainerName(slot.nextTrainer)" />
+            [alt]="getTrainerName(slot.nextTrainer)"
+            loading="lazy" decoding="async" />
           } @else {
           <div class="team-card-avatar-placeholder">
             <i class="fa-solid fa-user"></i>

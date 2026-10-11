@@ -32,7 +32,6 @@ export class TeamShowcaseComponent implements OnDestroy {
 
   slots = signal<TrainerSlot[]>([]);
 
-  // ✅ دالة لحساب الـ rating
   getTrainerRating(trainer: Trainer): number {
     if (!trainer.average_rating) return 0;
 
@@ -44,17 +43,14 @@ export class TeamShowcaseComponent implements OnDestroy {
     return Number(trainer.average_rating) || 0;
   }
 
-  // ✅ دالة للحصول على الاسم
   getTrainerName(trainer: Trainer): string {
     return trainer.users?.full_name || 'Unknown';
   }
 
-  // ✅ دالة للحصول على التخصص
   getTrainerSpecialization(trainer: Trainer): string {
     return trainer.specializations?.name_ar || trainer.specializations?.name_en || '';
   }
 
-  // ✅ دالة للحصول على الصورة
   getTrainerAvatar(trainer: Trainer): string | null {
     return trainer.users?.profile_image || null;
   }

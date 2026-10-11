@@ -29,7 +29,6 @@ export class AdminService {
     return obs.pipe(map((res) => (res?.data !== undefined ? res.data : res))) as Observable<T>;
   }
 
-  // ==================== Users ====================
 
   getUsers(query: {
     search?: string;
@@ -66,7 +65,6 @@ export class AdminService {
     );
   }
 
-  // ==================== Trainers ====================
 
   getTrainers(status?: string): Observable<AdminTrainer[]> {
     let params = new HttpParams();
@@ -96,7 +94,6 @@ export class AdminService {
     return this.unwrap<AdminTrainer>(this.http.patch<any>(`${this.baseUrl}/trainers/${id}/activate`, {}));
   }
 
-  // -- Update Trainer Data (Admin) --
   updateTrainer(id: string, payload: { years_of_experience?: number; bio_ar?: string; bio_en?: string }): Observable<AdminTrainer> {
     return this.unwrap<AdminTrainer>(this.http.patch<any>(`${this.baseUrl}/trainers/${id}`, payload));
   }
@@ -117,7 +114,6 @@ export class AdminService {
     return this.http.delete<void>(`${this.baseUrl}/trainers/documents/${documentId}`);
   }
 
-  // ==================== Volunteers ====================
 
   getVolunteers(status?: string): Observable<AdminVolunteer[]> {
     let params = new HttpParams();
@@ -139,7 +135,6 @@ export class AdminService {
     return this.unwrap<AdminVolunteer>(this.http.patch<any>(`${this.baseUrl}/volunteers/${id}/reject`, { reason }));
   }
 
-  // ==================== Certificates ====================
 
   getCertificates(): Observable<AdminCertificate[]> {
     return this.unwrap<any>(this.http.get<any>(`${this.baseUrl}/certificates`)).pipe(
@@ -163,7 +158,6 @@ export class AdminService {
     return this.http.delete<void>(`${this.baseUrl}/certificates/${id}`);
   }
 
-  // ==================== Corporate Requests ====================
 
   getCorporateRequests(status?: CorporateAction | 'ALL'): Observable<AdminCorporateRequest[]> {
     let params = new HttpParams();
@@ -183,7 +177,6 @@ export class AdminService {
     );
   }
 
-  // ==================== Specializations ====================
 
   getSpecializationRequests(): Observable<SpecializationSuggestion[]> {
     return this.unwrap<any>(this.http.get<any>(`${this.baseUrl}/specializations/requests`)).pipe(
@@ -215,7 +208,6 @@ export class AdminService {
     return this.http.delete<void>(`${this.baseUrl}/specializations/${id}`);
   }
 
-  // ==================== Programs ====================
 
   getPrograms(): Observable<AdminProgram[]> {
     return this.unwrap<any>(this.http.get<any>(`${this.baseUrl}/programs`)).pipe(
@@ -247,7 +239,6 @@ export class AdminService {
     return this.http.delete<void>(`${this.baseUrl}/programs/${id}`);
   }
 
-  // ==================== Dashboard ====================
 
   getDashboard(): Observable<AdminDashboardStats> {
     return this.unwrap<AdminDashboardStats>(this.http.get<any>(`${this.baseUrl}/dashboard`));

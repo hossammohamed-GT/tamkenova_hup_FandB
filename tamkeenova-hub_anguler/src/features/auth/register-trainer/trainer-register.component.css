@@ -2,7 +2,6 @@
   max-width: 560px;
 }
 
-/* -- Step Indicator -- */
 .step-indicator {
   display: flex;
   align-items: flex-start;
@@ -77,7 +76,6 @@
   color: var(--color-text);
 }
 
-/* -- Specialization Options -- */
 .spec-loading {
   font-size: var(--text-sm);
   display: flex;
@@ -123,7 +121,6 @@
   color: #fff;
 }
 
-/* -- Text Areas -- */
 .field-textarea {
   height: auto;
   padding-block: 0.7rem;
@@ -133,7 +130,6 @@
   line-height: 1.5;
 }
 
-/* -- Pricing Fields -- */
 .field-row {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -146,7 +142,6 @@
   }
 }
 
-/* -- Dynamic Document Lists -- */
 .dynamic-list {
   display: flex;
   flex-direction: column;
@@ -214,7 +209,6 @@
   background: color-mix(in srgb, var(--color-primary) 5%, transparent);
 }
 
-/* -- Step Navigation -- */
 .step-nav {
   display: flex;
   gap: 0.7rem;

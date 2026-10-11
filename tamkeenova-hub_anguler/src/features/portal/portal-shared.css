@@ -26,7 +26,7 @@
 }
 
 .animate-in {
-  /* Keep the final frame visible. Component styles may define a backwards-only animation. */
+  /* Keep final frame visible */
   opacity: 1;
   transform: translateY(0);
   animation: portal-enter 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) both !important;
@@ -122,7 +122,6 @@
   margin-top: 0;
 }
 
-/* -- Shared Field Controls -- */
 .field {
   position: relative;
 }
@@ -209,7 +208,6 @@
   margin-top: 0.5rem;
 }
 
-/* -- Shared Buttons -- */
 .btn-outline {
   height: 46px;
   padding-inline: 1.3rem;
@@ -235,7 +233,6 @@
   outline-offset: 2px;
 }
 
-/* -- Dynamic Document Lists -- */
 .dynamic-list {
   display: flex;
   flex-direction: column;
@@ -303,7 +300,6 @@
   background: color-mix(in srgb, var(--color-primary) 5%, transparent);
 }
 
-/* -- Item Lists -- */
 .item-list {
   display: flex;
   flex-direction: column;
@@ -373,7 +369,6 @@
   background: color-mix(in srgb, var(--color-danger) 8%, var(--color-surface));
 }
 
-/* -- Empty States -- */
 .empty-state {
   text-align: center;
   padding: 3rem 1.5rem;
@@ -386,7 +381,6 @@
   color: var(--color-border);
 }
 
-/* -- Status Badges -- */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -419,7 +413,6 @@
   margin: 1.5rem 0;
 }
 
-/* -- Modal -- */
 .modal-backdrop {
   position: fixed;
   inset: 0;

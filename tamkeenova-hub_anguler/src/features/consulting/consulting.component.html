@@ -29,7 +29,6 @@
 
   <div class="consulting-form-card surface chamfer-sm glass-form-card">
 
-    <!-- Audience Toggle Glass -->
     @if (!submitted()) {
     <div class="audience-toggle glass-toggle" [class.is-b2c]="audience() === 'b2c'">
       <span class="audience-toggle-pill"></span>
@@ -46,25 +45,24 @@
 
     @if (!submitted()) {
 
-    <!-- B2B Full Corporate Form -->
     @if (audience() === 'b2b') {
     <div class="form-header">
-      <h3><i class="fa-solid fa-building"></i> {{ 'consultingPage.form.b2b_title' | translate }}</h3>
+      <h2><i class="fa-solid fa-building"></i> {{ 'consultingPage.form.b2b_title' | translate }}</h2>
       <p class="text-muted">{{ 'consultingPage.form.b2b_subtitle' | translate }}</p>
     </div>
 
     <form class="consulting-form b2b-form" (ngSubmit)="submit()" novalidate>
       <div class="form-grid">
         <div class="form-field" [class.has-error]="touched() && !b2b.company_name()">
-          <label>{{ 'consultingPage.form.company_name' | translate }} <span class="required-mark">*</span></label>
-          <input type="text" class="form-control" [ngModel]="b2b.company_name()" (ngModelChange)="b2b.company_name.set($event)"
+          <label for="cf-company_name">{{ 'consultingPage.form.company_name' | translate }} <span class="required-mark">*</span></label>
+          <input id="cf-company_name" type="text" class="form-control" [ngModel]="b2b.company_name()" (ngModelChange)="b2b.company_name.set($event)"
             name="company_name" [placeholder]="'consultingPage.form.name_placeholder' | translate" />
           @if (touched() && !b2b.company_name()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
         </div>
 
         <div class="form-field">
-          <label>{{ 'consultingPage.form.service_type' | translate }} *</label>
-          <select class="form-control" [ngModel]="b2b.service_type()" (ngModelChange)="b2b.service_type.set($event)" name="service_type">
+          <label for="cf-service_type">{{ 'consultingPage.form.service_type' | translate }} *</label>
+          <select id="cf-service_type" class="form-control" [ngModel]="b2b.service_type()" (ngModelChange)="b2b.service_type.set($event)" name="service_type">
             @for (t of serviceTypes; track t) {
             <option [value]="t">{{ 'student_corporate.service_types.' + t | translate }}</option>
             }
@@ -72,59 +70,59 @@
         </div>
 
         <div class="form-field" [class.has-error]="touched() && !b2b.contact_name()">
-          <label>{{ 'consultingPage.form.contact_name' | translate }} *</label>
-          <input type="text" class="form-control" [ngModel]="b2b.contact_name()" (ngModelChange)="b2b.contact_name.set($event)"
+          <label for="cf-contact_name">{{ 'consultingPage.form.contact_name' | translate }} *</label>
+          <input id="cf-contact_name" type="text" class="form-control" [ngModel]="b2b.contact_name()" (ngModelChange)="b2b.contact_name.set($event)"
             name="contact_name" />
           @if (touched() && !b2b.contact_name()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
         </div>
 
         <div class="form-field" [class.has-error]="touched() && !b2b.contact_email()">
-          <label>{{ 'consultingPage.form.contact_email' | translate }} *</label>
-          <input type="email" class="form-control" dir="ltr" [ngModel]="b2b.contact_email()" (ngModelChange)="b2b.contact_email.set($event)"
+          <label for="cf-contact_email">{{ 'consultingPage.form.contact_email' | translate }} *</label>
+          <input id="cf-contact_email" type="email" class="form-control" dir="ltr" [ngModel]="b2b.contact_email()" (ngModelChange)="b2b.contact_email.set($event)"
             name="contact_email" />
           @if (touched() && !b2b.contact_email()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
         </div>
 
         <div class="form-field">
-          <label>{{ 'student_corporate.fields.contact_phone' | translate }}</label>
-          <input type="tel" dir="ltr" class="form-control" [ngModel]="b2b.contact_phone()" (ngModelChange)="b2b.contact_phone.set($event)"
+          <label for="cf-contact_phone">{{ 'student_corporate.fields.contact_phone' | translate }}</label>
+          <input id="cf-contact_phone" type="tel" dir="ltr" class="form-control" [ngModel]="b2b.contact_phone()" (ngModelChange)="b2b.contact_phone.set($event)"
             name="contact_phone" [placeholder]="'consultingPage.form.phone_placeholder' | translate" />
         </div>
 
         <div class="form-field">
-          <label>{{ 'student_corporate.fields.contact_whatsapp' | translate }}</label>
-          <input type="tel" dir="ltr" class="form-control" [ngModel]="b2b.contact_whatsapp()" (ngModelChange)="b2b.contact_whatsapp.set($event)"
+          <label for="cf-contact_whatsapp">{{ 'student_corporate.fields.contact_whatsapp' | translate }}</label>
+          <input id="cf-contact_whatsapp" type="tel" dir="ltr" class="form-control" [ngModel]="b2b.contact_whatsapp()" (ngModelChange)="b2b.contact_whatsapp.set($event)"
             name="contact_whatsapp" />
         </div>
 
         <div class="form-field">
-          <label>{{ 'consultingPage.form.sector' | translate }}</label>
-          <input type="text" class="form-control" [ngModel]="b2b.sector()" (ngModelChange)="b2b.sector.set($event)" name="sector" />
+          <label for="cf-sector">{{ 'consultingPage.form.sector' | translate }}</label>
+          <input id="cf-sector" type="text" class="form-control" [ngModel]="b2b.sector()" (ngModelChange)="b2b.sector.set($event)" name="sector" />
         </div>
 
         <div class="form-field">
-          <label>{{ 'consultingPage.form.country' | translate }}</label>
-          <input type="text" class="form-control" [ngModel]="b2b.country()" (ngModelChange)="b2b.country.set($event)" name="country" />
+          <label for="cf-country">{{ 'consultingPage.form.country' | translate }}</label>
+          <input id="cf-country" type="text" class="form-control" [ngModel]="b2b.country()" (ngModelChange)="b2b.country.set($event)" name="country" />
         </div>
 
         <div class="form-field">
-          <label>{{ 'consultingPage.form.employees_count' | translate }}</label>
-          <input type="number" min="1" dir="ltr" class="form-control" [ngModel]="b2b.employees_count()" (ngModelChange)="b2b.employees_count.set($any($event) ? +$any($event) : null)" name="employees_count" />
+          <label for="cf-employees_count">{{ 'consultingPage.form.employees_count' | translate }}</label>
+          <input id="cf-employees_count" type="number" min="1" dir="ltr" class="form-control" [ngModel]="b2b.employees_count()" (ngModelChange)="b2b.employees_count.set($any($event) ? +$any($event) : null)" name="employees_count" />
         </div>
 
         <div class="form-field">
-          <label>{{ 'consultingPage.form.project_duration' | translate }}</label>
-          <input type="text" class="form-control" [ngModel]="b2b.project_duration()" (ngModelChange)="b2b.project_duration.set($event)" name="project_duration" />
+          <label for="cf-project_duration">{{ 'consultingPage.form.project_duration' | translate }}</label>
+          <input id="cf-project_duration" type="text" class="form-control" [ngModel]="b2b.project_duration()" (ngModelChange)="b2b.project_duration.set($event)" name="project_duration" />
         </div>
 
         <div class="form-field">
-          <label>{{ 'consultingPage.form.expected_budget' | translate }}</label>
-          <input type="text" class="form-control" [ngModel]="b2b.expected_budget()" (ngModelChange)="b2b.expected_budget.set($event)" name="expected_budget" />
+          <label for="cf-expected_budget">{{ 'consultingPage.form.expected_budget' | translate }}</label>
+          <input id="cf-expected_budget" type="text" class="form-control" [ngModel]="b2b.expected_budget()" (ngModelChange)="b2b.expected_budget.set($event)" name="expected_budget" />
         </div>
 
         <div class="form-field field-full" [class.has-error]="touched() && !b2b.service_description()">
-          <label>{{ 'consultingPage.form.service_desc' | translate }} *</label>
-          <textarea class="form-control" rows="5" [ngModel]="b2b.service_description()" (ngModelChange)="b2b.service_description.set($event)"
+          <label for="cf-service_description">{{ 'consultingPage.form.service_desc' | translate }} *</label>
+          <textarea id="cf-service_description" class="form-control" rows="5" [ngModel]="b2b.service_description()" (ngModelChange)="b2b.service_description.set($event)"
             name="service_description" [placeholder]="'consultingPage.form.details_placeholder' | translate"></textarea>
           @if (touched() && !b2b.service_description()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
         </div>
@@ -147,47 +145,46 @@
     </form>
     }
 
-    <!-- B2C Consultation Form -->
     @if (audience() === 'b2c') {
     <div class="form-header">
-      <h3><i class="fa-solid fa-user-graduate"></i> {{ 'consultingPage.form.b2c_title' | translate }}</h3>
+      <h2><i class="fa-solid fa-user-graduate"></i> {{ 'consultingPage.form.b2c_title' | translate }}</h2>
       <p class="text-muted">{{ 'consultingPage.form.b2c_subtitle' | translate }}</p>
     </div>
 
     <form class="consulting-form b2c-form" (ngSubmit)="submit()" novalidate>
       <div class="form-grid">
         <div class="form-field field-full" [class.has-error]="touched() && !b2c.title()">
-          <label>{{ 'consultingPage.form.consultation_title' | translate }} *</label>
-          <input type="text" class="form-control" [ngModel]="b2c.title()" (ngModelChange)="b2c.title.set($event)" name="b2c_title"
+          <label for="cf-b2c_title">{{ 'consultingPage.form.consultation_title' | translate }} *</label>
+          <input id="cf-b2c_title" type="text" class="form-control" [ngModel]="b2c.title()" (ngModelChange)="b2c.title.set($event)" name="b2c_title"
             [placeholder]="'booking.title_placeholder' | translate" />
           @if (touched() && !b2c.title()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
         </div>
 
         <div class="form-field field-full" [class.has-error]="touched() && !b2c.description()">
-          <label>{{ 'consultingPage.form.consultation_desc' | translate }} *</label>
-          <textarea class="form-control" rows="4" [ngModel]="b2c.description()" (ngModelChange)="b2c.description.set($event)"
+          <label for="cf-b2c_description">{{ 'consultingPage.form.consultation_desc' | translate }} *</label>
+          <textarea id="cf-b2c_description" class="form-control" rows="4" [ngModel]="b2c.description()" (ngModelChange)="b2c.description.set($event)"
             name="b2c_description" [placeholder]="'booking.topic_placeholder' | translate"></textarea>
           @if (touched() && !b2c.description()) { <span class="field-error">{{ 'consultingPage.form.required_error' | translate }}</span> }
         </div>
 
         <div class="form-field">
-          <label>{{ 'consultingPage.form.preferred_date' | translate }}</label>
-          <input type="date" class="form-control" [ngModel]="b2c.preferred_date()" (ngModelChange)="b2c.preferred_date.set($event)" name="preferred_date" />
+          <label for="cf-preferred_date">{{ 'consultingPage.form.preferred_date' | translate }}</label>
+          <input id="cf-preferred_date" type="date" class="form-control" [ngModel]="b2c.preferred_date()" (ngModelChange)="b2c.preferred_date.set($event)" name="preferred_date" />
         </div>
 
         <div class="form-field">
-          <label>{{ 'consultingPage.form.preferred_time' | translate }}</label>
-          <input type="time" class="form-control" dir="ltr" [ngModel]="b2c.preferred_time()" (ngModelChange)="b2c.preferred_time.set($event)" name="preferred_time" />
+          <label for="cf-preferred_time">{{ 'consultingPage.form.preferred_time' | translate }}</label>
+          <input id="cf-preferred_time" type="time" class="form-control" dir="ltr" [ngModel]="b2c.preferred_time()" (ngModelChange)="b2c.preferred_time.set($event)" name="preferred_time" />
         </div>
 
         <div class="form-field">
-          <label>{{ 'consultingPage.form.contact_phone' | translate }}</label>
-          <input type="tel" dir="ltr" class="form-control" [ngModel]="b2c.contact_phone()" (ngModelChange)="b2c.contact_phone.set($event)" name="b2c_phone" />
+          <label for="cf-b2c_phone">{{ 'consultingPage.form.contact_phone' | translate }}</label>
+          <input id="cf-b2c_phone" type="tel" dir="ltr" class="form-control" [ngModel]="b2c.contact_phone()" (ngModelChange)="b2c.contact_phone.set($event)" name="b2c_phone" />
         </div>
 
         <div class="form-field">
-          <label>{{ 'consultingPage.form.contact_method' | translate }}</label>
-          <div class="contact-method-toggle">
+          <label id="cf-contact_method-label">{{ 'consultingPage.form.contact_method' | translate }}</label>
+          <div class="contact-method-toggle" role="group" aria-labelledby="cf-contact_method-label">
             <button type="button" [class.is-active]="b2c.contact_method() === 'whatsapp'" (click)="b2c.contact_method.set('whatsapp')">
               <i class="fa-brands fa-whatsapp"></i> {{ 'consultingPage.form.whatsapp' | translate }}
             </button>
@@ -201,8 +198,8 @@
         </div>
 
         <div class="form-field field-full">
-          <label>{{ 'consultingPage.form.student_notes' | translate }}</label>
-          <textarea class="form-control" rows="2" [ngModel]="b2c.student_notes()" (ngModelChange)="b2c.student_notes.set($event)" name="student_notes"></textarea>
+          <label for="cf-student_notes">{{ 'consultingPage.form.student_notes' | translate }}</label>
+          <textarea id="cf-student_notes" class="form-control" rows="2" [ngModel]="b2c.student_notes()" (ngModelChange)="b2c.student_notes.set($event)" name="student_notes"></textarea>
         </div>
       </div>
 
@@ -223,20 +220,19 @@
     }
 
     } @else {
-    <!-- Success State -->
     <div class="success-state">
       <svg class="success-check" viewBox="0 0 80 80">
         <circle class="success-check-circle" cx="40" cy="40" r="36" />
         <path class="success-check-mark" d="M24 42 L35 53 L57 29" />
       </svg>
-      <h3 class="success-title">{{ 'consultingPage.success.title' | translate }}</h3>
+      <h2 class="success-title">{{ 'consultingPage.success.title' | translate }}</h2>
       <p class="success-text">{{ 'consultingPage.success.text' | translate }}</p>
 
       @if (audience() === 'b2b' && submittedRequestId()) {
       <div class="attachment-upload-section glass-attachment">
-        <h4><i class="fa-solid fa-paperclip"></i> {{ 'student_corporate.attachments' | translate }}</h4>
+        <h3><i class="fa-solid fa-paperclip"></i> {{ 'student_corporate.attachments' | translate }}</h3>
         <p class="text-muted">{{ 'student_corporate.upload_hint' | translate }}</p>
-        <input type="file" id="consulting-attachment-input" hidden (change)="onAttachmentSelected($event)" />
+        <input type="file" id="consulting-attachment-input" hidden (change)="onAttachmentSelected($event)" [attr.aria-label]="'student_corporate.upload_attachment' | translate" />
         <button type="button" class="btn-outline" (click)="triggerAttachmentInput()" [disabled]="isUploading()">
           @if (isUploading()) { <div class="loader-spinner-sm"></div> }
           @else { <i class="fa-solid fa-cloud-arrow-up"></i> {{ 'student_corporate.upload_attachment' | translate }} }

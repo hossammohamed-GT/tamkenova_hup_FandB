@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { App } from './app';
 import { appConfig } from './app.config';
 
-// -- Boots the app with the REAL app config (router + i18n + theme + interceptors) --
 describe('App bootstrap', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({

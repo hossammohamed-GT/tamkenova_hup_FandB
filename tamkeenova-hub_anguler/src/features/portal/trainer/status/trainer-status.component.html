@@ -22,7 +22,6 @@
 
     @else if (status(); as s) {
 
-    <!-- -- Pending Application State -- -->
     @if (s.status === 'PENDING') {
     <div class="status-icon is-pending">
       <i class="fa-solid fa-hourglass-half"></i>
@@ -72,7 +71,6 @@
     </div>
     }
 
-    <!-- -- Rejected Application State -- -->
     @else if (s.status === 'REJECTED') {
     <div class="status-icon is-rejected">
       <i class="fa-solid fa-circle-xmark"></i>
@@ -109,7 +107,6 @@
     </div>
     }
 
-    <!-- -- Approved Application State -- -->
     @else {
     <div class="status-icon is-approved">
       <i class="fa-solid fa-circle-check"></i>

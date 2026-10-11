@@ -14,6 +14,7 @@ import { loadingInterceptor } from '../core/interceptors/loading.interceptor';
 import { routes } from './app.routes';
 import { ThemeService } from '../core/services/theme.service';
 import { TransitionLinksService } from '../core/services/transition-links.service';
+import { SeoService } from '../core/seo/seo.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -39,6 +40,9 @@ export const appConfig: ApplicationConfig = {
     }),
     provideAppInitializer(() => {
       inject(TransitionLinksService).init();
+    }),
+    provideAppInitializer(() => {
+      inject(SeoService).init();
     }),
   ],
 };

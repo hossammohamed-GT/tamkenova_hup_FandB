@@ -31,7 +31,6 @@ export class StudentNotificationsComponent {
   showUnreadOnly = signal(false);
   isMarkingAll = signal(false);
 
-  // detail modal
   selectedNotification = signal<AppNotification | null>(null);
   notificationDetail = signal<Consultation | CorporateRequest | null>(null);
   isLoadingDetail = signal(false);
@@ -109,8 +108,7 @@ export class StudentNotificationsComponent {
         error: () => this.isLoadingDetail.set(false),
       });
     } else {
-      // Trainer / volunteer / task / system notifications have no entity
-      // endpoint — show the notification content itself instead of spinning.
+      // No entity endpoint here
       this.isLoadingDetail.set(false);
     }
   }
@@ -141,8 +139,7 @@ export class StudentNotificationsComponent {
     return 'tone-' + notificationTone(type);
   }
 
-  // Known types are ALWAYS shown in the user's language (the backend
-  // currently sends English-only titles/messages).
+  // Backend sends English only
   titleFor(notif: AppNotification): string {
     const key = notificationTypeKey(notif.type);
     const fullKey = 'notifications.types.' + key;

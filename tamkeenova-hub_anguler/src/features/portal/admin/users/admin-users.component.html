@@ -8,7 +8,6 @@
 
   <app-admin-nav />
 
-  <!-- -- Toolbar -- -->
   <div class="toolbar">
     <div class="toolbar-search">
       <i class="fa-solid fa-magnifying-glass"></i>
@@ -33,7 +32,6 @@
     </select>
   </div>
 
-  <!-- -- Role pills -- -->
   <div class="filter-pills staff-fade">
     @for (role of roleFilters; track role) {
       <button
@@ -148,7 +146,6 @@
       </table>
     </div>
 
-    <!-- -- Pagination -- -->
     @if (totalPages() > 1) {
       <div class="pagination">
         <button type="button" class="page-btn" [disabled]="page() === 1" (click)="goToPage(page() - 1)">
@@ -172,7 +169,6 @@
     }
   }
 
-  <!-- -- Role Change Modal -- -->
   @if (roleTarget(); as target) {
     <div class="modal-backdrop" (click)="closeRoleModal()">
       <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
@@ -224,7 +220,6 @@
     </div>
   }
 
-  <!-- -- Activity Modal -- -->
   @if (activityTarget(); as target) {
     <div class="modal-backdrop" (click)="closeActivity()">
       <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">

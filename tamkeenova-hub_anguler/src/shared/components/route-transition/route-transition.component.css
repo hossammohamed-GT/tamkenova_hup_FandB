@@ -6,8 +6,6 @@
   overflow: hidden;
 }
 
-/* Center-stage spiral: draws itself while spinning, the line thickens
-   until the coils merge into full coverage, then unwinds the same way. */
 .wipe-spiral {
   position: absolute;
   left: 50vw;

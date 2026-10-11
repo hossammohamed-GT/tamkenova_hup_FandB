@@ -1,6 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 
-// Layout regression only. HTTP fixtures do not write to a database.
+// Fixtures only, no writes
 const certificate = {
   id: 'card-1',
   title: 'Leadership & Professional Development',

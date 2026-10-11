@@ -22,12 +22,8 @@
 </div>
 } @else if (trainer(); as t) {
 <div class="trainer-details">
-  <a routerLink="/team" class="back-link" appScrollReveal>
-    <i class="fa-solid fa-arrow-right rtl-flip"></i>
-    {{ 'team_details.back' | translate }}
-  </a>
+  <app-breadcrumb [items]="crumbs()" />
 
-  <!-- Hero -->
   <section class="trainer-hero surface chamfer-lg"
     appScrollReveal>
     <div class="trainer-hero-bg"></div>
@@ -36,7 +32,8 @@
       <div class="trainer-hero-avatar-wrap">
         @if (avatar()) {
         <img [src]="avatar()" [alt]="name()"
-          class="trainer-hero-avatar" />
+          class="trainer-hero-avatar"
+          fetchpriority="high" decoding="async" />
         } @else {
         <div class="trainer-hero-avatar-fallback">{{
           initials() }}</div>
@@ -68,7 +65,6 @@
     </div>
   </section>
 
-  <!-- Stats -->
   <section class="trainer-stats-grid" appScrollReveal>
     <div class="stat-box surface">
       <i class="fa-solid fa-briefcase"></i>
@@ -108,28 +104,28 @@
     <div class="trainer-details-main">
       @if (bio()) {
       <section class="detail-card surface" appScrollReveal>
-        <h3 class="detail-card-title">
+        <h2 class="detail-card-title">
           <i class="fa-solid fa-quote-right"></i>
           {{ 'team_details.bio' | translate }}
-        </h3>
+        </h2>
         <p class="detail-card-text">{{ bio() }}</p>
       </section>
       } @if (description()) {
       <section class="detail-card surface" appScrollReveal>
-        <h3 class="detail-card-title">
+        <h2 class="detail-card-title">
           <i class="fa-solid fa-align-right"></i>
           {{ 'team_details.about' | translate }}
-        </h3>
+        </h2>
         <p class="detail-card-text">{{ description() }}</p>
       </section>
       }
 
       <section class="detail-card surface" appScrollReveal>
-        <h3 class="detail-card-title">
+        <h2 class="detail-card-title">
           <i class="fa-solid fa-certificate"></i>
           {{ 'team_details.certificates_title' | translate
           }}
-        </h3>
+        </h2>
         @if (certificates().length > 0) {
         <div class="certificates-list">
           @for (cert of certificates(); track cert.id) {
@@ -149,10 +145,10 @@
       </section>
 
       <section class="detail-card surface" appScrollReveal>
-        <h3 class="detail-card-title">
+        <h2 class="detail-card-title">
           <i class="fa-solid fa-book-open"></i>
           {{ 'team_details.programs_title' | translate }}
-        </h3>
+        </h2>
         @if (programs().length > 0) {
         <div class="programs-preview-grid">
           @for (p of programs(); track p.id) {
@@ -213,9 +209,5 @@
     </aside>
   </div>
 
-  <!-- @if (showBooking()) {
-  <app-booking-modal [trainer]="t"
-    (closed)="closeBooking()" />
-  } -->
 </div>
 }

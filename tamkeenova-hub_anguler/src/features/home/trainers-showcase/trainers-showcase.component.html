@@ -1,5 +1,4 @@
 <section class="trainers-section">
-  <!-- Section Header -->
   <div class="section-header animate-in">
     <span class="section-eyebrow">
       <i class="fa-solid fa-users"></i>
@@ -11,7 +10,7 @@
       translate }}</p>
   </div>
 
-  <!-- Loading State -->
+  <!-- Loading state -->
   @if (isLoading()) {
   <div class="trainers-grid">
     @for (i of [1,2,3,4,5,6]; track i) {
@@ -32,7 +31,6 @@
   </div>
   }
 
-  <!-- Trainers Grid -->
   @else if (featuredTrainers().length > 0) {
   <div class="trainers-grid">
     @for (trainer of featuredTrainers(); track trainer.id;
@@ -45,7 +43,6 @@
     }
   </div>
 
-  <!-- View All CTA -->
   <div class="view-all-wrapper animate-in"
     [style.animation-delay]="(featuredTrainers().length * 0.06 + 0.3) + 's'">
     <a routerLink="/team" class="view-all-btn">
@@ -59,7 +56,7 @@
   </div>
   }
 
-  <!-- Empty State -->
+  <!-- Empty state -->
   @else {
   <div class="empty-state surface chamfer-sm animate-in">
     <div class="empty-icon">

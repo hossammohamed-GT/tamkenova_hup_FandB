@@ -1,14 +1,11 @@
 <section class="profile-page">
-  <!-- Loader فقط عند التحميل الأولي -->
   @if (isLoading() && !hasLoaded()) {
   <div class="profile-loader">
     <div class="loader-spinner"></div>
     <p>{{ 'loader.loading' | translate }}</p>
   </div>
   } @else {
-  <!-- حتى لو فشل التحميل، اعرض واجهة مستقرة -->
   @if (displayProfile(); as p) {
-  <!-- Profile Header - ثابت لا يختفي -->
   <div class="profile-hero chamfer-sm">
     <div class="profile-hero-bg"></div>
     <div class="profile-hero-content">
@@ -54,7 +51,6 @@
     }
   </div>
   } @else {
-  <!-- Fallback hero لو profile null -->
   <div class="profile-hero chamfer-sm">
     <div class="profile-hero-bg"></div>
     <div class="profile-hero-content">
@@ -71,7 +67,6 @@
   </div>
   }
 
-  <!-- Tab Navigation - ثابت دائما -->
   <nav class="profile-tabs surface">
     @for (tab of tabs; track tab.id) {
     <button type="button" class="profile-tab" [class.is-active]="activeTab() === tab.id" (click)="setTab(tab.id)">
@@ -81,7 +76,6 @@
     }
   </nav>
 
-  <!-- Profile Form - ثابت، لا يختفي عند تغيير التاب -->
   <form [formGroup]="form" (ngSubmit)="save()" class="profile-form" novalidate>
 
     @if (activeTab() === 'general') {
@@ -130,7 +124,7 @@
           {{ 'trainer_profile.spec_request_sent' | translate }}
         </div>
         } @else {
-        <!-- تم إصلاح التداخل: div بدلا من form -->
+        <!-- Avoid nested form -->
         <div [formGroup]="specRequestForm" class="form-grid">
           <div class="field">
             <label class="field-label">{{ 'trainer_profile.spec_name_ar' | translate }}</label>

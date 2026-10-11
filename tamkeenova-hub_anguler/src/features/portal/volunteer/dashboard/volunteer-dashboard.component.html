@@ -8,7 +8,6 @@
     </div>
   </div>
 
-  <!-- -- Volunteer Sub Nav -- -->
   <nav class="staff-nav">
     <a class="staff-nav-item is-active" routerLink="/portal/trainee">
       <i class="fa-solid fa-gauge-high"></i>
@@ -40,7 +39,6 @@
       </button>
     </div>
   } @else {
-    <!-- -- Core stats + gauge -- -->
     <div class="dash-layout">
       <div class="stats-grid">
         @for (card of coreCards(); track card.labelKey) {
@@ -79,7 +77,6 @@
       </div>
     </div>
 
-    <!-- -- Volunteer impact stats -- -->
     <h2 class="section-title impact-title">{{ 'volunteer_dashboard.impact' | translate }}</h2>
     <div class="stats-grid impact-grid">
       @for (card of volunteerCards(); track card.labelKey) {
@@ -93,7 +90,6 @@
       }
     </div>
 
-    <!-- -- Last tasks -- -->
     @if ((displayStats().last_tasks?.length ?? 0) > 0) {
       <h2 class="section-title impact-title">{{ 'volunteer_dashboard.last_tasks' | translate }}</h2>
       <div class="table-wrap staff-fade">
@@ -133,7 +129,6 @@
       </div>
     }
 
-    <!-- -- Quick actions -- -->
     <div class="quick-row">
       <a routerLink="/portal/trainee/tasks" class="quick-card surface staff-fade">
         <span class="quick-icon">

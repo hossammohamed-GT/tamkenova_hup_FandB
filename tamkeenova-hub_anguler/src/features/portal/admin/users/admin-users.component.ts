@@ -51,17 +51,14 @@ export class AdminUsersComponent implements OnInit {
   page = signal(1);
   readonly limit = 20;
 
-  // -- Role change modal --
   roleTarget = signal<AdminUser | null>(null);
   selectedRole = signal<ManagedRole | null>(null);
   isChangingRole = signal(false);
 
-  // -- Activity modal --
   activityTarget = signal<AdminUser | null>(null);
   activityLogs = signal<ActivityLog[]>([]);
   isLoadingActivity = signal(false);
 
-  // -- Toast --
   toastKey = signal<string | null>(null);
   toastParams = signal<{ role?: string } | null>(null);
 
@@ -140,7 +137,6 @@ export class AdminUsersComponent implements OnInit {
     this.load();
   }
 
-  // Silent re-fetch (no spinner) to reconcile with the server after mutations
   refresh(): void {
     this.load(false);
   }
@@ -169,7 +165,6 @@ export class AdminUsersComponent implements OnInit {
       });
   }
 
-  // ================= Role change =================
 
   openRoleModal(user: AdminUser): void {
     this.roleTarget.set(user);
@@ -212,7 +207,6 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
-  // ================= Activate / Deactivate =================
 
   toggleActive(user: AdminUser): void {
     const next = !user.is_active;
@@ -226,7 +220,6 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
-  // ================= Activity =================
 
   openActivity(user: AdminUser): void {
     this.activityTarget.set(user);
@@ -254,7 +247,6 @@ export class AdminUsersComponent implements OnInit {
     return translated !== key ? translated : role;
   }
 
-  // ================= Toast =================
 
   private showToast(key: string): void {
     this.toastKey.set(key);

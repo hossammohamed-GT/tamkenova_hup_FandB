@@ -6,7 +6,6 @@
     </div>
   </div>
 
-  <!-- Filters -->
   <div class="filters-bar surface glass-filter-bar">
     <div class="search-box">
       <i class="fa-solid fa-magnifying-glass"></i>
@@ -62,7 +61,6 @@
       <p class="trainer-bio">{{ bioOf(t) | slice: 0 : 110 }}{{ bioOf(t).length > 110 ? '…' : '' }}</p>
       }
 
-      <!-- Interactive Rating Stars -->
       <div class="trainer-rating-interactive" (mouseleave)="onStarLeave(t.id)">
         <div class="rating-stars">
           @for (star of [1,2,3,4,5]; track star) {

@@ -65,7 +65,7 @@ export class StudentDashboardComponent {
 
   constructor() {
     const profile$ = this.studentService.getProfile().pipe(
-      // fallback to prevent forkJoin fail
+      // Never fail forkJoin
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       catchError(() => of(null as any)),
     );

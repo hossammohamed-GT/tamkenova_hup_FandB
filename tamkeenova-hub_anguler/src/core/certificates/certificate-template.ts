@@ -42,7 +42,7 @@ export interface CertificateTemplate {
     qr: { x: number; y: number; width: number; height: number };
   };
 }
-// Coordinates are in the artwork's immutable 1800 × 1273 design space.
+// 1800x1273 design space
 const shared = {
   recipient: { x: 280, y: 533, width: 1330, height: 100, fontSize: 58, minFontSize: 29, lines: 2 },
   hours: { x: 270, y: 938, width: 260, height: 65, fontSize: 42, minFontSize: 28, lines: 1 },
@@ -388,7 +388,7 @@ export function validateValues(value: CertificateValues): void {
     throw new Error('certificate_studio.invalid');
   }
 }
-// Pure layout function, shared by preview/export and tested independently of canvas.
+// Keep canvas-independent
 export function fitText(
   value: string,
   box: FieldBox,
@@ -413,6 +413,6 @@ export function fitText(
     )
       return { lines, size };
   }
-  // Never truncate official names or paint outside the designated box.
+  // Never truncate names
   throw new Error('certificate_studio.too_long');
 }

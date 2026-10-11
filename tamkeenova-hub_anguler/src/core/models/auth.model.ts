@@ -21,7 +21,6 @@ export interface RegisterRequest {
   confirm_password: string;
   role: UserRole;
   username?: string;
-  // -- Trainer Registration Fields --
   specialization_id?: string;
   bio_ar?: string;
   bio_en?: string;

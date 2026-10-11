@@ -39,8 +39,7 @@ export class VolunteerStatusComponent {
       },
       error: (err) => {
         if (err?.status !== 401) {
-          // Endpoint unavailable — the admin still reviews the account,
-          // keep the volunteer informed instead of an error wall.
+          // Assume pending on error
           this.status.set({ status: 'PENDING' });
         }
         this.isLoading.set(false);

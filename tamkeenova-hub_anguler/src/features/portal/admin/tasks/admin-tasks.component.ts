@@ -58,7 +58,6 @@ export class AdminTasksComponent implements OnInit {
 
   busyId = signal<string | null>(null);
 
-  // ================= Create / Edit Task =================
   showTaskForm = signal(false);
   editTask = signal<Task | null>(null);
   isSavingTask = signal(false);
@@ -73,25 +72,21 @@ export class AdminTasksComponent implements OnInit {
     estimated_hours: this.fb.control<number | null>(null),
   });
 
-  // -- Assignees picker (create form) --
   pickedUsers = signal<{ user: AdminUser; order: number }[]>([]);
   memberResults = signal<AdminUser[]>([]);
   memberSearchTerm = signal('');
   isSearchingMembers = signal(false);
 
-  // ================= Delete Confirm =================
   deleteTarget = signal<Task | null>(null);
   isDeleting = signal(false);
 
-  // ================= Task Details =================
   details = signal<Task | null>(null);
   isLoadingDetails = signal(false);
   detailsLoadError = signal(false);
-  // Task roster (assignees with users) and raw submission rows, merged in assigneeRows
   private roster = signal<TaskAssignee[]>([]);
   private submissionsRaw = signal<any[]>([]);
   submissionsLoading = signal(false);
-  // Submissions fetched before are replayed instantly on re-open, then silently refreshed
+  // Replay cache, refresh silently
   private submissionsCache = new Map<string, any[]>();
   comments = signal<TaskComment[]>([]);
   isLoadingComments = signal(false);
@@ -105,7 +100,6 @@ export class AdminTasksComponent implements OnInit {
       .map((assignee) => ({ assignee, user: (assignee.users as AdminUser | null) ?? null }));
   });
 
-  // -- Review form --
   reviewTarget = signal<TaskAssignee | null>(null);
   reviewForm = this.fb.nonNullable.group({
     score: this.fb.control<number | null>(null),
@@ -113,13 +107,11 @@ export class AdminTasksComponent implements OnInit {
   });
   isReviewing = signal(false);
 
-  // -- Add assignee (details) --
   detailMemberResults = signal<AdminUser[]>([]);
   detailMemberSearchTerm = signal('');
   isAddingAssignee = signal(false);
   newAssigneeOrder = this.fb.nonNullable.control<number>(1);
 
-  // -- Comment --
   commentForm = this.fb.nonNullable.group({ body: ['', Validators.required] });
   isSendingComment = signal(false);
 
@@ -148,7 +140,6 @@ export class AdminTasksComponent implements OnInit {
     this.activeFilter.set(filter);
   }
 
-  // Silent re-fetch (no spinner) to reconcile with the server after mutations
   refresh(): void {
     this.load(false);
   }
@@ -196,7 +187,6 @@ export class AdminTasksComponent implements OnInit {
     }
   }
 
-  // ================= Create / Edit =================
 
   openCreate(): void {
     this.editTask.set(null);
@@ -244,7 +234,6 @@ export class AdminTasksComponent implements OnInit {
       return;
     }
     this.isSearchingMembers.set(true);
-    // Search both employees and volunteers
     this.adminService.getUsers({ search: query, role: 'EMPLOYEE', limit: 5 }).subscribe({
       next: (employees) => {
         this.adminService.getUsers({ search: query, role: 'VOLUNTEER', limit: 5 }).subscribe({
@@ -343,7 +332,6 @@ export class AdminTasksComponent implements OnInit {
     });
   }
 
-  // ================= Delete =================
 
   askDelete(task: Task): void {
     this.deleteTarget.set(task);
@@ -374,7 +362,6 @@ export class AdminTasksComponent implements OnInit {
     });
   }
 
-  // ================= Details =================
 
   openDetails(task: Task): void {
     this.details.set(task);
@@ -382,8 +369,7 @@ export class AdminTasksComponent implements OnInit {
     this.reviewTarget.set(null);
     this.detailMemberResults.set([]);
     this.detailsLoadError.set(false);
-    // Seed with whatever the list already carries so names render instantly,
-    // then hydrate silently from the dedicated endpoints.
+    // Seed instantly, hydrate silently
     this.roster.set(task.task_assignees ?? []);
     const cachedSubs = this.submissionsCache.get(task.id) ?? [];
     this.submissionsRaw.set(cachedSubs);
@@ -395,23 +381,19 @@ export class AdminTasksComponent implements OnInit {
     this.loadComments(task.id);
   }
 
-  // GET /tasks/:id -> roster (assignees incl. users);
-  // GET /tasks/:id/submissions -> submission rows embedding their assignee.
-  // Each source fills its own signal; assigneeRows() merges both, so a
-  // partial result can never erase names or submissions.
+  // Partial results never erase
   private fetchAssignees(taskId: string): void {
     this.tasksService.getById(taskId).subscribe({
       next: (task) => {
         if (this.details()?.id !== taskId) return;
         const rows = Array.isArray(task?.task_assignees) ? task.task_assignees : [];
         if (rows.length > 0) this.roster.set(rows);
-        // The details payload already carries the comments — show them at once
-        // instead of waiting for the dedicated comments request.
+        // Reuse embedded comments
         if (this.isLoadingComments() && this.comments().length === 0) {
           const seeded = Array.isArray(task?.task_comments) ? task.task_comments : [];
           if (seeded.length > 0) this.comments.set(seeded);
         }
-        // An empty roster is a valid state (no assignees yet) — not an error.
+        // Empty roster is valid
         this.detailsLoadError.set(false);
         this.isLoadingDetails.set(false);
       },
@@ -446,13 +428,11 @@ export class AdminTasksComponent implements OnInit {
     this.fetchAssignees(task.id);
   }
 
-  // Re-fetch the open details modal (assignees + their latest statuses)
   private refreshDetailsIfOpen(taskId: string): void {
     if (!taskId || this.details()?.id !== taskId) return;
     this.fetchAssignees(taskId);
   }
 
-  // Template accessors: tolerate alternate backend field names
   submissionOf(assignee: TaskAssignee): TaskSubmission | null {
     return submissionOfAssignee(assignee as any);
   }
@@ -461,7 +441,7 @@ export class AdminTasksComponent implements OnInit {
     return submissionFiles(submission as any);
   }
 
-  // Review outcome lives on the assignee row and/or its submission
+  // Score in two places
   scoreOf(assignee: TaskAssignee): number | null {
     const row = assignee as any;
     const value = row.score ?? this.submissionOf(assignee)?.score;
@@ -557,11 +537,9 @@ export class AdminTasksComponent implements OnInit {
     });
   }
 
-  // ================= Review =================
 
   openReview(row: AssigneeRow): void {
-    // Reset BEFORE revealing the block: when the form is created it picks up
-    // these values immediately (zoneless renders on the scheduled tick).
+    // Reset before revealing
     const previousScore = this.scoreOf(row.assignee);
     this.reviewForm.reset({
       score: previousScore !== null ? previousScore : null,
@@ -588,7 +566,7 @@ export class AdminTasksComponent implements OnInit {
         return;
       }
       if (required !== null && required !== undefined && raw.score < required) {
-        // Below required score → the API treats this as rejection
+        // Low score means rejection
         this.showToast('admin_tasks.score_below_required', true);
         return;
       }
@@ -608,7 +586,6 @@ export class AdminTasksComponent implements OnInit {
           this.showToast(
             action === 'APPROVE' ? 'admin_tasks.review_approved' : 'admin_tasks.review_rejected',
           );
-          // Re-hydrate the open modal (fresh statuses, scores, notes) and the list.
           const detail = this.details();
           if (detail) this.fetchAssignees(detail.id);
           this.refresh();
@@ -620,7 +597,6 @@ export class AdminTasksComponent implements OnInit {
       });
   }
 
-  // ================= Comments =================
 
   sendComment(): void {
     const task = this.details();

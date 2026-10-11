@@ -1,8 +1,4 @@
-/**
- * API error → stable i18n key (frontend "level 1" mapping from the
- * backend error-handling reference). The backend `message` text is for
- * debugging only — never shown to users.
- */
+// Never show backend messages
 
 type ErrRule = {
   key: string;
@@ -13,14 +9,12 @@ type ErrRule = {
 };
 
 const RULES: ErrRule[] = [
-  // -- Generic guards --
   { key: 'AUTH_NO_TOKEN', msg: /Authorization header missing/i },
   { key: 'AUTH_BAD_TOKEN', msg: /Invalid token format/i },
   { key: 'AUTH_SESSION_EXPIRED', msg: /Invalid or expired token/i },
   { key: 'AUTH_FORBIDDEN', msg: /^Access denied$/i },
   { key: 'AUTH_ROLE_FORBIDDEN', msg: /do not have permission/i },
 
-  // -- Auth --
   { key: 'AUTH_EMAIL_EXISTS', msg: /Email already exists/i },
   { key: 'AUTH_PASSWORD_MISMATCH', msg: /Passwords do not match/i },
   { key: 'AUTH_USERNAME_EXISTS', msg: /Username already exists/i },
@@ -37,7 +31,6 @@ const RULES: ErrRule[] = [
   { key: 'AUTH_PASSWORD_POLICY', msg: /include upper, lower, and a number/i },
   { key: 'AUTH_SUPER_ADMIN_ONLY', msg: /Only a super admin/i },
 
-  // -- Student profile --
   { key: 'STUDENT_USERNAME_TAKEN', msg: /Username is already taken/i },
   { key: 'WRONG_PASSWORD', msg: /Current password is incorrect/i },
   { key: 'SAME_PASSWORD', msg: /must be different from current password/i },
@@ -47,14 +40,12 @@ const RULES: ErrRule[] = [
   { key: 'FILE_TOO_LARGE', msg: /size must not exceed/i },
   { key: 'NO_FILE', msg: /No file provided/i },
 
-  // -- Programs & enrollments --
   { key: 'PROGRAM_NOT_FOUND', msg: /Program not found/i },
   { key: 'PROGRAM_INACTIVE', msg: /program is not currently available/i },
   { key: 'ENROLL_ALREADY', msg: /already enrolled/i },
   { key: 'ENROLL_NOT_FOUND', msg: /Enrollment not found/i },
   { key: 'ENROLL_BAD_STATUS', msg: /Cannot cancel enrollment/i },
 
-  // -- Certificates / reviews / public profile --
   { key: 'CERT_NOT_FOUND', msg: /Certificate not found/i },
   { key: 'REVIEW_NOT_FOUND', msg: /Review not found/i },
   { key: 'REVIEW_EMPTY', msg: /At least one field \(rating or comment\)/i },
@@ -62,11 +53,9 @@ const RULES: ErrRule[] = [
   { key: 'REVIEW_SELF', msg: /cannot rate your own profile/i },
   { key: 'PROFILE_USER_NOT_FOUND', msg: /User not found or not verified/i },
 
-  // -- Trainer --
   { key: 'TRAINER_NOT_FOUND', msg: /Trainer not found/i },
   { key: 'TRAINER_UNAUTHORIZED', msg: /^Unauthorized$/i, path: /\/trainers\// },
 
-  // -- Consultations --
   { key: 'CONSULT_NOT_FOUND', msg: /Consultation not found/i },
   { key: 'CONSULT_NOT_YOURS', msg: /does not belong to you/i },
   { key: 'CONSULT_NO_ACCESS', msg: /do not have access to this consultation/i },
@@ -74,19 +63,16 @@ const RULES: ErrRule[] = [
   { key: 'CONSULT_REVIEW_NOT_COMPLETED', msg: /only review completed consultations/i },
   { key: 'CONSULT_ALREADY_REVIEWED', msg: /already reviewed this consultation/i },
 
-  // -- Corporate --
   { key: 'CORPORATE_NOT_FOUND', msg: /Corporate request not found/i },
   { key: 'CORPORATE_NOT_YOURS', msg: /request does not belong to you/i },
   { key: 'BAD_FILE_TYPE', msg: /Only PDF, DOC, DOCX, JPG, PNG, WEBP/i },
   { key: 'CORPORATE_NEED_ASSIGNEE', msg: /assigned_to \(employee id\) is required/i },
 
-  // -- Admin --
   { key: 'VOLUNTEER_NOT_FOUND', msg: /Volunteer not found/i },
   { key: 'ADMIN_CERT_BAD_TYPE', msg: /Only PDF files are allowed/i },
   { key: 'SPEC_EXISTS', msg: /Specialization already exists/i },
   { key: 'SPEC_NOT_FOUND', msg: /Specialization not found/i },
 
-  // -- Tasks --
   { key: 'TASK_NO_ASSIGNEES', msg: /At least one assignee is required/i },
   { key: 'TASK_USER_NOT_FOUND', msg: /Assignee user not found/i },
   { key: 'TASK_BAD_ROLE', msg: /is not an employee or volunteer/i },
@@ -103,15 +89,10 @@ const RULES: ErrRule[] = [
   { key: 'NOTIFICATION_NOT_FOUND', msg: /Notification not found/i },
 ];
 
-/**
- * Maps an HttpErrorResponse to an `errors.*` translation key.
- * Falls back to `fallback` only when the error carries no recognizable
- * HTTP shape at all — otherwise status-based fallbacks apply.
- */
 export function apiErrorKey(err: unknown, fallback?: string): string {
   const e = err as { status?: number; statusText?: string; url?: string; error?: { message?: string | string[] } } | null;
 
-  // Network failure / request never reached the server
+  // Request never reached server
   if (e && typeof e === 'object' && 'status' in e && (e.status === 0 || e.status === -1) && !e.statusText) {
     return 'errors.S_OFFLINE';
   }
@@ -127,10 +108,9 @@ export function apiErrorKey(err: unknown, fallback?: string): string {
     if (rule.msg && messages.some((m) => rule.msg!.test(m))) return `errors.${rule.key}`;
   }
 
-  // Validation pipe: message is an array of class-validator strings
+  // Array means validation errors
   if (Array.isArray(raw) && raw.length > 0) return 'errors.VALIDATION';
 
-  // Status-level fallbacks
   if (status === 401) return 'errors.AUTH_SESSION_EXPIRED';
   if (status === 403) return 'errors.S_403';
   if (status === 404) return 'errors.S_404';

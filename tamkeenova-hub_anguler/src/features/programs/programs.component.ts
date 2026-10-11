@@ -31,7 +31,6 @@ export class ProgramsComponent {
     { value: 'ADVANCED', labelKey: 'programs.level.advanced' },
   ];
 
-  // -- Derive Available Program Categories --
   categories = computed(() => {
     const programs = this.allPrograms();
 
@@ -46,7 +45,6 @@ export class ProgramsComponent {
     return ['all', ...Array.from(unique)];
   });
 
-  // -- Filter Programs by Search and Selected Criteria --
   filteredPrograms = computed(() => {
     const programs = this.allPrograms();
     if (!Array.isArray(programs)) return [];
@@ -89,15 +87,13 @@ export class ProgramsComponent {
     this.load();
   }
 
-  // -- Load Public Programs --
   load(): void {
     this.isLoading.set(true);
 
     this.programsService.getAllPublic().subscribe({
       next: (response) => {
-        console.log('📦 Programs loaded:', response);
+        console.log('Programs loaded:', response);
 
-        // -- Normalize the API Response Shape --
         let programsArray: Program[] = [];
 
         if (Array.isArray(response)) {
@@ -110,29 +106,26 @@ export class ProgramsComponent {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('❌ Failed to load programs:', err);
+        console.error('Failed to load programs:', err);
         this.allPrograms.set([]);
         this.isLoading.set(false);
       },
     });
   }
 
-  // -- Clear All Program Filters --
   clearFilters(): void {
     this.searchTerm.set('');
     this.selectedCategory.set('all');
     this.selectedLevel.set('all');
   }
 
-  // -- Set the Active Program Category --
   setCategory(cat: string): void {
-    console.log('🔽 Category selected:', cat);
+    console.log('Category selected:', cat);
     this.selectedCategory.set(cat);
   }
 
-  // -- Set the Active Program Level --
   setLevel(level: ProgramLevel | 'all'): void {
-    console.log('🔽 Level selected:', level);
+    console.log('Level selected:', level);
     this.selectedLevel.set(level);
   }
 

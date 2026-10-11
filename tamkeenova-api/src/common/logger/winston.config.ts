@@ -1,34 +1,25 @@
 import * as winston from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
 
-export const winstonConfig = {
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json(),
-  ),
+export type LogCategory = 'auth' | 'errors' | 'security';
 
-  transports: [
-    new DailyRotateFile({
-      dirname: 'logs/errors',
-      filename: '%DATE%.log',
-      datePattern: 'YYYY-MM-DD',
-      level: 'error',
-      maxFiles: '30d',
-    }),
+export function createLoggerConfig(
+  category: LogCategory,
+): winston.LoggerOptions {
+  // Vercel Functions have a read-only application filesystem. Use stdout/stderr
+  // so logs are available in Vercel Logs without creating files at startup.
+  const transport =
+    process.env.VERCEL === '1'
+      ? new winston.transports.Console({ stderrLevels: ['error'] })
+      : new winston.transports.File({
+          filename: `logs/${category}/${category}.log`,
+        });
 
-    new DailyRotateFile({
-      dirname: 'logs/auth',
-      filename: '%DATE%.log',
-      datePattern: 'YYYY-MM-DD',
-      level: 'info',
-      maxFiles: '30d',
-    }),
-
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple(),
-      ),
-    }),
-  ],
-};
+  return {
+    defaultMeta: { category },
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.json(),
+    ),
+    transports: [transport],
+  };
+}

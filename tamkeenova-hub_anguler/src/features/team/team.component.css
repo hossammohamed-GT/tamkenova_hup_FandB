@@ -4,7 +4,6 @@
   background: var(--color-background);
 }
 
-/* ========== Header ========== */
 .team-header {
   text-align: center;
   max-width: 600px;
@@ -42,7 +41,6 @@
   color: var(--color-text-muted);
 }
 
-/* ========== Grid ========== */
 .team-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -61,7 +59,6 @@
   }
 }
 
-/* ========== Skeleton ========== */
 .trainer-card-skeleton {
   padding: 1.5rem;
   display: flex;
@@ -108,7 +105,6 @@
   }
 }
 
-/* ========== Empty State ========== */
 .empty-state {
   max-width: 400px;
   margin: 4rem auto;
@@ -143,7 +139,6 @@
   color: var(--color-text-muted);
 }
 
-/* ========== Animations ========== */
 @keyframes fadeUp {
   from {
     opacity: 0;

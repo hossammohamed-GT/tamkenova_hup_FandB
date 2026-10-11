@@ -1,9 +1,3 @@
-/* ==========================================================================
-   Trainer Details — component styles
-   Built on the global design tokens (--color-primary, --color-accent, etc.)
-   ========================================================================== */
-
-/* ---------- Skeleton / loading state ---------- */
 .trainer-details-skeleton {
   max-width: 1040px;
   margin: 0 auto;
@@ -60,7 +54,6 @@
   }
 }
 
-/* ---------- Not found state ---------- */
 .trainer-not-found {
   max-width: 480px;
   margin: 80px auto;
@@ -97,7 +90,6 @@
   display: inline-flex;
 }
 
-/* ---------- Page shell ---------- */
 .trainer-details {
   max-width: 1040px;
   margin: 0 auto;
@@ -132,7 +124,6 @@ html[dir='rtl'] .back-link:hover i {
   transform: translateX(3px);
 }
 
-/* ---------- Hero ---------- */
 .trainer-hero {
   position: relative;
   padding: 56px 32px 44px;
@@ -275,7 +266,6 @@ html[dir='rtl'] .hero-availability-dot {
   transform: translateY(0);
 }
 
-/* ---------- Stats grid ---------- */
 .trainer-stats-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -324,7 +314,6 @@ html[dir='rtl'] .hero-availability-dot {
   }
 }
 
-/* ---------- Body layout ---------- */
 .trainer-details-body {
   display: grid;
   grid-template-columns: 1fr 320px;
@@ -358,7 +347,6 @@ html[dir='rtl'] .hero-availability-dot {
   }
 }
 
-/* ---------- Detail cards ---------- */
 .detail-card {
   padding: 24px;
   transition: box-shadow var(--transition-fast);
@@ -394,7 +382,6 @@ html[dir='rtl'] .hero-availability-dot {
   font-style: italic;
 }
 
-/* Certificates */
 .certificates-list {
   display: flex;
   flex-wrap: wrap;
@@ -426,7 +413,6 @@ html[dir='rtl'] .hero-availability-dot {
   background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface-alt));
 }
 
-/* Programs preview */
 .programs-preview-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -452,7 +438,6 @@ html[dir='rtl'] .hero-availability-dot {
   line-height: 1.5;
 }
 
-/* ---------- Sidebar: price card ---------- */
 .price-card {
   padding: 22px;
   display: flex;
@@ -503,7 +488,6 @@ html[dir='rtl'] .hero-availability-dot {
   box-shadow: 0 10px 22px color-mix(in srgb, var(--color-accent) 35%, transparent);
 }
 
-/* ---------- Sidebar: socials card ---------- */
 .socials-card {
   padding: 20px 22px;
   display: flex;
@@ -544,7 +528,6 @@ html[dir='rtl'] .hero-availability-dot {
   color: #fff;
 }
 
-/* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .shimmer,
   .hero-availability-dot {

@@ -33,7 +33,6 @@
     }
   </div>
   <p class="studio-intro">{{ 'certificate_studio.intro' | translate }}</p>
-  <!-- -- Toolbar -- -->
   <div class="toolbar">
     <div class="toolbar-search">
       <i class="fa-solid fa-magnifying-glass"></i>
@@ -208,7 +207,6 @@
     </div>
   }
 
-  <!-- -- Issue / Edit Modal -- -->
   @if (showIssueModal()) {
     <div class="modal-backdrop" (click)="closeIssue()">
       <div
@@ -281,7 +279,6 @@
               </p>
             }
 
-            <!-- -- User picker (only when issuing) -- -->
             @if (!editTarget()) {
               <div class="field">
                 <label class="field-label">{{ 'admin_certificates.recipient' | translate }}</label>
@@ -606,7 +603,6 @@
     </div>
   }
 
-  <!-- -- Delete Confirm -- -->
   @if (deleteTarget(); as target) {
     <div class="modal-backdrop" (click)="closeDelete()">
       <div class="modal-card surface chamfer-sm modal-narrow" (click)="$event.stopPropagation()">

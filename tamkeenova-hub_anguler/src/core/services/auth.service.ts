@@ -40,12 +40,10 @@ export class AuthService {
   isVolunteer = computed(() => this.role() === 'VOLUNTEER');
   isStaffMember = computed(() => this.isEmployee() || this.isVolunteer());
 
-  // -- Register a New User --
   register(payload: RegisterRequest) {
     return this.http.post<RegisterResponse>(`${this.baseUrl}/register`, payload);
   }
 
-  // -- Submit a Volunteer Application (public) --
   registerVolunteer(payload: VolunteerRegisterRequest) {
     return this.http.post<RegisterResponse>(`${this.baseUrl}/register/volunteer`, payload);
   }
@@ -54,17 +52,14 @@ export class AuthService {
     return this.http.get<{ success: boolean; data: { email_available: boolean; username_available: boolean; phone_available: boolean } }>(`${this.baseUrl}/availability`, { params });
   }
 
-  // -- Verify an Email Address --
   verifyEmail(payload: VerifyEmailRequest) {
     return this.http.post<ApiSuccessMessage>(`${this.baseUrl}/verify-email`, payload);
   }
 
-  // -- Resend an Email Verification Code --
   resendOtp(payload: ResendOtpRequest) {
     return this.http.post<ApiSuccessMessage>(`${this.baseUrl}/resend-otp`, payload);
   }
 
-  // -- Authenticate a User --
   login(payload: LoginRequest) {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, payload);
   }
@@ -77,7 +72,6 @@ export class AuthService {
     return this.http.post<ApiSuccessMessage>(`${this.baseUrl}/reset-password`, payload);
   }
 
-  // -- Persist the Authenticated User Session --
   setSession(response: LoginResponse): void {
     const { access_token, user } = response.data;
     try {
@@ -89,12 +83,10 @@ export class AuthService {
     this._currentUser.set(user);
   }
 
-  // -- Retrieve the Authenticated User --
   fetchCurrentUser() {
     return this.http.get<ApiDataResponse<User>>(`${this.baseUrl}/me`);
   }
 
-  // -- Refresh the Stored User Profile --
   refreshCurrentUser(): void {
     this.fetchCurrentUser().subscribe({
       next: (res) => {
@@ -107,7 +99,6 @@ export class AuthService {
     });
   }
 
-  // -- Landing route for a role (single source of truth) --
   homeRouteForRole(role: UserRole | null): string {
     if (role === 'TRAINER') return '/portal/trainer';
     if (role === 'ADMIN' || role === 'SUPER_ADMIN') return '/portal/admin';
@@ -118,9 +109,6 @@ export class AuthService {
 
   private syncInFlight: Observable<{ changed: boolean; role: UserRole | null }> | null = null;
 
-  // -- Reconcile the cached session with server truth.
-  // Role may have changed server-side (admin action). Concurrent callers
-  // share one in-flight request. Never logs out except on a real 401.
   syncSession(): Observable<{ changed: boolean; role: UserRole | null }> {
     if (this.syncInFlight) return this.syncInFlight;
     const previous = this._currentUser()?.role ?? null;
@@ -136,6 +124,7 @@ export class AuthService {
         return { changed, role: fresh.role };
       }),
       catchError((err) => {
+        // Logout on 401 only
         if (err?.status === 401) {
           this.logout(false);
           this.router.navigate(['/login']);
@@ -150,7 +139,6 @@ export class AuthService {
     return this.syncInFlight;
   }
 
-  // -- Retrieve the Stored Access Token --
   getToken(): string | null {
     try {
       return localStorage.getItem(TOKEN_KEY);
@@ -159,7 +147,6 @@ export class AuthService {
     }
   }
 
-  // -- Restore a Valid User from Local Storage --
   private readUserFromStorage(): User | null {
     try {
       if (typeof localStorage === 'undefined') return null;
@@ -177,7 +164,6 @@ export class AuthService {
     }
   }
 
-  // -- Clear the Current User Session --
   logout(redirect = true): void {
     try {
       if (typeof localStorage !== 'undefined') {

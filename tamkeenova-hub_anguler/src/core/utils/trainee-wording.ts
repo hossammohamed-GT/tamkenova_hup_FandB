@@ -1,4 +1,4 @@
-/** Presentation only. Never use this for API roles, routes, identifiers or persisted values. */
+// Display only, never identifiers
 export function traineeWording(text: string | null | undefined): string {
   return (text ?? '')
     .replace(/volunteering/gi, (value) => (value[0] === 'V' ? 'Training' : 'training'))

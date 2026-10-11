@@ -16,7 +16,6 @@
       <form [formGroup]="form" (ngSubmit)="submit()"
         class="auth-form" novalidate>
 
-        <!-- -- Role Selection -- -->
         <div class="field">
           <span class="field-label">{{
             'auth.register.role_label' | translate }}</span>
@@ -59,7 +58,6 @@
           </div>
         </div>
 
-        <!-- -- Full Name Field -- -->
         <div class="field"
           [class.is-valid]="isFieldValid('full_name')"
           [class.is-invalid]="isFieldInvalid('full_name')">
@@ -84,7 +82,6 @@
           </span>
         </div>
 
-        <!-- -- Username Field -- -->
         <div class="field"
           [class.is-valid]="isFieldValid('email')"
           [class.is-invalid]="isFieldInvalid('email')">
@@ -108,7 +105,6 @@
           </span>
         </div>
 
-        <!-- -- Phone Field -- -->
         <div class="field"
           [class.is-valid]="isFieldValid('username')"
           [class.is-invalid]="isFieldInvalid('username')">
@@ -136,7 +132,6 @@
           </span>
         </div>
 
-        <!-- -- Email Field -- -->
         <div class="field"
           [class.is-valid]="isFieldValid('phone')"
           [class.is-invalid]="isFieldInvalid('phone')">
@@ -161,7 +156,6 @@
           </span>
         </div>
 
-        <!-- -- Password Field -- -->
         <div class="field"
           [class.is-valid]="isFieldValid('password')"
           [class.is-invalid]="isFieldInvalid('password')">

@@ -1,4 +1,4 @@
-// 2026.2 edition. Build-time artwork only; no fixed wording is painted at runtime.
+// 2026.2 edition
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
 const root = new URL('../public/certificates/', import.meta.url);
@@ -97,8 +97,7 @@ for (const type of ['training', 'volunteer'])
     ${partners ? label('IN COLLABORATION WITH', 'بالشراكة مع', center, 1111, 11, gold) : arabic ? text('نُمكّن اليوم، لنصنع أثر الغد', center, 1180, 35, navy, 'Amiri') : text('Empowering people. Shaping tomorrow.', center, 1180, 36, navy, 'Cormorant Garamond Light', 'font-style="italic"')}
     ${label('TAMKEENOVA  ·  LEARNING WITH PURPOSE', 'تمكينوفا، تعلّم يصنع الفارق', center, training ? 1237 : 1246, 10, muted)}
   </svg>`;
-      // Arabic is a true RTL composition, not just translated English text.
-      // Mirror the geometry, while keeping text and the official logo upright.
+      // Mirror geometry, upright text
       if (arabic) {
         artwork = artwork
           .replace(

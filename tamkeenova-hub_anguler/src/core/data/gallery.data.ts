@@ -1,9 +1,5 @@
 import { GalleryImage } from "../../features/gallery-showcase/gallery-showcase.component.js";
 
-/* Real event/training photography, stored locally (no external links).
-   Programs = trainings & workshops (12). Events = conferences, ceremonies
-   & large gatherings (11). Two uploaded files were deliberately excluded:
-   a 206px thumbnail (unusable) and an AI-fabricated Red Crescent scene. */
 const PROGRAM_SHOTS: GalleryImage[] = [
   { src: '/images/gallery/gallery-01.jpg', alt: 'TamkeeNova Hub training session with branded rollup' },
   { src: '/images/gallery/gallery-02.jpg', alt: 'Android development trainees group photo' },

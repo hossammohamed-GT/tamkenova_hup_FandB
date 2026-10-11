@@ -3,12 +3,6 @@ import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { RouteTransitionService } from './route-transition.service';
 
-/**
- * Routes every internal link click through the spiral transition.
- * Listens in the capture phase so it can claim the click before the
- * router's own handlers; modifier clicks, new-tab targets, downloads,
- * external URLs and same-page anchors keep their native behavior.
- */
 @Injectable({ providedIn: 'root' })
 export class TransitionLinksService {
   private doc = inject(DOCUMENT);
@@ -19,6 +13,7 @@ export class TransitionLinksService {
   init(): void {
     if (this.attached || typeof window === 'undefined') return;
     this.attached = true;
+    // Capture clicks before router
     this.doc.addEventListener('click', (e) => this.onCapture(e as MouseEvent), true);
   }
 
@@ -31,7 +26,7 @@ export class TransitionLinksService {
     if (anchor.hasAttribute('download')) return;
     const href = anchor.getAttribute('href') || '';
     if (!href.startsWith('/')) return;
-    // Same-page fragment scroll: keep native behavior.
+    // Keep native anchor scroll
     const hashIdx = href.indexOf('#');
     if (hashIdx >= 0) {
       const pathOnly = href.slice(0, hashIdx);

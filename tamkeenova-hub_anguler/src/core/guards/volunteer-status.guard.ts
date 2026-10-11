@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
 import { VolunteersService } from '../services/volunteers.service';
 
-// Volunteers must stay on the status page until the admin approves them.
+// Block until admin approval
 export const volunteerStatusGuard: CanActivateFn = () => {
   const volunteersService = inject(VolunteersService);
   const router = inject(Router);
@@ -22,10 +22,9 @@ export const volunteerStatusGuard: CanActivateFn = () => {
       return router.createUrlTree(['/portal/trainee/status']);
     }),
     catchError((err) => {
-      // 401 is handled by the auth interceptor (logout + redirect).
+      // Interceptor handles 401
       if (err?.status === 401) return of(true);
-      // Fail open on any other error (missing endpoint / network glitch)
-      // to avoid locking volunteers out of their portal.
+      // Fail open, avoid lockout
       return of(true);
     }),
   );

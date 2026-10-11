@@ -31,7 +31,6 @@
   overflow: visible;
 }
 
-/* -- Animated Path -- */
 .loader-path {
   fill: var(--color-primary);
   fill-opacity: 0;
@@ -53,7 +52,6 @@
   filter: drop-shadow(0 0 0 transparent);
 }
 
-/* -- Brand Wordmark -- */
 .loader-wordmark {
   display: flex;
   margin-block-start: 1.5rem;
@@ -92,7 +90,6 @@
   }
 }
 
-/* -- Loading Status -- */
 .loader-status {
   display: flex;
   align-items: center;

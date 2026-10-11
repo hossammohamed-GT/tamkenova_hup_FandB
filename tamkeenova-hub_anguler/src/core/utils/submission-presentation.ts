@@ -1,6 +1,5 @@
 import { environment } from '../../environments/environment';
 
-/** Attachment shape we render in the UI (normalized). */
 export interface SubmissionFile {
   id: string;
   name: string;
@@ -9,15 +8,7 @@ export interface SubmissionFile {
 
 type Json = Record<string, any>;
 
-/**
- * Builds the admin details rows from the two backend sources:
- * - assignees: the task roster (GET /tasks and GET /tasks/:id include
- *   `task_assignees` with nested `users`).
- * - submissions: GET /tasks/:id/submissions returns SUBMISSION rows
- *   (task_submissions) each embedding its assignee under `task_assignees`.
- * The result is one row per assignee with `submission` attached, so names
- * never vanish and every submission is visible for review.
- */
+// Two endpoints, different shapes
 export function mergeSubmissionsIntoAssignees(
   assignees: Array<Json | null | undefined> | null | undefined,
   submissions: Array<Json | null | undefined> | null | undefined,
@@ -53,28 +44,21 @@ export function mergeSubmissionsIntoAssignees(
   return [...rows.values()];
 }
 
-/**
- * Reads the submission of an assignee row, tolerating alternate backend keys
- * (submission / task_submission / submission_data).
- */
+// Backend keys vary
 export function submissionOfAssignee(assignee: Json | null | undefined): any | null {
   if (!assignee) return null;
   const raw = assignee['submission'] ?? assignee['task_submission'] ?? assignee['submission_data'];
   return raw ?? null;
 }
 
-/** Builds an absolute URL for attachments that the backend stores as relative paths. */
+// Backend stores relative paths
 export function absoluteFileUrl(url: string): string {
   if (!url) return '';
   if (/^https?:\/\//i.test(url) || url.startsWith('blob:') || url.startsWith('data:')) return url;
   return `${environment.apiUrl}/${url.replace(/^\/+/, '')}`;
 }
 
-/**
- * Normalizes the attachment list of a submission. The API has used several
- * container keys (task_submission_attachments / attachments / files) and
- * several url keys (file_url / url / file_path) — handle all of them.
- */
+// Normalize attachment shapes
 export function submissionFiles(submission: Json | null | undefined): SubmissionFile[] {
   if (!submission) return [];
   const rawList =

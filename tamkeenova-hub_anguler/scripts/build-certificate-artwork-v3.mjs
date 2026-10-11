@@ -1,4 +1,4 @@
-// 2026.3: reference-inspired ornamental design. All fixed copy is baked into artwork.
+// 2026.3 edition
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
 import jpeg from 'jpeg-js';

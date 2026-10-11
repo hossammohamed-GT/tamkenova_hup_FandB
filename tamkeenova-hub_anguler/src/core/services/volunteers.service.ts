@@ -15,11 +15,10 @@ export class VolunteersService {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/volunteers`;
 
-  // Cached approval flag (avoids re-checking on every navigation)
+  // Cached approval
   isApprovedCached = false;
 
-  // -- Retrieve the Current Volunteer's Application Status --
-  // Tries the documented shape, then a couple of common aliases.
+  // Try endpoint aliases
   getMyStatus(): Observable<VolunteerStatusData> {
     return this.tryStatus(`${this.baseUrl}/me`).pipe(
       catchError((err) => {
@@ -46,7 +45,7 @@ export class VolunteersService {
     );
   }
 
-  // -- Suppress endpoint-missing noise for the caller --
+  // Null instead of errors
   silent(): Observable<VolunteerStatusData | null> {
     return this.getMyStatus().pipe(catchError(() => of(null)));
   }

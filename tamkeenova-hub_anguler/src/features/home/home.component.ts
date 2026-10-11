@@ -4,7 +4,6 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { PartnersService } from '../../core/services/partners.service';
 import { StrategicPartner } from '../../core/models/partner.model';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
-// import { TrainersShowcaseComponent } from '../trainers-showcase/trainers-showcase.component';
 import { TrainersShowcaseComponent } from './trainers-showcase/trainers-showcase.component';
 interface ServiceCard {
   icon: string;
@@ -47,6 +46,12 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     '/images/gallery/gallery-15.jpg',
   ];
   activeHeroIndex = signal(0);
+
+  heroSlideBg(i: number): string | null {
+    const active = this.activeHeroIndex();
+    const next = (active + 1) % this.heroImages.length;
+    return active === i || next === i ? 'url(' + this.heroImages[i] + ')' : null;
+  }
   private heroTimer?: ReturnType<typeof setInterval>;
 
   galleryImages: string[] = [
@@ -259,7 +264,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     );
 
     const prefersReduced = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
-    // Nothing to rotate with a single logo — sliding it out and back in only looks broken.
+    // Single logo, nothing rotates
     if (prefersReduced || this.partnerCards.length <= 1) return;
 
     const startDelay = setTimeout(() => {
@@ -291,18 +296,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const current = this.slots();
     if (!current[idx]) return;
     const next = this.pickNextCard(idx);
-    // Same logo coming in (e.g. a single partner) — skip instead of sliding it out and back.
+    // Skip same-logo slide
     if (next.img === current[idx].currentImg) return;
 
-    // Step 1: swap the incoming frame's image while it still sits at its
-    // off-card start position (no transition runs yet).
+    // Swap image before sliding
     const updated = [...current];
     updated[idx] = { ...updated[idx], nextImg: next.img, nextHref: next.href, nextAlt: next.alt };
     this.slots.set(updated);
 
-    // Step 2: on the next frame — after the browser has painted the new logo
-    // at the start position — run the slide. Setting src + class in one tick
-    // lets the logo pop into the card before/without the movement.
+    // Slide on next frame
     const raf = requestAnimationFrame(() => {
       const s = this.slots();
       if (!s[idx] || s[idx].sliding) return;

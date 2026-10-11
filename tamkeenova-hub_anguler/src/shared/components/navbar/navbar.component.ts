@@ -129,7 +129,7 @@ export class NavbarComponent {
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement | null;
     if (!target || typeof (target as any).closest !== 'function') {
-      // text node or non-element click
+      // Non-element click
       this.isUserMenuOpen.set(false);
       if (!this.isNotifHovering()) {
         this.isNotifDropdownOpen.set(false);
@@ -144,7 +144,6 @@ export class NavbarComponent {
         this.isNotifDropdownOpen.set(false);
       }
     }
-    // also close user menu if clicked outside but inside navbar and not user menu
     if (clickedInside && this.isUserMenuOpen()) {
       const insideUserMenu = target.closest('.user-menu');
       if (!insideUserMenu) {
@@ -219,9 +218,7 @@ export class NavbarComponent {
     return 'tone-' + notificationTone(type);
   }
 
-  // Known types are ALWAYS shown in the user's language (the backend
-  // currently sends English-only titles/messages). Unknown types fall
-  // back to the backend text, then to a generic translated label.
+  // Backend sends English only
   titleFor(notif: AppNotification): string {
     const key = notificationTypeKey(notif.type);
     const fullKey = 'notifications.types.' + key;
@@ -312,8 +309,7 @@ export class NavbarComponent {
         error: () => this.isLoadingDetail.set(false),
       });
     } else {
-      // Trainer / volunteer / task / system notifications have no entity
-      // endpoint — show the notification content itself instead of spinning.
+      // No entity endpoint here
       this.isLoadingDetail.set(false);
     }
   }
@@ -397,7 +393,7 @@ export class NavbarComponent {
     return '/portal/student/profile';
   });
 
-  // Admins manage everything from the admin portal — no public profile page
+  // No admin profile page
   isAdminRole = computed(() => {
     const role = this.authService.role();
     return role === 'ADMIN' || role === 'SUPER_ADMIN';

@@ -10,7 +10,6 @@
     </button>
   </div>
 
-  <!-- -- Status Filters -- -->
   <div class="filter-pills staff-fade">
     @for (f of statusFilters; track f) {
       <button
@@ -107,7 +106,6 @@
     </div>
   }
 
-  <!-- ================= Task Details Modal ================= -->
   @if (selected(); as item) {
     <div class="modal-backdrop" (click)="closeDetails()">
       <div class="modal-card surface chamfer-sm modal-wide" (click)="$event.stopPropagation()">
@@ -143,7 +141,6 @@
           <p class="desc-text">{{ item.task.description }}</p>
         }
 
-        <!-- -- Timeline -- -->
         <div class="timeline staff-timeline">
           @for (step of timelineSteps(item); track step.key) {
             <div
@@ -178,7 +175,6 @@
           </div>
         }
 
-        <!-- -- Actions: Start -- -->
         @if (canStart(item)) {
           <div class="action-band">
             <button type="button" class="btn-primary-sm btn-sm" [disabled]="busy()" (click)="startTask(item)">
@@ -191,7 +187,6 @@
           </div>
         }
 
-        <!-- -- Submission -- -->
         @if (canSubmit(item)) {
           <h4 class="detail-subtitle">
             {{ (item.status === 'REJECTED' ? 'my_tasks.resubmit' : 'my_tasks.submit_title') | translate }}
@@ -264,7 +259,6 @@
           </form>
         }
 
-        <!-- -- Existing submission (read only) -- -->
         @if (item.submission && item.status !== 'IN_PROGRESS' && item.status !== 'PENDING') {
           <h4 class="detail-subtitle">{{ 'my_tasks.submission' | translate }}</h4>
           <div class="submission-box">
@@ -295,7 +289,6 @@
           </div>
         }
 
-        <!-- -- Result -- -->
         @if (item.status === 'APPROVED') {
           <div class="result-banner result-approved">
             <i class="fa-solid fa-circle-check"></i>
@@ -325,7 +318,6 @@
           </div>
         }
 
-        <!-- -- Comments -- -->
         <h4 class="detail-subtitle">{{ 'my_tasks.comments' | translate }} ({{ comments().length }})</h4>
 
         @if (isLoadingComments()) {

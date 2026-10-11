@@ -46,7 +46,6 @@
   color: var(--color-danger);
 }
 
-/* -- Role options -- */
 .role-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -121,7 +120,6 @@
   line-height: 1.4;
 }
 
-/* -- Activity list -- */
 .activity-list {
   list-style: none;
   margin: 0;

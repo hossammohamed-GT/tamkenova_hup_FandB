@@ -197,9 +197,10 @@
   color: var(--color-text-muted);
 }
 
-.trainer-info h3 {
+.trainer-info h2 {
   font-size: var(--text-lg);
   font-weight: 700;
+  margin: 0;
 }
 
 .trainer-rating {
@@ -227,7 +228,6 @@
   text-decoration: none;
 }
 
-/* -- Side -- */
 .details-side {
   position: sticky;
   top: 7rem;

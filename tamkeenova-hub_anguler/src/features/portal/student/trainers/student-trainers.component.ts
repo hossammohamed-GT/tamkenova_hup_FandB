@@ -41,7 +41,6 @@ export class StudentTrainersComponent {
   totalPages = signal(1);
   total = signal(0);
 
-  // rating state per trainer
   hoverRatings = signal<Record<string, number>>({});
   userRatings = signal<Record<string, number>>({});
   ratingLoading = signal<Record<string, boolean>>({});
@@ -152,7 +151,7 @@ export class StudentTrainersComponent {
     event.stopPropagation();
     if (this.ratingLoading()[trainer.id]) return;
 
-    // Never fail silently: logged-out clicks get a visible message under the card.
+    // Never fail silently
     if (!this.authService.isLoggedIn()) {
       this.flashRatingError(trainer.id, 'student_trainers.login_to_rate');
       return;
@@ -177,7 +176,7 @@ export class StudentTrainersComponent {
         }));
         this.ratingSuccess.update((m) => ({ ...m, [trainer.id]: true }));
         this.ratingLoading.update((m) => ({ ...m, [trainer.id]: false }));
-        // Use exact server stats (re-rates update without inflating the count).
+        // Trust server counts
         this.trainers.update((list) =>
           list.map((t) =>
             t.id === trainer.id

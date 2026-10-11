@@ -21,12 +21,11 @@ const IGNORED_URLS = [
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
   const loader = inject(LoaderService);
 
-  // تجاهل طلبات الخلفية والـ GET لتجنب الوميض الجهنمي
+  // Skip background polling
   const shouldIgnore =
     IGNORED_URLS.some((url) => req.url.includes(url)) ||
     req.method === 'GET';
 
-  // فقط POST, PUT, PATCH, DELETE تظهر اللودر - ولفترة قصيرة
   if (shouldIgnore) {
     return next(req);
   }
@@ -39,7 +38,7 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
       activeRequests--;
       if (activeRequests <= 0) {
         activeRequests = 0;
-        // تأخير بسيط لتجنب الوميض السريع
+        // Settle before hiding
         setTimeout(() => {
           if (activeRequests === 0) loader.hide();
         }, 150);

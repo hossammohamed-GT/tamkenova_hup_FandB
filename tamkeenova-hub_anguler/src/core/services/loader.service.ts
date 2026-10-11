@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class LoaderService {
-  // يبدأ مخفي لتجنب الوميض الجهنمي - App يظهره أوليا ثم يخفيه
+  // Hidden until splash
   isVisible = signal(false);
 
   show(): void {

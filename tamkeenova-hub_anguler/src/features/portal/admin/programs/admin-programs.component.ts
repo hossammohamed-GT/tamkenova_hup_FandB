@@ -27,11 +27,9 @@ export class AdminProgramsComponent implements OnInit {
 
   busyId = signal<string | null>(null);
 
-  // -- Edit modal --
   editTarget = signal<AdminProgram | null>(null);
   isSaving = signal(false);
 
-  // -- Delete confirm --
   deleteTarget = signal<AdminProgram | null>(null);
   isDeleting = signal(false);
 
@@ -71,7 +69,6 @@ export class AdminProgramsComponent implements OnInit {
     return Number(program.average_rating).toFixed(1);
   }
 
-  // Silent re-fetch (no spinner) to reconcile with the server after mutations
   refresh(): void {
     this.load(false);
   }
@@ -103,7 +100,6 @@ export class AdminProgramsComponent implements OnInit {
     return program.is_active === true || (program.is_active === undefined && !program.is_hidden && program.is_published !== false);
   }
 
-  // ================= Hide / Show =================
 
   toggleVisibility(program: AdminProgram): void {
     this.busyId.set(program.id);
@@ -130,7 +126,6 @@ export class AdminProgramsComponent implements OnInit {
     });
   }
 
-  // ================= Edit =================
 
   openEdit(program: AdminProgram): void {
     this.editTarget.set(program);
@@ -179,7 +174,6 @@ export class AdminProgramsComponent implements OnInit {
       });
   }
 
-  // ================= Delete =================
 
   askDelete(program: AdminProgram): void {
     this.deleteTarget.set(program);

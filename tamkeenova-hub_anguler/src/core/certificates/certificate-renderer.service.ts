@@ -69,7 +69,7 @@ export class CertificateRenderer {
     const ctx = canvas.getContext('2d');
     if (!ctx) throw new Error('certificate_studio.render_error');
     ctx.scale(canvas.width / ARTBOARD.width, canvas.height / ARTBOARD.height);
-    // The sole source of fixed wording/branding. Optional partner logos use a reserved band.
+    // Wording lives in artwork
     ctx.drawImage(artwork, 0, 0, ARTBOARD.width, ARTBOARD.height);
     this.drawField(
       ctx,
@@ -104,7 +104,7 @@ export class CertificateRenderer {
     this.drawField(ctx, digits(values.issued_at.slice(0, 10)), template.fields.date, 'ltr');
     const url = new URL('/verify', window.location.origin);
     url.searchParams.set('code', values.verification_code);
-    // Four-module quiet zone. Generated locally, never sent to an external QR service.
+    // QR stays local
     const qr = await QRCode.toCanvas(url.href, {
       width: 512,
       margin: 4,

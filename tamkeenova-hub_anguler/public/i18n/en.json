@@ -1650,5 +1650,99 @@
       "password_same": "New password must be different from the current one",
       "password_weak": "Password must be at least 8 characters"
     }
+  },
+  "seo":   {
+    "home": {
+      "title": "TamkeeNova HUB | Certified Training Programs & Expert Trainers",
+      "description": "TamkeeNova HUB: certified training programs, expert trainers, corporate consulting and verifiable certificates in Fayoum and Upper Egypt."
+    },
+    "programs": {
+      "title": "Training Programs",
+      "description": "Browse certified training programs: skill development and workshops led by expert trainers. Choose your program and enroll now."
+    },
+    "programDetails": {
+      "title": "Program Details",
+      "description": "Training program details: content, trainer, duration and price. Enroll now at TamkeeNova HUB."
+    },
+    "consulting": {
+      "title": "Consulting & Corporate Services",
+      "description": "Consulting for individuals and organizations: training solutions and business development with TamkeeNova HUB experts."
+    },
+    "team": {
+      "title": "Our Trainers",
+      "description": "Meet TamkeeNova HUB expert trainers across specializations. Choose your trainer and book a consultation."
+    },
+    "trainerDetails": {
+      "title": "Trainer Profile",
+      "description": "Trainer profile: specialization, experience, programs and reviews. Book your consultation now."
+    },
+    "gallery": {
+      "title": "Photo Gallery",
+      "description": "Highlights from our programs and events: workshops, graduations and conferences in pictures."
+    },
+    "verify": {
+      "title": "Verify Certificates",
+      "description": "Verify the authenticity of TamkeeNova HUB certificates."
+    },
+    "publicProfile": {
+      "title": "Public Profile",
+      "description": "Public profile: completed programs and certificates."
+    },
+    "login": {
+      "title": "Log In",
+      "description": "Log in to access your programs, certificates and consultations."
+    },
+    "register": {
+      "title": "Create Account",
+      "description": "Create your account and join our trainees: certified programs and verifiable certificates."
+    },
+    "registerTrainer": {
+      "title": "Join as a Trainer",
+      "description": "Apply as a trainer: share your expertise and deliver programs with TamkeeNova HUB."
+    },
+    "registerTrainee": {
+      "title": "Join as a Trainee",
+      "description": "Join TamkeeNova HUB and help create community impact."
+    },
+    "verifyOtp": {
+      "title": "Verify Email",
+      "description": "Enter the code sent to your email to activate your account."
+    },
+    "forgot": {
+      "title": "Reset Password",
+      "description": "Regain access to your account via email."
+    },
+    "reset": {
+      "title": "Set New Password",
+      "description": "Set a new password for your account."
+    },
+    "notfound": {
+      "title": "Page Not Found",
+      "description": "Page not found. Browse our training programs or contact us."
+    },
+    "portal": {
+      "description": "Your TamkeeNova HUB dashboard."
+    },
+    "studentHome": {
+      "title": "Student Dashboard"
+    },
+    "trainerHome": {
+      "title": "Trainer Dashboard"
+    },
+    "studentProfile": {
+      "title": "My Profile"
+    },
+    "trainerProfile": {
+      "title": "Trainer Profile"
+    },
+    "trainerStatus": {
+      "title": "Trainer Application Status"
+    },
+    "volunteerStatus": {
+      "title": "Application Status"
+    },
+    "trainerConsultations": {
+      "title": "Manage Consultations"
+    }
   }
 }

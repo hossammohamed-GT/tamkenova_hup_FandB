@@ -12,17 +12,14 @@ export class SpecializationService {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/specializations`;
 
-  // -- Retrieve All Specializations --
   getAll() {
     return this.http.get<Specialization[]>(this.baseUrl);
   }
 
-  // -- Retrieve a Specialization by Identifier --
   getById(id: string) {
     return this.http.get<Specialization>(`${this.baseUrl}/${id}`);
   }
 
-  // -- Submit a New Specialization Request --
   requestNew(payload: SpecializationRequestPayload) {
     return this.http.post<SpecializationRequestResponse>(`${this.baseUrl}/request`, payload);
   }

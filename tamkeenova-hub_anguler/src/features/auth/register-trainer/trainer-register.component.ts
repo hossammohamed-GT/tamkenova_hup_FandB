@@ -48,8 +48,7 @@ export class TrainerRegisterComponent {
   requestingSpecialization = signal(false);
 
   private touchedFields = signal<Set<string>>(new Set());
-  // Backend error tied to a specific field (e.g. email exists) — shown inline
-  // under that field, with the wizard jumping back to the step that owns it.
+  // Inline field error
   serverFieldError = signal<{ field: string; key: string } | null>(null);
 
   readonly passwordRequirements = PASSWORD_REQUIREMENTS;
@@ -323,8 +322,7 @@ export class TrainerRegisterComponent {
         this.isLoading.set(false);
         const key = apiErrorKey(err, 'auth.errors.generic');
         this.errorMessage.set(key);
-        // Duplicate email/username/phone only surfaces at final submit —
-        // jump back to the step that owns the field and flag it inline.
+        // Jump to owning step
         const fieldByError: Record<string, string> = {
           'errors.AUTH_EMAIL_EXISTS': 'email',
           'errors.AUTH_USERNAME_EXISTS': 'username',

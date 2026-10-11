@@ -1,6 +1,5 @@
 import { Injectable, signal } from '@angular/core';
 
-// -- Shared UI state across the Admin Portal pages (badges, counters) --
 @Injectable({ providedIn: 'root' })
 export class AdminUiService {
   pendingTrainers = signal(0);

@@ -1,5 +1,4 @@
 import type { CertificateLanguage, PartnerLogo } from '../certificates/certificate-template';
-// -- Admin Module Models (mirrors Tamkeenova Admin API) --
 
 import { TaskAssignee, Task } from './tasks.model';
 

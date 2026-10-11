@@ -13,7 +13,6 @@
   @if (isLoading()) {
     <div class="empty-state"><div class="loader-spinner"></div></div>
   } @else {
-    <!-- -- Status Filters -- -->
     <div class="filter-pills">
       @for (s of statuses; track s) {
         <button
@@ -90,7 +89,6 @@
     }
   }
 
-  <!-- -- Details Modal -- -->
   @if (selected(); as d) {
     <div class="modal-backdrop" (click)="closeDetails()">
       <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
@@ -151,7 +149,6 @@
     </div>
   }
 
-  <!-- -- Cancel Confirm Modal -- -->
   @if (cancelTarget(); as t) {
     <div class="modal-backdrop" (click)="closeCancel()">
       <div class="modal-card modal-card-sm surface chamfer-sm" (click)="$event.stopPropagation()">

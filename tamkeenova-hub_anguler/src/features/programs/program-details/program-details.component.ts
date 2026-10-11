@@ -1,17 +1,28 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { StudentService } from '../../../core/services/student.service';
 import { ProgramsService } from '../../../core/services/programs.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { StudentProgramDetails } from '../../../core/models/student.model';
 import { apiErrorKey } from '../../../core/utils/api-error';
+import { SeoService } from '../../../core/seo/seo.service';
+import {
+  BreadcrumbComponent,
+  Crumb,
+} from '../../../shared/components/breadcrumb/breadcrumb.component';
+
+const LEVEL_LABEL: Record<string, string> = {
+  BEGINNER: 'Beginner',
+  INTERMEDIATE: 'Intermediate',
+  ADVANCED: 'Advanced',
+};
 
 @Component({
   selector: 'app-program-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, RouterLink, TranslatePipe, BreadcrumbComponent],
   templateUrl: './program-details.component.html',
   styleUrl: './program-details.component.css',
 })
@@ -21,6 +32,8 @@ export class ProgramDetailsComponent {
   private studentService = inject(StudentService);
   private programsService = inject(ProgramsService);
   private authService = inject(AuthService);
+  private seo = inject(SeoService);
+  private translate = inject(TranslateService);
 
   isLoading = signal(true);
   notFound = signal(false);
@@ -42,7 +55,15 @@ export class ProgramDetailsComponent {
     return Math.round(((price - discount) / price) * 100);
   });
 
+  crumbs = computed<Crumb[]>(() => [
+    { labelKey: 'nav.home', route: '/' },
+    { labelKey: 'nav.programs', route: '/programs' },
+    { label: this.program()?.title ?? '' },
+  ]);
+
   constructor() {
+    effect(() => this.pushSeo());
+
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) {
       this.notFound.set(true);
@@ -50,7 +71,6 @@ export class ProgramDetailsComponent {
       return;
     }
 
-    // -- Students get full details from the authenticated endpoint --
     if (this.authService.isLoggedIn() && this.authService.isStudent()) {
       this.studentService.getProgramDetails(id).subscribe({
         next: (res) => {
@@ -65,7 +85,7 @@ export class ProgramDetailsComponent {
       return;
     }
 
-    // -- Guests fall back to the public programs list --
+    // Guests search public list
     this.programsService.getAllPublic().subscribe({
       next: (programs) => {
         const found = (programs ?? []).find((p) => p.id === id);
@@ -136,5 +156,47 @@ export class ProgramDetailsComponent {
 
   goToEnrollments(): void {
     this.router.navigate(['/portal/student/enrollments']);
+  }
+
+  private pushSeo(): void {
+    const p = this.program();
+    if (!p) return;
+    this.translate.currentLang();
+    const url = this.seo.absoluteUrl(`/programs/${p.id}`);
+    const description = p.short_description || p.description || '';
+    this.seo.setDynamic({
+      title: `${p.title} | TamkeeNova HUB`,
+      description,
+      image: p.image_url,
+      type: 'article',
+    });
+    this.seo.setBreadcrumbJsonLd([
+      { name: this.translate.instant('nav.home'), url: this.seo.absoluteUrl('/') },
+      { name: this.translate.instant('nav.programs'), url: this.seo.absoluteUrl('/programs') },
+      { name: p.title, url },
+    ]);
+    this.seo.setJsonLd('page', {
+      '@context': 'https://schema.org',
+      '@type': 'Course',
+      name: p.title,
+      description,
+      ...(p.image_url ? { image: this.seo.absoluteUrl(p.image_url) } : {}),
+      provider: {
+        '@type': 'EducationalOrganization',
+        name: 'TamkeeNova HUB',
+        url: this.seo.absoluteUrl('/'),
+      },
+      ...(p.duration_hours ? { timeRequired: `PT${p.duration_hours}H` } : {}),
+      ...(LEVEL_LABEL[p.level] ? { educationalLevel: LEVEL_LABEL[p.level] } : {}),
+      offers: {
+        '@type': 'Offer',
+        price: Number(p.price) || 0,
+        priceCurrency: 'EGP',
+        availability: p.is_active
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+        url,
+      },
+    });
   }
 }

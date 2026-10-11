@@ -5,17 +5,14 @@ import { GALLERY_HERO_IMAGES, GALLERY_PROGRAMS_IMAGES, GALLERY_EVENTS_IMAGES } f
 @Injectable({ providedIn: 'root' })
 export class GalleryService {
 
-  // -- Retrieve Hero Images --
   getHeroImages(): string[] {
     return GALLERY_HERO_IMAGES;
   }
 
-  // -- Retrieve Program Gallery Images --
   getPrograms(): GalleryImage[] {
     return GALLERY_PROGRAMS_IMAGES;
   }
 
-  // -- Retrieve Event Gallery Images --
   getEvents(): GalleryImage[] {
     return GALLERY_EVENTS_IMAGES;
   }

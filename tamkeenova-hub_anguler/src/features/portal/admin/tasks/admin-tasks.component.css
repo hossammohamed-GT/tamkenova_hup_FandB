@@ -54,7 +54,6 @@
   color: #fff;
 }
 
-/* -- Task cards grid -- */
 .task-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -150,7 +149,6 @@
   flex-wrap: wrap;
 }
 
-/* -- Picked assignees chips -- */
 .picked-list {
   display: flex;
   gap: 0.45rem;
@@ -197,7 +195,6 @@
   background: color-mix(in srgb, var(--color-danger) 26%, transparent);
 }
 
-/* -- Modal helpers -- */
 .modal-narrow {
   max-width: 440px;
 }
@@ -243,7 +240,6 @@
   padding: 1.25rem 1rem;
 }
 
-/* -- Review cards -- */
 .review-list {
   display: flex;
   flex-direction: column;
@@ -342,7 +338,6 @@
   background: color-mix(in srgb, var(--color-primary) 4%, var(--color-surface));
 }
 
-/* -- Add assignee -- */
 .add-assignee-row {
   display: flex;
   gap: 0.6rem;
@@ -359,7 +354,6 @@
   min-width: 0;
 }
 
-/* -- Comments -- */
 .no-comments {
   font-size: var(--text-sm);
 }
@@ -374,7 +368,6 @@
   flex: 1;
 }
 
-/* -- Loading skeletons (opacity pulse only, no movement) -- */
 .skeleton-line {
   display: block;
   height: 0.7rem;

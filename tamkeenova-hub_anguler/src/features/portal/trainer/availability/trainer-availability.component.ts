@@ -21,9 +21,7 @@ function timeRangeValidator(group: AbstractControl): ValidationErrors | null {
   return null;
 }
 
-// -- Convert an API Time Value for Form Input --
 const toInputTime = (t: string) => t.slice(0, 5);
-// -- Convert a Form Time Value for the API --
 const toApiTime = (t: string) => (t.length === 5 ? `${t}:00` : t);
 
 @Component({
@@ -59,7 +57,6 @@ export class TrainerAvailabilityComponent {
     { validators: timeRangeValidator },
   );
 
-  // -- Group Availability Slots by Day and Start Time --
   grouped = computed(() =>
     this.days
       .map((day) => ({
@@ -84,7 +81,6 @@ export class TrainerAvailabilityComponent {
     this.load();
   }
 
-  // -- Load Availability Slots --
   load(): void {
     this.isLoading.set(true);
     this.errorMessage.set(null);
@@ -105,7 +101,6 @@ export class TrainerAvailabilityComponent {
     return toInputTime(time);
   }
 
-  // -- Open the Form for a New Availability Slot --
   openCreate(day?: number): void {
     this.editing.set(null);
     this.form.reset({ day_of_week: day ?? 0, start_time: '09:00', end_time: '12:00' });
@@ -113,7 +108,6 @@ export class TrainerAvailabilityComponent {
     this.showForm.set(true);
   }
 
-  // -- Open the Form for an Existing Availability Slot --
   openEdit(slot: AvailabilitySlot): void {
     this.editing.set(slot);
     this.form.reset({
@@ -131,7 +125,6 @@ export class TrainerAvailabilityComponent {
     this.editing.set(null);
   }
 
-  // -- Create or Update an Availability Slot --
   save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -167,7 +160,6 @@ export class TrainerAvailabilityComponent {
     });
   }
 
-  // -- Delete an Availability Slot --
   remove(slot: AvailabilitySlot): void {
     this.deletingId.set(slot.id);
 

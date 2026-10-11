@@ -30,12 +30,10 @@ export class AdminSpecializationsComponent implements OnInit {
   requests = signal<SpecializationSuggestion[]>([]);
   specializations = signal<Specialization[]>([]);
 
-  // -- Add / edit form --
   showForm = signal(false);
   editTarget = signal<Specialization | null>(null);
   isSaving = signal(false);
 
-  // -- Delete confirm --
   deleteTarget = signal<Specialization | null>(null);
   isDeleting = signal(false);
 
@@ -84,7 +82,6 @@ export class AdminSpecializationsComponent implements OnInit {
     });
   }
 
-  // ================= Requests =================
 
   decideRequest(request: SpecializationSuggestion, approve: boolean): void {
     this.busyRequestId.set(request.id);
@@ -106,7 +103,6 @@ export class AdminSpecializationsComponent implements OnInit {
     });
   }
 
-  // ================= Specializations CRUD =================
 
   openCreate(): void {
     this.editTarget.set(null);

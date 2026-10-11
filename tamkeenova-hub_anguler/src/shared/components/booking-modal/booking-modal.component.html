@@ -32,7 +32,6 @@
         </div>
 
         @if (!isLoggedIn()) {
-          <!-- -- Guest Gate -- -->
           <div class="booking-gate">
             <i class="fa-solid fa-circle-user"></i>
             <p>{{ 'booking.login_required' | translate }}</p>
@@ -41,7 +40,6 @@
             </button>
           </div>
         } @else if (!isStudent()) {
-          <!-- -- Non-student Notice -- -->
           <div class="booking-gate">
             <i class="fa-solid fa-circle-info"></i>
             <p>{{ 'booking.trainer_notice' | translate }}</p>

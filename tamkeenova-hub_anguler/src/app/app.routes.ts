@@ -8,38 +8,47 @@ import { trainerStatusGuard } from '../core/guards/trainer-status.guard';
 import { volunteerStatusGuard } from '../core/guards/volunteer-status.guard';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
+  {
+    path: '',
+    component: HomeComponent,
+    data: { seo: { titleKey: 'seo.home.title', descriptionKey: 'seo.home.description', index: true, rawTitle: true } },
+  },
   {
     path: 'programs',
+    data: { seo: { titleKey: 'seo.programs.title', descriptionKey: 'seo.programs.description', index: true } },
     loadComponent: () =>
       import('../features/programs/programs.component').then((m) => m.ProgramsComponent),
   },
   {
     path: 'consulting',
+    data: { seo: { titleKey: 'seo.consulting.title', descriptionKey: 'seo.consulting.description', index: true } },
     loadComponent: () =>
       import('../features/consulting/consulting.component').then((m) => m.ConsultingComponent),
   },
   {
     path: 'team',
+    data: { seo: { titleKey: 'seo.team.title', descriptionKey: 'seo.team.description', index: true } },
     loadComponent: () => import('../features/team/team.component').then((m) => m.TeamComponent),
   },
   {
     path: 'gallery',
+    data: { seo: { titleKey: 'seo.gallery.title', descriptionKey: 'seo.gallery.description', index: true } },
     loadComponent: () =>
       import('../features/gallery-showcase/gallery-showcase.component').then(
         (m) => m.GalleryShowcaseComponent,
       ),
   },
 
-  // -- Authentication Routes --
   {
     path: 'register',
+    data: { seo: { titleKey: 'seo.register.title', descriptionKey: 'seo.register.description' } },
     canActivate: [guestGuard],
     loadComponent: () =>
       import('../features/auth/register/register.component').then((m) => m.RegisterComponent),
   },
   {
     path: 'register/trainer',
+    data: { seo: { titleKey: 'seo.registerTrainer.title', descriptionKey: 'seo.registerTrainer.description' } },
     canActivate: [guestGuard],
     loadComponent: () =>
       import('../features/auth/register-trainer/trainer-register.component').then(
@@ -51,6 +60,7 @@ export const routes: Routes = [
   },
   {
     path: 'register/trainee',
+    data: { seo: { titleKey: 'seo.registerTrainee.title', descriptionKey: 'seo.registerTrainee.description' } },
     canActivate: [guestGuard],
     loadComponent: () =>
       import('../features/auth/register-volunteer/volunteer-register.component').then(
@@ -59,18 +69,21 @@ export const routes: Routes = [
   },
   {
     path: 'verify-otp',
+    data: { seo: { titleKey: 'seo.verifyOtp.title', descriptionKey: 'seo.verifyOtp.description' } },
     canActivate: [guestGuard],
     loadComponent: () =>
       import('../features/auth/verify-otp/verify-otp.component').then((m) => m.VerifyOtpComponent),
   },
   {
     path: 'login',
+    data: { seo: { titleKey: 'seo.login.title', descriptionKey: 'seo.login.description' } },
     canActivate: [guestGuard],
     loadComponent: () =>
       import('../features/auth/login/login.component').then((m) => m.LoginComponent),
   },
   {
     path: 'forgot-password',
+    data: { seo: { titleKey: 'seo.forgot.title', descriptionKey: 'seo.forgot.description' } },
     canActivate: [guestGuard],
     loadComponent: () =>
       import('../features/auth/forgot-password/forgot-password.component').then(
@@ -79,6 +92,7 @@ export const routes: Routes = [
   },
   {
     path: 'reset-password',
+    data: { seo: { titleKey: 'seo.reset.title', descriptionKey: 'seo.reset.description' } },
     canActivate: [guestGuard],
     loadComponent: () =>
       import('../features/auth/reset-password/reset-password.component').then(
@@ -86,17 +100,16 @@ export const routes: Routes = [
       ),
   },
 
-  // All authenticated recipients, including volunteers, can access their own records.
+  // Shared by all roles
   {
     path: 'portal/certificates',
+    data: { seo: { titleKey: 'student_certificates.title', descriptionKey: 'seo.portal.description' } },
     canActivate: [authGuard],
     loadComponent: () => import('../features/portal/student/certificates/student-certificates.component').then(m => m.StudentCertificatesComponent),
   },
-  // -- Student Portal Routes --
   {
     path: 'portal',
-    // Redirects happen before guards, so the role lookup reads the stored session
-    // directly instead of combining redirectTo with canActivate (invalid config).
+    // Redirects run before guards
     redirectTo: () => {
       try {
         if (typeof localStorage === 'undefined') return '/login';
@@ -117,10 +130,12 @@ export const routes: Routes = [
   },
   {
     path: 'portal/student',
+    data: { seo: { titleKey: 'seo.studentHome.title', descriptionKey: 'seo.portal.description' } },
     canActivate: [authGuard, roleGuard(['STUDENT'])],
     children: [
       {
         path: '',
+        data: { seo: { titleKey: 'seo.studentHome.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/student/dashboard/student-dashboard.component').then(
             (m) => m.StudentDashboardComponent,
@@ -128,6 +143,7 @@ export const routes: Routes = [
       },
       {
         path: 'profile',
+        data: { seo: { titleKey: 'seo.studentProfile.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/student/profile/student-profile.component').then(
             (m) => m.StudentProfileComponent,
@@ -135,6 +151,7 @@ export const routes: Routes = [
       },
       {
         path: 'enrollments',
+        data: { seo: { titleKey: 'student_enrollments.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/student/enrollments/student-enrollments.component').then(
             (m) => m.StudentEnrollmentsComponent,
@@ -142,6 +159,7 @@ export const routes: Routes = [
       },
       {
         path: 'consultations',
+        data: { seo: { titleKey: 'student_consultations.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import(
             '../features/portal/student/consultations/student-consultations.component'
@@ -149,6 +167,7 @@ export const routes: Routes = [
       },
       {
         path: 'certificates',
+        data: { seo: { titleKey: 'student_certificates.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import(
             '../features/portal/student/certificates/student-certificates.component'
@@ -156,6 +175,7 @@ export const routes: Routes = [
       },
       {
         path: 'corporate-requests',
+        data: { seo: { titleKey: 'student_corporate.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import(
             '../features/portal/student/corporate-requests/student-corporate-requests.component'
@@ -163,6 +183,7 @@ export const routes: Routes = [
       },
       {
         path: 'reviews',
+        data: { seo: { titleKey: 'student_reviews.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/student/reviews/student-reviews.component').then(
             (m) => m.StudentReviewsComponent,
@@ -170,6 +191,7 @@ export const routes: Routes = [
       },
       {
         path: 'notifications',
+        data: { seo: { titleKey: 'notifications.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import(
             '../features/portal/student/notifications/student-notifications.component'
@@ -177,6 +199,7 @@ export const routes: Routes = [
       },
       {
         path: 'trainers',
+        data: { seo: { titleKey: 'student_trainers.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/student/trainers/student-trainers.component').then(
             (m) => m.StudentTrainersComponent,
@@ -185,13 +208,14 @@ export const routes: Routes = [
     ],
   },
 
-  // -- Trainer Portal Routes --
   {
     path: 'portal/trainer',
+    data: { seo: { titleKey: 'seo.trainerHome.title', descriptionKey: 'seo.portal.description' } },
     canActivate: [authGuard, roleGuard(['TRAINER'])],
     children: [
       {
         path: '',
+        data: { seo: { titleKey: 'seo.trainerHome.title', descriptionKey: 'seo.portal.description' } },
         canActivate: [trainerStatusGuard],
         loadComponent: () =>
           import('../features/portal/trainer/dashboard/trainer-dashboard.component').then(
@@ -200,6 +224,7 @@ export const routes: Routes = [
       },
       {
         path: 'status',
+        data: { seo: { titleKey: 'seo.trainerStatus.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/trainer/status/trainer-status.component').then(
             (m) => m.TrainerStatusComponent,
@@ -207,6 +232,7 @@ export const routes: Routes = [
       },
       {
         path: 'profile',
+        data: { seo: { titleKey: 'seo.trainerProfile.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/trainer/profile/trainer-profile.component').then(
             (m) => m.TrainerProfileComponent,
@@ -214,6 +240,7 @@ export const routes: Routes = [
       },
       {
         path: 'programs',
+        data: { seo: { titleKey: 'trainer_programs.title', descriptionKey: 'seo.portal.description' } },
         canActivate: [trainerStatusGuard],
         loadComponent: () =>
           import('../features/portal/trainer/programs/trainer-programs.component').then(
@@ -222,6 +249,7 @@ export const routes: Routes = [
       },
       {
         path: 'availability',
+        data: { seo: { titleKey: 'trainer_availability.title', descriptionKey: 'seo.portal.description' } },
         canActivate: [trainerStatusGuard],
         loadComponent: () =>
           import('../features/portal/trainer/availability/trainer-availability.component').then(
@@ -230,6 +258,7 @@ export const routes: Routes = [
       },
       {
         path: 'consultations',
+        data: { seo: { titleKey: 'seo.trainerConsultations.title', descriptionKey: 'seo.portal.description' } },
         canActivate: [trainerStatusGuard],
         loadComponent: () =>
           import('../features/portal/trainer/consultations/trainer-consultations.component').then(
@@ -238,6 +267,7 @@ export const routes: Routes = [
       },
       {
         path: 'reviews',
+        data: { seo: { titleKey: 'trainer_reviews.title', descriptionKey: 'seo.portal.description' } },
         canActivate: [trainerStatusGuard],
         loadComponent: () =>
           import('../features/portal/trainer/reviews/trainer-reviews.component').then(
@@ -246,6 +276,7 @@ export const routes: Routes = [
       },
       {
         path: 'notifications',
+        data: { seo: { titleKey: 'notifications.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import(
             '../features/portal/student/notifications/student-notifications.component'
@@ -254,13 +285,14 @@ export const routes: Routes = [
     ],
   },
 
-  // -- Admin Portal Routes --
   {
     path: 'portal/admin',
+    data: { seo: { titleKey: 'admin_dashboard.title', descriptionKey: 'seo.portal.description' } },
     canActivate: [authGuard, roleGuard(['ADMIN', 'SUPER_ADMIN'])],
     children: [
       {
         path: '',
+        data: { seo: { titleKey: 'admin_dashboard.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/admin/dashboard/admin-dashboard.component').then(
             (m) => m.AdminDashboardComponent,
@@ -268,6 +300,7 @@ export const routes: Routes = [
       },
       {
         path: 'users',
+        data: { seo: { titleKey: 'admin_users.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/admin/users/admin-users.component').then(
             (m) => m.AdminUsersComponent,
@@ -275,6 +308,7 @@ export const routes: Routes = [
       },
       {
         path: 'trainers',
+        data: { seo: { titleKey: 'admin_trainers.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/admin/trainers/admin-trainers.component').then(
             (m) => m.AdminTrainersComponent,
@@ -285,6 +319,7 @@ export const routes: Routes = [
       },
       {
         path: 'trainees',
+        data: { seo: { titleKey: 'admin_volunteers.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/admin/volunteers/admin-volunteers.component').then(
             (m) => m.AdminVolunteersComponent,
@@ -292,6 +327,7 @@ export const routes: Routes = [
       },
       {
         path: 'certificates',
+        data: { seo: { titleKey: 'admin_certificates.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/admin/certificates/admin-certificates.component').then(
             (m) => m.AdminCertificatesComponent,
@@ -299,6 +335,7 @@ export const routes: Routes = [
       },
       {
         path: 'corporate',
+        data: { seo: { titleKey: 'admin_corporate.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/admin/corporate/admin-corporate.component').then(
             (m) => m.AdminCorporateComponent,
@@ -306,6 +343,7 @@ export const routes: Routes = [
       },
       {
         path: 'specializations',
+        data: { seo: { titleKey: 'admin_specializations.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/admin/specializations/admin-specializations.component').then(
             (m) => m.AdminSpecializationsComponent,
@@ -313,10 +351,12 @@ export const routes: Routes = [
       },
       {
         path: 'partners',
+        data: { seo: { titleKey: 'admin_partners.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () => import('../features/portal/admin/partners/admin-partners.component').then((m) => m.AdminPartnersComponent),
       },
       {
         path: 'programs',
+        data: { seo: { titleKey: 'admin_programs.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/admin/programs/admin-programs.component').then(
             (m) => m.AdminProgramsComponent,
@@ -324,6 +364,7 @@ export const routes: Routes = [
       },
       {
         path: 'tasks',
+        data: { seo: { titleKey: 'admin_tasks.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/admin/tasks/admin-tasks.component').then(
             (m) => m.AdminTasksComponent,
@@ -332,13 +373,14 @@ export const routes: Routes = [
     ],
   },
 
-  // -- Employee Portal Routes --
   {
     path: 'portal/employee',
+    data: { seo: { titleKey: 'employee_dashboard.title', descriptionKey: 'seo.portal.description' } },
     canActivate: [authGuard, roleGuard(['EMPLOYEE'])],
     children: [
       {
         path: '',
+        data: { seo: { titleKey: 'employee_dashboard.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/employee/dashboard/employee-dashboard.component').then(
             (m) => m.EmployeeDashboardComponent,
@@ -346,6 +388,7 @@ export const routes: Routes = [
       },
       {
         path: 'tasks',
+        data: { seo: { titleKey: 'my_tasks.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/tasks/my-tasks/my-tasks.component').then(
             (m) => m.MyTasksComponent,
@@ -353,6 +396,7 @@ export const routes: Routes = [
       },
       {
         path: 'notifications',
+        data: { seo: { titleKey: 'notifications.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import(
             '../features/portal/student/notifications/student-notifications.component'
@@ -360,6 +404,7 @@ export const routes: Routes = [
       },
       {
         path: 'profile',
+        data: { seo: { titleKey: 'staff_profile.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/staff/profile/staff-profile.component').then(
             (m) => m.StaffProfileComponent,
@@ -368,16 +413,17 @@ export const routes: Routes = [
     ],
   },
 
-  // -- Volunteer Portal Routes --
   {
     path: 'portal/volunteer', redirectTo: 'portal/trainee',
   },
   {
     path: 'portal/trainee',
+    data: { seo: { titleKey: 'volunteer_dashboard.title', descriptionKey: 'seo.portal.description' } },
     canActivate: [authGuard, roleGuard(['VOLUNTEER'])],
     children: [
       {
         path: '',
+        data: { seo: { titleKey: 'volunteer_dashboard.title', descriptionKey: 'seo.portal.description' } },
         canActivate: [volunteerStatusGuard],
         loadComponent: () =>
           import('../features/portal/volunteer/dashboard/volunteer-dashboard.component').then(
@@ -386,6 +432,7 @@ export const routes: Routes = [
       },
       {
         path: 'status',
+        data: { seo: { titleKey: 'seo.volunteerStatus.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/volunteer/status/volunteer-status.component').then(
             (m) => m.VolunteerStatusComponent,
@@ -393,6 +440,7 @@ export const routes: Routes = [
       },
       {
         path: 'tasks',
+        data: { seo: { titleKey: 'my_tasks.title', descriptionKey: 'seo.portal.description' } },
         canActivate: [volunteerStatusGuard],
         loadComponent: () =>
           import('../features/portal/tasks/my-tasks/my-tasks.component').then(
@@ -401,6 +449,7 @@ export const routes: Routes = [
       },
       {
         path: 'notifications',
+        data: { seo: { titleKey: 'notifications.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import(
             '../features/portal/student/notifications/student-notifications.component'
@@ -408,6 +457,7 @@ export const routes: Routes = [
       },
       {
         path: 'profile',
+        data: { seo: { titleKey: 'staff_profile.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>
           import('../features/portal/staff/profile/staff-profile.component').then(
             (m) => m.StaffProfileComponent,
@@ -418,6 +468,7 @@ export const routes: Routes = [
 
   {
     path: 'team/:slug',
+    data: { seo: { titleKey: 'seo.trainerDetails.title', descriptionKey: 'seo.trainerDetails.description', index: true, ogType: 'profile' } },
     loadComponent: () =>
       import('../features/team/trainer-details/trainer-details.component').then(
         (m) => m.TrainerDetailsComponent,
@@ -425,6 +476,7 @@ export const routes: Routes = [
   },
   {
     path: 'programs/:id',
+    data: { seo: { titleKey: 'seo.programDetails.title', descriptionKey: 'seo.programDetails.description', index: true, ogType: 'article' } },
     loadComponent: () =>
       import('../features/programs/program-details/program-details.component').then(
         (m) => m.ProgramDetailsComponent,
@@ -432,16 +484,22 @@ export const routes: Routes = [
   },
   {
     path: 'verify',
+    data: { seo: { titleKey: 'seo.verify.title', descriptionKey: 'seo.verify.description' } },
     loadComponent: () =>
       import('../features/verify/verify.component').then((m) => m.VerifyComponent),
   },
   {
     path: 'u/:username',
+    data: { seo: { titleKey: 'seo.publicProfile.title', descriptionKey: 'seo.publicProfile.description' } },
     loadComponent: () =>
       import('../features/verify/user-public-profile/user-public-profile.component').then(
         (m) => m.UserPublicProfileComponent,
       ),
   },
 
-  { path: '**', component: NotFoundComponent },
+  {
+    path: '**',
+    component: NotFoundComponent,
+    data: { seo: { titleKey: 'seo.notfound.title', descriptionKey: 'seo.notfound.description' } },
+  },
 ];

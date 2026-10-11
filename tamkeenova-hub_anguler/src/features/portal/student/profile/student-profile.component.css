@@ -17,7 +17,6 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Stable overrides لمنع الاختفاء */
 .stable-profile-page,
 .stable-hero,
 .stable-section,
@@ -66,7 +65,6 @@
   color: var(--color-text-muted);
 }
 
-/* -- Hero -- */
 .profile-hero {
   position: relative;
   overflow: hidden;
@@ -229,7 +227,6 @@
   gap: 0.5rem;
 }
 
-/* -- Tabs -- */
 .profile-tabs {
   display: flex;
   gap: 0.5rem;
@@ -264,7 +261,6 @@
   color: #fff;
 }
 
-/* -- Sections -- */
 .profile-section {
   padding: 1.75rem;
   margin-bottom: 1.5rem;

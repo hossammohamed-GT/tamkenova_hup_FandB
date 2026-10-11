@@ -5,7 +5,7 @@ import { PNG } from 'pngjs';
 import { test, expect } from '@playwright/test';
 import { CERTIFICATE_TEMPLATES } from '../src/core/certificates/certificate-template';
 
-// HTTP fixtures only: these tests never write to a real organization's database.
+// Fixtures only, no writes
 const user = {
   id: '550e8400-e29b-41d4-a716-446655440000',
   full_name: 'Layla Ahmed Hassan',
@@ -185,7 +185,7 @@ test('training preview changes only designated rectangles; issue, edit and PDF e
 
   const pdfBytes = readFileSync(testInfo.outputPath('training.pdf'));
   expect(pdfBytes.length).toBeLessThan(10 * 1024 * 1024);
-  // Decode the actual first JPEG embedded in the two-page PDF and verify its QR.
+  // Verify embedded QR
   const start = pdfBytes.indexOf(Buffer.from([255, 216, 255]));
   const end = pdfBytes.indexOf(Buffer.from([255, 217]), start) + 2;
   expect(start).toBeGreaterThan(0);

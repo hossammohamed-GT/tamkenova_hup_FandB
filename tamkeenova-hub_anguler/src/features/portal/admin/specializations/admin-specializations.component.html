@@ -12,7 +12,6 @@
 
   <app-admin-nav />
 
-  <!-- -- Tabs -- -->
   <div class="subtabs staff-fade">
     <button
       type="button"
@@ -37,7 +36,6 @@
     </button>
   </div>
 
-  <!-- -- Requests Tab -- -->
   @if (activeTab() === 'requests') {
     @if (isLoadingRequests()) {
       <div class="staff-empty"><div class="loader-spinner"></div></div>
@@ -91,7 +89,6 @@
     }
   }
 
-  <!-- -- List Tab -- -->
   @if (activeTab() === 'list') {
     @if (isLoadingList()) {
       <div class="staff-empty"><div class="loader-spinner"></div></div>
@@ -122,7 +119,6 @@
     }
   }
 
-  <!-- -- Create / Edit Modal -- -->
   @if (showForm()) {
     <div class="modal-backdrop" (click)="closeForm()">
       <div class="modal-card surface chamfer-sm modal-narrow" (click)="$event.stopPropagation()">
@@ -162,7 +158,6 @@
     </div>
   }
 
-  <!-- -- Delete Confirm -- -->
   @if (deleteTarget(); as target) {
     <div class="modal-backdrop" (click)="closeDelete()">
       <div class="modal-card surface chamfer-sm modal-narrow" (click)="$event.stopPropagation()">

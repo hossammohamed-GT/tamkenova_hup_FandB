@@ -27,7 +27,6 @@ export class StudentService {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/students`;
 
-  // -- Profile & Account -- يدعم wrapper
   getProfile(): Observable<StudentProfile> {
     return this.http.get<any>(`${this.baseUrl}/profile`).pipe(
       map((res) => res?.data ?? res)
@@ -64,7 +63,6 @@ export class StudentService {
     );
   }
 
-  // -- Trainer Browse --
   getTrainers(query: TrainersQuery = {}): Observable<PaginatedResponse<TrainerListItem>> {
     let params = new HttpParams();
     if (query.search) params = params.set('search', query.search);
@@ -78,7 +76,6 @@ export class StudentService {
     });
   }
 
-  // -- Training Programs --
   getPrograms(query: ProgramsQuery = {}): Observable<PaginatedResponse<StudentProgramListItem>> {
     let params = new HttpParams();
     if (query.search) params = params.set('search', query.search);
@@ -101,7 +98,6 @@ export class StudentService {
     );
   }
 
-  // -- Enrollments --
   enroll(programId: string): Observable<EnrollResponse> {
     return this.http.post<EnrollResponse>(`${this.baseUrl}/enrollments`, {
       program_id: programId,
@@ -129,14 +125,12 @@ export class StudentService {
     );
   }
 
-  // -- Certificates --
   getCertificates(): Observable<{ data: StudentCertificate[]; total: number }> {
     return this.http.get<{ data: StudentCertificate[]; total: number }>(
       `${this.baseUrl}/certificates`,
     );
   }
 
-  // -- Reviews --
   getMyReviews(): Observable<{ data: StudentReview[]; total: number }> {
     return this.http.get<{ data: StudentReview[]; total: number }>(`${this.baseUrl}/reviews`);
   }

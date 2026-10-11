@@ -35,7 +35,6 @@ export class ConsultingComponent {
 
   audience = signal<AudienceType>('b2b');
 
-  // -- B2B fields --
   b2b = {
     contact_name: signal(''),
     contact_email: signal(''),
@@ -53,7 +52,6 @@ export class ConsultingComponent {
 
   serviceTypes = ['TRAINING', 'CONSULTING', 'CORPORATE_TRAINING', 'OTHER'];
 
-  // -- B2C fields --
   b2c = {
     trainer_id: signal(''),
     trainer_search: signal(''),
@@ -81,7 +79,6 @@ export class ConsultingComponent {
     return this.trainers().find((t) => t.id === id) ?? null;
   });
 
-  // -- UI state --
   submitting = signal(false);
   submitted = signal(false);
   submittedRequestId = signal<string | null>(null);
@@ -113,13 +110,11 @@ export class ConsultingComponent {
   });
 
   constructor() {
-    // preload trainers for B2C
     this.studentService.getTrainers({ limit: 50 }).subscribe({
       next: (res) => this.trainers.set(res.data ?? []),
       error: () => undefined,
     });
 
-    // prefill email from user
     const user = this.currentUser();
     if (user) {
       this.b2b.contact_email.set(user.email ?? '');

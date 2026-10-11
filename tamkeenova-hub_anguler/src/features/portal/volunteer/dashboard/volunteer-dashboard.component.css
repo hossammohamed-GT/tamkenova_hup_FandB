@@ -80,7 +80,6 @@
   color: var(--color-accent);
 }
 
-/* -- Quick actions -- */
 .quick-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

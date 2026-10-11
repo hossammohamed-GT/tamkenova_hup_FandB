@@ -24,8 +24,11 @@
 
 ## Project setup
 
+Use Node.js 24 (pinned in `package.json` and `.nvmrc`) locally and on Vercel:
+
 ```bash
-$ npm install
+$ nvm use
+$ npm ci
 ```
 
 ## Compile and run the project
@@ -53,6 +56,48 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+
+## Vercel deployment
+
+- Use Vercel's **NestJS** framework preset with the repository root as the Root Directory. The entrypoint is `src/main.ts`; no custom serverless handler is required.
+- `package.json` pins **Node.js 24.x** for both builds and Functions.
+- `vercel.json` sets the non-secret runtime variable **`NODE_OPTIONS=--experimental-require-module`**. Keep any project-level `NODE_OPTIONS` override consistent with this flag; do not disable it with `--no-experimental-require-module`. This setting is required at process startup, not inside application code or a runtime-loaded `.env` file.
+- Keep the build command as `npm run build` so Prisma Client is regenerated on every build. Do not configure `dist` as a static-site Output Directory.
+- Set environment variables in the relevant Vercel environment (**Production** and/or **Preview**): `DATABASE_URL`, `JWT_SECRET`, `JWT_EXPIRES_IN`, `SUPABASE_URL`, and `SUPABASE_SECRET_KEY`. Email delivery also requires `MAIL_USER` and `MAIL_PASSWORD`.
+- For a different frontend domain or a preview frontend, add its exact origin to the comma-separated `FRONTEND_ORIGINS` variable.
+- Leave **Automatically expose System Environment Variables** enabled. Vercel supplies `VERCEL=1`, which selects console logging instead of filesystem logging. Auth/security logs go to stdout and errors to stderr, as JSON with a `category` field. View them in **Vercel → Logs**. Locally, the existing `logs/auth`, `logs/errors`, and `logs/security` files are preserved.
+- Redeploy after changing environment variables. Never commit `.env` or secret values.
+
+After deployment, request **`/api/health`** (not `/health`):
+
+```json
+{ "success": true, "status": "ok" }
+```
+
+`/api` also returns the API's version and running message. A successful build alone does not prove runtime database connectivity; verify the health response and runtime logs on the deployed URL.
+
+### Why `ERR_REQUIRE_ESM` occurred
+
+The current NodeNext build emits CommonJS because this package does not declare `"type": "module"`. Nest 12 is ESM-only, and `@nestjs/throttler` also loads Nest through CommonJS. Local recent Node versions support `require(ESM)`, but [Vercel disables this feature by default](https://vercel.com/docs/functions/runtimes/node-js/advanced-node-configuration#experimental-node.js-require-of-es-module). The runtime `NODE_OPTIONS` flag explicitly enables the documented interoperability support. Upgrading Node **alone** or changing only `main.ts` to a dynamic import would not address all of these imports.
+
+Native runtime regression checks (after building, using Node 24):
+
+```bash
+npm run build
+npm run test:runtime
+```
+
+These tests reproduce `ERR_REQUIRE_ESM` with interoperability disabled, check that the deployed flag loads Nest and Throttler, and run the **compiled `dist/main.js`** bootstrap with a read-only filesystem simulation. The bootstrap test substitutes database/storage/configuration providers and an ephemeral test listener; it is not a live database or Vercel connectivity test.
+
+Logging regression checks (including a simulated read-only filesystem):
+
+```bash
+npm run test:logger
+npm run test:certificates
+npm test -- --runInBand --runTestsByPath src/modules/students/students.repository.spec.ts
+```
+
+The dedicated logger and certificate commands use the existing ESM-compatible test setup for Nest 12. The legacy default Jest configuration is not ESM-compatible for those suites.
 
 ## Deployment
 

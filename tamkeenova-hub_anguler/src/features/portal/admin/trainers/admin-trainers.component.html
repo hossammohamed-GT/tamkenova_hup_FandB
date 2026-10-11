@@ -8,7 +8,6 @@
 
   <app-admin-nav />
 
-  <!-- -- Status Filters -- -->
   <div class="filter-pills staff-fade">
     @for (f of filters; track f) {
       <button
@@ -173,7 +172,6 @@
     </div>
   }
 
-  <!-- -- Reject Modal -- -->
   @if (rejectTarget(); as target) {
     <div class="modal-backdrop" (click)="closeReject()">
       <div class="modal-card surface chamfer-sm" (click)="$event.stopPropagation()">
@@ -219,7 +217,6 @@
     </div>
   }
 
-  <!-- -- Details Modal -- -->
   @if (details(); as d) {
     <div class="modal-backdrop" (click)="closeDetails()">
       <div class="modal-card surface chamfer-sm modal-wide" (click)="$event.stopPropagation()">

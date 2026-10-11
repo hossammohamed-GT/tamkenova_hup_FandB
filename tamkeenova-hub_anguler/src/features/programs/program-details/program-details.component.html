@@ -14,17 +14,13 @@
       </a>
     </div>
   } @else if (program(); as p) {
-    <a routerLink="/programs" class="back-link">
-      <i class="fa-solid fa-arrow-right rtl-flip"></i>
-      {{ 'program_details.back' | translate }}
-    </a>
+    <app-breadcrumb [items]="crumbs()" />
 
     <div class="details-grid">
-      <!-- -- Main Column -- -->
       <div class="details-main">
         <div class="details-cover surface chamfer-sm">
           @if (p.image_url) {
-            <img [src]="p.image_url" [alt]="p.title" />
+            <img [src]="p.image_url" [alt]="p.title" fetchpriority="high" decoding="async" />
           } @else {
             <div class="details-cover-placeholder">
               <i class="fa-solid fa-book"></i>
@@ -66,13 +62,13 @@
           <div class="details-section surface chamfer-sm trainer-strip">
             <div class="trainer-info">
               @if (p.trainers.users.profile_image) {
-                <img [src]="p.trainers.users.profile_image" [alt]="p.trainers.users.full_name" />
+                <img [src]="p.trainers.users.profile_image" [alt]="p.trainers.users.full_name" loading="lazy" decoding="async" />
               } @else {
                 <div class="trainer-avatar-fallback"><i class="fa-solid fa-user"></i></div>
               }
               <div>
                 <span class="trainer-label">{{ 'program_details.trainer' | translate }}</span>
-                <h3>{{ p.trainers.users.full_name }}</h3>
+                <h2 class="trainer-name">{{ p.trainers.users.full_name }}</h2>
                 @if (p.trainers.average_rating) {
                   <span class="trainer-rating">
                     <i class="fa-solid fa-star"></i>
@@ -88,7 +84,6 @@
         }
       </div>
 
-      <!-- -- Side Column -- -->
       <aside class="details-side">
         <div class="enroll-card surface chamfer-sm">
           <div class="price-row">

@@ -61,7 +61,6 @@ export class TrainerCardComponent {
     return n.slice(0, 2).toUpperCase();
   });
 
-  // -- Interactive rating state --
   hoverRating = signal(0);
   userRating = signal(0);
   isRating = signal(false);
@@ -113,12 +112,18 @@ export class TrainerCardComponent {
     this.hoverRating.set(0);
   }
 
+  onRatingZoneClick(event: Event): void {
+    // Never navigate from here
+    event.stopPropagation();
+    event.preventDefault();
+  }
+
   onStarClick(star: number, event: Event): void {
     event.stopPropagation();
     event.preventDefault();
     if (!this.interactiveRating() || this.isRating()) return;
 
-    // Never fail silently: guests and non-students get a visible message under the card.
+    // Never fail silently
     if (!this.isLoggedIn()) {
       this.flashRatingError('student_trainers.login_to_rate');
       return;

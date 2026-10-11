@@ -88,7 +88,6 @@
   margin-bottom: 0.5rem;
 }
 
-/* -- Item rows inside modal -- */
 .staff-item-list {
   list-style: none;
   margin: 0;
@@ -157,7 +156,6 @@
   }
 }
 
-/* ================= Trainer Cards (identity UI) ================= */
 .trainer-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
@@ -180,7 +178,6 @@
     box-shadow 0.35s ease;
 }
 
-/* top accent line — appears on hover, persistent (accent) for pending */
 .trainer-card::before {
   content: "";
   position: absolute;
@@ -206,7 +203,6 @@
   background: var(--color-accent);
 }
 
-/* subtle avatar shine on hover (no movement) */
 .trainer-avatar {
   position: relative;
   width: 54px;
@@ -331,7 +327,6 @@
   gap: 0.4rem;
 }
 
-/* professional staggered entrance — fade only */
 .trainer-grid .staff-fade {
   opacity: 0;
   animation: trainer-card-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
@@ -360,7 +355,6 @@
   }
 }
 
-/* ================= Responsive ================= */
 @media (max-width: 760px) {
   .trainer-grid {
     grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));

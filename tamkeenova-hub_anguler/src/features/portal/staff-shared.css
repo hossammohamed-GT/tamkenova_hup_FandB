@@ -1,10 +1,3 @@
-/* =============================================================
-   Staff Portals Shared Styles (Admin / Employee / Volunteer)
-   - Uses the global color tokens (light + dark)
-   - Calm, smooth motion: opacity-only entrances, no vertical jumps
-   ============================================================= */
-
-/* -- Neutralize vertical movement on hover (global rule for these portals) -- */
 .portal-page .surface:hover,
 .portal-page .portal-card:hover,
 .portal-page .corp-card:hover,
@@ -15,7 +8,6 @@
   transform: none;
 }
 
-/* -- Fade-only entrance (replaces the translate-based animate-in) -- */
 .portal-page .animate-in {
   opacity: 0;
   transform: none;
@@ -37,7 +29,6 @@
   }
 }
 
-/* ================= Staff Sub Navigation ================= */
 .staff-nav {
   display: flex;
   align-items: center;
@@ -101,7 +92,6 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
-/* ================= Stat Cards ================= */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -167,7 +157,6 @@ a.stat-card {
   color: var(--color-accent-text);
 }
 
-/* ================= Toolbar (search + filters) ================= */
 .toolbar {
   display: flex;
   align-items: center;
@@ -215,7 +204,6 @@ a.stat-card {
   box-shadow: var(--focus-ring);
 }
 
-/* ================= Data Table ================= */
 .table-wrap {
   overflow-x: auto;
   border-radius: var(--radius-md);
@@ -321,7 +309,6 @@ a.stat-card {
   font-size: var(--text-sm);
 }
 
-/* ================= Pagination ================= */
 .pagination {
   display: flex;
   align-items: center;
@@ -371,10 +358,7 @@ a.stat-card {
   font-weight: 600;
 }
 
-/* ================= Buttons =================
-   NOTE: every *-sm variant carries the full base layout (not just .btn-sm),
-   so a variant used without the .btn-sm base class still renders as a
-   proper button instead of degrading to bare text. */
+/* Variants work standalone */
 .btn-sm,
 .btn-primary-sm,
 .btn-accent-sm,
@@ -510,7 +494,6 @@ a.stat-card {
   }
 }
 
-/* ================= Modal (fade + subtle scale, no vertical slide) ================= */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -556,7 +539,6 @@ a.stat-card {
   color: var(--color-text);
 }
 
-/* -- Toast (fade only) ================= */
 .staff-toast {
   position: fixed;
   bottom: 1.5rem;
@@ -583,13 +565,11 @@ a.stat-card {
   background: color-mix(in srgb, var(--color-danger) 8%, var(--color-surface));
 }
 
-/* -- Shared fade-in entrance (no vertical movement) -- */
 .staff-fade {
   opacity: 0;
   animation: staff-fade-in 0.4s ease forwards;
 }
 
-/* ================= Badges (extra staff statuses) ================= */
 .badge-neutral {
   background: color-mix(in srgb, var(--color-text-muted) 14%, transparent);
   color: var(--color-text-muted);
@@ -625,7 +605,6 @@ html[data-theme='dark'] .badge-medium {
   color: var(--color-success);
 }
 
-/* ================= Empty / loading ================= */
 .staff-empty {
   text-align: center;
   padding: 3rem 1.5rem;
@@ -648,7 +627,6 @@ html[data-theme='dark'] .badge-medium {
   margin-top: 1.25rem;
 }
 
-/* ================= Progress ring & bars ================= */
 .staff-progress {
   height: 8px;
   border-radius: 999px;
@@ -663,7 +641,6 @@ html[data-theme='dark'] .badge-medium {
   transition: width 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* ================= Detail rows ================= */
 .staff-detail-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -695,7 +672,6 @@ html[data-theme='dark'] .badge-medium {
   word-break: break-word;
 }
 
-/* ================= Section tabs inside modal/pages ================= */
 .subtabs {
   display: flex;
   gap: 0.4rem;
@@ -732,7 +708,6 @@ html[data-theme='dark'] .badge-medium {
   box-shadow: var(--shadow-sm);
 }
 
-/* ================= Timeline ================= */
 .staff-timeline {
   position: relative;
   display: flex;
@@ -808,7 +783,6 @@ html[data-theme='dark'] .badge-medium {
   color: var(--color-text-muted);
 }
 
-/* ================= Prominent Action Button (hero) ================= */
 .btn-hero {
   position: relative;
   display: inline-flex;
@@ -850,7 +824,6 @@ html[data-theme='dark'] .badge-medium {
   cursor: not-allowed;
 }
 
-/* ================= Search picker feedback ================= */
 .user-picker-empty,
 .user-picker-hint {
   display: flex;
@@ -875,7 +848,6 @@ html[data-theme='dark'] .badge-medium {
   border: 1px dashed var(--color-border);
 }
 
-/* ================= User picker (shared) ================= */
 .user-picker {
   position: relative;
 }
@@ -939,7 +911,6 @@ html[data-theme='dark'] .badge-medium {
   text-overflow: ellipsis;
 }
 
-/* ================= File chips ================= */
 .file-chip {
   display: inline-flex;
   align-items: center;
@@ -958,7 +929,6 @@ html[data-theme='dark'] .badge-medium {
   border-color: var(--color-primary);
 }
 
-/* ================= Comment list ================= */
 .comment-list {
   display: flex;
   flex-direction: column;
@@ -1003,7 +973,6 @@ html[data-theme='dark'] .badge-medium {
   display: block;
 }
 
-/* ================= Circular gauge ================= */
 .gauge-wrap {
   position: relative;
   display: inline-flex;
@@ -1031,7 +1000,6 @@ html[data-theme='dark'] .badge-medium {
   stroke: color-mix(in srgb, var(--color-text-muted) 14%, transparent);
 }
 
-/* ================= Responsive ================= */
 @media (max-width: 720px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1061,7 +1029,6 @@ html[data-theme='dark'] .badge-medium {
   }
 }
 
-/* ================= Responsive tables → cards on mobile ================= */
 @media (max-width: 760px) {
   .table-wrap {
     border: none;
@@ -1108,7 +1075,6 @@ html[data-theme='dark'] .badge-medium {
     color: var(--color-text-muted);
   }
 
-  /* action cells keep the label but stack buttons below on very small screens */
   .staff-table td .cell-actions {
     justify-content: flex-end;
     flex-wrap: wrap;

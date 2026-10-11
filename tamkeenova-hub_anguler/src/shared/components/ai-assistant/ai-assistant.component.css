@@ -320,7 +320,7 @@ html[dir='rtl'] .rtl-flip {
   transform: scaleX(-1);
 }
 
-/* Coming-soon card shown while the assistant is not live yet. */
+/* Temporary placeholder */
 .soon-card {
   margin: 2.5rem auto;
   max-width: 260px;

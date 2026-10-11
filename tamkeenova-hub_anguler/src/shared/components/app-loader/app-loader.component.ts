@@ -70,7 +70,7 @@ export class AppLoaderComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    // jsdom (and very old browsers) do not implement SVGGeometryElement.getTotalLength
+    // jsdom lacks getTotalLength
     if (typeof gate.getTotalLength !== 'function' || typeof t.getTotalLength !== 'function') {
       root.classList.add('is-filled', 'is-revealing', 'is-loading');
       return;

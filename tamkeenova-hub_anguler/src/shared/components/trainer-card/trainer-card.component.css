@@ -34,7 +34,6 @@
   transform: translateY(-5px);
 }
 
-/* Cover / Avatar */
 .trainer-card-cover {
   position: relative;
   height: 88px;
@@ -86,7 +85,6 @@
   border: 2px solid var(--color-surface);
 }
 
-/* Body */
 .trainer-card-body {
   flex: 1;
   display: flex;
@@ -120,7 +118,6 @@
   margin-top: 0.15rem;
 }
 
-/* ===== Rating Stars with Animation ===== */
 .trainer-card-rating {
   display: flex;
   flex-direction: column;
@@ -133,6 +130,8 @@
   transition: all var(--transition-base);
   width: 100%;
   margin-top: 0.2rem;
+  /* Not part of card link */
+  cursor: default;
 }
 
 .trainer-card-rating.is-interactive:hover {
@@ -259,7 +258,6 @@
   75% { transform: translateX(3px); }
 }
 
-/* Stats chips */
 .trainer-card-stats {
   display: flex;
   flex-wrap: wrap;
@@ -286,7 +284,6 @@
   color: var(--color-text-muted);
 }
 
-/* Footer */
 .trainer-card-footer {
   width: 100%;
   display: flex;

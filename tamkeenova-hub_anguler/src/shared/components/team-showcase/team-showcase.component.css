@@ -47,7 +47,6 @@
   transition: none !important;
 }
 
-/* Current Card Animation */
 .team-card-current {
   transform: translateY(0);
 }
@@ -56,7 +55,6 @@
   transform: translateY(-115%);
 }
 
-/* Next Card Animation */
 .team-card-next {
   transform: translateY(115%);
 }
@@ -65,7 +63,6 @@
   transform: translateY(0);
 }
 
-/* Avatar */
 .team-card-avatar {
   width: 64px;
   height: 64px;
@@ -91,7 +88,6 @@
   font-size: 1.5rem;
 }
 
-/* Content */
 .team-card-content {
   display: flex;
   flex-direction: column;

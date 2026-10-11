@@ -12,7 +12,6 @@
 
   <app-admin-nav />
 
-  <!-- -- Status Filters -- -->
   <div class="filter-pills staff-fade">
     @for (f of statusFilters; track f) {
       <button
@@ -78,7 +77,6 @@
             </span>
           </div>
 
-          <!-- -- Assignee status summary -- -->
           @if ((task.task_assignees?.length ?? 0) > 0) {
             <div class="assignee-strip">
               @for (assignee of task.task_assignees!.slice(0, 4); track assignee.id) {
@@ -109,7 +107,6 @@
     </div>
   }
 
-  <!-- ================= Create / Edit Task Modal ================= -->
   @if (showTaskForm()) {
     <div class="modal-backdrop" (click)="closeTaskForm()">
       <div class="modal-card surface chamfer-sm modal-wide" (click)="$event.stopPropagation()">
@@ -156,7 +153,6 @@
             </div>
           </div>
 
-          <!-- -- Assignees (create only) -- -->
           @if (!editTask()) {
             <div class="field">
               <label class="field-label">{{ 'admin_tasks.add_assignees' | translate }}</label>
@@ -241,7 +237,6 @@
     </div>
   }
 
-  <!-- ================= Delete Confirm ================= -->
   @if (deleteTarget(); as target) {
     <div class="modal-backdrop" (click)="closeDelete()">
       <div class="modal-card surface chamfer-sm modal-narrow" (click)="$event.stopPropagation()">
@@ -270,7 +265,6 @@
     </div>
   }
 
-  <!-- ================= Task Details Modal ================= -->
   @if (details(); as d) {
     <div class="modal-backdrop" (click)="closeDetails()">
       <div class="modal-card surface chamfer-sm modal-wide" (click)="$event.stopPropagation()">
@@ -306,7 +300,6 @@
           <p class="desc-text">{{ d.description }}</p>
         }
 
-        <!-- -- Assignees -- -->
         <h4 class="detail-subtitle">
           {{ 'admin_tasks.assignees' | translate }} ({{ assigneeRows().length }})
         </h4>
@@ -419,7 +412,6 @@
                   </button>
                 </div>
 
-                <!-- -- Inline review form -- -->
                 @if (reviewTarget()?.id === row.assignee.id) {
                   <div class="review-form" [formGroup]="reviewForm">
                     <div class="form-grid form-grid-2">
@@ -458,7 +450,6 @@
           </div>
         }
 
-        <!-- -- Add assignee -- -->
         <h4 class="detail-subtitle">{{ 'admin_tasks.add_assignee' | translate }}</h4>
         <div class="add-assignee-row">
           <input
@@ -504,7 +495,6 @@
           </div>
         </div>
 
-        <!-- -- Comments -- -->
         <h4 class="detail-subtitle">{{ 'my_tasks.comments' | translate }} ({{ comments().length }})</h4>
 
         @if (isLoadingComments()) {

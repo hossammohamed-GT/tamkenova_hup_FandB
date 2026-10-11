@@ -14,7 +14,6 @@ export class CorporateRequestService {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/corporate-requests`;
 
-  // -- Submit Corporate Request --
   create(
     payload: CreateCorporateRequestPayload,
   ): Observable<{ message: string; request: Partial<CorporateRequest> }> {
@@ -24,7 +23,6 @@ export class CorporateRequestService {
     );
   }
 
-  // -- Upload Attachment --
   uploadAttachment(
     id: string,
     file: File,
@@ -37,14 +35,12 @@ export class CorporateRequestService {
     );
   }
 
-  // -- My Corporate Requests --
   getMine(status?: CorporateStatus): Observable<{ data: CorporateRequest[]; total: number }> {
     let params = new HttpParams();
     if (status) params = params.set('status', status);
     return this.http.get<{ data: CorporateRequest[]; total: number }>(this.baseUrl, { params });
   }
 
-  // -- Corporate Request Details --
   getById(id: string): Observable<CorporateRequest> {
     return this.http.get<CorporateRequest>(`${this.baseUrl}/${id}`);
   }

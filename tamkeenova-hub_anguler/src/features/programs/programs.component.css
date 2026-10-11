@@ -1,10 +1,8 @@
-/* -- Page Layout -- */
 .programs-page {
   min-height: 100vh;
   background: var(--color-background);
 }
 
-/* -- Hero Section -- */
 .programs-hero {
   position: relative;
   padding: 11rem 6vw 4rem;
@@ -86,7 +84,6 @@
   margin: 0 auto;
 }
 
-/* -- Hero Search -- */
 .hero-search-box {
   position: relative;
   display: flex;
@@ -149,7 +146,6 @@
   color: #fff;
 }
 
-/* -- Hero Statistics -- */
 .hero-stats {
   display: flex;
   align-items: center;
@@ -196,7 +192,6 @@
   }
 }
 
-/* -- Program Filters -- */
 .filters {
   display: flex;
   flex-direction: column;
@@ -304,7 +299,6 @@
   color: var(--color-danger);
 }
 
-/* -- Program Grid -- */
 .programs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -321,7 +315,6 @@
   }
 }
 
-/* -- Program Card -- */
 .program-card {
   display: flex;
   flex-direction: column;
@@ -350,7 +343,6 @@
   transform: translateY(-4px);
 }
 
-/* -- Program Cover -- */
 .program-cover {
   position: relative;
   height: 180px;
@@ -413,7 +405,6 @@
   color: #fff;
 }
 
-/* -- Program Details -- */
 .program-body {
   padding: 1.4rem 1.5rem 1.6rem;
   display: flex;
@@ -422,7 +413,6 @@
   flex: 1;
 }
 
-/* -- Trainer Details -- */
 .program-trainer {
   display: flex;
   align-items: center;
@@ -480,7 +470,6 @@
   text-overflow: ellipsis;
 }
 
-/* -- Program Title -- */
 .program-title {
   font-size: var(--text-lg);
   font-weight: 700;
@@ -488,7 +477,6 @@
   line-height: 1.4;
 }
 
-/* -- Program Description -- */
 .program-desc {
   font-size: var(--text-sm);
   line-height: 1.6;
@@ -500,7 +488,6 @@
   flex: 1;
 }
 
-/* -- Program Metadata -- */
 .program-meta {
   display: flex;
   flex-wrap: wrap;
@@ -525,7 +512,6 @@
   font-weight: 700;
 }
 
-/* -- Program Price -- */
 .program-price {
   display: flex;
   align-items: baseline;
@@ -552,7 +538,6 @@
   color: var(--color-text-muted);
 }
 
-/* -- Call to Action -- */
 .program-cta {
   display: flex;
   align-items: center;
@@ -578,7 +563,6 @@ html[dir='ltr'] .program-cta:hover i {
   transform: translateX(3px);
 }
 
-/* -- Loading Skeleton -- */
 .program-card-skeleton {
   display: flex;
   flex-direction: column;
@@ -636,7 +620,6 @@ html[dir='ltr'] .program-cta:hover i {
   }
 }
 
-/* -- No Results State -- */
 .no-results {
   max-width: 460px;
   margin: 3rem auto;
@@ -657,14 +640,13 @@ html[dir='ltr'] .program-cta:hover i {
   color: var(--color-text-muted);
 }
 
-.no-results h3 {
+.no-results h2 {
   font-size: var(--text-xl);
   font-weight: 700;
   color: var(--color-text);
   margin-bottom: 1.25rem;
 }
 
-/* -- Coming Soon State -- */
 .coming-soon {
   padding: 4rem 6vw;
   display: flex;
@@ -704,7 +686,6 @@ html[dir='ltr'] .program-cta:hover i {
   margin-bottom: 1.75rem;
 }
 
-/* -- Animations -- */
 .animate-in {
   animation: slideDown 0.5s ease;
 }
@@ -721,7 +702,6 @@ html[dir='ltr'] .program-cta:hover i {
   }
 }
 
-/* -- Responsive Styles -- */
 @media (max-width: 640px) {
   .programs-hero {
     padding: 9rem 4vw 3.5rem;
@@ -742,7 +722,6 @@ html[dir='ltr'] .program-cta:hover i {
   }
 }
 
-/* -- Reduced Motion Styles -- */
 @media (prefers-reduced-motion: reduce) {
 
   .program-card,

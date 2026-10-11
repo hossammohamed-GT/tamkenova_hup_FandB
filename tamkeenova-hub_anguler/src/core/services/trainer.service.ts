@@ -53,22 +53,18 @@ export class TrainerService {
       );
   }
 
-  // -- Retrieve the Current Trainer Profile -- يدعم {data} و مباشر
   getMyProfile() {
     return this.http.get<any>(`${this.baseUrl}/me`).pipe(
       map((res) => {
-        // لو { success, data: profile } أو { data: profile } أو مباشرة profile
         return (res?.data ?? res) as TrainerProfile;
       }),
     );
   }
 
-  // -- Update the Current Trainer Profile --
   updateMyProfile(payload: UpdateTrainerProfilePayload) {
     return this.http.patch<ApiSuccessMessage>(`${this.baseUrl}/me`, payload);
   }
 
-  // -- Retrieve Trainer Programs -- يدعم wrapper
   getPrograms() {
     return this.http.get<any>(`${this.baseUrl}/programs`).pipe(
       map((res) => {
@@ -78,22 +74,18 @@ export class TrainerService {
     );
   }
 
-  // -- Create a Trainer Program --
   createProgram(payload: ProgramPayload) {
     return this.http.post<ApiSuccessMessage>(`${this.baseUrl}/programs`, payload);
   }
 
-  // -- Update a Trainer Program --
   updateProgram(id: string, payload: ProgramPayload) {
     return this.http.put<ApiSuccessMessage>(`${this.baseUrl}/programs/${id}`, payload);
   }
 
-  // -- Delete a Trainer Program --
   deleteProgram(id: string) {
     return this.http.delete<ApiSuccessMessage>(`${this.baseUrl}/programs/${id}`);
   }
 
-  // -- Retrieve Availability Slots -- يدعم wrapper
   getAvailability() {
     return this.http.get<any>(`${this.baseUrl}/availability`).pipe(
       map((res) => {
@@ -103,22 +95,18 @@ export class TrainerService {
     );
   }
 
-  // -- Create an Availability Slot --
   createAvailability(payload: AvailabilityPayload) {
     return this.http.post<ApiSuccessMessage>(`${this.baseUrl}/availability`, payload);
   }
 
-  // -- Update an Availability Slot --
   updateAvailability(id: string, payload: Partial<AvailabilityPayload>) {
     return this.http.patch<ApiSuccessMessage>(`${this.baseUrl}/availability/${id}`, payload);
   }
 
-  // -- Delete an Availability Slot --
   deleteAvailability(id: string) {
     return this.http.delete<ApiSuccessMessage>(`${this.baseUrl}/availability/${id}`);
   }
 
-  // -- Retrieve Trainer Reviews -- يدعم wrapper
   getTrainerReviews(trainerId: string) {
     return this.http.get<any>(`${this.baseUrl}/${trainerId}/reviews`).pipe(
       map((res) => {
@@ -128,12 +116,11 @@ export class TrainerService {
     );
   }
 
-  // -- Submit a Trainer Review (re-rating updates the existing review) --
+  // Re-rating updates existing
   createReview(trainerId: string, payload: { rating: number; comment: string }) {
     return this.http.post<ReviewSubmitResponse>(`${this.baseUrl}/${trainerId}/reviews`, payload);
   }
 
-  // -- Retrieve Trainer Dashboard Statistics --
   getDashboardStats() {
     return this.http.get<ApiDataResponse<TrainerDashboardStats>>(`${this.baseUrl}/dashboard`);
   }

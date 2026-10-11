@@ -1,7 +1,3 @@
-// -- Shared presentation helpers for AppNotifications --
-// Maps a notification `type` (free-form string from the API) to an icon,
-// a color tone and a translated fallback title/message.
-
 export type NotificationTone = 'primary' | 'accent' | 'success' | 'danger' | 'info' | 'neutral';
 
 export function notificationIcon(type: string | null | undefined): string {
@@ -34,8 +30,7 @@ export function notificationTone(type: string | null | undefined): NotificationT
   return 'neutral';
 }
 
-// Translation key describing what the notification is about (used as a
-// fallback when the backend title/message are empty).
+// Fallback title key
 export function notificationTypeKey(type: string | null | undefined): string {
   const t = (type ?? '').toUpperCase();
   if (t.includes('PROGRAM')) return 'program_submitted';
@@ -56,9 +51,7 @@ export function notificationTypeKey(type: string | null | undefined): string {
   return 'update';
 }
 
-// Types we can confidently translate in the UI. The backend currently sends
-// English-only titles/messages, so for these types the UI overrides the
-// backend text with the user's language.
+// Backend sends English only
 export function isKnownNotificationType(type: string | null | undefined): boolean {
   return notificationTypeKey(type) !== 'update';
 }

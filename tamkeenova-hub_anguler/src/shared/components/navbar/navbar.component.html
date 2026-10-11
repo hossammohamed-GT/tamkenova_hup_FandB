@@ -1,7 +1,6 @@
 <header class="navbar" [class.is-scrolled]="isScrolled()">
   <div class="navbar-inner">
 
-    <!-- Brand Logo -->
     <a routerLink="/" class="navbar-brand" (click)="closeMobileMenu()">
       <img src="/images/logo.svg" alt="TamkeeNova" class="brand-mark">
       <span class="brand-word">
@@ -14,7 +13,6 @@
       </span>
     </a>
 
-    <!-- Desktop Navigation -->
     <nav class="navbar-links" aria-label="Main navigation">
       @for (link of navLinks; track link.route) {
       <a [routerLink]="link.route" routerLinkActive="is-active"
@@ -24,7 +22,6 @@
       }
     </nav>
 
-    <!-- Desktop Actions -->
     <div class="navbar-actions">
 
       <button type="button" class="control-btn desktop-only" (click)="toggleLanguage()"
@@ -48,7 +45,6 @@
       }
 
       @if (isLoggedIn()) {
-      <!-- Notifications Bell with Glass Dropdown -->
       <div class="notif-dropdown-wrapper desktop-only" (mouseenter)="onNotifMouseEnter()"
         (mouseleave)="onNotifMouseLeave()">
         <button type="button" class="control-btn control-btn-icon notif-btn" (click)="goToNotifications()"
@@ -59,7 +55,6 @@
           }
         </button>
 
-        <!-- Glassmorphic Dropdown -->
         <div class="notif-glass-dropdown" [class.is-open]="isNotifDropdownOpen()" (mouseenter)="onDropdownMouseEnter()"
           (mouseleave)="onDropdownMouseLeave()">
           <div class="notif-glass-header">
@@ -166,7 +161,6 @@
     </div>
   </div>
 
-  <!-- Mobile Navigation Panel -->
   <div class="mobile-panel chamfer-lg" [class.is-open]="isMobileMenuOpen()">
     <nav class="mobile-links" aria-label="Mobile navigation">
       @for (link of navLinks; track link.route) {
@@ -246,7 +240,6 @@
 
 <div class="mobile-backdrop" [class.is-open]="isMobileMenuOpen()" (click)="closeMobileMenu()"></div>
 
-<!-- Notification Full Details Modal (Glass) -->
 @if (showNotifDetailModal()) {
 <div class="notif-detail-backdrop" (click)="closeNotifDetail()">
   <div class="notif-detail-modal notif-detail-glass chamfer-sm" (click)="$event.stopPropagation()">
