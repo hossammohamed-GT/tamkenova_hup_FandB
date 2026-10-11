@@ -12,53 +12,6 @@ import {
 } from '../../core/models/course-catalog.model';
 import { CourseCatalogService } from '../../core/services/course-catalog.service';
 
-const DEFAULT_CATEGORIES: CourseCategory[] = [
-  {
-    id: 'default-business',
-    slug: 'business-professional-skills',
-    name_ar: 'المهارات المهنية والأعمال',
-    name_en: 'Business & Professional Skills',
-  },
-  {
-    id: 'default-technology',
-    slug: 'technology-innovation',
-    name_ar: 'التكنولوجيا والابتكار',
-    name_en: 'Technology & Innovation',
-  },
-  {
-    id: 'default-arts',
-    slug: 'arts-design-media',
-    name_ar: 'الفنون والتصميم والإعلام',
-    name_en: 'Arts, Design & Media',
-  },
-  {
-    id: 'default-wellbeing',
-    slug: 'wellbeing',
-    name_ar: 'الصحة النفسية والجسدية',
-    name_en: 'Wellbeing',
-  },
-  { id: 'default-lifestyle', slug: 'lifestyle', name_ar: 'أسلوب الحياة', name_en: 'Lifestyle' },
-  {
-    id: 'default-education',
-    slug: 'education-academics',
-    name_ar: 'التعليم والدراسات الأكاديمية',
-    name_en: 'Education & Academics',
-  },
-  {
-    id: 'default-family',
-    slug: 'family-relationships',
-    name_ar: 'الأسرة والعلاقات',
-    name_en: 'Family & Relationships',
-  },
-  { id: 'default-languages', slug: 'languages', name_ar: 'اللغات', name_en: 'Languages' },
-  {
-    id: 'default-soft-skills',
-    slug: 'soft-skills',
-    name_ar: 'المهارات الشخصية',
-    name_en: 'Soft Skills',
-  },
-];
-
 @Component({
   selector: 'app-programs',
   standalone: true,
@@ -145,7 +98,7 @@ export class ProgramsComponent {
         }),
       ),
     }).subscribe(({ categories, collections, programs }) => {
-      this.categories.set(categories.length ? categories : DEFAULT_CATEGORIES);
+      this.categories.set(categories);
       this.collections.set(collections);
       this.learningPrograms.set(programs);
     });
