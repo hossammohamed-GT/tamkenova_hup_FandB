@@ -935,7 +935,6 @@ body.route-enter router-outlet + * {
 
 /* Category icons are local SVGs: no external icon-font loading dependency. */
 .programs-page .category-section svg.rtl-flip { transform: none; }
-.programs-page .category-controls svg,
 .programs-page .category-icon-badge svg,
 .programs-page .category-arrow svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 .programs-page .category-section .category-icon-badge svg { width: 100%; height: 100%; }
@@ -944,36 +943,46 @@ body.route-enter router-outlet + * {
 .programs-page .category-tile:not(.category-skeleton) { pointer-events: none; }
 .programs-page .category-tile .category-content { pointer-events: auto; }
 /* Each scene has its own outline, glass return and architectural setting. */
-.programs-page .category-section { padding-block: 2rem 2.5rem; }
-.programs-page .category-heading { align-items: flex-start; margin-bottom: 0; z-index: 3; pointer-events: none; }
-.programs-page .category-heading-copy { max-width: 27%; }
+.programs-page .category-section {
+  width: calc(100% - clamp(32px, 5vw, 96px));
+  max-width: 1920px;
+  padding-block: 1.75rem 3rem;
+}
+.programs-page .category-heading { align-items: flex-start; margin-bottom: 1.25rem; }
+.programs-page .category-heading-copy { max-width: 100%; }
 .programs-page .category-heading-copy h2 { font-size: clamp(1.5rem, 2.15vw, 2rem); }
-.programs-page .category-heading-copy p { max-width: 310px; }
-.programs-page .category-controls { display: flex; align-items: center; gap: 0.7rem; min-height: 44px; pointer-events: auto; }
-.programs-page .category-controls .text-link { margin-inline-end: 0.8rem; }
-.programs-page .category-nav { display: grid; place-items: center; width: 42px; height: 42px; border: 0; border-radius: 50%; background: color-mix(in srgb, var(--color-text) 5%, var(--color-surface)); color: var(--color-text); cursor: pointer; transition: background 180ms ease; }
-.programs-page .category-nav:hover { background: color-mix(in srgb, var(--color-accent) 20%, var(--color-surface)); }
-.programs-page .category-nav:focus-visible { outline: 3px solid #c48b36; outline-offset: 3px; }
+.programs-page .category-heading-copy p { max-width: 560px; }
+/* All API categories wrap in place. Reserve a full cell for each sculpture AND
+   its 140%-wide setting, so neither cards nor their gardens can overlap. */
 .programs-page .category-grid {
   position: relative;
-  display: grid;
-  grid-template-columns: repeat(100, minmax(0, 1fr));
-  grid-template-rows: repeat(100, minmax(0, 1fr));
+  --category-columns: 5;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-items: flex-start;
   width: 100%;
-  height: clamp(410px, 34vw, 510px);
-  margin-top: -100px;
-  padding: 0;
-  gap: 0;
+  height: auto;
+  margin: 0;
+  padding: .5rem 0 2rem;
+  gap: clamp(2.75rem, 3vw, 3.5rem) 0;
   overflow: visible;
+}
+.programs-page .category-slot {
+  flex: 0 0 calc(100% / var(--category-columns));
+  display: flex;
+  justify-content: center;
+  min-width: 0;
 }
 .programs-page .category-tile {
   --category-tint: #0b5665;
   position: relative;
   display: block;
-  grid-column: 1 / span 23;
-  grid-row: 30 / span 65;
-  width: 100%;
-  height: 100%;
+  flex: 0 0 auto;
+  width: 70%;
+  max-width: 230px;
+  height: auto;
+  aspect-ratio: 1.04;
   min-width: 0;
   overflow: visible;
   padding: 0;
@@ -988,11 +997,6 @@ body.route-enter router-outlet + * {
   font: inherit;
   transition: filter 200ms ease, transform 250ms ease;
 }
-.programs-page .category-tile:nth-of-type(2) { grid-column: 25 / span 20; grid-row: 1 / span 56; }
-.programs-page .category-tile:nth-of-type(3) { grid-column-start: 35; grid-row-start: 36; }
-.programs-page .category-tile:nth-of-type(4) { grid-column: 51 / span 22; grid-row: 1 / span 56; }
-.programs-page .category-tile:nth-of-type(5) { grid-column-start: 64; grid-row: 36 / span 65; }
-.programs-page .category-tile:nth-of-type(6) { grid-column: 79 / span 22; grid-row-start: 20; }
 .programs-page .category-tile[data-category='business-professional-skills'] { --category-tint: #075360; }
 .programs-page .category-tile[data-category='technology-innovation'] { --category-tint: #0d4266; }
 .programs-page .category-tile[data-category='arts-design-media'] { --category-tint: #b74827; }
@@ -1008,13 +1012,13 @@ body.route-enter router-outlet + * {
   position: absolute; inset: 0; display: block;
   clip-path: polygon(0 30%, 50% 3%, 100% 30%, 100% 74%, 48% 98%, 0 74%);
 }
-.programs-page .category-number { position: absolute; inset-inline-start: 7%; top: 32%; z-index: 1; font-size: clamp(1.3rem, 2vw, 2rem); line-height: 1; font-weight: 800; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.12); pointer-events: none; }
-.programs-page .category-content { position: absolute; z-index: 2; inset-inline: 13% 12%; top: 40%; bottom: 19%; display: flex; align-items: flex-end; gap: .35rem; justify-content: space-between; }
-.programs-page .category-card-info { display: flex; min-width: 0; flex: 1; flex-direction: column; align-items: flex-start; gap: .35rem; align-self: flex-start; }
-.programs-page .category-icon-badge { display: grid; place-items: center; width: 34px; height: 34px; margin-bottom: .15rem; background: transparent; border: 0; border-radius: 0; color: #fff6d5; font-size: 1.65rem; }
-.programs-page .category-name { color: white; font-size: clamp(.8rem, 1.08vw, 1rem); font-weight: 750; line-height: 1.28; text-shadow: 0 1px 3px rgba(0,0,0,.12); }
-.programs-page .category-course-count { color: rgba(255,255,255,.78); font-size: clamp(.64rem, .84vw, .78rem); line-height: 1.3; }
-.programs-page .category-arrow { display: grid; place-items: center; width: 35px; height: 35px; flex: 0 0 35px; margin-bottom: 3%; border: 1px solid rgba(255,255,255,.65); border-radius: 50%; background: transparent; color: white; font-size: .75rem; transition: background 180ms ease, transform 180ms ease; }
+.programs-page .category-number { position: absolute; inset-inline-start: 7%; top: 32%; z-index: 1; font-size: clamp(1.15rem, 1.5vw, 1.6rem); line-height: 1; font-weight: 800; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.12); pointer-events: none; }
+.programs-page .category-content { position: absolute; z-index: 2; inset-inline: 13% 12%; top: 36%; bottom: 19%; display: block; }
+.programs-page .category-card-info { display: flex; min-width: 0; flex: 1; flex-direction: column; align-items: flex-start; gap: .2rem; }
+.programs-page .category-icon-badge { display: grid; place-items: center; width: 22px; height: 22px; margin-bottom: .1rem; background: transparent; border: 0; border-radius: 0; color: #fff6d5; font-size: 1.65rem; }
+.programs-page .category-name { color: white; font-size: clamp(.64rem, .8vw, .85rem); font-weight: 750; line-height: 1.28; text-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.programs-page .category-course-count { color: rgba(255,255,255,.78); font-size: clamp(.58rem, .7vw, .7rem); line-height: 1.3; }
+.programs-page .category-arrow { position: absolute; inset-inline-end: 0; top: 0; display: grid; place-items: center; width: 24px; height: 24px; margin-bottom: 3%; border: 1px solid rgba(255,255,255,.65); border-radius: 50%; background: transparent; color: white; font-size: .75rem; transition: background 180ms ease, transform 180ms ease; }
 .programs-page .category-tile:hover .category-arrow { background: rgba(255,255,255,.17); transform: translateX(2px); }
 .programs-page .category-tile:focus-visible { outline: none; filter: drop-shadow(0 0 3px #b47b21) drop-shadow(0 0 3px #b47b21); }
 .programs-page .text-link:focus-visible,
@@ -1033,34 +1037,22 @@ body.route-enter router-outlet + * {
 .programs-page .category-skeleton-name { width: 100px; max-width: 100%; height: 14px; }
 .programs-page .category-skeleton-count { width: 64px; height: 10px; margin-top: 4px; }
 .programs-page .category-load-error { position: relative; z-index: 3; padding: 1rem 0; color: var(--color-text-muted); }
-/* Expanded mode retains the stagger but makes every API category accessible. */
-.programs-page .category-grid.is-expanded { height: auto; margin-top: 1.5rem; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: none; gap: 1rem 2rem; padding-bottom: 2.5rem; }
-.programs-page .category-grid.is-expanded .category-tile { grid-column: auto; grid-row: auto; aspect-ratio: 1.04; height: auto; }
-.programs-page .category-grid.is-expanded .category-tile:nth-of-type(3n + 2) { top: 2.5rem; }
-@media (max-width: 1100px) {
-  .programs-page .category-heading-copy { max-width: 55%; }
-  .programs-page .category-grid { height: auto; margin-top: 1.5rem; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: none; gap: .5rem 1rem; padding-bottom: 2.5rem; }
-  .programs-page .category-grid .category-tile { grid-column: auto; grid-row: auto; aspect-ratio: 1.04; height: auto; }
-  .programs-page .category-grid .category-tile:nth-of-type(3n + 2) { top: 2.5rem; }
-  .programs-page .category-name { font-size: clamp(.8rem, 1.45vw, 1rem); }
+@media (max-width: 1199px) {
+  .programs-page .category-grid { --category-columns: 4; }
+}
+@media (max-width: 959px) {
+  .programs-page .category-grid { --category-columns: 3; }
 }
 @media (max-width: 680px) {
-  .programs-page .category-heading { flex-direction: column; gap: .9rem; }
-  .programs-page .category-heading-copy { max-width: 100%; }
   .programs-page .category-heading-copy h2 { font-size: 1.55rem; }
-  .programs-page .category-controls { width: 100%; gap: .5rem; }
-  .programs-page .category-controls .text-link { margin-inline-end: auto; }
-  .programs-page .category-nav { width: 36px; height: 36px; }
-  .programs-page .category-grid,
-  .programs-page .category-grid.is-expanded { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin-top: .5rem; padding-bottom: 2rem; }
-  .programs-page .category-grid .category-tile:nth-of-type(n) { top: 0; }
-  .programs-page .category-grid .category-tile:nth-of-type(even) { top: 1.75rem; }
-  .programs-page .category-content { inset-inline: 11% 9%; top: 36%; bottom: 18%; gap: .2rem; }
+  .programs-page .category-grid { --category-columns: 2; gap: 2.75rem 0; }
+  .programs-page .category-tile { width: calc(100% - .75rem); max-width: 210px; }
+  .programs-page .category-content { inset-inline: 11% 9%; top: 36%; bottom: 18%; }
   .programs-page .category-card-info { gap: .2rem; }
-  .programs-page .category-icon-badge { width: 25px; height: 25px; font-size: 1.25rem; margin: 0; }
+  .programs-page .category-icon-badge { width: 22px; height: 22px; margin: 0; }
   .programs-page .category-name { font-size: clamp(.63rem, 2.45vw, .85rem); }
   .programs-page .category-course-count { font-size: .58rem; }
-  .programs-page .category-arrow { width: 25px; height: 25px; flex-basis: 25px; font-size: .6rem; }
+  .programs-page .category-arrow { width: 22px; height: 22px; font-size: .6rem; }
 }
 @media (prefers-reduced-motion: reduce) {
   .programs-page .category-tile,

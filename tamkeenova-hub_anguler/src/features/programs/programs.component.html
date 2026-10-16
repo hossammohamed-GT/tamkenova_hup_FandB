@@ -119,28 +119,14 @@
           <h2 id="category-heading">{{ 'programs.catalog.category_title' | translate }}</h2>
           <p>{{ 'programs.catalog.category_subtitle' | translate }}</p>
         </div>
-        <div class="category-controls">
-          @if (!allCategoriesExpanded() && categories().length > 6) {
-            <button type="button" class="text-link" (click)="expandCategories()">
-              {{ 'programs.catalog.view_all' | translate }}
-              <svg class="rtl-flip" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6" /></svg>
-            </button>
-            <button type="button" class="category-nav" (click)="moveCategories(-1)"
-              [attr.aria-label]="'programs.catalog.previous_categories' | translate">
-              <svg class="rtl-flip" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6" /></svg>
-            </button>
-            <button type="button" class="category-nav" (click)="moveCategories(1)"
-              [attr.aria-label]="'programs.catalog.next_categories' | translate">
-              <svg class="rtl-flip" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6" /></svg>
-            </button>
-          }
-        </div>
+
       </div>
 
-      <div class="category-grid" #categoryGrid [class.is-expanded]="allCategoriesExpanded()" [attr.aria-busy]="isLoadingCategories()">
+      <div class="category-grid" #categoryGrid [attr.aria-busy]="isLoadingCategories()">
         @if (isLoadingCategories() && !categories().length) {
           <span class="visually-hidden" role="status">{{ 'programs.catalog.loading' | translate }}</span>
           @for (item of categoryPlaceholders; track item) {
+            <div class="category-slot">
             <div class="category-tile category-skeleton" aria-hidden="true">
               <span class="category-face"><span class="category-overlay"></span></span>
               <span class="category-content"><span class="category-card-info">
@@ -149,9 +135,11 @@
                 <span class="category-skeleton-count"></span>
               </span></span>
             </div>
+            </div>
           }
         }
         @for (category of displayedCategories(); track category.id; let index = $index) {
+          <div class="category-slot">
           <button
             class="category-tile"
             type="button"
@@ -181,6 +169,7 @@
               </span>
             </span>
           </button>
+          </div>
         }
       </div>
       @if (categoriesUnavailable()) {

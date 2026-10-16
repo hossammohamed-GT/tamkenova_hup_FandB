@@ -5,7 +5,7 @@
 .sculpture-photo { transition: filter 220ms ease; }
 :host-context(.category-tile:hover) .sculpture-photo { filter: saturate(1.1) brightness(1.04); }
 :host-context([data-theme='dark']) .category-setting { filter: brightness(.65) saturate(.75); }
-@media (max-width: 680px) { .category-setting { width: 125%; left: -12.5%; opacity: .85; } }
+@media (max-width: 680px) { .category-setting { width: 100%; left: 0; opacity: .85; } }
 @media (prefers-reduced-motion: reduce) { .sculpture-photo { transition: none; } }
 
 /* Only the painted, clipped sculpture is a mouse target; its surrounding garden is not. */

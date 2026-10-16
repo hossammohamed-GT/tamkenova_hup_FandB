@@ -50,17 +50,14 @@ export class ProgramsComponent {
   readonly isEnglish = computed(() => this.translate.currentLang() === 'en');
   readonly isLoadingCategories = signal(true);
   readonly categoriesUnavailable = signal(false);
-  readonly categoryPlaceholders = Array.from({ length: 6 }, (_, index) => index);
+  readonly categoryPlaceholders = Array.from({ length: 9 }, (_, index) => index);
   readonly categories = signal<CourseCategory[]>([]);
-  readonly categoryOffset = signal(0);
-  readonly allCategoriesExpanded = signal(false);
   readonly displayedCategories = computed(() => {
     const order = ['business-professional-skills', 'technology-innovation', 'arts-design-media',
       'wellbeing', 'education-academics', 'lifestyle'];
     const rank = (slug: string) => { const index = order.indexOf(slug); return index < 0 ? order.length : index; };
     const records = [...this.categories()].sort((a, b) => rank(a.slug) - rank(b.slug));
-    if (this.allCategoriesExpanded() || records.length <= 6) return records;
-    return Array.from({ length: 6 }, (_, index) => records[(this.categoryOffset() + index) % records.length]);
+    return records;
   });
   readonly categoryCount = signal<number | null>(null);
   readonly expertCount = signal<number | null>(null);
@@ -151,15 +148,6 @@ export class ProgramsComponent {
       ),
       error: () => this.expertCount.set(null),
     });
-  }
-
-  moveCategories(direction: number): void {
-    const count = this.categories().length;
-    if (count > 6) this.categoryOffset.update((offset) => (offset + direction * 3 + count) % count);
-  }
-
-  expandCategories(): void {
-    this.allCategoriesExpanded.set(true);
   }
 
   loadCategories(): void {
