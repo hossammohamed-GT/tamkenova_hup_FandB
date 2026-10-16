@@ -39,7 +39,6 @@ export class ProgramsComponent {
   private readonly catalogService = inject(CourseCatalogService);
   private readonly trainersService = inject(TrainersService);
   private readonly translate = inject(TranslateService);
-  private categoryCarouselIndex = 0;
 
   @ViewChild('categoryGrid') private categoryGrid?: ElementRef<HTMLDivElement>;
 
@@ -68,9 +67,24 @@ export class ProgramsComponent {
   readonly visibleCollections = computed(() =>
     this.collections().filter((collection) => collection.courses?.length > 0),
   );
-  readonly featuredPrograms = computed(() =>
-    this.learningPrograms().filter((program) => program.courses?.length > 0),
+  readonly selectedCategoryRecord = computed(
+    () => this.categories().find((category) => category.slug === this.selectedCategory()) ?? null,
   );
+  readonly visibleLearningPrograms = computed(() => {
+    const selectedSlug = this.selectedCategory();
+    const category = this.selectedCategoryRecord();
+    const selectedSlugs = new Set(
+      [category?.slug, ...(category?.children ?? []).map((child) => child.slug)].filter(
+        (slug): slug is string => !!slug,
+      ),
+    );
+
+    return this.learningPrograms().filter(
+      (program) =>
+        program.courses?.length > 0 &&
+        (!selectedSlug || selectedSlugs.has(program.course_categories?.slug ?? '')),
+    );
+  });
   get activeFilterCount(): number {
     return (
       Number(!!this.selectedCategory()) +
@@ -152,7 +166,7 @@ export class ProgramsComponent {
         language: this.selectedLanguage() || undefined,
         sort: this.selectedSort(),
         page: nextPage,
-        limit: this.pageSize,
+        limit: this.selectedCategory() ? 60 : this.pageSize,
       })
       .subscribe({
         next: (response) => {
@@ -187,28 +201,114 @@ export class ProgramsComponent {
   }
 
   selectCategory(slug: string): void {
-    this.selectedCategory.set(this.selectedCategory() === slug ? '' : slug);
+    if (!slug) {
+      if (this.selectedCategory()) this.showAllCategories();
+      return;
+    }
+    if (this.selectedCategory() === slug) {
+      this.showAllCategories();
+      return;
+    }
+
+    const sourceCard = Array.from(
+      this.categoryGrid?.nativeElement.querySelectorAll<HTMLElement>('.category-tile') ?? [],
+    ).find((card) => card.dataset['category'] === slug);
+    const sourceImage = sourceCard?.querySelector<HTMLElement>('.category-image');
+    const transitionDocument = typeof document === 'undefined'
+      ? null
+      : (document as Document & {
+          startViewTransition?: (
+            updateCallback: () => void | Promise<void>,
+          ) => { finished: Promise<void> };
+        });
+
+    if (!transitionDocument?.startViewTransition) {
+      this.activateCategory(slug);
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    sourceImage?.style.setProperty('view-transition-name', 'category-spotlight-image');
+    const transition = transitionDocument.startViewTransition(async () => {
+      this.activateCategory(slug);
+      this.scrollToPageTopImmediately();
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    });
+    void transition.finished
+      .catch(() => undefined)
+      .then(() => {
+        if (sourceImage?.isConnected) sourceImage.style.removeProperty('view-transition-name');
+      });
+  }
+
+  showAllCategories(): void {
+    if (!this.selectedCategory()) {
+      this.resetCatalogFilters();
+      return;
+    }
+
+    const transitionDocument = typeof document === 'undefined'
+      ? null
+      : (document as Document & {
+          startViewTransition?: (
+            updateCallback: () => void | Promise<void>,
+          ) => { finished: Promise<void> };
+        });
+
+    if (!transitionDocument?.startViewTransition) {
+      this.resetCatalogFilters();
+      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    const transition = transitionDocument.startViewTransition(() => {
+      this.resetCatalogFilters();
+      this.scrollToPageTopImmediately();
+    });
+    void transition.finished.catch(() => undefined);
+  }
+
+  private activateCategory(slug: string): void {
+    this.searchInput = '';
+    this.selectedCategory.set(slug);
+    this.selectedLevel.set('');
+    this.selectedType.set('');
+    this.selectedLanguage.set('');
+    this.selectedSort.set('newest');
     this.loadCourses(true);
+  }
+
+  private resetCatalogFilters(): void {
+    this.searchInput = '';
+    this.selectedCategory.set('');
+    this.selectedLevel.set('');
+    this.selectedType.set('');
+    this.selectedLanguage.set('');
+    this.selectedSort.set('newest');
+    this.loadCourses(true);
+  }
+
+  private scrollToPageTopImmediately(): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    const rootStyle = document.documentElement.style;
+    const previousScrollBehavior = rootStyle.scrollBehavior;
+    rootStyle.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    rootStyle.scrollBehavior = previousScrollBehavior;
   }
 
   scrollCategories(direction: 'previous' | 'next'): void {
     const track = this.categoryGrid?.nativeElement;
     if (!track) return;
 
-    const cards = Array.from(track.querySelectorAll<HTMLElement>('.category-tile'));
-    if (!cards.length) return;
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    if (maxScroll <= 0) return;
 
-    const cardStep = cards[0].getBoundingClientRect().width + 12;
-    const visibleColumns = Math.max(1, Math.floor(track.clientWidth / cardStep));
-    const pageSize = visibleColumns * 2;
-    const maxIndex = Math.max(0, cards.length - pageSize);
-    const nextIndex = this.categoryCarouselIndex + (direction === 'next' ? pageSize : -pageSize);
-    this.categoryCarouselIndex = Math.max(0, Math.min(maxIndex, nextIndex));
-
-    cards[this.categoryCarouselIndex]?.scrollIntoView({
+    const rtl = typeof getComputedStyle !== 'undefined' && getComputedStyle(track).direction === 'rtl';
+    const sign = (direction === 'next' ? 1 : -1) * (rtl ? -1 : 1);
+    track.scrollBy({
+      left: sign * Math.min(track.clientWidth * 0.82, maxScroll),
       behavior: 'smooth',
-      block: 'nearest',
-      inline: this.isEnglish() ? 'start' : 'end',
     });
   }
 
@@ -237,17 +337,20 @@ export class ProgramsComponent {
   }
 
   clearFilters(): void {
-    this.searchInput = '';
-    this.selectedCategory.set('');
-    this.selectedLevel.set('');
-    this.selectedType.set('');
-    this.selectedLanguage.set('');
-    this.selectedSort.set('newest');
-    this.loadCourses(true);
+    if (this.selectedCategory()) {
+      this.showAllCategories();
+      return;
+    }
+    this.resetCatalogFilters();
   }
 
   categoryName(category: CourseCategory): string {
     return this.isEnglish() ? category.name_en : category.name_ar;
+  }
+
+  categoryDescription(category: CourseCategory): string {
+    const description = this.isEnglish() ? category.description_en : category.description_ar;
+    return description?.trim() || this.translate.instant('programs.catalog.category_description_fallback');
   }
 
   categoryCardImage(category: CourseCategory): string | null {

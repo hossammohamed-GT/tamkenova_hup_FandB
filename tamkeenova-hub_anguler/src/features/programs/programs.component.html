@@ -1,4 +1,5 @@
 <main class="programs-page">
+  @if (!selectedCategory()) {
   <section class="catalog-hero">
     <div class="hero-art" aria-hidden="true"></div>
 
@@ -70,7 +71,43 @@
       <span><strong>{{ expertCount() ?? '—' }}</strong> {{ 'programs.catalog.expert_instructors' | translate }}</span>
     </div>
   </section>
+  } @else if (selectedCategoryRecord(); as activeCategory) {
+  <section class="catalog-hero category-detail-hero" aria-labelledby="selected-category-heading">
+    <div class="category-detail-art" aria-hidden="true">
+      @let detailImage = categoryCardImage(activeCategory);
+      @if (detailImage) {
+        <img
+          class="category-detail-image"
+          [src]="detailImage"
+          alt=""
+          [style.view-transition-name]="'category-spotlight-image'"
+        />
+      } @else {
+        <span class="category-detail-placeholder">
+          <i [class]="'fa-solid ' + categoryIcon(activeCategory.slug)"></i>
+        </span>
+      }
+    </div>
+    <div class="category-detail-content">
+      <button type="button" class="category-back-button" (click)="showAllCategories()">
+        <i class="fa-solid fa-arrow-left rtl-flip" aria-hidden="true"></i>
+        {{ 'programs.catalog.back_to_all_categories' | translate }}
+      </button>
+      <span class="eyebrow">
+        <span class="eyebrow-rule"></span>
+        {{ 'programs.catalog.category_detail_eyebrow' | translate }}
+      </span>
+      <h1 id="selected-category-heading">{{ categoryName(activeCategory) }}</h1>
+      <p>{{ categoryDescription(activeCategory) }}</p>
+      <span class="selected-category-stat">
+        <strong>{{ activeCategory.courses_count ?? '—' }}</strong>
+        {{ 'programs.catalog.courses_ready' | translate }}
+      </span>
+    </div>
+  </section>
+  }
 
+  @if (!selectedCategory()) {
   @if (categories().length) {
     <section class="category-section content-width" aria-labelledby="category-heading">
       <div class="section-heading category-heading">
@@ -154,7 +191,9 @@
     </section>
   }
 
-  @if (featuredPrograms().length) {
+  }
+
+  @if (visibleLearningPrograms().length) {
     <section class="learning-path-section">
       <div class="content-width">
         <div class="section-heading light-heading">
@@ -165,7 +204,7 @@
           </div>
         </div>
         <div class="learning-path-grid">
-          @for (program of featuredPrograms(); track program.id) {
+          @for (program of visibleLearningPrograms(); track program.id) {
             <article class="learning-path-card">
               @if (program.cover_image_url) {
                 <img
@@ -219,9 +258,15 @@
   <section class="catalog-section content-width" id="course-list" aria-labelledby="catalog-heading">
     <div class="section-heading catalog-heading">
       <div>
-        <span class="section-kicker">{{ 'programs.catalog.learn_something_new' | translate }}</span>
-        <h2 id="catalog-heading">{{ 'programs.catalog.all_courses' | translate }}</h2>
+        <span class="section-kicker">{{ (selectedCategory() ? 'programs.catalog.category_courses' : 'programs.catalog.learn_something_new') | translate }}</span>
+        <h2 id="catalog-heading">{{ selectedCategory() ? selectedCategoryName() : ('programs.catalog.all_courses' | translate) }}</h2>
         <p>{{ 'programs.catalog.results_summary' | translate: { count: totalCourses() } }}</p>
+        @if (selectedCategory()) {
+          <button type="button" class="category-return-link text-link" (click)="showAllCategories()">
+            <i class="fa-solid fa-arrow-left rtl-flip" aria-hidden="true"></i>
+            {{ 'programs.catalog.back_to_all_categories' | translate }}
+          </button>
+        }
       </div>
       <label class="sort-control">
         <span>{{ 'programs.catalog.sort_by' | translate }}</span>
@@ -272,7 +317,7 @@
         </select>
       </label>
       @if (selectedCategory()) {
-        <button type="button" class="active-filter" (click)="selectCategory(selectedCategory())">
+        <button type="button" class="active-filter" (click)="showAllCategories()">
           {{ selectedCategoryName() }} <i class="fa-solid fa-xmark"></i>
         </button>
       }

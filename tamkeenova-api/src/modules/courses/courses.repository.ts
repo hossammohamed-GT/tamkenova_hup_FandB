@@ -78,7 +78,10 @@ export class CoursesRepository {
             category_links: {
               some: {
                 category_id: {
-                  in: [category.id, ...category.children.map((child) => child.id)],
+                  in: [
+                    category.id,
+                    ...category.children.map((child) => child.id),
+                  ],
                 },
               },
             },
@@ -109,11 +112,33 @@ export class CoursesRepository {
     }
 
     if (query.category) {
-      where.category_links = {
-        some: {
-          course_categories: { slug: query.category, is_active: true },
+      const category = await this.prisma.course_categories.findFirst({
+        where: { slug: query.category, is_active: true },
+        select: {
+          id: true,
+          children: {
+            where: { is_active: true },
+            select: { id: true },
+          },
         },
-      };
+      });
+
+      where.category_links = category
+        ? {
+            some: {
+              category_id: {
+                in: [
+                  category.id,
+                  ...category.children.map((child) => child.id),
+                ],
+              },
+            },
+          }
+        : {
+            some: {
+              course_categories: { slug: query.category, is_active: true },
+            },
+          };
     }
     if (query.level) where.level = query.level;
     if (query.language) where.language = query.language;
