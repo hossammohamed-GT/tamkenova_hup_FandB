@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { catchError, forkJoin, of } from 'rxjs';
 import {
@@ -12,6 +11,8 @@ import {
   LearningProgram,
 } from '../../core/models/course-catalog.model';
 import { CourseCatalogService } from '../../core/services/course-catalog.service';
+import { Trainer } from '../../core/models/trainer.model';
+import { TrainersService } from '../../core/services/trainers.service';
 
 // Category records still come from the API; this only supplies local artwork if
 // the database row has not been seeded with image_url yet.
@@ -36,11 +37,16 @@ const CATEGORY_CARD_IMAGE_FALLBACKS: Readonly<Record<string, string>> = {
 })
 export class ProgramsComponent {
   private readonly catalogService = inject(CourseCatalogService);
+  private readonly trainersService = inject(TrainersService);
   private readonly translate = inject(TranslateService);
-  private readonly route = inject(ActivatedRoute);
+  private categoryCarouselIndex = 0;
+
+  @ViewChild('categoryGrid') private categoryGrid?: ElementRef<HTMLDivElement>;
 
   readonly isEnglish = computed(() => this.translate.currentLang() === 'en');
   readonly categories = signal<CourseCategory[]>([]);
+  readonly categoryCount = signal<number | null>(null);
+  readonly expertCount = signal<number | null>(null);
   readonly collections = signal<CourseCollection[]>([]);
   readonly learningPrograms = signal<LearningProgram[]>([]);
   readonly courses = signal<Course[]>([]);
@@ -54,6 +60,7 @@ export class ProgramsComponent {
   readonly hasMore = signal(false);
   readonly catalogUnavailable = signal(false);
   readonly totalCourses = signal(0);
+  readonly catalogCourseCount = signal<number | null>(null);
   readonly page = signal(1);
   readonly pageSize = 12;
   searchInput = '';
@@ -84,19 +91,7 @@ export class ProgramsComponent {
 
   constructor() {
     this.loadLandingContent();
-    this.route.queryParamMap.pipe(takeUntilDestroyed()).subscribe((params) => {
-      const sort = params.get('sort') ?? 'newest';
-      const contentType = params.get('content_type') ?? '';
-      const allowedSorts = ['newest', 'popular', 'rating', 'duration'];
-
-      this.selectedSort.set(allowedSorts.includes(sort) ? sort : 'newest');
-      this.selectedType.set(contentType === 'VIDEO' || contentType === 'PODCOURSE' ? contentType : '');
-      this.searchInput = '';
-      this.selectedCategory.set('');
-      this.selectedLevel.set('');
-      this.selectedLanguage.set('');
-      this.loadCourses(true);
-    });
+    this.loadCourses(true);
   }
 
   retry(): void {
@@ -110,7 +105,7 @@ export class ProgramsComponent {
       categories: this.catalogService.getCategories().pipe(
         catchError(() => {
           this.catalogUnavailable.set(true);
-          return of([] as CourseCategory[]);
+          return of(null as CourseCategory[] | null);
         }),
       ),
       collections: this.catalogService.getCollections().pipe(
@@ -125,10 +120,17 @@ export class ProgramsComponent {
           return of([] as LearningProgram[]);
         }),
       ),
-    }).subscribe(({ categories, collections, programs }) => {
-      this.categories.set(categories);
+      trainers: this.trainersService.getAll().pipe(
+        catchError(() => of(null as Trainer[] | null)),
+      ),
+    }).subscribe(({ categories, collections, programs, trainers }) => {
+      this.categories.set(categories ?? []);
+      this.categoryCount.set(categories?.length ?? null);
       this.collections.set(collections);
       this.learningPrograms.set(programs);
+      this.expertCount.set(
+        trainers?.filter((trainer) => trainer.trainer_status === 'APPROVED').length ?? null,
+      );
     });
   }
 
@@ -158,7 +160,17 @@ export class ProgramsComponent {
             reset ? (response.data ?? []) : [...current, ...(response.data ?? [])],
           );
           this.page.set(response.meta?.page ?? nextPage);
-          this.totalCourses.set(response.meta?.total ?? response.count ?? 0);
+          const resultCount = response.meta?.total ?? response.count ?? 0;
+          this.totalCourses.set(resultCount);
+          if (
+            !this.searchInput.trim() &&
+            !this.selectedCategory() &&
+            !this.selectedLevel() &&
+            !this.selectedType() &&
+            !this.selectedLanguage()
+          ) {
+            this.catalogCourseCount.set(resultCount);
+          }
           this.hasMore.set((response.meta?.page ?? nextPage) < (response.meta?.total_pages ?? 0));
           this.catalogUnavailable.set(false);
           this.isLoading.set(false);
@@ -177,6 +189,27 @@ export class ProgramsComponent {
   selectCategory(slug: string): void {
     this.selectedCategory.set(this.selectedCategory() === slug ? '' : slug);
     this.loadCourses(true);
+  }
+
+  scrollCategories(direction: 'previous' | 'next'): void {
+    const track = this.categoryGrid?.nativeElement;
+    if (!track) return;
+
+    const cards = Array.from(track.querySelectorAll<HTMLElement>('.category-tile'));
+    if (!cards.length) return;
+
+    const cardStep = cards[0].getBoundingClientRect().width + 12;
+    const visibleColumns = Math.max(1, Math.floor(track.clientWidth / cardStep));
+    const pageSize = visibleColumns * 2;
+    const maxIndex = Math.max(0, cards.length - pageSize);
+    const nextIndex = this.categoryCarouselIndex + (direction === 'next' ? pageSize : -pageSize);
+    this.categoryCarouselIndex = Math.max(0, Math.min(maxIndex, nextIndex));
+
+    cards[this.categoryCarouselIndex]?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+      inline: this.isEnglish() ? 'start' : 'end',
+    });
   }
 
   selectLevel(event: Event): void {

@@ -13,69 +13,17 @@
       </span>
     </a>
 
-    <nav class="navbar-links" aria-label="Main navigation">
-      <div class="nav-dropdown programs-nav-menu" (mouseenter)="onProgramsMenuEnter()" (mouseleave)="onProgramsMenuLeave()">
-        <div class="nav-dropdown-heading">
-          <a routerLink="/programs" routerLinkActive="is-active" class="navbar-link" (click)="closeProgramsDropdown()">
-            {{ 'nav.programs' | translate }}
-          </a>
-          <button
-            type="button"
-            class="nav-dropdown-toggle"
-            [attr.aria-label]="'nav.open_programs_menu' | translate"
-            [attr.aria-expanded]="isProgramsDropdownOpen()"
-            aria-haspopup="true"
-            (click)="toggleProgramsDropdown()"
-          >
-            <i class="fa-solid fa-chevron-down" [class.is-open]="isProgramsDropdownOpen()"></i>
-          </button>
-        </div>
-        <div class="navbar-dropdown-panel" [class.is-open]="isProgramsDropdownOpen()">
-          @for (link of programMenuLinks; track link.labelKey) {
-          <a
-            class="navbar-dropdown-link"
-            [routerLink]="link.route"
-            [queryParams]="link.queryParams"
-            (click)="closeProgramsDropdown()"
-          >
-            <span>{{ link.labelKey | translate }}</span>
-            <i class="fa-solid fa-arrow-right rtl-flip" aria-hidden="true"></i>
-          </a>
-          }
-        </div>
-      </div>
-
+    <nav class="navbar-links" [attr.aria-label]="'nav.primary_navigation' | translate">
       @for (link of navLinks; track link.route) {
-      <a [routerLink]="link.route" routerLinkActive="is-active" class="navbar-link">
+      <a
+        [routerLink]="link.route"
+        routerLinkActive="is-active"
+        [routerLinkActiveOptions]="{ exact: link.route === '/' }"
+        class="navbar-link"
+      >
         {{ link.labelKey | translate }}
       </a>
       }
-
-      <div class="nav-dropdown more-nav-menu" (mouseenter)="onMoreMenuEnter()" (mouseleave)="onMoreMenuLeave()">
-        <button
-          type="button"
-          class="navbar-link more-menu-trigger"
-          [attr.aria-expanded]="isMoreDropdownOpen()"
-          aria-haspopup="true"
-          (click)="toggleMoreDropdown()"
-        >
-          {{ 'nav.more' | translate }}
-          <i class="fa-solid fa-chevron-down" [class.is-open]="isMoreDropdownOpen()"></i>
-        </button>
-        <div class="navbar-dropdown-panel" [class.is-open]="isMoreDropdownOpen()">
-          @for (link of moreMenuLinks; track link.route) {
-          <a
-            class="navbar-dropdown-link"
-            [routerLink]="link.route"
-            routerLinkActive="is-active"
-            (click)="closeMoreDropdown()"
-          >
-            <span>{{ link.labelKey | translate }}</span>
-            <i class="fa-solid fa-arrow-right rtl-flip" aria-hidden="true"></i>
-          </a>
-          }
-        </div>
-      </div>
     </nav>
 
     <div class="navbar-actions">
@@ -96,7 +44,7 @@
         {{ 'nav.login' | translate }}
       </a>
       <a routerLink="/register" class="btn-accent navbar-cta chamfer-sm desktop-only">
-        {{ 'nav.sign_up' | translate }}
+        {{ 'nav.register' | translate }}
       </a>
       }
 
@@ -218,29 +166,15 @@
   </div>
 
   <div class="mobile-panel chamfer-lg" [class.is-open]="isMobileMenuOpen()">
-    <nav class="mobile-links" aria-label="Mobile navigation">
-      <a routerLink="/" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }" class="mobile-link" (click)="closeMobileMenu()">
-        {{ 'nav.home' | translate }}
-        <i class="fa-solid fa-arrow-left mobile-link-icon rtl-flip"></i>
-      </a>
-      <a routerLink="/programs" routerLinkActive="is-active" class="mobile-link" (click)="closeMobileMenu()">
-        {{ 'nav.programs' | translate }}
-        <i class="fa-solid fa-arrow-left mobile-link-icon rtl-flip"></i>
-      </a>
-      @for (link of programMenuLinks; track link.labelKey) {
-      <a [routerLink]="link.route" [queryParams]="link.queryParams" class="mobile-link mobile-link-sub" (click)="closeMobileMenu()">
-        {{ link.labelKey | translate }}
-        <i class="fa-solid fa-arrow-left mobile-link-icon rtl-flip"></i>
-      </a>
-      }
+    <nav class="mobile-links" [attr.aria-label]="'nav.mobile_navigation' | translate">
       @for (link of navLinks; track link.route) {
-      <a [routerLink]="link.route" routerLinkActive="is-active" class="mobile-link" (click)="closeMobileMenu()">
-        {{ link.labelKey | translate }}
-        <i class="fa-solid fa-arrow-left mobile-link-icon rtl-flip"></i>
-      </a>
-      }
-      @for (link of moreMenuLinks; track link.route) {
-      <a [routerLink]="link.route" routerLinkActive="is-active" class="mobile-link" (click)="closeMobileMenu()">
+      <a
+        [routerLink]="link.route"
+        routerLinkActive="is-active"
+        [routerLinkActiveOptions]="{ exact: link.route === '/' }"
+        class="mobile-link"
+        (click)="closeMobileMenu()"
+      >
         {{ link.labelKey | translate }}
         <i class="fa-solid fa-arrow-left mobile-link-icon rtl-flip"></i>
       </a>
@@ -253,7 +187,7 @@
         {{ 'nav.login' | translate }}
       </a>
       <a routerLink="/register" class="btn-accent control-btn control-btn-block" (click)="closeMobileMenu()">
-        {{ 'nav.sign_up' | translate }}
+        {{ 'nav.register' | translate }}
       </a>
       }
 

@@ -52,7 +52,7 @@ export class CoursesRepository {
   }
 
   async getCategories() {
-    return this.prisma.course_categories.findMany({
+    const categories = await this.prisma.course_categories.findMany({
       where: { is_active: true, parent_id: null },
       orderBy: { display_order: 'asc' },
       include: {
@@ -69,6 +69,28 @@ export class CoursesRepository {
         },
       },
     });
+
+    const courseCounts = await Promise.all(
+      categories.map((category) =>
+        this.prisma.courses.count({
+          where: {
+            status: 'PUBLISHED',
+            category_links: {
+              some: {
+                category_id: {
+                  in: [category.id, ...category.children.map((child) => child.id)],
+                },
+              },
+            },
+          },
+        }),
+      ),
+    );
+
+    return categories.map((category, index) => ({
+      ...category,
+      courses_count: courseCounts[index],
+    }));
   }
 
   async getCourses(query: CourseCatalogQueryDto) {

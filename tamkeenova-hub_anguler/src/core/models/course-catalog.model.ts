@@ -10,6 +10,7 @@ export interface CourseCategory {
   description_en?: string | null;
   image_url?: string | null;
   icon_name?: string | null;
+  courses_count?: number;
   parent_id?: string | null;
   children?: CourseCategory[];
 }

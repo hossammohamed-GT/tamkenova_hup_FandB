@@ -1,19 +1,14 @@
 <main class="programs-page">
   <section class="catalog-hero">
-    <div class="hero-art" aria-hidden="true">
-      <span class="hero-orbit hero-orbit-one"></span>
-      <span class="hero-orbit hero-orbit-two"></span>
-      <span class="hero-glow"></span>
-      <span class="hero-dot hero-dot-one"></span>
-      <span class="hero-dot hero-dot-two"></span>
-    </div>
+    <div class="hero-art" aria-hidden="true"></div>
 
     <div class="hero-content">
       <div class="hero-copy">
-        <span class="eyebrow"
-          ><i class="fa-solid fa-sparkles"></i> {{ 'programs.catalog.eyebrow' | translate }}</span
-        >
-        <h1>{{ 'programs.catalog.title' | translate }}</h1>
+        <span class="eyebrow"><span class="eyebrow-rule"></span>{{ 'programs.catalog.eyebrow' | translate }}</span>
+        <h1>
+          <span>{{ 'programs.catalog.title_line_one' | translate }}</span>
+          <span>{{ 'programs.catalog.title_line_two' | translate }} <em>{{ 'programs.catalog.title_highlight' | translate }}</em></span>
+        </h1>
         <p class="hero-description">{{ 'programs.catalog.subtitle' | translate }}</p>
 
         <form class="hero-search" (ngSubmit)="submitSearch()">
@@ -35,71 +30,76 @@
               <i class="fa-solid fa-xmark"></i>
             </button>
           }
-          <button type="submit" class="search-submit">
-            {{ 'programs.catalog.search' | translate }}
+          <button type="submit" class="search-submit" [attr.aria-label]="'programs.catalog.search' | translate">
+            <i class="fa-solid fa-arrow-right rtl-flip" aria-hidden="true"></i>
           </button>
         </form>
 
         <div class="hero-highlights">
-          <span
-            ><i class="fa-solid fa-circle-check"></i>
-            {{ 'programs.catalog.self_paced' | translate }}</span
-          >
-          <span
-            ><i class="fa-solid fa-circle-check"></i>
-            {{ 'programs.catalog.learn_anywhere' | translate }}</span
-          >
-          <span
-            ><i class="fa-solid fa-circle-check"></i>
-            {{ 'programs.catalog.expert_led' | translate }}</span
-          >
+          <span><i class="fa-solid fa-book-open"></i>{{ 'programs.catalog.self_paced' | translate }}</span>
+          <span><i class="fa-solid fa-laptop"></i>{{ 'programs.catalog.learn_anywhere' | translate }}</span>
+          <span><i class="fa-solid fa-users"></i>{{ 'programs.catalog.expert_led' | translate }}</span>
         </div>
       </div>
 
-      <div class="hero-art-card" aria-hidden="true">
-        <div class="art-card-top"><span></span><span></span><span></span></div>
-        <div class="art-card-icon"><i class="fa-solid fa-book-open-reader"></i></div>
-        <div class="art-card-lines"><span></span><span></span><span></span></div>
-        <div class="art-card-progress"><span></span></div>
-        <div class="art-floating-badge">
-          <i class="fa-solid fa-play"></i
-          ><span>{{ 'programs.catalog.learn_at_your_pace' | translate }}</span>
+      <aside class="hero-benefit-card" [attr.aria-label]="'programs.catalog.benefits_label' | translate">
+        <div class="hero-benefit-item">
+          <i class="fa-solid fa-graduation-cap"></i>
+          <span>{{ 'programs.catalog.benefit_practical' | translate }}</span>
         </div>
-      </div>
+        <div class="hero-benefit-item">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>{{ 'programs.catalog.benefit_career' | translate }}</span>
+        </div>
+        <div class="hero-benefit-item">
+          <i class="fa-solid fa-users"></i>
+          <span>{{ 'programs.catalog.benefit_experts' | translate }}</span>
+        </div>
+        <div class="hero-benefit-item">
+          <i class="fa-solid fa-laptop-house"></i>
+          <span>{{ 'programs.catalog.benefit_flexible' | translate }}</span>
+        </div>
+      </aside>
     </div>
 
     <div class="hero-bottom">
-      <span
-        ><strong>{{ categories().length }}</strong>
-        {{ 'programs.catalog.explore_fields' | translate }}</span
-      >
-      <span class="hero-bottom-divider"></span>
-      <span
-        ><strong>{{ totalCourses() }}</strong>
-        {{ 'programs.catalog.courses_ready' | translate }}</span
-      >
+      <span><strong>{{ categoryCount() ?? '—' }}</strong> {{ 'programs.catalog.explore_fields' | translate }}</span>
+      <span class="hero-bottom-divider" aria-hidden="true"></span>
+      <span><strong>{{ catalogCourseCount() }}</strong> {{ 'programs.catalog.courses_ready' | translate }}</span>
+      <span class="hero-bottom-divider" aria-hidden="true"></span>
+      <span><strong>{{ expertCount() ?? '—' }}</strong> {{ 'programs.catalog.expert_instructors' | translate }}</span>
     </div>
   </section>
 
   @if (categories().length) {
     <section class="category-section content-width" aria-labelledby="category-heading">
       <div class="section-heading category-heading">
-        <div>
-          <span class="section-kicker">{{
-            'programs.catalog.browse_by_interest' | translate
-          }}</span>
+        <div class="category-heading-copy">
+          <span class="section-kicker">{{ 'programs.catalog.browse_by_interest' | translate }}</span>
           <h2 id="category-heading">{{ 'programs.catalog.category_title' | translate }}</h2>
+          <p>{{ 'programs.catalog.category_subtitle' | translate }}</p>
         </div>
-        <button type="button" class="text-link" (click)="selectCategory('')">
-          {{ 'programs.catalog.view_all' | translate }} <i class="fa-solid fa-arrow-right"></i>
-        </button>
+        <div class="category-heading-actions">
+          <button type="button" class="text-link" (click)="selectCategory('')">
+            {{ 'programs.catalog.view_all' | translate }} <i class="fa-solid fa-arrow-right rtl-flip"></i>
+          </button>
+          <div class="category-scroll-controls">
+            <button type="button" (click)="scrollCategories('previous')" [attr.aria-label]="'programs.catalog.previous_categories' | translate">
+              <i class="fa-solid fa-chevron-left rtl-flip" aria-hidden="true"></i>
+            </button>
+            <button type="button" (click)="scrollCategories('next')" [attr.aria-label]="'programs.catalog.next_categories' | translate">
+              <i class="fa-solid fa-chevron-right rtl-flip" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div class="category-grid">
+      <div class="category-grid" #categoryGrid>
         @for (category of categories(); track category.id) {
           <button
             class="category-tile"
             type="button"
+            [attr.data-category]="category.slug"
             [class.is-selected]="selectedCategory() === category.slug"
             (click)="selectCategory(category.slug)"
           >
@@ -108,14 +108,22 @@
               <img class="category-image" [src]="imageUrl" alt="" loading="lazy" />
             } @else {
               <span class="category-image-placeholder">
-                <i class="fa-solid" [class]="'fa-solid ' + categoryIcon(category.slug)"></i>
+                <i [class]="'fa-solid ' + categoryIcon(category.slug)"></i>
               </span>
             }
             <span class="category-overlay" aria-hidden="true"></span>
             <span class="category-content">
-              <span class="category-name">{{ categoryName(category) }}</span>
+              <span class="category-card-info">
+                <span class="category-icon-badge" aria-hidden="true">
+                  <i [class]="'fa-solid ' + categoryIcon(category.slug)"></i>
+                </span>
+                <span class="category-name">{{ categoryName(category) }}</span>
+                <span class="category-course-count">
+                  {{ category.courses_count ?? '—' }} {{ 'programs.catalog.courses' | translate }}
+                </span>
+              </span>
               <span class="category-arrow" aria-hidden="true">
-                <i class="fa-solid fa-arrow-up"></i>
+                <i class="fa-solid fa-arrow-right rtl-flip"></i>
               </span>
             </span>
           </button>
