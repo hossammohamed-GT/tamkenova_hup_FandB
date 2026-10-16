@@ -184,6 +184,7 @@
       "browse_by_interest": "اكتشف مهارتك القادمة",
       "category_title": "استكشف حسب المجال",
       "category_subtitle": "اكتشف مجالات تناسب أهدافك واهتماماتك.",
+      "categories_error": "تعذّر تحميل المجالات. حاول مرة أخرى.",
       "category_detail_eyebrow": "استكشف هذا المجال",
       "category_description_fallback": "تصفح الدورات والبرامج التعليمية المتاحة في هذا المجال.",
       "category_courses": "برامج هذا المجال",

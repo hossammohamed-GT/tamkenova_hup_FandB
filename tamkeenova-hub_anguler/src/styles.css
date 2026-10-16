@@ -845,7 +845,7 @@ body.route-enter router-outlet + * {
 }
 
 
-/* Programs category mosaic and selected-category hero. */
+/* Programs geometric category cards and selected-category hero. */
 .programs-page .category-section {
   position: relative;
   isolation: isolate;
@@ -951,8 +951,8 @@ body.route-enter router-outlet + * {
   overflow: hidden;
   padding: 0;
   clip-path: polygon(
-    0 12%, 2% 6%, 6% 0, 94% 0, 98% 6%, 100% 12%,
-    100% 88%, 98% 94%, 94% 100%, 6% 100%, 2% 94%, 0 88%
+    0 12%, 6% 6%, 12% 0, 88% 0, 94% 6%, 100% 12%,
+    100% 88%, 94% 94%, 88% 100%, 12% 100%, 6% 94%, 0 88%
   );
   border: 0;
   background: var(--category-tint);
@@ -963,6 +963,42 @@ body.route-enter router-outlet + * {
   text-align: start;
   transition: filter 180ms ease, transform 220ms cubic-bezier(0.2, 0.75, 0.25, 1);
 }
+
+.programs-page .category-tile::after {
+  position: absolute;
+  z-index: 1;
+  inset: 10px;
+  border-block: 1px solid rgba(255, 255, 255, 0.3);
+  clip-path: polygon(12% 0, 88% 0, 100% 12%, 100% 88%, 88% 100%, 12% 100%, 0 88%, 0 12%);
+  content: '';
+  pointer-events: none;
+}
+
+/* Use the same grid cells as the real cards to reserve space from first paint. */
+.programs-page .category-grid > .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.programs-page .category-skeleton {
+  background: color-mix(in srgb, var(--color-border) 65%, var(--color-surface));
+  cursor: default;
+  filter: none;
+  pointer-events: none;
+}
+.programs-page .category-skeleton-icon,
+.programs-page .category-skeleton-name,
+.programs-page .category-skeleton-count {
+  display: block;
+  background: color-mix(in srgb, var(--color-text-muted) 20%, var(--color-surface));
+}
+.programs-page .category-skeleton-icon { width: 32px; height: 32px; margin-bottom: 8px; }
+.programs-page .category-skeleton-name { width: 110px; max-width: 100%; height: 14px; }
+.programs-page .category-skeleton-count { width: 64px; height: 10px; margin-top: 4px; }
+.programs-page .category-load-error { padding: 1rem 0; color: var(--color-text-muted); }
 
 .programs-page .category-tile[data-category='business-professional-skills'] { --category-tint: #0d5965; }
 .programs-page .category-tile[data-category='technology-innovation'] { --category-tint: #114f73; }
@@ -1026,7 +1062,8 @@ body.route-enter router-outlet + * {
   height: 32px;
   margin-bottom: 0.1rem;
   border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 50%;
+  border-radius: 0;
+  clip-path: polygon(0 0, 75% 0, 100% 25%, 100% 100%, 25% 100%, 0 75%);
   background: rgba(255, 255, 255, 0.18);
   color: #fff;
   font-size: 0.9rem;
@@ -1055,7 +1092,8 @@ body.route-enter router-outlet + * {
   height: 36px;
   flex: 0 0 36px;
   border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 50%;
+  border-radius: 0;
+  clip-path: polygon(0 0, 75% 0, 100% 25%, 100% 100%, 25% 100%, 0 75%);
   background: rgba(255, 255, 255, 0.13);
   color: #fff;
   font-size: 0.75rem;

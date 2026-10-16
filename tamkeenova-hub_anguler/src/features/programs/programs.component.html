@@ -111,7 +111,7 @@
   }
 
   @if (!selectedCategory()) {
-  @if (categories().length) {
+  @if (isLoadingCategories() || categoriesUnavailable() || categories().length) {
     <section class="category-section content-width" aria-labelledby="category-heading">
       <div class="section-heading category-heading">
         <div class="category-heading-copy">
@@ -121,7 +121,19 @@
         </div>
       </div>
 
-      <div class="category-grid" #categoryGrid>
+      <div class="category-grid" #categoryGrid [attr.aria-busy]="isLoadingCategories()">
+        @if (isLoadingCategories() && !categories().length) {
+          <span class="visually-hidden" role="status">{{ 'programs.catalog.loading' | translate }}</span>
+          @for (item of categoryPlaceholders; track item) {
+            <div class="category-tile category-skeleton" aria-hidden="true">
+              <span class="category-content"><span class="category-card-info">
+                <span class="category-skeleton-icon"></span>
+                <span class="category-skeleton-name"></span>
+                <span class="category-skeleton-count"></span>
+              </span></span>
+            </div>
+          }
+        }
         @for (category of categories(); track category.id) {
           <button
             class="category-tile"
@@ -132,7 +144,7 @@
           >
             @let imageUrl = categoryCardImage(category);
             @if (imageUrl) {
-              <img class="category-image" [src]="imageUrl" alt="" loading="lazy" />
+              <img class="category-image" [src]="imageUrl" alt="" loading="eager" decoding="async" />
             } @else {
               <span class="category-image-placeholder">
                 <i [class]="'fa-solid ' + categoryIcon(category.slug)"></i>
@@ -156,6 +168,14 @@
           </button>
         }
       </div>
+      @if (categoriesUnavailable()) {
+        <div class="category-load-error" role="status">
+          <p>{{ 'programs.catalog.categories_error' | translate }}</p>
+          <button type="button" class="button-secondary" (click)="loadCategories()">
+            {{ 'programs.catalog.try_again' | translate }}
+          </button>
+        </div>
+      }
     </section>
   }
 

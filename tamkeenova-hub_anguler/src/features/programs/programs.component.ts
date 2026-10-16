@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { catchError, forkJoin, of } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   Course,
   CourseCategory,
@@ -11,7 +11,6 @@ import {
   LearningProgram,
 } from '../../core/models/course-catalog.model';
 import { CourseCatalogService } from '../../core/services/course-catalog.service';
-import { Trainer } from '../../core/models/trainer.model';
 import { TrainersService } from '../../core/services/trainers.service';
 
 // Category records still come from the API; this only supplies local artwork if
@@ -29,7 +28,7 @@ const CATEGORY_CARD_IMAGE_FALLBACKS: Readonly<Record<string, string>> = {
 };
 
 const CATEGORY_RECTANGLE_CLIP_PATH =
-  'polygon(0 0, 2% 0, 6% 0, 94% 0, 98% 0, 100% 0, 100% 88%, 100% 94%, 100% 100%, 6% 100%, 2% 100%, 0 100%)';
+  'polygon(0 0, 6% 0, 12% 0, 88% 0, 94% 0, 100% 0, 100% 88%, 100% 94%, 100% 100%, 12% 100%, 6% 100%, 0 100%)';
 
 @Component({
   selector: 'app-programs',
@@ -39,6 +38,7 @@ const CATEGORY_RECTANGLE_CLIP_PATH =
   styleUrl: './programs.component.css',
 })
 export class ProgramsComponent {
+  private readonly destroyRef = inject(DestroyRef);
   private readonly catalogService = inject(CourseCatalogService);
   private readonly trainersService = inject(TrainersService);
   private readonly translate = inject(TranslateService);
@@ -47,6 +47,9 @@ export class ProgramsComponent {
   @ViewChild('categoryGrid') private categoryGrid?: ElementRef<HTMLDivElement>;
 
   readonly isEnglish = computed(() => this.translate.currentLang() === 'en');
+  readonly isLoadingCategories = signal(true);
+  readonly categoriesUnavailable = signal(false);
+  readonly categoryPlaceholders = Array.from({ length: 9 }, (_, index) => index);
   readonly categories = signal<CourseCategory[]>([]);
   readonly categoryCount = signal<number | null>(null);
   readonly expertCount = signal<number | null>(null);
@@ -120,34 +123,38 @@ export class ProgramsComponent {
   }
 
   private loadLandingContent(): void {
-    forkJoin({
-      categories: this.catalogService.getCategories().pipe(
-        catchError(() => {
-          this.catalogUnavailable.set(true);
-          return of(null as CourseCategory[] | null);
-        }),
+    // Start categories first and publish each response independently. A slow
+    // trainer/collection request must never hold the category section back.
+    this.loadCategories();
+    this.catalogService.getCollections().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (collections) => this.collections.set(collections),
+      error: () => this.collections.set([]),
+    });
+    this.catalogService.getLearningPrograms().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (programs) => this.learningPrograms.set(programs),
+      error: () => this.learningPrograms.set([]),
+    });
+    this.trainersService.getAll().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (trainers) => this.expertCount.set(
+        trainers.filter((trainer) => trainer.trainer_status === 'APPROVED').length,
       ),
-      collections: this.catalogService.getCollections().pipe(
-        catchError(() => {
-          this.catalogUnavailable.set(true);
-          return of([] as CourseCollection[]);
-        }),
-      ),
-      programs: this.catalogService.getLearningPrograms().pipe(
-        catchError(() => {
-          this.catalogUnavailable.set(true);
-          return of([] as LearningProgram[]);
-        }),
-      ),
-      trainers: this.trainersService.getAll().pipe(catchError(() => of(null as Trainer[] | null))),
-    }).subscribe(({ categories, collections, programs, trainers }) => {
-      this.categories.set(categories ?? []);
-      this.categoryCount.set(categories?.length ?? null);
-      this.collections.set(collections);
-      this.learningPrograms.set(programs);
-      this.expertCount.set(
-        trainers?.filter((trainer) => trainer.trainer_status === 'APPROVED').length ?? null,
-      );
+      error: () => this.expertCount.set(null),
+    });
+  }
+
+  loadCategories(): void {
+    this.isLoadingCategories.set(true);
+    this.categoriesUnavailable.set(false);
+    this.catalogService.getCategories().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: (categories) => {
+        this.categories.set(categories);
+        this.categoryCount.set(categories.length);
+        this.isLoadingCategories.set(false);
+      },
+      error: () => {
+        this.categoriesUnavailable.set(true);
+        this.isLoadingCategories.set(false);
+      },
     });
   }
 

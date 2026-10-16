@@ -184,6 +184,7 @@
       "browse_by_interest": "Find your next skill",
       "category_title": "Explore by category",
       "category_subtitle": "Discover fields designed to match your goals and interests.",
+      "categories_error": "Categories could not be loaded. Please try again.",
       "category_detail_eyebrow": "Explore this category",
       "category_description_fallback": "Browse the courses and learning programs available in this field.",
       "category_courses": "Programs in this category",
