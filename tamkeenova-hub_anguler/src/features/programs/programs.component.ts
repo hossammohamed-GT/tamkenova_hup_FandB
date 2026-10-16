@@ -28,6 +28,9 @@ const CATEGORY_CARD_IMAGE_FALLBACKS: Readonly<Record<string, string>> = {
   'soft-skills': '/assets/course-categories/soft-skills.jpg',
 };
 
+const CATEGORY_RECTANGLE_CLIP_PATH =
+  'polygon(0 0, 2% 0, 6% 0, 94% 0, 98% 0, 100% 0, 100% 88%, 100% 94%, 100% 100%, 6% 100%, 2% 100%, 0 100%)';
+
 @Component({
   selector: 'app-programs',
   standalone: true,
@@ -39,6 +42,7 @@ export class ProgramsComponent {
   private readonly catalogService = inject(CourseCatalogService);
   private readonly trainersService = inject(TrainersService);
   private readonly translate = inject(TranslateService);
+  private categoryScrollTimer: number | null = null;
 
   @ViewChild('categoryGrid') private categoryGrid?: ElementRef<HTMLDivElement>;
 
@@ -209,6 +213,7 @@ export class ProgramsComponent {
       return;
     }
 
+    this.cancelCategoryPageScroll();
     const sourceCard = Array.from(
       this.categoryGrid?.nativeElement.querySelectorAll<HTMLElement>('.category-tile') ?? [],
     ).find((card) => card.dataset['category'] === slug);
@@ -223,20 +228,22 @@ export class ProgramsComponent {
           )
         : null;
 
-    // Swap the page immediately; the floating copy handles the image movement
-    // while Angular renders the filtered catalog beneath it.
+    // Render the selected page immediately. The copied image first squares its
+    // corners in place, then flies into the hero as the page scrolls to the top.
     this.isCategoryImageAnimating.set(!!flightImage);
     this.activateCategory(slug);
-    this.scrollToPageTopImmediately();
 
     if (flightImage && sourceBounds) {
       window.requestAnimationFrame(() =>
         this.animateCategoryImageFlight(flightImage, sourceBounds),
       );
+    } else {
+      this.scrollToPageTopImmediately();
     }
   }
 
   showAllCategories(): void {
+    this.cancelCategoryPageScroll();
     document.querySelector('.category-image-flight')?.remove();
     this.isCategoryImageAnimating.set(false);
     this.resetCatalogFilters();
@@ -279,14 +286,15 @@ export class ProgramsComponent {
       } else {
         flightImage.remove();
         this.isCategoryImageAnimating.set(false);
+        this.scrollToPageTopImmediately();
       }
       return;
     }
 
     const targetBounds = target.getBoundingClientRect();
     const destination = {
-      left: `${targetBounds.left}px`,
-      top: `${targetBounds.top}px`,
+      left: `${targetBounds.left + window.scrollX}px`,
+      top: `${targetBounds.top + window.scrollY}px`,
       width: `${targetBounds.width}px`,
       height: `${targetBounds.height}px`,
     };
@@ -296,16 +304,20 @@ export class ProgramsComponent {
       width: `${sourceBounds.width}px`,
       height: `${sourceBounds.height}px`,
     };
-
+    const originalClipPath = flightImage.style.clipPath || 'none';
     const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-    const duration = reducedMotion ? 1 : 760;
+    const duration = reducedMotion ? 1 : 860;
+    const morphOffset = 0.2;
+    const morphDuration = Math.round(duration * morphOffset);
+    const travelDuration = Math.max(1, duration - morphDuration);
 
     if (typeof flightImage.animate === 'function') {
       const animation = flightImage.animate(
         [
-          { ...start, opacity: 1, offset: 0 },
-          { ...destination, opacity: 1, offset: 0.78 },
-          { ...destination, opacity: 0, offset: 1 },
+          { ...start, clipPath: originalClipPath, opacity: 1, offset: 0 },
+          { ...start, clipPath: CATEGORY_RECTANGLE_CLIP_PATH, opacity: 1, offset: morphOffset },
+          { ...destination, clipPath: CATEGORY_RECTANGLE_CLIP_PATH, opacity: 1, offset: 0.9 },
+          { ...destination, clipPath: CATEGORY_RECTANGLE_CLIP_PATH, opacity: 0, offset: 1 },
         ],
         {
           duration,
@@ -313,31 +325,52 @@ export class ProgramsComponent {
           fill: 'forwards',
         },
       );
+      this.scheduleCategoryPageScroll(morphDuration);
       void animation.finished.then(
-        () => {
-          flightImage.remove();
-          this.isCategoryImageAnimating.set(false);
-        },
-        () => {
-          flightImage.remove();
-          this.isCategoryImageAnimating.set(false);
-        },
+        () => this.finishCategoryImageFlight(flightImage),
+        () => this.finishCategoryImageFlight(flightImage),
       );
       return;
     }
 
-    flightImage.style.transition = `left ${duration}ms ease, top ${duration}ms ease, width ${duration}ms ease, height ${duration}ms ease, opacity ${duration}ms ease`;
+    flightImage.style.transition = `clip-path ${morphDuration}ms ease-in-out`;
     window.requestAnimationFrame(() => {
-      flightImage.style.left = destination.left;
-      flightImage.style.top = destination.top;
-      flightImage.style.width = destination.width;
-      flightImage.style.height = destination.height;
-      flightImage.style.opacity = '0';
+      flightImage.style.clipPath = CATEGORY_RECTANGLE_CLIP_PATH;
+      this.scheduleCategoryPageScroll(morphDuration);
+      window.setTimeout(() => {
+        if (!this.selectedCategory()) return;
+        flightImage.style.transition = `left ${travelDuration}ms cubic-bezier(0.2, 0.75, 0.25, 1), top ${travelDuration}ms cubic-bezier(0.2, 0.75, 0.25, 1), width ${travelDuration}ms cubic-bezier(0.2, 0.75, 0.25, 1), height ${travelDuration}ms cubic-bezier(0.2, 0.75, 0.25, 1), opacity ${travelDuration}ms ease`;
+        flightImage.style.left = destination.left;
+        flightImage.style.top = destination.top;
+        flightImage.style.width = destination.width;
+        flightImage.style.height = destination.height;
+        flightImage.style.opacity = '0';
+      }, morphDuration);
     });
-    window.setTimeout(() => {
-      flightImage.remove();
-      this.isCategoryImageAnimating.set(false);
-    }, duration + 50);
+    window.setTimeout(() => this.finishCategoryImageFlight(flightImage), duration + 50);
+  }
+
+  private scheduleCategoryPageScroll(delay: number): void {
+    this.cancelCategoryPageScroll();
+    if (window.scrollY <= 0) return;
+
+    this.categoryScrollTimer = window.setTimeout(() => {
+      this.categoryScrollTimer = null;
+      if (this.selectedCategory()) this.scrollToPageTopImmediately();
+    }, delay);
+  }
+
+  private cancelCategoryPageScroll(): void {
+    if (this.categoryScrollTimer === null) return;
+    window.clearTimeout(this.categoryScrollTimer);
+    this.categoryScrollTimer = null;
+  }
+
+  private finishCategoryImageFlight(flightImage: HTMLImageElement): void {
+    flightImage.remove();
+    this.cancelCategoryPageScroll();
+    if (this.selectedCategory()) this.scrollToPageTopImmediately();
+    this.isCategoryImageAnimating.set(false);
   }
 
   private activateCategory(slug: string): void {

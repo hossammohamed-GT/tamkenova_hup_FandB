@@ -841,7 +841,7 @@ body.route-enter router-outlet + * {
   pointer-events: none;
   object-fit: cover;
   backface-visibility: hidden;
-  will-change: left, top, width, height, opacity;
+  will-change: left, top, width, height, clip-path, opacity;
 }
 
 
@@ -951,10 +951,8 @@ body.route-enter router-outlet + * {
   overflow: hidden;
   padding: 0;
   clip-path: polygon(
-    47.8% 1.1%, 49.2% 0.2%, 50% 0, 50.8% 0.2%, 52.2% 1.1%,
-    96.4% 22.5%, 99.2% 25%, 100% 28%, 100% 72%, 99.2% 75%, 96.4% 77.5%,
-    52.2% 98.9%, 50% 100%, 47.8% 98.9%,
-    3.6% 77.5%, 0.8% 75%, 0 72%, 0 28%, 0.8% 25%, 3.6% 22.5%
+    0 12%, 2% 6%, 6% 0, 94% 0, 98% 6%, 100% 12%,
+    100% 88%, 98% 94%, 94% 100%, 6% 100%, 2% 94%, 0 88%
   );
   border: 0;
   background: var(--category-tint);
@@ -1016,8 +1014,8 @@ body.route-enter router-outlet + * {
   align-items: flex-end;
   justify-content: space-between;
   gap: 0.65rem;
-  inset-inline: 15%;
-  bottom: 0.85rem;
+  inset-inline: 10%;
+  bottom: 0.9rem;
 }
 
 .programs-page .category-card-info { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; gap: 0.25rem; }
