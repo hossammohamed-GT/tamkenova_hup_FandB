@@ -153,6 +153,7 @@
               <!-- Retain a decoded local image for the existing image-to-hero transition. -->
               <img class="category-image category-flight-source" [src]="imageUrl" alt="" loading="eager" decoding="async" />
             }
+            <span class="category-foreground">
             <span class="category-number" aria-hidden="true">{{ (index + 1).toString().padStart(2, '0') }}</span>
             <span class="category-content">
               <span class="category-card-info">
@@ -167,6 +168,7 @@
               <span class="category-arrow" aria-hidden="true">
                 <svg class="rtl-flip" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6" /></svg>
               </span>
+            </span>
             </span>
           </button>
           </div>

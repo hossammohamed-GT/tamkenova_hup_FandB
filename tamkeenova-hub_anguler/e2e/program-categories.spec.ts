@@ -61,6 +61,49 @@ for (const [language, width] of [['en', 1024], ['ar', 1024], ['en', 1280], ['ar'
         expect(a.right <= b.left + 1 || b.right <= a.left + 1 || a.bottom <= b.top + 1 || b.bottom <= a.top + 1).toBe(true);
       }
     }
+    if (width >= 1024) {
+      const first = cards.first();
+      await first.scrollIntoViewIfNeeded();
+      await page.mouse.move(0, 0);
+      const setting = first.locator('.category-setting');
+      const sculpture = first.locator('.category-sculpture');
+      const neon = first.locator('.sculpture-neon');
+      const orbit = first.locator('.neon-core');
+      const floorBefore = (await setting.boundingBox())!;
+      const bodyBefore = (await sculpture.boundingBox())!;
+      await first.locator('.category-name').hover();
+      await expect.poll(async () => (await sculpture.boundingBox())!.width).toBeGreaterThan(bodyBefore.width * 1.03);
+      await expect.poll(() => neon.evaluate(el => getComputedStyle(el).opacity)).toBe('1');
+      const floorAfter = (await setting.boundingBox())!;
+      expect(floorAfter.x).toBeCloseTo(floorBefore.x, 1);
+      expect(floorAfter.y).toBeCloseTo(floorBefore.y, 1);
+      expect(floorAfter.width).toBeCloseTo(floorBefore.width, 1);
+      expect(floorAfter.height).toBeCloseTo(floorBefore.height, 1);
+      expect((await sculpture.boundingBox())!.y).toBeLessThan(bodyBefore.y - 5);
+      expect(await first.locator('.category-foreground').evaluate(el => getComputedStyle(el).transform))
+        .toBe(await sculpture.evaluate(el => getComputedStyle(el).transform));
+      expect(await orbit.evaluate(el => getComputedStyle(el).animationPlayState)).toBe('running');
+      const dashBefore = await orbit.evaluate(el => getComputedStyle(el).strokeDashoffset);
+      await expect.poll(() => orbit.evaluate(el => getComputedStyle(el).strokeDashoffset)).not.toBe(dashBefore);
+      expect(await orbit.getAttribute('d')).toBe(await first.locator('.sculpture-rim').getAttribute('d'));
+      expect(await cards.nth(1).locator('.sculpture-neon').evaluate(el => getComputedStyle(el).opacity)).toBe('0');
+      if (width === 1440) {
+        await page.emulateMedia({ reducedMotion: 'reduce' });
+        await expect.poll(() => sculpture.evaluate(el => getComputedStyle(el).transform)).toBe('none');
+        expect(await orbit.evaluate(el => getComputedStyle(el).animationName)).toBe('none');
+        expect(await orbit.evaluate(el => getComputedStyle(el).strokeDasharray)).toBe('none');
+        await page.emulateMedia({ reducedMotion: 'no-preference' });
+      }
+      await page.mouse.move(0, 0);
+      await expect.poll(() => neon.evaluate(el => getComputedStyle(el).opacity)).toBe('0');
+      expect(await orbit.evaluate(el => getComputedStyle(el).animationPlayState)).toBe('paused');
+      await expect.poll(() => sculpture.evaluate(el => getComputedStyle(el).transform)).toBe('none');
+      // Keyboard users get the same affordance without lifting the platform.
+      await first.focus();
+      await expect.poll(() => neon.evaluate(el => getComputedStyle(el).opacity)).toBe('1');
+      expect((await setting.boundingBox())!.y).toBeCloseTo(floorBefore.y, 1);
+      await first.evaluate(el => (el as HTMLElement).blur());
+    }
     // All actions remain unobstructed.
     for (let index = 0; index < 9; index++) {
       const arrow = cards.nth(index).locator('.category-arrow');

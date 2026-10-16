@@ -70,6 +70,11 @@
     }
   }
 </svg>
+<!-- A stationary, transparent copy of the silhouette keeps hover stable when
+     the floating body lifts away from the pointer. It does not cover the garden. -->
+<svg class="sculpture-hover-surface" viewBox="0 0 360 340" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+  <path [attr.d]="outline()" fill="transparent" />
+</svg>
 <svg class="category-sculpture" viewBox="0 0 360 340" preserveAspectRatio="none" aria-hidden="true" focusable="false">
   <defs>
     <clipPath [id]="uid() + '-outline'"><path [attr.d]="outline()"/></clipPath>
@@ -121,4 +126,11 @@
     <path [attr.d]="front()" fill="none" stroke="#ffedc8" stroke-opacity=".46" stroke-width="1.1"/>
   </g>
   <path class="sculpture-rim" [attr.d]="outline()" fill="none" [attr.stroke]="ref('rim')" stroke-width="1.2"/>
+  <!-- Normalized arc length follows each custom outline at a constant pace,
+       rather than rotating a rectangular gradient around the artboard. -->
+  <g class="sculpture-neon" fill="none" aria-hidden="true">
+    <path class="neon-halo neon-orbit" [attr.d]="outline()" pathLength="100" />
+    <path class="neon-trail neon-orbit" [attr.d]="outline()" pathLength="100" />
+    <path class="neon-core neon-orbit" [attr.d]="outline()" pathLength="100" />
+  </g>
 </svg>

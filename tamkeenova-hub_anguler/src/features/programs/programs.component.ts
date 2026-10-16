@@ -233,7 +233,7 @@ export class ProgramsComponent {
       this.categoryGrid?.nativeElement.querySelectorAll<HTMLElement>('.category-tile') ?? [],
     ).find((card) => card.dataset['category'] === slug);
     const sourceImage = sourceCard?.querySelector<HTMLImageElement>('.category-image');
-    const sourceBounds = sourceCard?.getBoundingClientRect();
+    const sourceBounds = (sourceCard?.querySelector('.category-sculpture') ?? sourceCard)?.getBoundingClientRect();
     const flightImage =
       sourceCard && sourceImage && sourceBounds && sourceBounds.width > 0
         ? this.createCategoryImageFlight(
