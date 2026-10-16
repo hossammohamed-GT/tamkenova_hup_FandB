@@ -28,7 +28,7 @@ describe('Programs mega menu', () => {
       }},
     ]}).compileComponents();
   });
-  it('cancels old category requests and does not replace the current list with a stale response', () => {
+  it('coalesces warmed requests and does not replace the selected list with another response', () => {
     const fixture=TestBed.createComponent(ProgramsMegaMenuComponent);
     const component=fixture.componentInstance;
     component.selectCategory(categories[1]);
@@ -37,17 +37,30 @@ describe('Programs mega menu', () => {
     expect(component.courses()[0].id).toBe('current');
     expect(queries[1]).toMatchObject({category:'technology-innovation',sort:'popular',limit:4});
     component.selectCategory(categories[0]);
-    expect(component.loadingCourses()).toBe(true);
+    expect(component.loadingCourses()).toBe(false);
+    expect(component.courses()[0].id).toBe('stale');
+    expect(requests).toHaveLength(2);
+  });
+  it('warms categories before interaction and retries failed background requests', () => {
+    const fixture = TestBed.createComponent(ProgramsMegaMenuComponent);
+    const component = fixture.componentInstance;
+    expect(queries.map(query => query.category)).toEqual(categories.map(category => category.slug));
+    requests[1].error(new Error('background offline'));
+    expect(component.coursesError()).toBe(false);
+    component.selectCategory(categories[1]);
+    expect(requests).toHaveLength(3);
+    requests[2].next(response('retry')); requests[2].complete();
+    expect(component.courses()[0].id).toBe('retry');
   });
   it('caches a successful category/sort response and requests the actual server sort', () => {
     const fixture=TestBed.createComponent(ProgramsMegaMenuComponent);
     const component=fixture.componentInstance;
     requests[0].next(response('popular')); requests[0].complete();
     component.selectSort('rating');
-    expect(queries[1].sort).toBe('rating');
-    requests[1].next(response('rated')); requests[1].complete();
+    expect(queries[2].sort).toBe('rating');
+    requests[2].next(response('rated')); requests[2].complete();
     component.selectSort('popular');
-    expect(requests).toHaveLength(2);
+    expect(requests).toHaveLength(3);
     expect(component.courses()[0].id).toBe('popular');
   });
   it('can retry course failures and keeps category navigation available', () => {
@@ -56,11 +69,11 @@ describe('Programs mega menu', () => {
     requests[0].error(new Error('offline'));
     expect(component.coursesError()).toBe(true);
     expect(component.categories()).toHaveLength(2);
-    component.loadCourses(); requests[1].next(response('recovered'));
+    component.loadCourses(); requests[2].next(response('recovered'));
     expect(component.coursesError()).toBe(false);
     expect(component.courses()[0].id).toBe('recovered');
   });
-  it('updates localized names and unsubscribes when the menu closes', () => {
+  it('updates localized names and unsubscribes when the navbar is destroyed', () => {
     const fixture=TestBed.createComponent(ProgramsMegaMenuComponent);
     const component=fixture.componentInstance;
     expect(component.categoryName(categories[0])).toBe('Business');

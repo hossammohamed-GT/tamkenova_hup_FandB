@@ -2,7 +2,7 @@ import { Component, DestroyRef, computed, inject, output, signal } from '@angula
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, catchError, map, of, switchMap, tap } from 'rxjs';
+import { EMPTY, Observable, Subject, catchError, finalize, from, map, mergeMap, of, shareReplay, switchMap, tap } from 'rxjs';
 import { Course, CourseCategory } from '../../../core/models/course-catalog.model';
 import { CourseCatalogService } from '../../../core/services/course-catalog.service';
 import { ThemeService } from '../../../core/services/theme.service';
@@ -30,7 +30,8 @@ export class ProgramsMegaMenuComponent {
   readonly english = computed(() => this.theme.language() === 'en');
   readonly sorts = [{ value: 'popular', key: 'popular' }, { value: 'newest', key: 'new' }, { value: 'rating', key: 'rated' }];
   private readonly requests = new Subject<{ category: string; sort: string }>();
-  // In-session cache only. Cancelling a request cannot publish stale category results.
+  // Mounted with the navbar, not recreated by hover. Never cache failed requests.
+  private readonly inFlight = new Map<string, Observable<Course[]>>();
   private readonly cache = new Map<string, Course[]>();
   readonly categoryImage = computed(() => {
     const category = this.selected();
@@ -43,11 +44,8 @@ export class ProgramsMegaMenuComponent {
     this.requests.pipe(
       tap(() => { this.loadingCourses.set(true); this.coursesError.set(false); this.courses.set([]); }),
       switchMap(query => {
-        const key = `${query.category}:${query.sort}`;
-        if (this.cache.has(key)) return of({ courses: this.cache.get(key)!, failed: false });
-        return this.catalog.getCourses({ ...query, limit: 4, page: 1 }).pipe(
-          tap(response => this.cache.set(key, response.data ?? [])),
-          map(response => ({ courses: response.data ?? [], failed: false })),
+        return this.fetchCourses(query.category, query.sort).pipe(
+          map(courses => ({ courses, failed: false })),
           catchError(() => of({ courses: [] as Course[], failed: true })),
         );
       }),
@@ -67,10 +65,33 @@ export class ProgramsMegaMenuComponent {
       next: categories => {
         this.categories.set(categories);
         this.loadingCategories.set(false);
-        if (categories.length) this.selectCategory(categories[0]);
+        if (categories.length) {
+          this.selectCategory(categories[0]);
+          // Warm popular courses for every remaining category, with bounded concurrency.
+          from(categories.slice(1)).pipe(
+            mergeMap(category => this.fetchCourses(category.slug, 'popular').pipe(catchError(() => EMPTY)), 3),
+            takeUntilDestroyed(this.destroyRef),
+          ).subscribe();
+        }
       },
       error: () => { this.loadingCategories.set(false); this.categoriesError.set(true); },
     });
+  }
+  private fetchCourses(category: string, sort: string): Observable<Course[]> {
+    const key = `${category}:${sort}`;
+    if (this.cache.has(key)) return of(this.cache.get(key)!);
+    const pending = this.inFlight.get(key);
+    if (pending) return pending;
+    const request = this.catalog.getCourses({ category, sort, limit: 4, page: 1 }).pipe(
+      map(response => response.data ?? []),
+      tap(courses => this.cache.set(key, courses)),
+      takeUntilDestroyed(this.destroyRef),
+      finalize(() => this.inFlight.delete(key)),
+      // Continue warming even when the visitor switches categories mid-request.
+      shareReplay({ bufferSize: 1, refCount: false }),
+    );
+    this.inFlight.set(key, request);
+    return request;
   }
   selectCategory(category: CourseCategory): void {
     if (this.selected()?.slug === category.slug) return;

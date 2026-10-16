@@ -63,7 +63,12 @@
   </section>
 
   <aside class="mega-feature">
-    <div class="mega-feature-lines" aria-hidden="true"></div>
+    <svg class="mega-feature-geometry" viewBox="0 0 420 640" preserveAspectRatio="none" aria-hidden="true">
+      <path class="mega-facet" d="M205 0H420V180L312 116Z"/>
+      <path class="mega-facet-alt" d="M420 130V440L292 518 200 450 200 282Z"/>
+      <path class="mega-facet" d="M420 510V640H208Z"/>
+      <path class="mega-wire" d="M205 0 420 130M312 0v88l108 68M420 485 208 640M340 0v72l80 49"/>
+    </svg>
     <div class="mega-feature-copy">
       <span class="mega-eyebrow">{{ selected() ? categoryName(selected()!) : ('nav.programs' | translate) }}</span>
       <h2>{{ 'nav.mega.build' | translate }} <em>{{ 'nav.mega.future' | translate }}</em></h2>
@@ -71,11 +76,19 @@
       <p>{{ 'nav.mega.feature_text' | translate }}</p>
       <ul>
         @for (benefit of ['growth', 'practical', 'flexible']; track benefit) {
-          <li><span class="mega-benefit-icon" aria-hidden="true">✦</span>{{ 'nav.mega.' + benefit | translate }}</li>
+          <li><span class="mega-benefit-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path [attr.d]="benefit === 'growth' ? 'M4 19V5M4 19h16M7 14l4-4 4 2 5-8M15 4h5v5' : benefit === 'practical' ? 'M4 7h16v13H4zM8 7V4h8v3M4 12l8 3 8-3M10 14h4v3h-4z' : 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l4 2'"/></svg></span>{{ 'nav.mega.' + benefit | translate }}</li>
         }
       </ul>
       <a routerLink="/programs" [queryParams]="selected() ? {category: selected()!.slug} : {}" (click)="closed.emit()">{{ 'nav.mega.explore' | translate }} <span aria-hidden="true">→</span></a>
     </div>
-    <div class="mega-feature-photo" aria-hidden="true"><img [src]="categoryImage()" alt=""/><span></span></div>
+    <svg class="mega-feature-photo" viewBox="0 0 300 480" aria-hidden="true">
+      <defs>
+        <clipPath id="programs-feature-cut"><path d="M275 14Q296 2 296 27V362Q296 383 278 395L157 475 40 406Q22 394 22 374V220Q22 199 9 185Q-6 166 14 152Z"/></clipPath>
+        <linearGradient id="programs-feature-gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff3ca"/><stop offset=".5" stop-color="#cb9240"/><stop offset="1" stop-color="#ffe3a2"/></linearGradient>
+        <linearGradient id="programs-feature-shade" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#002a38" stop-opacity="0"/><stop offset="1" stop-color="#001b28" stop-opacity=".6"/></linearGradient>
+      </defs>
+      <image [attr.href]="categoryImage()" width="300" height="480" preserveAspectRatio="xMidYMid slice" clip-path="url(#programs-feature-cut)"/>
+      <path d="M275 14Q296 2 296 27V362Q296 383 278 395L157 475 40 406Q22 394 22 374V220Q22 199 9 185Q-6 166 14 152Z" fill="url(#programs-feature-shade)" stroke="url(#programs-feature-gold)" stroke-width="2.5"/>
+    </svg>
   </aside>
 </div>

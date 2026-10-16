@@ -14,16 +14,21 @@ Use Node.js 24 (as required by the backend). From the repository root, with the 
 ```bash
 cd tamkeenova-api
 npm ci
+npm run prisma:generate
 npm run db:demo-courses
 ```
 
-If this database has not yet had the course-catalog schema installed, run this
-**once before** the demo seed:
+The commands use **Prisma Client and the models in `schema.prisma`**, with the
+same `DATABASE_URL` as the backend. They only modify data, never the database
+schema. After seeding, a table prints the actual demo count for every active
+category and the number of newly inserted courses. Re-running should show zero
+new inserts and three demos per category. No active categories is an explicit
+error instead of a silent successful no-op.
 
-```bash
-npm run db:course-catalog
-npm run db:demo-courses
-```
+If catalog tables/columns are missing, review the schema/database difference
+before applying your normal Prisma schema workflow. Do not use `migrate reset`,
+`--force-reset`, or `--accept-data-loss` to fix missing preview data. The legacy
+`seed.sql` and `remove.sql` are retained as SQL fixtures, not the default commands.
 
 No database credentials should be committed or pasted into chat. Confirm your
 connection targets a development/staging database before running the command.
@@ -61,8 +66,8 @@ Do not convert a seeded row into a real course: create a new real course instead
 
 ### Remove the temporary image files too
 
-The SQL cleanup removes the courses and their cover references; it cannot delete
-files shipped with the frontend. **Only after SQL cleanup succeeds**, and after
+The database cleanup removes the courses and their cover references; it cannot delete
+files shipped with the frontend. **Only after database cleanup succeeds**, and after
 confirming no real course reuses these demo covers, run this from the repository
 root to remove the dedicated demo-image folder:
 

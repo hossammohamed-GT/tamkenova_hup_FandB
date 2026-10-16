@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, map, shareReplay } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   Course,
@@ -28,10 +28,13 @@ export class CourseCatalogService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/courses`;
 
-  getCategories(): Observable<CourseCategory[]> {
-    return this.http
+  // Shared between the eager navbar and Programs page; failed requests remain retryable.
+  private readonly categories$ = this.http
       .get<CourseCatalogResponse<CourseCategory[]>>(`${this.baseUrl}/categories`)
-      .pipe(map((response) => response.data ?? []));
+      .pipe(map((response) => response.data ?? []), shareReplay({ bufferSize: 1, refCount: false }));
+
+  getCategories(): Observable<CourseCategory[]> {
+    return this.categories$;
   }
 
   getCollections(): Observable<CourseCollection[]> {
