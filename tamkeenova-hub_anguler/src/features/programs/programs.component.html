@@ -73,14 +73,17 @@
   </section>
   } @else if (selectedCategoryRecord(); as activeCategory) {
   <section class="catalog-hero category-detail-hero" aria-labelledby="selected-category-heading">
-    <div class="category-detail-art" aria-hidden="true">
+    <div
+      class="category-detail-art"
+      [class.is-image-moving]="isCategoryImageAnimating()"
+      aria-hidden="true"
+    >
       @let detailImage = categoryCardImage(activeCategory);
       @if (detailImage) {
         <img
           class="category-detail-image"
           [src]="detailImage"
           alt=""
-          [style.view-transition-name]="'category-spotlight-image'"
         />
       } @else {
         <span class="category-detail-placeholder">
@@ -115,19 +118,6 @@
           <span class="section-kicker">{{ 'programs.catalog.browse_by_interest' | translate }}</span>
           <h2 id="category-heading">{{ 'programs.catalog.category_title' | translate }}</h2>
           <p>{{ 'programs.catalog.category_subtitle' | translate }}</p>
-        </div>
-        <div class="category-heading-actions">
-          <button type="button" class="text-link" (click)="selectCategory('')">
-            {{ 'programs.catalog.view_all' | translate }} <i class="fa-solid fa-arrow-right rtl-flip"></i>
-          </button>
-          <div class="category-scroll-controls">
-            <button type="button" (click)="scrollCategories('previous')" [attr.aria-label]="'programs.catalog.previous_categories' | translate">
-              <i class="fa-solid fa-chevron-left rtl-flip" aria-hidden="true"></i>
-            </button>
-            <button type="button" (click)="scrollCategories('next')" [attr.aria-label]="'programs.catalog.next_categories' | translate">
-              <i class="fa-solid fa-chevron-right rtl-flip" aria-hidden="true"></i>
-            </button>
-          </div>
         </div>
       </div>
 

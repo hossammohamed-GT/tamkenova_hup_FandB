@@ -830,22 +830,18 @@ body.route-enter router-outlet + * {
   }
 }
 
-/* Shared-element transition used when a category image moves into the detail hero. */
-::view-transition-group(category-spotlight-image) {
-  z-index: 2;
-  animation-duration: 760ms;
-  animation-timing-function: cubic-bezier(0.2, 0.75, 0.25, 1);
-}
-
-::view-transition-image-pair(category-spotlight-image) {
-  overflow: hidden;
-}
-
-::view-transition-old(category-spotlight-image),
-::view-transition-new(category-spotlight-image) {
-  height: 100%;
+/* Temporary image copy for the immediate category-to-hero flight animation. */
+.category-image-flight {
+  position: fixed;
+  z-index: 2147483647;
+  display: block;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  pointer-events: none;
   object-fit: cover;
-  mix-blend-mode: normal;
+  backface-visibility: hidden;
+  will-change: left, top, width, height, opacity;
 }
 
 
@@ -871,14 +867,8 @@ body.route-enter router-outlet + * {
 }
 
 [data-theme='dark'] .programs-page .section-heading h2 { color: #f0f5f5; }
-
 [data-theme='dark'] .programs-page .section-heading p { color: #b7c2c6; }
-
 [data-theme='dark'] .programs-page .text-link { color: #bfd3db; }
-
-[data-theme='dark'] .programs-page .category-scroll-controls button { background: #27383e; color: #e5eeee; }
-
-[data-theme='dark'] .programs-page .category-scroll-controls button:hover { background: #176071; color: #fff; }
 
 .programs-page .section-heading {
   display: flex;
@@ -889,20 +879,13 @@ body.route-enter router-outlet + * {
 }
 
 .programs-page .category-heading {
-  position: absolute;
-  z-index: 5;
-  top: 1.55rem;
-  inset-inline: 0;
-  align-items: flex-start;
+  position: relative;
+  align-items: flex-end;
   min-height: 0;
-  margin: 0;
-  pointer-events: none;
+  margin: 0 0 1.25rem;
 }
 
-.programs-page .category-heading-copy,
-.programs-page .category-heading-actions { pointer-events: auto; }
-
-.programs-page .category-heading-copy { max-width: 355px; }
+.programs-page .category-heading-copy { max-width: 560px; }
 
 .programs-page .section-heading .section-kicker {
   margin-bottom: 0.5rem;
@@ -927,13 +910,6 @@ body.route-enter router-outlet + * {
   line-height: 1.5;
 }
 
-.programs-page .category-heading-actions {
-  display: flex;
-  align-items: center;
-  gap: 1.1rem;
-  padding-top: 0.4rem;
-}
-
 .programs-page .text-link {
   display: inline-flex;
   flex: 0 0 auto;
@@ -952,49 +928,18 @@ body.route-enter router-outlet + * {
 }
 
 .programs-page .text-link:hover { color: #a66d22; }
-
 .programs-page .text-link i { transition: transform 160ms ease; }
-
 .programs-page .text-link:hover i { transform: translateX(3px); }
 
-.programs-page .category-scroll-controls { display: flex; gap: 0.5rem; }
-
-.programs-page .category-scroll-controls button {
-  display: grid;
-  width: 37px;
-  height: 37px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(232, 233, 231, 0.9);
-  color: #16313f;
-  cursor: pointer;
-  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
-  place-items: center;
-}
-
-.programs-page .category-scroll-controls button:hover {
-  transform: translateY(-2px);
-  background: #0e5061;
-  color: #fff;
-}
-
 .programs-page .category-grid {
-  position: relative;
   display: grid;
-  grid-template-columns: repeat(5, minmax(280px, 1fr));
-  grid-template-rows: repeat(2, clamp(210px, 17vw, 240px));
-  gap: 0.55rem 0.8rem;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-auto-rows: clamp(178px, 15vw, 210px);
+  gap: 1rem;
   width: 100%;
-  overflow-x: auto;
-  padding: 0.1rem 0.15rem 0.8rem;
-  scroll-padding-inline: 0.5rem;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  overscroll-behavior-inline: contain;
+  overflow: visible;
+  padding: 0.45rem 0.15rem 0.9rem;
 }
-
-.programs-page .category-grid::-webkit-scrollbar { display: none; }
 
 .programs-page .category-tile {
   --category-tint: #0b5665;
@@ -1015,63 +960,27 @@ body.route-enter router-outlet + * {
   background: var(--category-tint);
   color: #fff;
   cursor: pointer;
-  filter: drop-shadow(0 12px 15px rgba(20, 40, 42, 0.2));
+  filter: drop-shadow(0 10px 12px rgba(20, 40, 42, 0.16));
   isolation: isolate;
-  scroll-snap-align: center;
   text-align: start;
   transition: filter 180ms ease, transform 220ms cubic-bezier(0.2, 0.75, 0.25, 1);
 }
 
-.programs-page .category-tile[data-category='business-professional-skills'] { --category-tint: #0d5965; grid-column: 1; grid-row: 2; transform: translateY(-88px); z-index: 2; }
+.programs-page .category-tile[data-category='business-professional-skills'] { --category-tint: #0d5965; }
+.programs-page .category-tile[data-category='technology-innovation'] { --category-tint: #114f73; }
+.programs-page .category-tile[data-category='arts-design-media'] { --category-tint: #b64d31; }
+.programs-page .category-tile[data-category='wellbeing'] { --category-tint: #367251; }
+.programs-page .category-tile[data-category='lifestyle'] { --category-tint: #b98235; }
+.programs-page .category-tile[data-category='education-academics'] { --category-tint: #57427e; }
+.programs-page .category-tile[data-category='family-relationships'] { --category-tint: #805250; }
+.programs-page .category-tile[data-category='languages'] { --category-tint: #39757a; }
+.programs-page .category-tile[data-category='soft-skills'] { --category-tint: #554b75; }
 
-.programs-page .category-tile[data-category='technology-innovation'] { --category-tint: #114f73; grid-column: 2; grid-row: 1; z-index: 1; }
-
-.programs-page .category-tile[data-category='arts-design-media'] { --category-tint: #b64d31; grid-column: 2; grid-row: 2; transform: translateY(-68px); z-index: 3; }
-
-.programs-page .category-tile[data-category='wellbeing'] { --category-tint: #367251; grid-column: 3; grid-row: 1; z-index: 1; }
-
-.programs-page .category-tile[data-category='lifestyle'] { --category-tint: #b98235; grid-column: 4; grid-row: 1; transform: translateY(76px); z-index: 3; }
-
-.programs-page .category-tile[data-category='education-academics'] { --category-tint: #57427e; grid-column: 3; grid-row: 2; transform: translateY(-36px); z-index: 2; }
-
-.programs-page .category-tile[data-category='family-relationships'] { --category-tint: #805250; grid-column: 4; grid-row: 2; transform: translateY(-18px); z-index: 2; }
-
-.programs-page .category-tile[data-category='languages'] { --category-tint: #39757a; grid-column: 5; grid-row: 1; z-index: 1; }
-
-.programs-page .category-tile[data-category='soft-skills'] { --category-tint: #554b75; grid-column: 5; grid-row: 2; transform: translateY(-60px); z-index: 2; }
-
-.programs-page .category-tile:hover,
-.programs-page .category-tile.is-selected {
-  z-index: 8;
-  filter: drop-shadow(0 18px 20px rgba(17, 36, 42, 0.3)) brightness(1.08);
+.programs-page .category-tile:hover {
+  z-index: 2;
+  transform: translateY(-3px) scale(1.012);
+  filter: drop-shadow(0 14px 16px rgba(17, 36, 42, 0.22)) brightness(1.04);
 }
-
-.programs-page .category-tile[data-category='business-professional-skills']:hover,
-.programs-page .category-tile[data-category='business-professional-skills'].is-selected { transform: translateY(-96px) scale(1.025); }
-
-.programs-page .category-tile[data-category='technology-innovation']:hover,
-.programs-page .category-tile[data-category='technology-innovation'].is-selected { transform: translateY(-8px) scale(1.025); }
-
-.programs-page .category-tile[data-category='arts-design-media']:hover,
-.programs-page .category-tile[data-category='arts-design-media'].is-selected { transform: translateY(-76px) scale(1.025); }
-
-.programs-page .category-tile[data-category='wellbeing']:hover,
-.programs-page .category-tile[data-category='wellbeing'].is-selected { transform: translateY(-8px) scale(1.025); }
-
-.programs-page .category-tile[data-category='lifestyle']:hover,
-.programs-page .category-tile[data-category='lifestyle'].is-selected { transform: translateY(68px) scale(1.025); }
-
-.programs-page .category-tile[data-category='education-academics']:hover,
-.programs-page .category-tile[data-category='education-academics'].is-selected { transform: translateY(-44px) scale(1.025); }
-
-.programs-page .category-tile[data-category='family-relationships']:hover,
-.programs-page .category-tile[data-category='family-relationships'].is-selected { transform: translateY(-26px) scale(1.025); }
-
-.programs-page .category-tile[data-category='languages']:hover,
-.programs-page .category-tile[data-category='languages'].is-selected { transform: translateY(-8px) scale(1.025); }
-
-.programs-page .category-tile[data-category='soft-skills']:hover,
-.programs-page .category-tile[data-category='soft-skills'].is-selected { transform: translateY(-68px) scale(1.025); }
 
 .programs-page .category-image,
 .programs-page .category-image-placeholder,
@@ -1085,7 +994,6 @@ body.route-enter router-outlet + * {
 
 .programs-page .category-image,
 .programs-page .category-image-placeholder { z-index: 0; }
-
 .programs-page .category-image { object-fit: cover; transition: transform 400ms ease; }
 
 .programs-page .category-image-placeholder {
@@ -1158,12 +1066,10 @@ body.route-enter router-outlet + * {
   backdrop-filter: blur(5px);
 }
 
-.programs-page .category-tile:hover .category-image { transform: scale(1.055); }
-
+.programs-page .category-tile:hover .category-image { transform: scale(1.04); }
 .programs-page .category-tile:hover .category-arrow { transform: translateX(2px); background: rgba(255, 255, 255, 0.25); }
 
 .programs-page .category-tile:focus-visible,
-.programs-page .category-scroll-controls button:focus-visible,
 .programs-page .text-link:focus-visible,
 .programs-page .search-submit:focus-visible,
 .programs-page .search-reset:focus-visible {
@@ -1172,8 +1078,14 @@ body.route-enter router-outlet + * {
 }
 
 [dir='rtl'] .programs-page .category-tile:hover .category-arrow { transform: translateX(-2px); }
-
 [dir='rtl'] .programs-page .search-submit:hover { transform: translateX(-2px); }
+
+@media (max-width: 1100px) {
+  .programs-page .category-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: clamp(170px, 20vw, 205px);
+  }
+}
 
 .programs-page .catalog-hero.category-detail-hero {
   display: flex;
@@ -1200,7 +1112,16 @@ body.route-enter router-outlet + * {
   height: 100%;
 }
 
-.programs-page .category-detail-image { object-fit: cover; object-position: center 45%; }
+.programs-page .category-detail-image {
+  object-fit: cover;
+  object-position: center 45%;
+  transition: opacity 180ms ease;
+}
+
+.programs-page .category-detail-art.is-image-moving .category-detail-image {
+  opacity: 0;
+  animation: none;
+}
 
 .programs-page .category-detail-placeholder {
   display: grid;

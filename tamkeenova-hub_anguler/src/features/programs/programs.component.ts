@@ -50,6 +50,7 @@ export class ProgramsComponent {
   readonly learningPrograms = signal<LearningProgram[]>([]);
   readonly courses = signal<Course[]>([]);
   readonly selectedCategory = signal('');
+  readonly isCategoryImageAnimating = signal(false);
   readonly selectedLevel = signal('');
   readonly selectedType = signal('');
   readonly selectedLanguage = signal('');
@@ -134,9 +135,7 @@ export class ProgramsComponent {
           return of([] as LearningProgram[]);
         }),
       ),
-      trainers: this.trainersService.getAll().pipe(
-        catchError(() => of(null as Trainer[] | null)),
-      ),
+      trainers: this.trainersService.getAll().pipe(catchError(() => of(null as Trainer[] | null))),
     }).subscribe(({ categories, collections, programs, trainers }) => {
       this.categories.set(categories ?? []);
       this.categoryCount.set(categories?.length ?? null);
@@ -213,59 +212,132 @@ export class ProgramsComponent {
     const sourceCard = Array.from(
       this.categoryGrid?.nativeElement.querySelectorAll<HTMLElement>('.category-tile') ?? [],
     ).find((card) => card.dataset['category'] === slug);
-    const sourceImage = sourceCard?.querySelector<HTMLElement>('.category-image');
-    const transitionDocument = typeof document === 'undefined'
-      ? null
-      : (document as Document & {
-          startViewTransition?: (
-            updateCallback: () => void | Promise<void>,
-          ) => { finished: Promise<void> };
-        });
+    const sourceImage = sourceCard?.querySelector<HTMLImageElement>('.category-image');
+    const sourceBounds = sourceCard?.getBoundingClientRect();
+    const flightImage =
+      sourceCard && sourceImage && sourceBounds && sourceBounds.width > 0
+        ? this.createCategoryImageFlight(
+            sourceImage,
+            sourceBounds,
+            getComputedStyle(sourceCard).clipPath,
+          )
+        : null;
 
-    if (!transitionDocument?.startViewTransition) {
-      this.activateCategory(slug);
-      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
+    // Swap the page immediately; the floating copy handles the image movement
+    // while Angular renders the filtered catalog beneath it.
+    this.isCategoryImageAnimating.set(!!flightImage);
+    this.activateCategory(slug);
+    this.scrollToPageTopImmediately();
+
+    if (flightImage && sourceBounds) {
+      window.requestAnimationFrame(() =>
+        this.animateCategoryImageFlight(flightImage, sourceBounds),
+      );
     }
-
-    sourceImage?.style.setProperty('view-transition-name', 'category-spotlight-image');
-    const transition = transitionDocument.startViewTransition(async () => {
-      this.activateCategory(slug);
-      this.scrollToPageTopImmediately();
-      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-    });
-    void transition.finished
-      .catch(() => undefined)
-      .then(() => {
-        if (sourceImage?.isConnected) sourceImage.style.removeProperty('view-transition-name');
-      });
   }
 
   showAllCategories(): void {
-    if (!this.selectedCategory()) {
-      this.resetCatalogFilters();
+    document.querySelector('.category-image-flight')?.remove();
+    this.isCategoryImageAnimating.set(false);
+    this.resetCatalogFilters();
+    this.scrollToPageTopImmediately();
+  }
+
+  private createCategoryImageFlight(
+    sourceImage: HTMLImageElement,
+    bounds: DOMRect,
+    clipPath: string,
+  ): HTMLImageElement {
+    document.querySelector('.category-image-flight')?.remove();
+
+    const flightImage = document.createElement('img');
+    flightImage.className = 'category-image-flight';
+    flightImage.src = sourceImage.currentSrc || sourceImage.src;
+    flightImage.alt = '';
+    flightImage.setAttribute('aria-hidden', 'true');
+    flightImage.style.left = `${bounds.left}px`;
+    flightImage.style.top = `${bounds.top}px`;
+    flightImage.style.width = `${bounds.width}px`;
+    flightImage.style.height = `${bounds.height}px`;
+    flightImage.style.clipPath = clipPath;
+    flightImage.style.objectPosition = getComputedStyle(sourceImage).objectPosition;
+    document.body.appendChild(flightImage);
+    return flightImage;
+  }
+
+  private animateCategoryImageFlight(
+    flightImage: HTMLImageElement,
+    sourceBounds: DOMRect,
+    retry = 0,
+  ): void {
+    const target = document.querySelector<HTMLElement>('.programs-page .category-detail-art');
+    if (!target || !target.clientWidth || !target.clientHeight) {
+      if (retry < 2) {
+        window.requestAnimationFrame(() =>
+          this.animateCategoryImageFlight(flightImage, sourceBounds, retry + 1),
+        );
+      } else {
+        flightImage.remove();
+        this.isCategoryImageAnimating.set(false);
+      }
       return;
     }
 
-    const transitionDocument = typeof document === 'undefined'
-      ? null
-      : (document as Document & {
-          startViewTransition?: (
-            updateCallback: () => void | Promise<void>,
-          ) => { finished: Promise<void> };
-        });
+    const targetBounds = target.getBoundingClientRect();
+    const destination = {
+      left: `${targetBounds.left}px`,
+      top: `${targetBounds.top}px`,
+      width: `${targetBounds.width}px`,
+      height: `${targetBounds.height}px`,
+    };
+    const start = {
+      left: `${sourceBounds.left}px`,
+      top: `${sourceBounds.top}px`,
+      width: `${sourceBounds.width}px`,
+      height: `${sourceBounds.height}px`,
+    };
 
-    if (!transitionDocument?.startViewTransition) {
-      this.resetCatalogFilters();
-      if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    const duration = reducedMotion ? 1 : 760;
+
+    if (typeof flightImage.animate === 'function') {
+      const animation = flightImage.animate(
+        [
+          { ...start, opacity: 1, offset: 0 },
+          { ...destination, opacity: 1, offset: 0.78 },
+          { ...destination, opacity: 0, offset: 1 },
+        ],
+        {
+          duration,
+          easing: 'cubic-bezier(0.2, 0.75, 0.25, 1)',
+          fill: 'forwards',
+        },
+      );
+      void animation.finished.then(
+        () => {
+          flightImage.remove();
+          this.isCategoryImageAnimating.set(false);
+        },
+        () => {
+          flightImage.remove();
+          this.isCategoryImageAnimating.set(false);
+        },
+      );
       return;
     }
 
-    const transition = transitionDocument.startViewTransition(() => {
-      this.resetCatalogFilters();
-      this.scrollToPageTopImmediately();
+    flightImage.style.transition = `left ${duration}ms ease, top ${duration}ms ease, width ${duration}ms ease, height ${duration}ms ease, opacity ${duration}ms ease`;
+    window.requestAnimationFrame(() => {
+      flightImage.style.left = destination.left;
+      flightImage.style.top = destination.top;
+      flightImage.style.width = destination.width;
+      flightImage.style.height = destination.height;
+      flightImage.style.opacity = '0';
     });
-    void transition.finished.catch(() => undefined);
+    window.setTimeout(() => {
+      flightImage.remove();
+      this.isCategoryImageAnimating.set(false);
+    }, duration + 50);
   }
 
   private activateCategory(slug: string): void {
@@ -295,21 +367,6 @@ export class ProgramsComponent {
     rootStyle.scrollBehavior = 'auto';
     window.scrollTo(0, 0);
     rootStyle.scrollBehavior = previousScrollBehavior;
-  }
-
-  scrollCategories(direction: 'previous' | 'next'): void {
-    const track = this.categoryGrid?.nativeElement;
-    if (!track) return;
-
-    const maxScroll = track.scrollWidth - track.clientWidth;
-    if (maxScroll <= 0) return;
-
-    const rtl = typeof getComputedStyle !== 'undefined' && getComputedStyle(track).direction === 'rtl';
-    const sign = (direction === 'next' ? 1 : -1) * (rtl ? -1 : 1);
-    track.scrollBy({
-      left: sign * Math.min(track.clientWidth * 0.82, maxScroll),
-      behavior: 'smooth',
-    });
   }
 
   selectLevel(event: Event): void {
@@ -350,7 +407,10 @@ export class ProgramsComponent {
 
   categoryDescription(category: CourseCategory): string {
     const description = this.isEnglish() ? category.description_en : category.description_ar;
-    return description?.trim() || this.translate.instant('programs.catalog.category_description_fallback');
+    return (
+      description?.trim() ||
+      this.translate.instant('programs.catalog.category_description_fallback')
+    );
   }
 
   categoryCardImage(category: CourseCategory): string | null {
