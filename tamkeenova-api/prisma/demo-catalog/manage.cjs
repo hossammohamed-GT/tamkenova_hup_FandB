@@ -4,6 +4,39 @@ const PREFIX = 'demo-catalog-v1-';
 const MARKER = '[TAMKEENOVA_DEMO_CATALOG_V1]';
 const marked = { slug: { startsWith: PREFIX }, description_en: { startsWith: MARKER } };
 
+// Standalone CLI connection budget; never changes .env or the backend pool.
+function demoConnectionUrl(env = process.env) {
+  const source = env.DEMO_DATABASE_URL || env.DATABASE_URL;
+  if (!source) throw new Error('DATABASE_URL is missing. Configure it locally in .env.');
+  let url;
+  try { url = new URL(source); } catch { throw new Error('Invalid database URL. Copy the PostgreSQL connection string from Neon; do not share it in chat.'); }
+  if (!['postgresql:', 'postgres:'].includes(url.protocol)) throw new Error('A PostgreSQL database URL is required.');
+  url.searchParams.set('connection_limit', '1');
+  url.searchParams.set('connect_timeout', '30');
+  url.searchParams.set('pool_timeout', '60');
+  return url.toString();
+}
+
+function errorCode(error) { return error?.code || error?.errorCode; }
+async function connectWithRetry(prisma, {
+  wait = ms => new Promise(resolve => setTimeout(resolve, ms)),
+  log = message => console.log(message),
+} = {}) {
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    log(`Connecting to database (${attempt}/3)...`);
+    try {
+      await prisma.$connect();
+      return;
+    } catch (error) {
+      // Retry connection setup ONLY: never replay writes or a cleanup transaction.
+      if (!['P1001', 'P1002', 'P2024'].includes(errorCode(error)) || attempt === 3) throw error;
+      await prisma.$disconnect().catch(() => {});
+      log('Connection is not ready; retrying before any data changes.');
+      await wait(attempt * 2000);
+    }
+  }
+}
+
 async function seedDemoCourses(prisma) {
   return prisma.$transaction(async tx => {
     const categories = await tx.course_categories.findMany({
@@ -45,7 +78,7 @@ async function seedDemoCourses(prisma) {
         demo_courses: links.filter(link => link.category_id === category.id).length,
       })),
     };
-  }, { timeout: 60000 });
+  }, { maxWait: 60000, timeout: 60000 });
 }
 
 async function removeDemoCourses(prisma) {
@@ -58,15 +91,17 @@ async function removeDemoCourses(prisma) {
     }
     // Delete by marker as well as id, so real courses cannot enter the cleanup set.
     return tx.courses.deleteMany({ where: { ...marked, id: { in: courses.map(course => course.id) } } });
-  }, { timeout: 60000, isolationLevel: 'Serializable' });
+  }, { maxWait: 60000, timeout: 60000, isolationLevel: 'Serializable' });
 }
 
 async function main() {
   const action = process.argv[2];
   if (!['seed', 'remove'].includes(action)) throw new Error('Use seed or remove.');
   const { PrismaClient } = require('@prisma/client');
-  const prisma = new PrismaClient();
+  const prisma = new PrismaClient({ datasources: { db: { url: demoConnectionUrl() } } });
   try {
+    await connectWithRetry(prisma);
+    console.log('Database connected. Starting data transaction.');
     if (action === 'seed') {
       const result = await seedDemoCourses(prisma);
       console.table(result.categories);
@@ -79,14 +114,16 @@ async function main() {
       console.log(`Removed ${result.count} marked demo courses. Real courses were preserved.`);
     }
   } catch (error) {
-    if (['P2021', 'P2022'].includes(error.code)) {
+    if (['P2021', 'P2022'].includes(errorCode(error))) {
       throw new Error('Catalog tables/columns are missing. Review schema.prisma against your database before applying a schema change. Do not reset the database.');
     }
-    if (error.code === 'P1001') throw new Error('Cannot reach the database. Check your Neon connection and DATABASE_URL locally; do not share credentials.');
+    if (['P1001', 'P1002', 'P2024'].includes(errorCode(error))) {
+      throw new Error('Database connection unavailable after waiting. Check Neon availability/network. You can set DEMO_DATABASE_URL to the Direct connection string for the SAME database in .env, without changing the backend DATABASE_URL. Do not share credentials.');
+    }
     throw error;
   } finally {
     await prisma.$disconnect();
   }
 }
 if (require.main === module) main().catch(error => { console.error(error.message); process.exitCode = 1; });
-module.exports = { seedDemoCourses, removeDemoCourses };
+module.exports = { seedDemoCourses, removeDemoCourses, demoConnectionUrl, connectWithRetry };

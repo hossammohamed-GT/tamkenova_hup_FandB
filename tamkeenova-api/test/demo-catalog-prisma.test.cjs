@@ -49,3 +49,45 @@ test('Prisma cleanup refuses learner history, then deletes only marked demos',as
   await assert.rejects(removeDemoCourses(db),/Removal cancelled/);db.rows[1]._count.reviews=0;
   const result=await removeDemoCourses(db);assert.equal(result.count,27);
 });
+
+const { demoConnectionUrl, connectWithRetry } = require('../prisma/demo-catalog/manage.cjs');
+test('CLI connection budget is isolated, preserves SSL and does not mutate the input environment', () => {
+  const env = {DATABASE_URL:'postgresql://user:example@db.example.test/catalog?sslmode=require&connect_timeout=60&pool_timeout=10&connection_limit=13'};
+  const original = env.DATABASE_URL;
+  const url = new URL(demoConnectionUrl(env));
+  assert.equal(url.searchParams.get('connection_limit'),'1');
+  assert.equal(url.searchParams.get('connect_timeout'),'30');
+  assert.equal(url.searchParams.get('pool_timeout'),'60');
+  assert.equal(url.searchParams.get('sslmode'),'require');
+  assert.equal(url.hostname,'db.example.test');
+  assert.equal(env.DATABASE_URL,original);
+});
+test('optional demo Direct URL is used without modifying or guessing the backend endpoint', () => {
+  const env = {DATABASE_URL:'postgresql://user:example@pool.example.test/catalog',DEMO_DATABASE_URL:'postgresql://user:example@direct.example.test/catalog?sslmode=require'};
+  assert.equal(new URL(demoConnectionUrl(env)).hostname,'direct.example.test');
+  assert.match(env.DATABASE_URL,/pool.example.test/);
+});
+test('invalid connection settings produce safe messages without echoing credentials', () => {
+  assert.throws(()=>demoConnectionUrl({}),/DATABASE_URL is missing/);
+  assert.throws(()=>demoConnectionUrl({DATABASE_URL:'private-secret-invalid'}),error=>!error.message.includes('private-secret'));
+  assert.throws(()=>demoConnectionUrl({DATABASE_URL:'https://example.test'}),/PostgreSQL/);
+});
+test('transient initialization and pool failures are retried before data transactions', async () => {
+  let attempts=0;let disconnects=0;const delays=[];
+  const prisma={
+    $connect:async()=>{attempts++;if(attempts===1)throw {errorCode:'P1001'};if(attempts===2)throw {code:'P2024'};},
+    $disconnect:async()=>{disconnects++;},
+  };
+  await connectWithRetry(prisma,{wait:async ms=>delays.push(ms),log:()=>{}});
+  assert.equal(attempts,3);assert.equal(disconnects,2);assert.deepEqual(delays,[2000,4000]);
+});
+test('authentication failures are not retried', async () => {
+  let attempts=0;const error={errorCode:'P1000'};
+  await assert.rejects(connectWithRetry({$connect:async()=>{attempts++;throw error;}},{log:()=>{}}),e=>e===error);
+  assert.equal(attempts,1);
+});
+test('connection retries are bounded and return the final error', async () => {
+  let attempts=0;const error={code:'P1002'};
+  await assert.rejects(connectWithRetry({$connect:async()=>{attempts++;throw error;},$disconnect:async()=>{}},{wait:async()=>{},log:()=>{}}),e=>e===error);
+  assert.equal(attempts,3);
+});

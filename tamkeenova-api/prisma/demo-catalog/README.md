@@ -30,6 +30,22 @@ before applying your normal Prisma schema workflow. Do not use `migrate reset`,
 `--force-reset`, or `--accept-data-loss` to fix missing preview data. The legacy
 `seed.sql` and `remove.sql` are retained as SQL fixtures, not the default commands.
 
+### Connection troubleshooting (Neon)
+
+The CLI opens the connection **before** starting a data transaction and retries
+transient connection setup failures up to three times. It does not retry writes.
+For this CLI process only it uses `connection_limit=1`, `connect_timeout=30` and
+`pool_timeout=60`, and gives transaction acquisition up to 60 seconds. These
+settings do not edit `.env`, the backend pool, or the database schema. A larger
+connection timeout alone does not increase Prisma's pool acquisition timeout.
+
+If the pooled endpoint is still unavailable, copy the **Direct** connection URL
+from Neon Connect for the **same branch, database and user** into an optional
+`DEMO_DATABASE_URL` variable in your local backend `.env`. Keep its SSL settings.
+The demo CLI prefers this URL, while the backend continues using `DATABASE_URL`.
+Do not infer a direct hostname by editing the pooler hostname manually. Neither
+longer timeouts nor retries can repair an unavailable server or blocked network.
+
 No database credentials should be committed or pasted into chat. Confirm your
 connection targets a development/staging database before running the command.
 The seed is transactional, additive and re-runnable: it never overwrites an
