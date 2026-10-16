@@ -112,7 +112,7 @@
 
   @if (!selectedCategory()) {
   @if (isLoadingCategories() || categoriesUnavailable() || categories().length) {
-    <section class="category-section content-width" aria-labelledby="category-heading">
+    <section class="category-section" aria-labelledby="category-heading">
       <div class="section-heading category-heading">
         <div class="category-heading-copy">
           <span class="section-kicker">{{ 'programs.catalog.browse_by_interest' | translate }}</span>

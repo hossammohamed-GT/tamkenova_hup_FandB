@@ -78,10 +78,21 @@
       <stop stop-color="#fff3cf" stop-opacity=".28"/><stop offset=".18" stop-color="currentColor" stop-opacity=".88"/>
       <stop offset=".64" stop-color="currentColor" stop-opacity=".84"/><stop offset="1" stop-color="currentColor" stop-opacity=".9"/>
     </linearGradient>
-    <linearGradient [id]="uid() + '-sheen'" x1="0" y1="0" x2="1" y2=".3">
-      <stop stop-color="#fff5de" stop-opacity=".48"/><stop offset=".14" stop-color="#fff5de" stop-opacity=".03"/>
-      <stop offset=".7" stop-color="#fff5de" stop-opacity="0"/><stop offset=".91" stop-color="#fff5de" stop-opacity=".2"/><stop offset="1" stop-color="#fff5de" stop-opacity=".02"/>
+    <!-- Broad reflected light alternates with dark strips like a polished tinted mirror. -->
+    <linearGradient [id]="uid() + '-sheen'" x1="0" y1="0" x2="1" y2=".32">
+      <stop stop-color="#ffefd2" stop-opacity=".5"/><stop offset=".12" stop-color="#fffaf0" stop-opacity=".04"/>
+      <stop offset=".48" stop-color="#fffaf0" stop-opacity="0"/><stop offset=".62" stop-color="#d9eced" stop-opacity=".08"/>
+      <stop offset=".73" stop-color="#f2ffff" stop-opacity=".42"/><stop offset=".78" stop-color="#fffdf4" stop-opacity=".12"/>
+      <stop offset=".82" stop-color="#0c2633" stop-opacity=".22"/><stop offset=".88" stop-color="#fff4d8" stop-opacity=".56"/>
+      <stop offset=".94" stop-color="#fffaf0" stop-opacity=".08"/><stop offset="1" stop-color="#081b25" stop-opacity=".16"/>
     </linearGradient>
+    <linearGradient [id]="uid() + '-reflection-fade'">
+      <stop stop-color="white" stop-opacity=".05"/><stop offset=".42" stop-color="white" stop-opacity=".1"/>
+      <stop offset=".74" stop-color="white" stop-opacity=".75"/><stop offset="1" stop-color="white" stop-opacity=".9"/>
+    </linearGradient>
+    <mask [id]="uid() + '-reflection-mask'" maskUnits="userSpaceOnUse" x="0" y="0" width="360" height="340">
+      <rect width="360" height="340" [attr.fill]="ref('reflection-fade')"/>
+    </mask>
     <linearGradient [id]="uid() + '-rim'" x1="0" y1="0" x2="1" y2="1">
       <stop stop-color="#fff9e7" stop-opacity=".85"/><stop offset=".4" stop-color="currentColor" stop-opacity=".3"/><stop offset=".75" stop-color="#fff9e7" stop-opacity=".65"/><stop offset="1" stop-color="currentColor" stop-opacity=".5"/>
     </linearGradient>
@@ -96,11 +107,15 @@
     <path d="M308 185 353 156V240L186 323 177 313 320 230Z" fill="#fcf2d8" fill-opacity=".14"/>
     <g [attr.clip-path]="ref('front')">
       <path [attr.d]="outline()" fill="currentColor" fill-opacity=".88"/>
-      @if (image()) {
-        <image class="sculpture-reflection" [attr.href]="image()" x="0" y="-440" width="360" height="260" transform="scale(1 -1)" preserveAspectRatio="xMidYMid slice" opacity=".13"/>
-      }
       <path [attr.d]="outline()" [attr.fill]="ref('glass')"/>
-      <path d="M0 95Q39 80 86 121L232 190Q266 202 301 178L321 171V341H0Z" [attr.fill]="ref('sheen')"/>
+      @if (image()) {
+        <!-- Render ABOVE the tint so the reflection is visible, but fade it away
+             behind the label to preserve white-text contrast. -->
+        <g [attr.mask]="ref('reflection-mask')">
+          <image class="sculpture-reflection" [attr.href]="image()" x="0" y="-440" width="360" height="290" transform="scale(1 -1)" preserveAspectRatio="xMidYMid slice" opacity=".3"/>
+        </g>
+      }
+      <path class="sculpture-polish" [attr.d]="outline()" [attr.fill]="ref('sheen')"/>
       <path d="M298 180Q321 183 322 208L319 263" fill="none" stroke="#fff3d6" stroke-opacity=".38" stroke-width="1.4"/>
     </g>
     <path [attr.d]="front()" fill="none" stroke="#ffedc8" stroke-opacity=".46" stroke-width="1.1"/>

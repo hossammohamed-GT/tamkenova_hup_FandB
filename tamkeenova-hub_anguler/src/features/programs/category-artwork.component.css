@@ -1,6 +1,6 @@
 :host { position: absolute; inset: 0; display: block; color: var(--category-tint, #0b5665); pointer-events: none; }
 .category-sculpture { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 12px 8px #263e3826); }
-.category-setting { position: absolute; width: 140%; height: 113%; left: -20%; top: 6%; overflow: visible; }
+.category-setting { position: absolute; width: 120%; height: 113%; left: -10%; top: 6%; overflow: visible; }
 .setting-line { fill: none; stroke: #b69660; stroke-width: .8; stroke-opacity: .48; }
 .sculpture-photo { transition: filter 220ms ease; }
 :host-context(.category-tile:hover) .sculpture-photo { filter: saturate(1.1) brightness(1.04); }
@@ -10,3 +10,8 @@
 
 /* Only the painted, clipped sculpture is a mouse target; its surrounding garden is not. */
 .sculpture-hit-area { pointer-events: visiblePainted; cursor: pointer; }
+
+/* Stationary reflection layers give the tinted front a polished mirror finish. */
+.sculpture-polish { opacity: .8; transition: opacity 220ms ease; pointer-events: none; }
+:host-context(.category-tile:hover) .sculpture-polish { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .sculpture-polish { transition: none; } }

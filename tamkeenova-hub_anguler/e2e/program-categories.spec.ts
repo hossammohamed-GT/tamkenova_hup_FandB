@@ -22,8 +22,19 @@ for (const [language, width] of [['en', 1024], ['ar', 1024], ['en', 1280], ['ar'
       meta: { total: 0, total_pages: 0, page: 1 },
     } }));
     await page.goto('/programs');
+    // The category scene itself is full bleed, not constrained by content-width.
+    expect(await page.locator('.category-section').evaluate(el => {
+      const r = el.getBoundingClientRect();
+      return Math.abs(r.left) < 1 && Math.abs(r.right - document.documentElement.clientWidth) < 1;
+    })).toBe(true);
     const cards = page.locator('button.category-tile');
     await expect(cards).toHaveCount(9);
+    if (width >= 1024) {
+      const expectedColumns = width >= 1200 ? 5 : 4;
+      const expectedCardWidth = Math.min(width / expectedColumns * .82, 300);
+      expect((await cards.first().boundingBox())!.width).toBeGreaterThan(expectedCardWidth - 4);
+    }
+    await expect(page.locator('.sculpture-polish')).toHaveCount(9);
     await expect(cards.first()).toHaveAttribute('data-category', slugs[0]);
     await expect(cards.nth(4)).toHaveAttribute('data-category', 'education-academics');
     await expect(page.locator('.category-icon-badge svg').first()).toBeVisible();
