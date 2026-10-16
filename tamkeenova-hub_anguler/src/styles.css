@@ -856,14 +856,16 @@ body.route-enter router-outlet + * {
   position: absolute;
   z-index: -1;
   inset: 0 -12vw;
-  background-image: linear-gradient(rgba(250, 249, 245, 0.48), rgba(250, 249, 245, 0.32)), url('/assets/course-categories/category-mosaic-background.jpg');
-  background-position: center top;
-  background-size: cover;
   content: '';
+  background-color: #faf8f3;
+  background-image:
+    radial-gradient(ellipse at 50% 0, #fffdf9 0%, #fffdf9cc 40%, transparent 75%),
+    repeating-linear-gradient(30deg, transparent 0 118px, #c4ab7e18 119px, transparent 120px 240px),
+    repeating-linear-gradient(150deg, transparent 0 118px, #c4ab7e18 119px, transparent 120px 240px);
 }
-
 [data-theme='dark'] .programs-page .category-section::before {
-  background-image: linear-gradient(rgba(14, 27, 34, 0.86), rgba(14, 27, 34, 0.86)), url('/assets/course-categories/category-mosaic-background.jpg');
+  background-color: #12252c;
+  background-image: repeating-linear-gradient(30deg, transparent 0 118px, #c4ab7e0c 119px, transparent 120px 240px);
 }
 
 [data-theme='dark'] .programs-page .section-heading h2 { color: #f0f5f5; }
@@ -933,12 +935,16 @@ body.route-enter router-outlet + * {
 
 /* Category icons are local SVGs: no external icon-font loading dependency. */
 .programs-page .category-section svg.rtl-flip { transform: none; }
-.programs-page .category-section svg:not(.category-clip-defs) { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.programs-page .category-controls svg,
+.programs-page .category-icon-badge svg,
+.programs-page .category-arrow svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 .programs-page .category-section .category-icon-badge svg { width: 100%; height: 100%; }
 [dir='rtl'] .programs-page .category-section svg.rtl-flip { transform: scaleX(-1); }
-/* The six cards form one isometric scene, not a row of rectangular tiles. */
+/* Transparent corners must not steal clicks from another sculpture behind them. */
+.programs-page .category-tile:not(.category-skeleton) { pointer-events: none; }
+.programs-page .category-tile .category-content { pointer-events: auto; }
+/* Each scene has its own outline, glass return and architectural setting. */
 .programs-page .category-section { padding-block: 2rem 2.5rem; }
-.programs-page .category-clip-defs { position: absolute; pointer-events: none; }
 .programs-page .category-heading { align-items: flex-start; margin-bottom: 0; z-index: 3; pointer-events: none; }
 .programs-page .category-heading-copy { max-width: 27%; }
 .programs-page .category-heading-copy h2 { font-size: clamp(1.5rem, 2.15vw, 2rem); }
@@ -976,47 +982,39 @@ body.route-enter router-outlet + * {
   background: transparent;
   color: #fff;
   cursor: pointer;
-  filter: drop-shadow(0 15px 10px rgba(33, 49, 42, 0.2));
+  filter: none;
   isolation: isolate;
   text-align: start;
   font: inherit;
   transition: filter 200ms ease, transform 250ms ease;
 }
-.programs-page .category-tile:nth-of-type(2) { grid-column-start: 25; grid-row-start: 1; }
+.programs-page .category-tile:nth-of-type(2) { grid-column: 25 / span 20; grid-row: 1 / span 56; }
 .programs-page .category-tile:nth-of-type(3) { grid-column-start: 35; grid-row-start: 36; }
-.programs-page .category-tile:nth-of-type(4) { grid-column-start: 51; grid-row-start: 1; }
+.programs-page .category-tile:nth-of-type(4) { grid-column: 51 / span 22; grid-row: 1 / span 56; }
 .programs-page .category-tile:nth-of-type(5) { grid-column-start: 64; grid-row: 36 / span 65; }
 .programs-page .category-tile:nth-of-type(6) { grid-column: 79 / span 22; grid-row-start: 20; }
 .programs-page .category-tile[data-category='business-professional-skills'] { --category-tint: #075360; }
-.programs-page .category-tile[data-category='technology-innovation'] { --category-tint: #144c70; }
+.programs-page .category-tile[data-category='technology-innovation'] { --category-tint: #0d4266; }
 .programs-page .category-tile[data-category='arts-design-media'] { --category-tint: #b74827; }
 .programs-page .category-tile[data-category='wellbeing'] { --category-tint: #2e6545; }
-.programs-page .category-tile[data-category='lifestyle'] { --category-tint: #b17a2c; }
+.programs-page .category-tile[data-category='lifestyle'] { --category-tint: #ad7425; }
 .programs-page .category-tile[data-category='education-academics'] { --category-tint: #50387a; }
 .programs-page .category-tile[data-category='family-relationships'] { --category-tint: #805250; }
 .programs-page .category-tile[data-category='languages'] { --category-tint: #39757a; }
 .programs-page .category-tile[data-category='soft-skills'] { --category-tint: #554b75; }
-.programs-page .category-tile:hover { z-index: 4; transform: translateY(-7px); filter: drop-shadow(0 21px 13px rgba(26, 45, 42, 0.27)); }
-.programs-page .category-face { position: absolute; inset: 0; display: block; overflow: hidden; clip-path: url(#program-category-hex); background: var(--category-tint); }
-.programs-page .category-image,
-.programs-page .category-image-placeholder { position: absolute; inset: 0; display: block; width: 100%; height: 70%; object-fit: cover; object-position: center; transition: transform 450ms ease; }
-.programs-page .category-image-placeholder { display: grid; place-items: center; background: linear-gradient(130deg, #b2c6bc, var(--category-tint)); font-size: 3rem; }
-.programs-page .category-overlay {
+.programs-page .category-tile:hover { z-index: 4; transform: translateY(-5px); }
+.programs-page .category-flight-source { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
+.programs-page .category-skeleton .category-face {
   position: absolute; inset: 0; display: block;
-  /* The sloping top edge is the front face of the isometric card. */
-  clip-path: polygon(0 26%, 62% 51%, 100% 40%, 100% 100%, 0 100%);
-  background: linear-gradient(115deg, color-mix(in srgb, var(--category-tint) 86%, white), var(--category-tint) 45%, color-mix(in srgb, var(--category-tint) 75%, black));
-  box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.28);
+  clip-path: polygon(0 30%, 50% 3%, 100% 30%, 100% 74%, 48% 98%, 0 74%);
 }
-.programs-page .category-fold { position: absolute; inset: 0; clip-path: polygon(62% 51%, 100% 40%, 100% 100%, 62% 100%); background: linear-gradient(90deg, rgba(0,0,0,.12), rgba(255,255,255,.08)); border-inline-start: 1px solid rgba(255,255,255,.12); }
 .programs-page .category-number { position: absolute; inset-inline-start: 7%; top: 32%; z-index: 1; font-size: clamp(1.3rem, 2vw, 2rem); line-height: 1; font-weight: 800; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.12); pointer-events: none; }
-.programs-page .category-content { position: absolute; z-index: 2; inset-inline: 13% 12%; top: 39%; bottom: 18%; display: flex; align-items: flex-end; gap: .35rem; justify-content: space-between; }
+.programs-page .category-content { position: absolute; z-index: 2; inset-inline: 13% 12%; top: 40%; bottom: 19%; display: flex; align-items: flex-end; gap: .35rem; justify-content: space-between; }
 .programs-page .category-card-info { display: flex; min-width: 0; flex: 1; flex-direction: column; align-items: flex-start; gap: .35rem; align-self: flex-start; }
 .programs-page .category-icon-badge { display: grid; place-items: center; width: 34px; height: 34px; margin-bottom: .15rem; background: transparent; border: 0; border-radius: 0; color: #fff6d5; font-size: 1.65rem; }
 .programs-page .category-name { color: white; font-size: clamp(.8rem, 1.08vw, 1rem); font-weight: 750; line-height: 1.28; text-shadow: 0 1px 3px rgba(0,0,0,.12); }
 .programs-page .category-course-count { color: rgba(255,255,255,.78); font-size: clamp(.64rem, .84vw, .78rem); line-height: 1.3; }
 .programs-page .category-arrow { display: grid; place-items: center; width: 35px; height: 35px; flex: 0 0 35px; margin-bottom: 3%; border: 1px solid rgba(255,255,255,.65); border-radius: 50%; background: transparent; color: white; font-size: .75rem; transition: background 180ms ease, transform 180ms ease; }
-.programs-page .category-tile:hover .category-image { transform: scale(1.045); }
 .programs-page .category-tile:hover .category-arrow { background: rgba(255,255,255,.17); transform: translateX(2px); }
 .programs-page .category-tile:focus-visible { outline: none; filter: drop-shadow(0 0 3px #b47b21) drop-shadow(0 0 3px #b47b21); }
 .programs-page .text-link:focus-visible,

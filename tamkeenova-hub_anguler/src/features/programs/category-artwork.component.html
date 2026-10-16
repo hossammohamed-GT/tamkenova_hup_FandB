@@ -1,0 +1,109 @@
+<!-- Each category owns a little architectural setting, independent of the page background. -->
+<svg class="category-setting" viewBox="0 0 460 380" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient [id]="uid() + '-stone'" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fffcf4"/><stop offset=".52" stop-color="#eee5d5"/><stop offset="1" stop-color="#d3c7b2"/>
+    </linearGradient>
+    <linearGradient [id]="uid() + '-brass'" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#f8d699"/><stop offset=".5" stop-color="#dba04c"/><stop offset="1" stop-color="#aa702b"/>
+    </linearGradient>
+    <linearGradient [id]="uid() + '-foliage'" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#8b963a"/><stop offset="1" stop-color="#264431"/>
+    </linearGradient>
+    <pattern [id]="uid() + '-grain'" width="9" height="11" patternUnits="userSpaceOnUse">
+      <path d="M1 2h1m4 5h1M2 10h.5" stroke="#a3957d" stroke-opacity=".22" stroke-width=".6"/>
+    </pattern>
+    <g [id]="uid() + '-tree'">
+      <ellipse cx="0" cy="8" rx="15" ry="6" fill="#918671" opacity=".13"/>
+      <path d="M-9-8 0-13 10-8 8 6 0 11-8 6Z" fill="#e9e1d3" stroke="#cabea9" stroke-width=".6"/>
+      <path d="M0 1v-59m0 31-10-14m10 3 10-12m-10 0-5-14" fill="none" stroke="#796044" stroke-width="2"/>
+      <g [attr.fill]="ref('foliage')">
+        <ellipse cx="-9" cy="-44" rx="7" ry="4" transform="rotate(25 -9 -44)"/><ellipse cx="7" cy="-49" rx="8" ry="4" transform="rotate(-35 7 -49)"/>
+        <ellipse cx="-5" cy="-60" rx="7" ry="4" transform="rotate(45 -5 -60)"/><ellipse cx="4" cy="-67" rx="5" ry="8" transform="rotate(20 4 -67)"/>
+        <ellipse cx="-13" cy="-54" rx="6" ry="3"/><ellipse cx="12" cy="-59" rx="6" ry="3" transform="rotate(-30 12 -59)"/>
+        <ellipse cx="-6" cy="-34" rx="8" ry="4" transform="rotate(30 -6 -34)"/><ellipse cx="7" cy="-37" rx="7" ry="4" transform="rotate(-25 7 -37)"/>
+      </g>
+    </g>
+    <g [id]="uid() + '-cube'">
+      <path d="M0 0 16-9 32 0 16 10Z" fill="currentColor" opacity=".6"/>
+      <path d="M0 0v20l16 10V10Z" fill="currentColor"/><path d="M16 10 32 0v20L16 30Z" fill="currentColor" opacity=".8"/>
+      <path d="M0 0 16 10 32 0M16 10v20" fill="none" stroke="#fff6dc" stroke-opacity=".3" stroke-width=".6"/>
+    </g>
+  </defs>
+  <!-- Fine construction lines, inset brass pins and stone courses tie the scene together. -->
+  <path class="setting-line" d="M8 192 207 78 451 216 248 338 8 201ZM26 215 224 102 435 224M47 232 243 121M245 338V92M8 192v17M451 216v17"/>
+  <path d="M29 226 233 108 425 219v32L220 369 29 258Z" fill="#b6ab95" opacity=".13"/>
+  <path d="M29 218 234 101 429 214 224 333Z" [attr.fill]="ref('stone')" stroke="#ded3bf" stroke-width=".8"/>
+  <path d="M29 218v23l195 115v-23Z" fill="#e0d4be"/>
+  <path d="M224 333 429 214v23L224 356Z" fill="#c7b89d"/>
+  <path d="M29 218 234 101 429 214 224 333Z" [attr.fill]="ref('grain')"/>
+  <path d="m34 228 190 113 199-115M34 235 224 349l199-116" fill="none" stroke="#faf6ed" stroke-opacity=".7" stroke-width="1"/>
+  <!-- Small rear wall / desk-height stone return, not a giant generic hexagonal block. -->
+  <path d="m346 112 35-20 30 18v109l-35 20-30-18Z" [attr.fill]="ref('stone')" stroke="#ddd2bd" stroke-width=".6"/>
+  <path d="m346 112 30 18 35-20M376 130v109" fill="none" stroke="#fcf9ef" stroke-width="1"/>
+  <path d="m346 112 35-20 30 18-35 20Z" fill="#fffaf0"/>
+  <use [attr.href]="'#' + uid() + '-tree'" transform="translate(389 103) scale(.85)"/>
+  <use [attr.href]="'#' + uid() + '-tree'" transform="translate(62 233) scale(.8)"/>
+  <use [attr.href]="'#' + uid() + '-cube'" transform="translate(395 252) scale(.8)" style="color: #326565"/>
+  <use [attr.href]="'#' + uid() + '-cube'" transform="translate(66 298) scale(.63)" style="color: #dda44e"/>
+  <path d="M55 201v-31m0-18v-12M408 267v29M108 311v22" stroke="#b99960" stroke-width=".7"/>
+  <g fill="#c59a53"><circle cx="55" cy="170" r="2.1"/><circle cx="408" cy="296" r="2"/><circle cx="108" cy="333" r="2"/></g>
+  @switch (slug()) {
+    @case ('business-professional-skills') {
+      <g transform="translate(319 272)"><path d="m-5 0 46-26 14 8-46 27Z" fill="#fff8eb"/><path d="M9 9v24M50-18V7" stroke="#bc975a" stroke-width="3"/><use [attr.href]="'#' + uid() + '-tree'" transform="translate(48 12) scale(.7)"/></g>
+    }
+    @case ('technology-innovation') {
+      <g transform="translate(31 167)"><path d="m0 0 22-13v44L0 44Z" fill="#2d5660"/><path d="m4 4 13-8v6L4 10Zm0 12 13-8v6L4 22Zm0 12 13-8v6L4 34Z" fill="#77bec7" opacity=".8"/></g>
+    }
+    @case ('arts-design-media') {
+      <g transform="translate(395 178)"><path d="m-9-26 18-10v38l-18 10Z" fill="#f1d0ae" stroke="#ae794c"/><path d="m-7-20 13-7v23l-13 7Z" fill="#c96e46"/><path d="M0-36v59m-1-8-12 13m12-13 12 2" stroke="#926f45" stroke-width="2"/></g>
+    }
+    @case ('wellbeing') {
+      <use [attr.href]="'#' + uid() + '-tree'" transform="translate(344 282) scale(1.05)"/>
+      <path d="m57 252 33-19 42 24-33 20Z" fill="#7d8b63" opacity=".7"/>
+    }
+    @case ('education-academics') {
+      <g transform="translate(36 214)"><path d="m0 0 30-17 14 8-30 17Z" fill="#83749b"/><path d="M0 0v9l14 8V8Z" fill="#c5b5a5"/><path d="m0-11 30-17 14 8-30 17Z" fill="#f4e5c7"/><path d="M0-11v9l14 8v-9Z" fill="#d7c5a5"/></g>
+    }
+    @default {
+      <use [attr.href]="'#' + uid() + '-cube'" transform="translate(52 197) scale(.9)" style="color: #b98b42"/>
+    }
+  }
+</svg>
+<svg class="category-sculpture" viewBox="0 0 360 340" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+  <defs>
+    <clipPath [id]="uid() + '-outline'"><path [attr.d]="outline()"/></clipPath>
+    <clipPath [id]="uid() + '-front'"><path [attr.d]="front()"/></clipPath>
+    <linearGradient [id]="uid() + '-glass'" x1="0" y1="0" x2="1" y2=".65">
+      <stop stop-color="#fff3cf" stop-opacity=".28"/><stop offset=".18" stop-color="currentColor" stop-opacity=".88"/>
+      <stop offset=".64" stop-color="currentColor" stop-opacity=".84"/><stop offset="1" stop-color="currentColor" stop-opacity=".9"/>
+    </linearGradient>
+    <linearGradient [id]="uid() + '-sheen'" x1="0" y1="0" x2="1" y2=".3">
+      <stop stop-color="#fff5de" stop-opacity=".48"/><stop offset=".14" stop-color="#fff5de" stop-opacity=".03"/>
+      <stop offset=".7" stop-color="#fff5de" stop-opacity="0"/><stop offset=".91" stop-color="#fff5de" stop-opacity=".2"/><stop offset="1" stop-color="#fff5de" stop-opacity=".02"/>
+    </linearGradient>
+    <linearGradient [id]="uid() + '-rim'" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fff9e7" stop-opacity=".85"/><stop offset=".4" stop-color="currentColor" stop-opacity=".3"/><stop offset=".75" stop-color="#fff9e7" stop-opacity=".65"/><stop offset="1" stop-color="currentColor" stop-opacity=".5"/>
+    </linearGradient>
+  </defs>
+  <g class="sculpture-hit-area" [attr.clip-path]="ref('outline')">
+    <path [attr.d]="outline()" fill="currentColor"/>
+    @if (image()) {
+      <image class="sculpture-photo" [attr.href]="image()" x="0" y="0" width="360" height="251" preserveAspectRatio="xMidYMid slice"/>
+    }
+    <!-- Rear glass return remains visible beside the overlapping, curved front panel. -->
+    <path d="M282 167 353 131V247L182 331 168 303 298 224Z" fill="currentColor" fill-opacity=".48" stroke="#fff2cf" stroke-opacity=".22"/>
+    <path d="M308 185 353 156V240L186 323 177 313 320 230Z" fill="#fcf2d8" fill-opacity=".14"/>
+    <g [attr.clip-path]="ref('front')">
+      <path [attr.d]="outline()" fill="currentColor" fill-opacity=".88"/>
+      @if (image()) {
+        <image class="sculpture-reflection" [attr.href]="image()" x="0" y="-440" width="360" height="260" transform="scale(1 -1)" preserveAspectRatio="xMidYMid slice" opacity=".13"/>
+      }
+      <path [attr.d]="outline()" [attr.fill]="ref('glass')"/>
+      <path d="M0 95Q39 80 86 121L232 190Q266 202 301 178L321 171V341H0Z" [attr.fill]="ref('sheen')"/>
+      <path d="M298 180Q321 183 322 208L319 263" fill="none" stroke="#fff3d6" stroke-opacity=".38" stroke-width="1.4"/>
+    </g>
+    <path [attr.d]="front()" fill="none" stroke="#ffedc8" stroke-opacity=".46" stroke-width="1.1"/>
+  </g>
+  <path class="sculpture-rim" [attr.d]="outline()" fill="none" [attr.stroke]="ref('rim')" stroke-width="1.2"/>
+</svg>

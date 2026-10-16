@@ -11,6 +11,7 @@ import {
   LearningProgram,
 } from '../../core/models/course-catalog.model';
 import { CourseCatalogService } from '../../core/services/course-catalog.service';
+import { CategoryArtworkComponent } from './category-artwork.component';
 import { TrainersService } from '../../core/services/trainers.service';
 
 // Category records still come from the API; this only supplies local artwork if
@@ -33,7 +34,7 @@ const CATEGORY_RECTANGLE_CLIP_PATH =
 @Component({
   selector: 'app-programs',
   standalone: true,
-  imports: [CommonModule, TranslatePipe, FormsModule, RouterLink],
+  imports: [CommonModule, TranslatePipe, FormsModule, RouterLink, CategoryArtworkComponent],
   templateUrl: './programs.component.html',
   styleUrl: './programs.component.css',
 })
@@ -250,7 +251,7 @@ export class ProgramsComponent {
         ? this.createCategoryImageFlight(
             sourceImage,
             sourceBounds,
-            'polygon(0 28%, 2% 24%, 48% 1%, 52% 1%, 98% 24%, 100% 28%, 100% 72%, 98% 76%, 52% 99%, 48% 99%, 2% 76%, 0 72%)',
+            this.categoryFlightClip(sourceCard),
           )
         : null;
 
@@ -274,6 +275,17 @@ export class ProgramsComponent {
     this.isCategoryImageAnimating.set(false);
     this.resetCatalogFilters();
     this.scrollToPageTopImmediately();
+  }
+
+  private categoryFlightClip(card: HTMLElement): string {
+    const outline = card.querySelector<SVGPathElement>('.sculpture-rim');
+    if (!outline || typeof outline.getTotalLength !== 'function') return CATEGORY_RECTANGLE_CLIP_PATH;
+    const length = outline.getTotalLength();
+    const points = Array.from({ length: 12 }, (_, index) => {
+      const point = outline.getPointAtLength(length * index / 12);
+      return `${(point.x / 360 * 100).toFixed(2)}% ${(point.y / 340 * 100).toFixed(2)}%`;
+    });
+    return `polygon(${points.join(', ')})`;
   }
 
   private createCategoryImageFlight(

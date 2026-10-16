@@ -113,13 +113,6 @@
   @if (!selectedCategory()) {
   @if (isLoadingCategories() || categoriesUnavailable() || categories().length) {
     <section class="category-section content-width" aria-labelledby="category-heading">
-      <svg class="category-clip-defs" aria-hidden="true" focusable="false" width="0" height="0">
-        <defs>
-          <clipPath id="program-category-hex" clipPathUnits="objectBoundingBox">
-            <path d="M .045 .235 L .455 .012 Q .5 -.012 .545 .012 L .955 .235 Q 1 .26 1 .31 L 1 .69 Q 1 .74 .955 .765 L .545 .988 Q .5 1.012 .455 .988 L .045 .765 Q 0 .74 0 .69 L 0 .31 Q 0 .26 .045 .235 Z" />
-          </clipPath>
-        </defs>
-      </svg>
       <div class="section-heading category-heading">
         <div class="category-heading-copy">
           <span class="section-kicker">{{ 'programs.catalog.browse_by_interest' | translate }}</span>
@@ -166,18 +159,12 @@
             [class.is-selected]="selectedCategory() === category.slug"
             (click)="selectCategory(category.slug)"
           >
-            <span class="category-face" aria-hidden="true">
             @let imageUrl = categoryCardImage(category);
+            <app-category-artwork [slug]="category.slug" [image]="imageUrl" />
             @if (imageUrl) {
-              <img class="category-image" [src]="imageUrl" alt="" loading="eager" decoding="async" />
-            } @else {
-              <span class="category-image-placeholder">
-                <i [class]="'fa-solid ' + categoryIcon(category.slug)"></i>
-              </span>
+              <!-- Retain a decoded local image for the existing image-to-hero transition. -->
+              <img class="category-image category-flight-source" [src]="imageUrl" alt="" loading="eager" decoding="async" />
             }
-            <span class="category-overlay"></span>
-            <span class="category-fold"></span>
-            </span>
             <span class="category-number" aria-hidden="true">{{ (index + 1).toString().padStart(2, '0') }}</span>
             <span class="category-content">
               <span class="category-card-info">
