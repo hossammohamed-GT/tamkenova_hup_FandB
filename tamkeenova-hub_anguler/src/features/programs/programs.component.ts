@@ -49,8 +49,18 @@ export class ProgramsComponent {
   readonly isEnglish = computed(() => this.translate.currentLang() === 'en');
   readonly isLoadingCategories = signal(true);
   readonly categoriesUnavailable = signal(false);
-  readonly categoryPlaceholders = Array.from({ length: 9 }, (_, index) => index);
+  readonly categoryPlaceholders = Array.from({ length: 6 }, (_, index) => index);
   readonly categories = signal<CourseCategory[]>([]);
+  readonly categoryOffset = signal(0);
+  readonly allCategoriesExpanded = signal(false);
+  readonly displayedCategories = computed(() => {
+    const order = ['business-professional-skills', 'technology-innovation', 'arts-design-media',
+      'wellbeing', 'education-academics', 'lifestyle'];
+    const rank = (slug: string) => { const index = order.indexOf(slug); return index < 0 ? order.length : index; };
+    const records = [...this.categories()].sort((a, b) => rank(a.slug) - rank(b.slug));
+    if (this.allCategoriesExpanded() || records.length <= 6) return records;
+    return Array.from({ length: 6 }, (_, index) => records[(this.categoryOffset() + index) % records.length]);
+  });
   readonly categoryCount = signal<number | null>(null);
   readonly expertCount = signal<number | null>(null);
   readonly collections = signal<CourseCollection[]>([]);
@@ -142,6 +152,15 @@ export class ProgramsComponent {
     });
   }
 
+  moveCategories(direction: number): void {
+    const count = this.categories().length;
+    if (count > 6) this.categoryOffset.update((offset) => (offset + direction * 3 + count) % count);
+  }
+
+  expandCategories(): void {
+    this.allCategoriesExpanded.set(true);
+  }
+
   loadCategories(): void {
     this.isLoadingCategories.set(true);
     this.categoriesUnavailable.set(false);
@@ -231,7 +250,7 @@ export class ProgramsComponent {
         ? this.createCategoryImageFlight(
             sourceImage,
             sourceBounds,
-            getComputedStyle(sourceCard).clipPath,
+            'polygon(0 28%, 2% 24%, 48% 1%, 52% 1%, 98% 24%, 100% 28%, 100% 72%, 98% 76%, 52% 99%, 48% 99%, 2% 76%, 0 72%)',
           )
         : null;
 
@@ -524,13 +543,28 @@ export class ProgramsComponent {
     return Number.isFinite(rating) ? rating.toFixed(1) : '0.0';
   }
 
+  categoryArtworkIcon(slug: string): string {
+    const paths: Record<string, string> = {
+      'business-professional-skills': 'M8 7V4h8v3 M3 8h18v12H3z M3 12l9 3 9-3 M10 14h4v3h-4z',
+      'technology-innovation': 'M5 4h14v12H5z M2 20h20 M8 20l1-4h6l1 4',
+      'arts-design-media': 'M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-4c-1-1 0-2 2-2h2a4 4 0 0 0 4-4c0-5-5-8-10-8z M7 9h.01 M11 6h.01 M16 7h.01 M6 14h.01',
+      wellbeing: 'M12 21C4 20 2 15 2 10c5 0 8 3 10 8 M12 21c8-1 10-6 10-11-5 0-8 3-10 8 M12 18C7 13 8 7 12 2c4 5 5 11 0 16z',
+      lifestyle: 'M3 9v6 M6 6v12 M9 9v6 M9 12h6 M15 9v6 M18 6v12 M21 9v6',
+      'education-academics': 'M2 8l10-5 10 5-10 5z M6 10v7c4 3 8 3 12 0v-7 M22 8v9',
+      'family-relationships': 'M8 7a3 3 0 1 0 0 .01 M17 7a3 3 0 1 0 0 .01 M2 21v-3a6 6 0 0 1 12 0v3 M14 13a6 6 0 0 1 8 5v3',
+      languages: 'M3 5h12 M9 2v3 M5 5c0 5 4 8 8 10 M13 5c0 5-4 8-10 10 M13 22l5-13 5 13 M15 18h6',
+      'soft-skills': 'M3 3h15v12H8l-5 4z M18 8h4v14l-5-4h-6v-3',
+    };
+    return paths[slug] ?? 'M3 4h7l2 2 2-2h7v16h-7l-2 2-2-2H3z M12 6v16';
+  }
+
   categoryIcon(slug: string): string {
     const icons: Record<string, string> = {
       'business-professional-skills': 'fa-chart-line',
-      'technology-innovation': 'fa-microchip',
+      'technology-innovation': 'fa-laptop',
       'arts-design-media': 'fa-palette',
-      wellbeing: 'fa-heart-pulse',
-      lifestyle: 'fa-compass',
+      wellbeing: 'fa-spa',
+      lifestyle: 'fa-dumbbell',
       'education-academics': 'fa-graduation-cap',
       'family-relationships': 'fa-people-group',
       languages: 'fa-language',

@@ -36,13 +36,13 @@ describe('Programs category loading', () => {
     }).compileComponents();
   });
 
-  it('renders the section and nine non-interactive placeholders before data arrives', () => {
+  it('renders the section and six non-interactive placeholders before data arrives', () => {
     const fixture = TestBed.createComponent(ProgramsComponent);
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
     expect(el.querySelector('#category-heading')).toBeTruthy();
     expect(el.querySelector('.category-grid')?.getAttribute('aria-busy')).toBe('true');
-    expect(el.querySelectorAll('.category-skeleton')).toHaveLength(9);
+    expect(el.querySelectorAll('.category-skeleton')).toHaveLength(6);
     expect(el.querySelectorAll('button.category-tile')).toHaveLength(0);
   });
 
@@ -52,7 +52,7 @@ describe('Programs category loading', () => {
     response.next(categories);
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
-    expect(el.querySelectorAll('button.category-tile')).toHaveLength(9);
+    expect(el.querySelectorAll('button.category-tile')).toHaveLength(6);
     expect(el.querySelectorAll('.category-skeleton')).toHaveLength(0);
     expect(el.querySelector('.category-grid')?.getAttribute('aria-busy')).toBe('false');
     expect(el.querySelector('img.category-image')?.getAttribute('loading')).toBe('eager');
@@ -70,11 +70,11 @@ describe('Programs category loading', () => {
     response = new Subject<CourseCategory[]>();
     el.querySelector<HTMLButtonElement>('.category-load-error button')!.click();
     fixture.detectChanges();
-    expect(el.querySelectorAll('.category-skeleton')).toHaveLength(9);
+    expect(el.querySelectorAll('.category-skeleton')).toHaveLength(6);
     response.next(categories);
     fixture.detectChanges();
     expect(el.querySelector('.category-load-error')).toBeNull();
-    expect(el.querySelectorAll('button.category-tile')).toHaveLength(9);
+    expect(el.querySelectorAll('button.category-tile')).toHaveLength(6);
   });
 
   it('removes loading placeholders for a successful empty response', () => {
@@ -83,6 +83,21 @@ describe('Programs category loading', () => {
     fixture.detectChanges();
     expect(fixture.componentInstance.isLoadingCategories()).toBe(false);
     expect(fixture.nativeElement.querySelector('.category-section')).toBeNull();
+  });
+
+  it('browses the remaining categories and can show all API records', () => {
+    const fixture = TestBed.createComponent(ProgramsComponent);
+    response.next(categories);
+    const component = fixture.componentInstance;
+    expect(component.displayedCategories()).toHaveLength(6);
+    component.moveCategories(1);
+    expect(component.displayedCategories()[0].id).toBe('category-3');
+    component.moveCategories(-1);
+    expect(component.displayedCategories()[0].id).toBe('category-0');
+    component.expandCategories();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('button.category-tile')).toHaveLength(9);
+    expect(fixture.nativeElement.querySelector('.category-grid.is-expanded')).toBeTruthy();
   });
 
   it('unsubscribes from category requests when leaving the page', () => {
