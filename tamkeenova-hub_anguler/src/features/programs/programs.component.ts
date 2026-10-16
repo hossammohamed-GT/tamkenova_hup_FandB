@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -39,6 +39,8 @@ const CATEGORY_RECTANGLE_CLIP_PATH =
   styleUrl: './programs.component.css',
 })
 export class ProgramsComponent {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
   private readonly catalogService = inject(CourseCatalogService);
   private readonly trainersService = inject(TrainersService);
@@ -121,7 +123,19 @@ export class ProgramsComponent {
 
   constructor() {
     this.loadLandingContent();
-    this.loadCourses(true);
+    let initialized = false;
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
+      const category = params.get('category')?.trim() || '';
+      if (initialized && category === this.selectedCategory()) return;
+      initialized = true;
+      this.searchInput = '';
+      this.selectedCategory.set(category);
+      this.selectedLevel.set('');
+      this.selectedType.set('');
+      this.selectedLanguage.set('');
+      this.selectedSort.set('newest');
+      this.loadCourses(true);
+    });
   }
 
   retry(): void {
@@ -399,7 +413,15 @@ export class ProgramsComponent {
     this.isCategoryImageAnimating.set(false);
   }
 
+  private syncCategoryQuery(category: string): void {
+    void this.router.navigate([], {
+      relativeTo: this.route, queryParams: { category: category || null },
+      queryParamsHandling: 'merge', replaceUrl: true,
+    });
+  }
+
   private activateCategory(slug: string): void {
+    this.syncCategoryQuery(slug);
     this.searchInput = '';
     this.selectedCategory.set(slug);
     this.selectedLevel.set('');
@@ -410,6 +432,7 @@ export class ProgramsComponent {
   }
 
   private resetCatalogFilters(): void {
+    this.syncCategoryQuery('');
     this.searchInput = '';
     this.selectedCategory.set('');
     this.selectedLevel.set('');

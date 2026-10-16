@@ -1141,3 +1141,22 @@ html[dir='rtl'] .mobile-link-icon {
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
+
+/* The Programs panel is anchored to the header, not to a narrow nav item. */
+.programs-entry { display: flex; align-items: center; align-self: stretch; }
+.programs-trigger { cursor: pointer; font-family: inherit; }
+.programs-trigger svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; transition: transform 180ms ease; }
+.programs-trigger[aria-expanded='true'] svg { transform: rotate(180deg); }
+.programs-trigger:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 5px; border-radius: 3px; }
+.programs-mega-shell { position: absolute; top: 100%; inset-inline: 0; padding-top: 12px; z-index: 110; }
+.programs-mega-shell::before { content: ''; position: absolute; top: 3px; left: var(--programs-anchor, 31%); width: 19px; height: 19px; background: var(--color-surface); border-top: 1px solid var(--color-border); border-inline-start: 1px solid var(--color-border); transform: translateX(-50%) rotate(45deg); z-index: 1; }
+.programs-mobile-close { display: none; }
+.mobile-programs-link { width: 100%; background: transparent; border: 0; font: inherit; text-align: start; cursor: pointer; }
+@media (max-width: 1040px) {
+  .programs-mega-shell { padding-top: 42px; background: var(--color-surface); box-shadow: 0 20px 40px #001c3326; }
+  .programs-mega-shell::before { display: none; }
+  .programs-mobile-close { display: block; position: absolute; inset-inline-end: 16px; top: 3px; width: 34px; height: 34px; border: 1px solid var(--color-border); border-radius: 50%; background: var(--color-surface); color: var(--color-text); font-size: 24px; cursor: pointer; }
+}
+@media (prefers-reduced-motion: reduce) { .programs-trigger svg { transition: none; } }
+
+.nav-control-icon { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }

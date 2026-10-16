@@ -15,6 +15,16 @@
 
     <nav class="navbar-links" [attr.aria-label]="'nav.primary_navigation' | translate">
       @for (link of navLinks; track link.route) {
+      @if (link.route === '/programs') {
+        <div class="programs-entry" (mouseenter)="openProgramsMenu()" (mouseleave)="scheduleProgramsClose()">
+          <button type="button" id="programs-menu-trigger" class="navbar-link programs-trigger"
+            [class.is-active]="isProgramsMenuOpen() || isProgramsRoute()" [attr.aria-expanded]="isProgramsMenuOpen()"
+            aria-controls="programs-mega-panel" (click)="openProgramsMenu()" (keydown.arrowdown)="focusProgramsMenu($event)">
+            {{ link.labelKey | translate }}
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
+          </button>
+        </div>
+      } @else {
       <a
         [routerLink]="link.route"
         routerLinkActive="is-active"
@@ -24,19 +34,23 @@
         {{ link.labelKey | translate }}
       </a>
       }
+      }
     </nav>
 
     <div class="navbar-actions">
 
       <button type="button" class="control-btn desktop-only" (click)="toggleLanguage()"
         [attr.aria-label]="'nav.toggle_lang' | translate">
-        <i class="fa-solid fa-globe"></i>
+        <svg class="nav-control-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c-5 5-5 13 0 18 5-5 5-13 0-18Z"/></svg>
         <span class="control-btn-label">{{ isArabic() ? 'EN' : 'AR' }}</span>
       </button>
 
       <button type="button" class="control-btn control-btn-icon desktop-only" (click)="toggleTheme()"
         [attr.aria-label]="'nav.toggle_theme' | translate">
-        <i class="fa-solid" [class.fa-moon]="!isDark()" [class.fa-sun]="isDark()"></i>
+        <svg class="nav-control-icon" viewBox="0 0 24 24" aria-hidden="true">
+          @if (isDark()) { <circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2"/> }
+          @else { <path d="M20 15a9 9 0 0 1-11-11 9 9 0 1 0 11 11Z"/> }
+        </svg>
       </button>
 
       @if (!isLoggedIn()) {
@@ -160,14 +174,24 @@
 
       <button type="button" class="menu-toggle" (click)="toggleMobileMenu()"
         [attr.aria-label]="'nav.toggle_menu' | translate" [attr.aria-expanded]="isMobileMenuOpen()">
-        <i class="fa-solid" [class.fa-bars]="!isMobileMenuOpen()" [class.fa-xmark]="isMobileMenuOpen()"></i>
+        <svg class="nav-control-icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="isMobileMenuOpen() ? 'm6 6 12 12M6 18 18 6' : 'M4 6h16M4 12h16M4 18h16'"/></svg>
       </button>
     </div>
   </div>
 
+  @if (isProgramsMenuOpen()) {
+    <div class="programs-mega-shell" [style.--programs-anchor]="programsAnchor() + 'px'" (mouseenter)="cancelProgramsClose()" (mouseleave)="scheduleProgramsClose()">
+      <button class="programs-mobile-close" type="button" (click)="onEscape()" [attr.aria-label]="'nav.mega.close' | translate">×</button>
+      <app-programs-mega-menu (closed)="closeProgramsMenu()" />
+    </div>
+  }
+
   <div class="mobile-panel chamfer-lg" [class.is-open]="isMobileMenuOpen()">
     <nav class="mobile-links" [attr.aria-label]="'nav.mobile_navigation' | translate">
       @for (link of navLinks; track link.route) {
+      @if (link.route === '/programs') {
+        <button class="mobile-link mobile-programs-link programs-entry" type="button" (click)="openMobilePrograms()">{{ link.labelKey | translate }} <span aria-hidden="true">→</span></button>
+      } @else {
       <a
         [routerLink]="link.route"
         routerLinkActive="is-active"
@@ -178,6 +202,7 @@
         {{ link.labelKey | translate }}
         <i class="fa-solid fa-arrow-left mobile-link-icon rtl-flip"></i>
       </a>
+      }
       }
     </nav>
 

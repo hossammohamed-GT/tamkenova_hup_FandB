@@ -1,0 +1,218 @@
+[
+  {
+    "category": "business-professional-skills",
+    "position": 1,
+    "title_en": "Strategic Planning for Modern Business",
+    "title_ar": "التخطيط الاستراتيجي للأعمال الحديثة",
+    "cover": "/assets/demo-courses/business-professional-skills-1.jpg",
+    "duration_minutes": 90
+  },
+  {
+    "category": "business-professional-skills",
+    "position": 2,
+    "title_en": "Project Management Fundamentals",
+    "title_ar": "أساسيات إدارة المشروعات",
+    "cover": "/assets/demo-courses/business-professional-skills-2.jpg",
+    "duration_minutes": 120
+  },
+  {
+    "category": "business-professional-skills",
+    "position": 3,
+    "title_en": "Leadership and Team Management",
+    "title_ar": "القيادة وإدارة فرق العمل",
+    "cover": "/assets/demo-courses/business-professional-skills-3.jpg",
+    "duration_minutes": 150
+  },
+  {
+    "category": "technology-innovation",
+    "position": 1,
+    "title_en": "Python for Everyday Problem Solving",
+    "title_ar": "بايثون لحل المشكلات اليومية",
+    "cover": "/assets/demo-courses/technology-innovation-1.jpg",
+    "duration_minutes": 90
+  },
+  {
+    "category": "technology-innovation",
+    "position": 2,
+    "title_en": "Artificial Intelligence Essentials",
+    "title_ar": "أساسيات الذكاء الاصطناعي",
+    "cover": "/assets/demo-courses/technology-innovation-2.jpg",
+    "duration_minutes": 120
+  },
+  {
+    "category": "technology-innovation",
+    "position": 3,
+    "title_en": "Build Your First Website",
+    "title_ar": "أنشئ موقعك الإلكتروني الأول",
+    "cover": "/assets/demo-courses/technology-innovation-3.jpg",
+    "duration_minutes": 150
+  },
+  {
+    "category": "arts-design-media",
+    "position": 1,
+    "title_en": "Visual Design Fundamentals",
+    "title_ar": "أساسيات التصميم البصري",
+    "cover": "/assets/demo-courses/arts-design-media-1.jpg",
+    "duration_minutes": 90
+  },
+  {
+    "category": "arts-design-media",
+    "position": 2,
+    "title_en": "Digital Photography Workshop",
+    "title_ar": "ورشة التصوير الفوتوغرافي الرقمي",
+    "cover": "/assets/demo-courses/arts-design-media-2.jpg",
+    "duration_minutes": 120
+  },
+  {
+    "category": "arts-design-media",
+    "position": 3,
+    "title_en": "Tell Your Story with Video",
+    "title_ar": "احكِ قصتك بالفيديو",
+    "cover": "/assets/demo-courses/arts-design-media-3.jpg",
+    "duration_minutes": 150
+  },
+  {
+    "category": "wellbeing",
+    "position": 1,
+    "title_en": "Mindfulness for a Balanced Life",
+    "title_ar": "اليقظة الذهنية لحياة متوازنة",
+    "cover": "/assets/demo-courses/wellbeing-1.jpg",
+    "duration_minutes": 90
+  },
+  {
+    "category": "wellbeing",
+    "position": 2,
+    "title_en": "Understanding Emotional Wellbeing",
+    "title_ar": "فهم الصحة النفسية",
+    "cover": "/assets/demo-courses/wellbeing-2.jpg",
+    "duration_minutes": 120
+  },
+  {
+    "category": "wellbeing",
+    "position": 3,
+    "title_en": "Healthy Habits That Last",
+    "title_ar": "عادات صحية تدوم",
+    "cover": "/assets/demo-courses/wellbeing-3.jpg",
+    "duration_minutes": 150
+  },
+  {
+    "category": "lifestyle",
+    "position": 1,
+    "title_en": "Personal Finance Essentials",
+    "title_ar": "أساسيات إدارة أموالك الشخصية",
+    "cover": "/assets/demo-courses/lifestyle-1.jpg",
+    "duration_minutes": 90
+  },
+  {
+    "category": "lifestyle",
+    "position": 2,
+    "title_en": "Fitness for Everyday Life",
+    "title_ar": "اللياقة للحياة اليومية",
+    "cover": "/assets/demo-courses/lifestyle-2.jpg",
+    "duration_minutes": 120
+  },
+  {
+    "category": "lifestyle",
+    "position": 3,
+    "title_en": "Cooking with Confidence",
+    "title_ar": "الطهي بثقة",
+    "cover": "/assets/demo-courses/lifestyle-3.jpg",
+    "duration_minutes": 150
+  },
+  {
+    "category": "education-academics",
+    "position": 1,
+    "title_en": "Learning How to Learn",
+    "title_ar": "تعلّم كيف تتعلّم",
+    "cover": "/assets/demo-courses/education-academics-1.jpg",
+    "duration_minutes": 90
+  },
+  {
+    "category": "education-academics",
+    "position": 2,
+    "title_en": "Research and Critical Inquiry",
+    "title_ar": "البحث والاستقصاء النقدي",
+    "cover": "/assets/demo-courses/education-academics-2.jpg",
+    "duration_minutes": 120
+  },
+  {
+    "category": "education-academics",
+    "position": 3,
+    "title_en": "Teaching in a Digital World",
+    "title_ar": "التدريس في عالم رقمي",
+    "cover": "/assets/demo-courses/education-academics-3.jpg",
+    "duration_minutes": 150
+  },
+  {
+    "category": "family-relationships",
+    "position": 1,
+    "title_en": "Positive Parenting Foundations",
+    "title_ar": "أسس التربية الإيجابية",
+    "cover": "/assets/demo-courses/family-relationships-1.jpg",
+    "duration_minutes": 90
+  },
+  {
+    "category": "family-relationships",
+    "position": 2,
+    "title_en": "Communication in Relationships",
+    "title_ar": "التواصل في العلاقات",
+    "cover": "/assets/demo-courses/family-relationships-2.jpg",
+    "duration_minutes": 120
+  },
+  {
+    "category": "family-relationships",
+    "position": 3,
+    "title_en": "Building Stronger Family Bonds",
+    "title_ar": "بناء روابط أسرية أقوى",
+    "cover": "/assets/demo-courses/family-relationships-3.jpg",
+    "duration_minutes": 150
+  },
+  {
+    "category": "languages",
+    "position": 1,
+    "title_en": "English for the Workplace",
+    "title_ar": "الإنجليزية في بيئة العمل",
+    "cover": "/assets/demo-courses/languages-1.jpg",
+    "duration_minutes": 90
+  },
+  {
+    "category": "languages",
+    "position": 2,
+    "title_en": "Everyday Arabic Conversation",
+    "title_ar": "المحادثة العربية اليومية",
+    "cover": "/assets/demo-courses/languages-2.jpg",
+    "duration_minutes": 120
+  },
+  {
+    "category": "languages",
+    "position": 3,
+    "title_en": "French for Beginners",
+    "title_ar": "الفرنسية للمبتدئين",
+    "cover": "/assets/demo-courses/languages-3.jpg",
+    "duration_minutes": 150
+  },
+  {
+    "category": "soft-skills",
+    "position": 1,
+    "title_en": "Confident Public Speaking",
+    "title_ar": "التحدث أمام الجمهور بثقة",
+    "cover": "/assets/demo-courses/soft-skills-1.jpg",
+    "duration_minutes": 90
+  },
+  {
+    "category": "soft-skills",
+    "position": 2,
+    "title_en": "Time Management and Productivity",
+    "title_ar": "إدارة الوقت والإنتاجية",
+    "cover": "/assets/demo-courses/soft-skills-2.jpg",
+    "duration_minutes": 120
+  },
+  {
+    "category": "soft-skills",
+    "position": 3,
+    "title_en": "Negotiation and Collaboration",
+    "title_ar": "التفاوض والتعاون",
+    "cover": "/assets/demo-courses/soft-skills-3.jpg",
+    "duration_minutes": 150
+  }
+]

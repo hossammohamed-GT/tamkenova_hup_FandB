@@ -1,0 +1,81 @@
+<div class="programs-mega" id="programs-mega-panel" [attr.aria-label]="'nav.mega.browse' | translate">
+  <aside class="mega-rail">
+    <h2>{{ 'nav.mega.browse' | translate }}</h2>
+    <div class="mega-category-list" [attr.aria-busy]="loadingCategories()">
+      @if (loadingCategories()) {
+        @for (item of [1,2,3,4,5,6]; track item) { <span class="mega-category-skeleton"></span> }
+      } @else if (categoriesError()) {
+        <p class="mega-state">{{ 'nav.mega.error' | translate }}</p>
+        <button class="mega-retry" type="button" (click)="loadCategories()">{{ 'programs.catalog.try_again' | translate }}</button>
+      } @else if (!categories().length) {
+        <p class="mega-state">{{ 'nav.mega.no_categories' | translate }}</p>
+      }
+      @for (category of categories(); track category.id) {
+        <button class="mega-category" type="button" [class.is-selected]="selected()?.id === category.id"
+          [attr.aria-pressed]="selected()?.id === category.id" (mouseenter)="selectCategory(category)"
+          (focus)="selectCategory(category)" (click)="selectCategory(category)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(category.slug)"/></svg>
+          <span>{{ categoryName(category) }}</span>
+          <svg class="mega-direction" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+        </button>
+      }
+    </div>
+    <a class="mega-browse-all" routerLink="/programs" (click)="closed.emit()">{{ 'nav.mega.browse_all' | translate }} <span aria-hidden="true">→</span></a>
+  </aside>
+
+  <section class="mega-main" [attr.aria-label]="'nav.mega.courses' | translate">
+    @if (selected(); as category) {
+      <div class="mega-heading">
+        <span class="mega-heading-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(category.slug)"/></svg></span>
+        <div><h2>{{ categoryName(category) }}</h2><p>{{ (english() ? category.description_en : category.description_ar) || ('nav.mega.subtitle' | translate) }}</p></div>
+        <a routerLink="/programs" [queryParams]="{category: category.slug}" (click)="closed.emit()">{{ 'nav.mega.view_all' | translate }} <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="mega-tabs" role="group" [attr.aria-label]="'programs.catalog.sort_by' | translate">
+        @for (tab of sorts; track tab.value) {
+          <button type="button" [class.is-active]="sort() === tab.value" [attr.aria-pressed]="sort() === tab.value" (click)="selectSort(tab.value)">{{ 'nav.mega.' + tab.key | translate }}</button>
+        }
+      </div>
+      <div class="mega-courses" [attr.aria-busy]="loadingCourses()" aria-live="polite">
+        @if (loadingCourses()) {
+          <span class="mega-sr-only" role="status">{{ 'programs.catalog.loading' | translate }}</span>
+          @for (item of [1,2,3]; track item) { <div class="mega-course-skeleton"><span></span><div></div></div> }
+        } @else if (coursesError()) {
+          <div class="mega-state"><p>{{ 'nav.mega.error' | translate }}</p><button type="button" class="mega-retry" (click)="loadCourses()">{{ 'programs.catalog.try_again' | translate }}</button></div>
+        } @else if (!courses().length) {
+          <div class="mega-state"><p>{{ 'nav.mega.empty' | translate }}</p><a routerLink="/programs" [queryParams]="{category: category.slug}" (click)="closed.emit()">{{ 'nav.mega.view_all' | translate }} →</a></div>
+        }
+        @for (course of courses(); track course.id) {
+          <a class="mega-course" [routerLink]="['/programs/course', course.slug]" (click)="closed.emit()">
+            <span class="mega-cover"><img [src]="course.cover_image_url || categoryImage()" alt="" loading="eager"/></span>
+            <span class="mega-course-info"><strong>{{ courseTitle(course) }}</strong>
+              @if (instructor(course)) { <span class="mega-instructor">{{ instructor(course) }}</span> }
+              <span class="mega-meta">
+                @if (rating(course) > 0 && course.ratings_count > 0) { <span class="mega-rating">★ {{ rating(course).toFixed(1) }}</span><span>·</span> }
+                @if (course.duration_minutes) { <span>{{ duration(course) }} {{ 'nav.mega.hours' | translate }}</span> }
+                @if (course.is_free) { <span class="mega-free">{{ 'programs.catalog.free' | translate }}</span> }
+              </span>
+            </span>
+            <svg class="mega-course-arrow mega-direction" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
+          </a>
+        }
+      </div>
+    } @else { <div class="mega-state">{{ 'nav.mega.welcome' | translate }}</div> }
+  </section>
+
+  <aside class="mega-feature">
+    <div class="mega-feature-lines" aria-hidden="true"></div>
+    <div class="mega-feature-copy">
+      <span class="mega-eyebrow">{{ selected() ? categoryName(selected()!) : ('nav.programs' | translate) }}</span>
+      <h2>{{ 'nav.mega.build' | translate }} <em>{{ 'nav.mega.future' | translate }}</em></h2>
+      <span class="mega-gold-rule" aria-hidden="true"></span>
+      <p>{{ 'nav.mega.feature_text' | translate }}</p>
+      <ul>
+        @for (benefit of ['growth', 'practical', 'flexible']; track benefit) {
+          <li><span class="mega-benefit-icon" aria-hidden="true">✦</span>{{ 'nav.mega.' + benefit | translate }}</li>
+        }
+      </ul>
+      <a routerLink="/programs" [queryParams]="selected() ? {category: selected()!.slug} : {}" (click)="closed.emit()">{{ 'nav.mega.explore' | translate }} <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="mega-feature-photo" aria-hidden="true"><img [src]="categoryImage()" alt=""/><span></span></div>
+  </aside>
+</div>

@@ -1,5 +1,28 @@
 {
   "nav": {
+    "mega": {
+      "browse": "Browse Categories",
+      "browse_all": "Browse All Courses",
+      "courses": "Courses in this category",
+      "subtitle": "Develop practical skills for your next step.",
+      "view_all": "View all",
+      "popular": "Popular Courses",
+      "new": "New Courses",
+      "rated": "Top Rated",
+      "hours": "hours",
+      "build": "Build Your",
+      "future": "Professional Future",
+      "feature_text": "Practical courses and fresh perspectives. Discover your next skill and create new opportunities.",
+      "growth": "Career Growth",
+      "practical": "Practical Learning",
+      "flexible": "Learn at Your Own Pace",
+      "explore": "Explore All Courses",
+      "empty": "New courses in this field are on their way. Explore all available programs.",
+      "error": "We could not load this content. Please try again.",
+      "no_categories": "No categories are available yet.",
+      "welcome": "Find your next skill. Choose a field to explore.",
+      "close": "Close Programs menu"
+},
     "tagline": "Empowerment & Training Platform",
     "home": "Home",
     "programs": "Programs",

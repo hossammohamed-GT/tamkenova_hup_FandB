@@ -1,5 +1,5 @@
-import { Component, HostListener, inject, signal, computed, ElementRef, effect } from '@angular/core';
-import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { Component, DestroyRef, HostListener, inject, signal, computed, ElementRef, effect } from '@angular/core';
+import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ThemeService } from '../../../core/services/theme.service.js';
@@ -15,6 +15,9 @@ import {
   notificationTypeKey,
   isKnownNotificationType,
 } from '../../../core/utils/notification-presentation';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter } from 'rxjs';
+import { ProgramsMegaMenuComponent } from '../programs-mega-menu/programs-mega-menu.component';
 import { TranslateService } from '@ngx-translate/core';
 
 interface NavLink {
@@ -25,7 +28,7 @@ interface NavLink {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, TranslatePipe],
+  imports: [CommonModule, RouterLink, RouterLinkActive, TranslatePipe, ProgramsMegaMenuComponent],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
@@ -39,6 +42,12 @@ export class NavbarComponent {
   private corporateService = inject(CorporateRequestService);
   private adminService = inject(AdminService);
   private translateService = inject(TranslateService);
+
+  readonly isProgramsMenuOpen = signal(false);
+  readonly isProgramsRoute = signal(false);
+  readonly programsAnchor = signal(0);
+  private readonly destroyRef = inject(DestroyRef);
+  private programsCloseTimer: ReturnType<typeof setTimeout> | null = null;
 
   isScrolled = signal(false);
   isMobileMenuOpen = signal(false);
@@ -61,6 +70,12 @@ export class NavbarComponent {
   unreadCount = this.notificationsService.unreadCount;
 
   constructor() {
+    this.router.events.pipe(filter(event => event instanceof NavigationEnd), takeUntilDestroyed(this.destroyRef))
+      .subscribe(event => {
+        this.isProgramsRoute.set(event.urlAfterRedirects.split('?')[0].startsWith('/programs'));
+        this.closeProgramsMenu();
+      });
+    this.destroyRef.onDestroy(() => this.cancelProgramsClose());
     effect(() => {
       if (this.isLoggedIn()) {
         this.notificationsService.refreshUnreadCount();
@@ -119,6 +134,48 @@ export class NavbarComponent {
     { labelKey: 'nav.gallery', route: '/gallery' },
   ];
 
+  openProgramsMenu(): void {
+    this.cancelProgramsClose();
+    const trigger = this.elementRef.nativeElement.querySelector('#programs-menu-trigger')?.getBoundingClientRect();
+    if (trigger?.width) this.programsAnchor.set(trigger.left + trigger.width / 2);
+    this.isProgramsMenuOpen.set(true);
+    this.isUserMenuOpen.set(false);
+    this.isNotifDropdownOpen.set(false);
+  }
+
+  openMobilePrograms(): void {
+    this.closeMobileMenu();
+    this.openProgramsMenu();
+  }
+
+  focusProgramsMenu(event: Event): void {
+    event.preventDefault();
+    this.openProgramsMenu();
+    requestAnimationFrame(() => this.elementRef.nativeElement.querySelector('.mega-category, .mega-browse-all')?.focus());
+  }
+
+  cancelProgramsClose(): void {
+    if (this.programsCloseTimer) clearTimeout(this.programsCloseTimer);
+    this.programsCloseTimer = null;
+  }
+
+  scheduleProgramsClose(): void {
+    this.cancelProgramsClose();
+    this.programsCloseTimer = setTimeout(() => {
+      if (!document.activeElement?.closest('.programs-entry, .programs-mega-shell')) this.closeProgramsMenu();
+    }, 220);
+  }
+
+  closeProgramsMenu(): void {
+    this.cancelProgramsClose();
+    this.isProgramsMenuOpen.set(false);
+  }
+
+  @HostListener('document:focusin', ['$event'])
+  onProgramsFocusChange(event: FocusEvent): void {
+    if (this.isProgramsMenuOpen() && !(event.target as Element)?.closest('.programs-entry, .programs-mega-shell')) this.closeProgramsMenu();
+  }
+
   @HostListener('window:scroll')
   onWindowScroll(): void {
     if (typeof window === 'undefined') return;
@@ -136,6 +193,7 @@ export class NavbarComponent {
       }
       return;
     }
+    if (!target.closest('.programs-entry, .programs-mega-shell')) this.closeProgramsMenu();
     const clickedInside = this.elementRef.nativeElement.contains(target);
     const isNotifArea = target.closest('.notif-dropdown-wrapper') || target.closest('.notif-glass-dropdown') || target.closest('.notif-detail-modal');
     if (!clickedInside && !isNotifArea) {
@@ -154,6 +212,10 @@ export class NavbarComponent {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
+    if (this.isProgramsMenuOpen()) {
+      this.closeProgramsMenu();
+      this.elementRef.nativeElement.querySelector(window.innerWidth > 1040 ? '#programs-menu-trigger' : '.menu-toggle')?.focus();
+    }
     this.isUserMenuOpen.set(false);
     this.isNotifDropdownOpen.set(false);
     this.showNotifDetailModal.set(false);
@@ -367,6 +429,7 @@ export class NavbarComponent {
   }
 
   toggleMobileMenu(): void {
+    this.closeProgramsMenu();
     this.isMobileMenuOpen.update((v) => !v);
     if (typeof document !== 'undefined') {
       document.body.style.overflow = this.isMobileMenuOpen() ? 'hidden' : '';
