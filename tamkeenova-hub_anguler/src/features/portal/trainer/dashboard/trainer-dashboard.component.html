@@ -108,7 +108,7 @@
       <h2 class="section-title">{{ 'trainer_dashboard.quick_actions' | translate }}</h2>
       <div class="quick-actions-grid">
         @for (action of quickActions; track action.route) {
-        <a [routerLink]="action.route" class="quick-action-card surface chamfer-sm stable-action">
+        <a [routerLink]="action.route" [queryParams]="action.queryParams || {}" class="quick-action-card surface chamfer-sm stable-action">
           <div class="quick-action-icon">
             <i class="fa-solid" [class]="action.icon"></i>
           </div>
@@ -138,15 +138,8 @@
           </div>
         </a>
 
-        <a routerLink="/portal/trainer/courses" class="section-card surface chamfer-sm"
-          ><div class="section-card-icon">
-            <i class="fa-solid fa-circle-play" aria-hidden="true"></i>
-          </div>
-          <h3>{{ 'course_workflow.studio' | translate }}</h3>
-          <p>{{ 'course_workflow.dashboard_hint' | translate }}</p></a
-        >
         <a
-          routerLink="/portal/trainer/programs"
+          routerLink="/portal/trainer/courses"
           class="section-card surface chamfer-sm stable-card"
         >
           <div class="section-card-header">

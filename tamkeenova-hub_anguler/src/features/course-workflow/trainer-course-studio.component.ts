@@ -1,7 +1,7 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -31,6 +31,9 @@ export class TrainerCourseStudioComponent {
   courses = signal<WorkflowCourse[]>([]);
   completions = signal<WorkflowEnrollment[]>([]);
   categories = signal<CourseCategory[]>([]);
+  categoriesLoading = signal(true);
+  selectedCategoryId = '';
+  private readonly route = inject(ActivatedRoute);
   loading = signal(true);
   busy = signal(false);
   error = signal('');
@@ -43,14 +46,60 @@ export class TrainerCourseStudioComponent {
   signatures: Record<string, string> = {};
   constructor() {
     this.load();
+    this.loadCategories();
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroy)).subscribe((params) => {
+      if (params.get('new') === '1' && !this.editor()) this.create();
+    });
+  }
+  loadCategories() {
+    this.error.set('');
+    this.categoriesLoading.set(true);
     this.catalog
       .getCategories()
       .pipe(takeUntilDestroyed(this.destroy))
       .subscribe({
-        next: (rows) => this.categories.set(rows.flatMap((c) => [c, ...(c.children || [])])),
-        error: (e) => this.error.set(workflowError(e)),
+        next: (rows) => {
+          this.categories.set(rows);
+          this.categoriesLoading.set(false);
+          this.syncCategory();
+        },
+        error: (e) => {
+          this.categoriesLoading.set(false);
+          this.error.set(workflowError(e));
+        },
       });
   }
+  childCategories() {
+    return this.categories().find((c) => c.id === this.selectedCategoryId)?.children || [];
+  }
+  selectCategory(id: string) {
+    this.selectedCategoryId = id;
+    this.draft.category_id = id;
+  }
+  syncCategory() {
+    this.selectedCategoryId =
+      this.categories().find(
+        (c) =>
+          c.id === this.draft.category_id ||
+          c.children?.some((child) => child.id === this.draft.category_id),
+      )?.id || '';
+  }
+  private readonly rowKeys = new WeakMap<object, string>();
+  private nextRowKey = 0;
+  rowKey(row: object): string {
+    let key = this.rowKeys.get(row);
+    if (!key) {
+      key = String(++this.nextRowKey);
+      this.rowKeys.set(row, key);
+    }
+    return key;
+  }
+  move<T>(rows: T[], index: number, offset: number) {
+    const target = index + offset;
+    if (target < 0 || target >= rows.length) return;
+    [rows[index], rows[target]] = [rows[target], rows[index]];
+  }
+
   statusLabel(value: string) {
     return workflowStatus(value, this.t('ar', 'en') === 'en');
   }
@@ -72,6 +121,9 @@ export class TrainerCourseStudioComponent {
       price: 0,
       language: 'ar',
       level: 'BEGINNER',
+      short_description_ar: '',
+      short_description_en: '',
+      content_type: 'VIDEO',
       sections: [],
     };
   }
@@ -108,6 +160,18 @@ export class TrainerCourseStudioComponent {
       });
   }
   create() {
+    if (
+      this.editor() &&
+      !window.confirm(
+        this.t(
+          'فتح نموذج جديد وإهمال التغييرات غير المحفوظة؟',
+          'Discard unsaved changes and open a new course?',
+        ),
+      )
+    )
+      return;
+    this.selectedCategoryId = '';
+    this.preview.set('');
     this.editingId = undefined;
     this.draft = this.empty();
     this.draft.sections.push(this.chapter());
@@ -125,6 +189,9 @@ export class TrainerCourseStudioComponent {
           this.editingId = row.id;
           this.draft = {
             ...this.empty(),
+            short_description_ar: row.short_description_ar || '',
+            short_description_en: row.short_description_en || '',
+            content_type: row.content_type || 'VIDEO',
             title_ar: row.title_ar,
             title_en: row.title_en,
             description_ar: row.description_ar || '',
@@ -139,6 +206,8 @@ export class TrainerCourseStudioComponent {
               title_ar: s.title_ar,
               title_en: s.title_en,
               lessons: s.lessons.map((l) => ({
+                description_ar: l.description_ar || '',
+                description_en: l.description_en || '',
                 title_ar: l.title_ar,
                 title_en: l.title_en,
                 media_url: l.media_url,
@@ -147,6 +216,7 @@ export class TrainerCourseStudioComponent {
               })),
             })),
           };
+          this.syncCategory();
           this.editor.set(true);
           this.busy.set(false);
         },
@@ -156,7 +226,7 @@ export class TrainerCourseStudioComponent {
         },
       });
   }
-  save() {
+  save(submitAfterSave = false) {
     if (this.busy()) return;
     this.busy.set(true);
     this.error.set('');
@@ -166,6 +236,30 @@ export class TrainerCourseStudioComponent {
       .subscribe({
         next: (row) => {
           this.editingId = row.id;
+          if (submitAfterSave) {
+            this.api
+              .submit(row.id)
+              .pipe(takeUntilDestroyed(this.destroy))
+              .subscribe({
+                next: () => {
+                  this.editor.set(false);
+                  this.busy.set(false);
+                  this.success.set(
+                    this.t(
+                      'تم الحفظ والإرسال للمراجعة وإشعار الأدمن.',
+                      'Saved and submitted for admin review.',
+                    ),
+                  );
+                  this.load();
+                },
+                error: (e) => {
+                  this.busy.set(false);
+                  this.error.set(workflowError(e));
+                  this.load();
+                },
+              });
+            return;
+          }
           this.editor.set(false);
           this.busy.set(false);
           this.success.set(

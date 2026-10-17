@@ -122,49 +122,56 @@ export class CourseWorkflowController {
   ) {
     return this.workflow.saveSettings(u.sub, dto);
   }
-  @Get('checkout/:id') @Header('Cache-Control', 'private, no-store') checkout(
-    @CurrentUser() u: User,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  @Get('checkout/:id')
+  @Roles('STUDENT', 'CLIENT', 'ADMIN', 'SUPER_ADMIN', 'EMPLOYEE', 'VOLUNTEER')
+  @Header('Cache-Control', 'private, no-store')
+  checkout(@CurrentUser() u: User, @Param('id', ParseUUIDPipe) id: string) {
     return this.workflow.checkout(u.sub, id);
   }
-  @Post('checkout/:id/report') report(
+  @Post('checkout/:id/report')
+  @Roles('STUDENT', 'CLIENT', 'ADMIN', 'SUPER_ADMIN', 'EMPLOYEE', 'VOLUNTEER')
+  report(
     @CurrentUser() u: User,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: TransferReportDto,
   ) {
     return this.workflow.reportTransfer(u.sub, id, dto);
   }
-  @Post('enroll/:id/free') enrollFree(
-    @CurrentUser() u: User,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  @Post('enroll/:id/free')
+  @Roles('STUDENT', 'CLIENT', 'ADMIN', 'SUPER_ADMIN', 'EMPLOYEE', 'VOLUNTEER')
+  enrollFree(@CurrentUser() u: User, @Param('id', ParseUUIDPipe) id: string) {
     return this.workflow.enrollFree(u.sub, id);
   }
   @Get('library/payments')
+  @Roles('STUDENT', 'CLIENT', 'ADMIN', 'SUPER_ADMIN', 'EMPLOYEE', 'VOLUNTEER')
   @Header('Cache-Control', 'private, no-store')
   myPayments(@CurrentUser() u: User) {
     return this.workflow.myPayments(u.sub);
   }
-  @Get('library') @Header('Cache-Control', 'private, no-store') library(
-    @CurrentUser() u: User,
-  ) {
+  @Get('library')
+  @Roles('STUDENT', 'CLIENT', 'ADMIN', 'SUPER_ADMIN', 'EMPLOYEE', 'VOLUNTEER')
+  @Header('Cache-Control', 'private, no-store')
+  library(@CurrentUser() u: User) {
     return this.workflow.library(u.sub);
   }
-  @Get('learning/:id') @Header('Cache-Control', 'private, no-store') learning(
-    @CurrentUser() u: User,
-    @Param('id', ParseUUIDPipe) id: string,
-  ) {
+  @Get('learning/:id')
+  @Roles('STUDENT', 'CLIENT', 'ADMIN', 'SUPER_ADMIN', 'EMPLOYEE', 'VOLUNTEER')
+  @Header('Cache-Control', 'private, no-store')
+  learning(@CurrentUser() u: User, @Param('id', ParseUUIDPipe) id: string) {
     return this.workflow.learning(u.sub, id);
   }
-  @Post('learning/:id/lessons/:lessonId/done') mark(
+  @Post('learning/:id/lessons/:lessonId/done')
+  @Roles('STUDENT', 'CLIENT', 'ADMIN', 'SUPER_ADMIN', 'EMPLOYEE', 'VOLUNTEER')
+  mark(
     @CurrentUser() u: User,
     @Param('id', ParseUUIDPipe) id: string,
     @Param('lessonId', ParseUUIDPipe) lesson: string,
   ) {
     return this.workflow.markLesson(u.sub, id, lesson);
   }
-  @Post('learning/:id/completion') requestCompletion(
+  @Post('learning/:id/completion')
+  @Roles('STUDENT', 'CLIENT', 'ADMIN', 'SUPER_ADMIN', 'EMPLOYEE', 'VOLUNTEER')
+  requestCompletion(
     @CurrentUser() u: User,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: CompletionRequestDto,

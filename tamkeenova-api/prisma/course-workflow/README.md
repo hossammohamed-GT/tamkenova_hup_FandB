@@ -1,8 +1,8 @@
 # Recorded-course approval, manual checkout and certification
 
 This workflow operates on `courses` / `course_enrollments`, **not** the legacy
-`training_programs` / `student_enrollments`. Existing programs, demo courses,
-YouTube links and certificates are not reset, republished or re-priced.
+`training_programs` / `student_enrollments`. Real programs, YouTube links and certificates are not reset, republished or re-priced.
+Temporary catalog demos are now retired; see the cleanup section below.
 
 ## Deployment (Node 24, existing application database)
 
@@ -17,6 +17,8 @@ YouTube links and certificates are not reset, republished or re-priced.
    npm run db:course-videos
    npm run db:course-workflow
    npx prisma validate
+   # Retire the old marked catalog samples; preserves real courses and learner history:
+   npm run db:demo-courses:remove
    npm run build
    ```
 
@@ -42,8 +44,17 @@ unreviewed schema synchronization to replace these constraints.
 
 * Approved instructor: `/portal/trainer/courses`. Create a bilingual draft with
   a category, intro YouTube URL, cover, EGP price (0 = free), chapters and YouTube
-  lessons/durations/previews. Saving is not publishing. Submit separately; all
-  existing active ADMIN/SUPER_ADMIN users receive a durable notification.
+  lessons/durations/previews. Main/subcategories come from the existing public catalog.
+  The form supports separate card summaries, full descriptions, VIDEO/PODCOURSE,
+  language, level and per-lesson descriptions. Chapters and lessons can be reordered.
+  Saving is not publishing: choose **Save draft** (incomplete video URLs are allowed)
+  or **Save & submit for review** (publishing validation requires YouTube intro/lessons).
+  All existing active ADMIN/SUPER_ADMIN users receive a durable submission notification.
+  Dashboard **Add course / program** opens `/portal/trainer/courses?new=1` directly.
+  Trainers are authors, not learners: navbar/library/checkout links redirect to the
+  studio, and learner workflow APIs reject TRAINER accounts. Old
+  `/portal/trainer/programs` redirects here; historical program tools remain at
+  `/portal/trainer/legacy-programs` without moving or deleting legacy records.
 * Admin: **Course reviews**. Inspect introduction and every chapter/lesson, then
   approve the submitted revision or reject with a reason. Any one admin suffices.
   Rejected drafts can be edited/resubmitted. Pending, published, or already-enrolled
@@ -76,6 +87,34 @@ unreviewed schema synchronization to replace these constraints.
   to the right publication, transfer, instructor or learner area; visible sessions
   poll unread notifications every 30 seconds. Existing training-program tools remain
   separate and available. Profile/verification completion counts include recorded courses.
+
+## Retired temporary catalog
+
+The API excludes courses with **both** the `demo-catalog-v1-` slug prefix and
+`[TAMKEENOVA_DEMO_CATALOG_V1]` English-description marker from category counts,
+search, shelves, program links, direct detail/access/playback and new checkout/enrollment.
+A real course matching only one marker is retained, including NULL descriptions.
+The nine real categories remain available for instructors; no replacement samples are inserted.
+
+After backing up and applying the workflow schema, run from the API directory with
+its normal database environment:
+
+```sh
+npm run db:demo-courses:remove
+```
+
+This transaction deletes only unused dual-marked demos. Demos with an owner,
+enrollments, reviews, payment requests or certificates are archived instead;
+relationships and financial/certificate history are retained. Repeat runs are safe.
+Existing private history is not erased; archiving prevents new public enrollment.
+Seeding catalog/video samples now requires explicit `ALLOW_DEMO_CATALOG_SEED=true`
+for isolated tests only. Never enable it during deployment. See
+`../demo-catalog/README.md` for connection troubleshooting.
+
+**Sandbox limitation:** cleanup was attempted but could not connect because no
+`DATABASE_URL` / backend `.env` was supplied. No live records were deleted or archived.
+Public exclusion takes effect when this updated API is deployed; physical cleanup
+must run against the intended database in the deployment environment.
 
 ## Consistency / security
 

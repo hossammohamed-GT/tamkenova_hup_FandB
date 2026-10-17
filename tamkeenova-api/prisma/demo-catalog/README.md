@@ -1,105 +1,67 @@
-# Temporary catalog preview courses
+# Retired temporary catalog: safe cleanup
 
-Adds **3 published, free demo courses per active category** (27 for the current
-nine categories). Active child categories and future categories also receive
-three generic workshops. These are clearly marked presentation records, not
-real training content: no video URLs, trainers, user accounts, fabricated ratings,
-reviews or enrollments are inserted. The declared durations are sample values.
+The site is moving to real instructor-authored courses. **Do not seed demo courses.**
+The nine catalog categories are real configuration and must remain. The updated API
+excludes dual-marked demos from every public catalog/count/detail/video path and
+from new checkout/enrollment, even before cleanup is run.
 
-## Add to your database
+## Clean the intended application database
 
-Use Node.js 24 (as required by the backend). From the repository root, with the backend's `.env` containing your existing
-`DATABASE_URL` for the intended database:
+Use Node 24. Back up the database, apply the additive course workflow schema
+(`../course-workflow/README.md`), and use the backend's existing local `.env`:
 
-```bash
+```sh
 cd tamkeenova-api
 npm ci
 npm run prisma:generate
-npm run db:demo-courses
-```
-
-The commands use **Prisma Client and the models in `schema.prisma`**, with the
-same `DATABASE_URL` as the backend. They only modify data, never the database
-schema. After seeding, a table prints the actual demo count for every active
-category and the number of newly inserted courses. Re-running should show zero
-new inserts and three demos per category. No active categories is an explicit
-error instead of a silent successful no-op.
-
-If catalog tables/columns are missing, review the schema/database difference
-before applying your normal Prisma schema workflow. Do not use `migrate reset`,
-`--force-reset`, or `--accept-data-loss` to fix missing preview data. The legacy
-`seed.sql` and `remove.sql` are retained as SQL fixtures, not the default commands.
-
-### Connection troubleshooting (Neon)
-
-The CLI opens the connection **before** starting a data transaction and retries
-transient connection setup failures up to three times. It does not retry writes.
-For this CLI process only it uses `connection_limit=1`, `connect_timeout=30` and
-`pool_timeout=60`, and gives transaction acquisition up to 60 seconds. These
-settings do not edit `.env`, the backend pool, or the database schema. A larger
-connection timeout alone does not increase Prisma's pool acquisition timeout.
-
-If the pooled endpoint is still unavailable, copy the **Direct** connection URL
-from Neon Connect for the **same branch, database and user** into an optional
-`DEMO_DATABASE_URL` variable in your local backend `.env`. Keep its SSL settings.
-The demo CLI prefers this URL, while the backend continues using `DATABASE_URL`.
-Do not infer a direct hostname by editing the pooler hostname manually. Neither
-longer timeouts nor retries can repair an unavailable server or blocked network.
-
-No database credentials should be committed or pasted into chat. Confirm your
-connection targets a development/staging database before running the command.
-The seed is transactional, additive and re-runnable: it never overwrites an
-existing course or edits real categories. It uses reserved `demo-catalog-v1-`
-slugs together with a `[TAMKEENOVA_DEMO_CATALOG_V1]` description marker.
-
-The 30 local JPG covers (27 named + 3 fallback covers) are already checked into
-`tamkeenova-hub_anguler/public/assets/demo-courses/`. Deploy the frontend from
-this branch too; image URLs are frontend-relative, not backend routes. To
-regenerate the artwork after changing `courses.json`:
-
-```bash
-cd ../tamkeenova-hub_anguler
-npm ci
-node scripts/build-demo-course-artwork.mjs
-```
-
-## Remove ONLY the demo courses later
-
-From `tamkeenova-api`:
-
-```bash
 npm run db:demo-courses:remove
 ```
 
-Removal checks **both** the reserved slug prefix and the description marker. It
-does not delete categories, users, trainers or legacy training programs. Foreign
-keys cascade the deleted demo courses' category links. If any demo course has
-acquired enrollments or reviews, removal aborts the entire transaction rather
-than silently deleting learner history. Review these records manually first.
-Real courses and non-marked slug collisions are retained.
+The CLI uses Prisma and requires **both** markers:
+- slug starts `demo-catalog-v1-`;
+- English description starts `[TAMKEENOVA_DEMO_CATALOG_V1]`.
 
-Do not convert a seeded row into a real course: create a new real course instead.
+In a serializable transaction it deletes only unused marked demos and archives
+ones with an instructor owner, enrollments, reviews, payment requests or certificates.
+It preserves real courses (including partial marker collisions), all categories,
+users, legacy programs and historical relationships. It reports deleted, archived
+and protected counts. Reruns are safe. Do not convert a sample into a real offering:
+create a new course through the trainer studio instead.
 
-### Remove the temporary image files too
+No live cleanup was possible in the coding sandbox: the attempted command stopped
+because `DATABASE_URL` / `.env` was missing, before changing any data. Run the command
+in your deployment environment; do not share credentials in chat or commit them.
 
-The database cleanup removes the courses and their cover references; it cannot delete
-files shipped with the frontend. **Only after database cleanup succeeds**, and after
-confirming no real course reuses these demo covers, run this from the repository
-root to remove the dedicated demo-image folder:
+## Connection troubleshooting
 
-```bash
-node -e "require('node:fs').rmSync('tamkeenova-hub_anguler/public/assets/demo-courses', { recursive: true, force: true })"
-```
+The CLI connects before opening a transaction, retrying transient connection setup
+failures up to three times; writes are not replayed. For this process only it sets
+`connection_limit=1`, `connect_timeout=30`, `pool_timeout=60`, with up to 60 seconds
+for transaction acquisition. It never edits the backend's pool settings or `.env`.
 
-Rebuild and redeploy the frontend to remove the images from the deployed assets.
-Do not run the artwork generator again unless you want to restore these covers.
+If the Neon pooled endpoint is unavailable, optionally configure `DEMO_DATABASE_URL`
+locally using the **Direct** connection URL for the **same branch/database/user**.
+Keep its SSL options; do not guess hostnames. Neither retries nor larger timeouts
+fix missing credentials, a blocked connection or an unavailable database server.
 
-## SQL verification (optional, in your database SQL editor)
+## Isolated regression fixtures only
+
+`courses.json`, `seed.sql`, `remove.sql`, the old removal helper and local cover
+artwork remain test fixtures, not production deployment instructions. The CLI
+sample seeds now refuse execution unless `ALLOW_DEMO_CATALOG_SEED=true` is explicitly
+set. Never enable it in production. No startup or migration automatically seeds demos.
+Archived records may still reference the old cover files, so this cleanup does not
+delete shipped assets or break retained history.
+
+## Verify the cleanup in your database SQL editor
 
 ```sql
-SELECT cat.slug, count(*) AS demo_courses
-FROM courses c JOIN course_category_links l ON l.course_id = c.id
-JOIN course_categories cat ON cat.id = l.category_id
-WHERE c.description_en LIKE '[TAMKEENOVA_DEMO_CATALOG_V1]%'
-GROUP BY cat.slug ORDER BY cat.slug;
+SELECT status, count(*) AS marked_courses
+FROM courses
+WHERE slug LIKE 'demo-catalog-v1-%'
+  AND description_en LIKE '[TAMKEENOVA_DEMO_CATALOG_V1]%'
+GROUP BY status;
 ```
+
+After successful cleanup there should be no published marked demos; any remaining
+marked courses should be archived to protect their history.

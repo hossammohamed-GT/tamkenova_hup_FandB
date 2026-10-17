@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { StudentCertificate } from '../models/student.model';
 import { environment } from '../../environments/environment';
 export interface DraftLesson {
+  description_ar?: string;
+  description_en?: string;
   title_ar: string;
   title_en: string;
   media_url: string;
@@ -15,6 +17,9 @@ export interface DraftChapter {
   lessons: DraftLesson[];
 }
 export interface CourseDraft {
+  short_description_ar?: string;
+  short_description_en?: string;
+  content_type?: string;
   title_ar: string;
   title_en: string;
   description_ar: string;
@@ -28,6 +33,9 @@ export interface CourseDraft {
   sections: DraftChapter[];
 }
 export interface WorkflowCourse {
+  short_description_ar?: string;
+  short_description_en?: string;
+  content_type?: string;
   id: string;
   slug: string;
   title_ar: string;

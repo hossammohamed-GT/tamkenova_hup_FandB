@@ -1,3 +1,4 @@
+import { publicCourseWhere } from './public-course-policy';
 import {
   BadRequestException,
   ConflictException,
@@ -191,7 +192,8 @@ export class CourseWorkflowService {
     )
       throw new BadRequestException('Invalid cover URL');
     for (const section of dto.sections)
-      for (const lesson of section.lessons) requireYoutube(lesson.media_url);
+      for (const lesson of section.lessons)
+        if (lesson.media_url) requireYoutube(lesson.media_url);
     return this.mutate(async (tx) => {
       const trainer = await this.trainer(tx, userId);
       let original:
@@ -213,6 +215,15 @@ export class CourseWorkflowService {
         where: { id: dto.category_id, is_active: true },
       });
       if (!category) throw new BadRequestException('Select an active category');
+      if (
+        category.parent_id &&
+        !(await tx.course_categories.findFirst({
+          where: { id: category.parent_id, parent_id: null, is_active: true },
+        }))
+      )
+        throw new BadRequestException(
+          'Select a subcategory belonging to an active main category',
+        );
       const lessons = dto.sections.flatMap((s) => s.lessons);
       const duration = lessons.reduce((n, l) => n + l.duration_minutes, 0);
       const data = {
@@ -220,8 +231,11 @@ export class CourseWorkflowService {
         title_en: dto.title_en.trim(),
         description_ar: dto.description_ar,
         description_en: dto.description_en,
-        short_description_ar: dto.description_ar.slice(0, 200),
-        short_description_en: dto.description_en.slice(0, 200),
+        short_description_ar:
+          dto.short_description_ar?.trim() || dto.description_ar.slice(0, 200),
+        short_description_en:
+          dto.short_description_en?.trim() || dto.description_en.slice(0, 200),
+        content_type: dto.content_type || 'VIDEO',
         preview_video_url: dto.preview_video_url || null,
         cover_image_url: dto.cover_image_url || null,
         language: dto.language,
@@ -502,7 +516,7 @@ export class CourseWorkflowService {
   }
   async checkout(userId: string, courseId: string) {
     const course = await this.db.courses.findFirst({
-      where: { id: courseId, status: 'PUBLISHED' },
+      where: { id: courseId, ...publicCourseWhere },
       select: summary,
     });
     if (!course) throw new NotFoundException('Course not found');
@@ -597,7 +611,7 @@ export class CourseWorkflowService {
       throw new BadRequestException('Transfer time cannot be in the future');
     return this.mutate(async (tx) => {
       const course = await tx.courses.findFirst({
-        where: { id: courseId, status: 'PUBLISHED' },
+        where: { id: courseId, ...publicCourseWhere },
       });
       if (!course) throw new NotFoundException('Course not available');
       await this.preventSelfEnrollment(tx, userId, course.owner_trainer_id);
@@ -746,7 +760,7 @@ export class CourseWorkflowService {
   async enrollFree(userId: string, courseId: string) {
     return this.mutate(async (tx) => {
       const course = await tx.courses.findFirst({
-        where: { id: courseId, status: 'PUBLISHED', is_free: true, price: 0 },
+        where: { id: courseId, ...publicCourseWhere, is_free: true, price: 0 },
       });
       if (!course)
         throw new BadRequestException(

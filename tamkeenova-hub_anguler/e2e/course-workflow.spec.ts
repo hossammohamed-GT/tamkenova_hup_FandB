@@ -150,7 +150,15 @@ async function setup(page: Page, role = 'STUDENT', language = 'en', enabled = tr
             name_ar: 'المهارات الشخصية',
             name_en: 'Soft Skills',
             slug: 'soft-skills',
-            children: [],
+            children: [
+              {
+                id: 'child-category',
+                name_ar: 'القيادة',
+                name_en: 'Leadership',
+                slug: 'leadership',
+                parent_id: 'category',
+              },
+            ],
           },
         ],
       };
@@ -441,3 +449,141 @@ for (const role of ['TRAINER', 'ADMIN'])
       fullPage: true,
     });
   });
+
+test('trainer dashboard add-program action opens the actual catalog authoring form, not legacy enrollment', async ({
+  page,
+}) => {
+  await setup(page, 'TRAINER');
+  await page.goto('/portal/trainer');
+  await page.getByRole('link', { name: 'Add course / program', exact: true }).click();
+  await expect(page).toHaveURL(/\/portal\/trainer\/courses\?new=1/);
+  await expect(page.getByRole('heading', { name: 'Course content editor' })).toBeVisible();
+  await expect(page.locator('main a[href="/my-courses"]')).toHaveCount(0);
+  await expect(page.getByLabel('Main category', { exact: true })).toBeVisible();
+});
+test('old instructor programs URL and learner routes consistently lead trainers to their authoring studio', async ({
+  page,
+}) => {
+  await setup(page, 'TRAINER');
+  for (const path of [
+    '/portal/trainer/programs',
+    '/my-courses',
+    '/programs/course/' + sample.slug + '/checkout',
+  ]) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/\/portal\/trainer\/courses$/);
+    await expect(page.getByRole('heading', { name: 'Courses & programs I teach' })).toBeVisible();
+  }
+});
+test('trainer public course view has management actions, never enrollment/payment/completion actions', async ({
+  page,
+}) => {
+  await setup(page, 'TRAINER');
+  const learnerRequests: string[] = [];
+  page.on('request', (req) => {
+    if (/course-workflow\/(learning|checkout|library|enroll)/.test(req.url()))
+      learnerRequests.push(req.url());
+  });
+  await page.goto('/programs/course/' + sample.slug);
+  await expect(page.locator('app-course-learning-actions')).toHaveCount(0);
+  await expect(page.locator('main a[href="/portal/trainer/courses"]')).toBeVisible();
+  expect(learnerRequests).toEqual([]);
+});
+test('instructor authors detailed categorized content, reorders lessons and saves/submits once', async ({
+  page,
+}) => {
+  const { calls } = await setup(page, 'TRAINER');
+  await page.goto('/portal/trainer/courses?new=1');
+  await page.locator('[name=title_ar]').fill('كورس قيادة حقيقي');
+  await page.locator('[name=title_en]').fill('Real leadership course');
+  await page.locator('[name=description_ar]').fill('وصف تفصيلي للكورس');
+  await page.locator('[name=description_en]').fill('Full course description');
+  await page.locator('[name=short_ar]').fill('نبذة تظهر في كارت الكورس');
+  await page.locator('[name=short_en]').fill('Summary for the existing catalog card');
+  await page.getByLabel('Main category', { exact: true }).selectOption('category');
+  await page.getByLabel('Subcategory', { exact: true }).selectOption('child-category');
+  await page.getByLabel('Content type', { exact: true }).selectOption('PODCOURSE');
+  await page.locator('[name=intro]').fill('https://youtu.be/5BciHXh074k');
+  await page.getByLabel('Arabic chapter title').fill('أساسيات');
+  await page.getByLabel('English chapter title').fill('Foundations');
+  const first = page.locator('.lesson-editor').first();
+  await first.getByLabel('Arabic title', { exact: true }).fill('الدرس الأول');
+  await first.getByLabel('English title', { exact: true }).fill('First lesson');
+  await first.getByLabel('YouTube URL', { exact: true }).fill('https://youtu.be/5BciHXh074k');
+  await first.getByLabel('Arabic lesson description').fill('تفاصيل الدرس الأول');
+  await page.getByRole('button', { name: 'Add lesson', exact: false }).click();
+  await expect(page.locator('.lesson-editor')).toHaveCount(2);
+  const second = page.locator('.lesson-editor').nth(1);
+  await second.getByLabel('Arabic title', { exact: true }).fill('الدرس الثاني');
+  await second.getByLabel('English title', { exact: true }).fill('Second lesson');
+  await second.getByLabel('YouTube URL', { exact: true }).fill('https://youtu.be/M7lc1UVf-VE');
+  await expect(
+    page.getByRole('button', { name: 'Save & submit for review', exact: true }),
+  ).toBeEnabled();
+  await second.getByRole('button', { name: 'Move lesson up', exact: false }).click();
+  await expect(
+    page.locator('.lesson-editor').first().getByLabel('English title', { exact: true }),
+  ).toHaveValue('Second lesson');
+  await expect(
+    page.getByRole('button', { name: 'Save & submit for review', exact: true }),
+  ).toBeEnabled();
+  await page.getByRole('button', { name: 'Save & submit for review', exact: true }).click();
+  await expect(
+    page.getByText('Saved and submitted for admin review.', { exact: true }),
+  ).toBeVisible();
+  const saved = calls.find((c) => c.path.endsWith('/trainer/courses'))?.body;
+  expect(saved).toMatchObject({
+    category_id: 'child-category',
+    content_type: 'PODCOURSE',
+    short_description_en: 'Summary for the existing catalog card',
+  });
+  expect(saved.sections[0].lessons.map((l: any) => l.title_en)).toEqual([
+    'Second lesson',
+    'First lesson',
+  ]);
+  expect(saved.sections[0].lessons.map((l: any) => l.title_ar)).toEqual([
+    'الدرس الثاني',
+    'الدرس الأول',
+  ]);
+  expect(saved.sections[0].lessons[1].description_ar).toBe('تفاصيل الدرس الأول');
+  expect(calls.filter((c) => c.path.endsWith('/trainer/courses'))).toHaveLength(1);
+  expect(calls.filter((c) => c.path.endsWith('/submit'))).toHaveLength(1);
+});
+
+test('instructor can retry catalog category loading without inventing local categories', async ({
+  page,
+}) => {
+  await setup(page, 'TRAINER');
+  let available = false;
+  await page.route('**/api/courses/categories', (route) =>
+    route.fulfill({
+      status: available ? 200 : 503,
+      contentType: 'application/json',
+      body: JSON.stringify(
+        available
+          ? {
+              success: true,
+              data: [
+                {
+                  id: 'real-category',
+                  slug: 'real-category',
+                  name_ar: 'مجال حقيقي',
+                  name_en: 'Real catalog category',
+                  children: [],
+                },
+              ],
+            }
+          : { message: 'Catalog unavailable' },
+      ),
+    }),
+  );
+  await page.goto('/portal/trainer/courses?new=1');
+  await expect(page.getByRole('button', { name: 'Reload categories', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Save draft', exact: true })).toBeDisabled();
+  available = true;
+  await page.getByRole('button', { name: 'Reload categories', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Reload categories', exact: true })).toHaveCount(0);
+  await page.getByLabel('Main category', { exact: true }).selectOption('real-category');
+  await expect(page.getByLabel('Main category', { exact: true })).toHaveValue('real-category');
+  await expect(page.locator('app-trainer-course-studio [role=alert]')).toHaveCount(0);
+});

@@ -94,9 +94,69 @@ async function removeDemoCourses(prisma) {
   }, { maxWait: 60000, timeout: 60000, isolationLevel: 'Serializable' });
 }
 
+// Production retirement: delete only untouched marked demos, archive anything with history.
+// The public course policy excludes both-marker demos immediately, even before this CLI is run.
+async function retireDemoCourses(prisma) {
+  return prisma.$transaction(
+    async (tx) => {
+      const courses = await tx.courses.findMany({
+        where: marked,
+        select: {
+          id: true,
+          owner_trainer_id: true,
+          _count: {
+            select: {
+              enrollments: true,
+              reviews: true,
+              payments: true,
+              certificates: true,
+            },
+          },
+        },
+      });
+      const protectedIds = courses
+        .filter(
+          (c) =>
+            c.owner_trainer_id || Object.values(c._count).some((n) => n > 0),
+        )
+        .map((c) => c.id);
+      const disposableIds = courses
+        .filter((c) => !protectedIds.includes(c.id))
+        .map((c) => c.id);
+      const archived = protectedIds.length
+        ? await tx.courses.updateMany({
+            where: {
+              ...marked,
+              id: { in: protectedIds },
+              status: { not: "ARCHIVED" },
+            },
+            data: { status: "ARCHIVED" },
+          })
+        : { count: 0 };
+      const deleted = disposableIds.length
+        ? await tx.courses.deleteMany({
+            where: {
+              ...marked,
+              id: { in: disposableIds },
+              owner_trainer_id: null,
+            },
+          })
+        : { count: 0 };
+      return {
+        deleted: deleted.count,
+        archived: archived.count,
+        protected: protectedIds.length,
+      };
+    },
+    { maxWait: 60000, timeout: 60000, isolationLevel: "Serializable" },
+  );
+}
+
 async function main() {
   const action = process.argv[2];
   if (!['seed', 'remove'].includes(action)) throw new Error('Use seed or remove.');
+  if (action === 'seed' && process.env.ALLOW_DEMO_CATALOG_SEED !== 'true')
+    throw new Error('Demo catalog is retired. Do not seed demo courses in production. Isolated tests only: ALLOW_DEMO_CATALOG_SEED=true.');
   const { PrismaClient } = require('@prisma/client');
   const prisma = new PrismaClient({ datasources: { db: { url: demoConnectionUrl() } } });
   try {
@@ -110,8 +170,8 @@ async function main() {
         console.warn('Some demo slugs belong to non-demo courses. These records were preserved; review the category counts above.');
       }
     } else {
-      const result = await removeDemoCourses(prisma);
-      console.log(`Removed ${result.count} marked demo courses. Real courses were preserved.`);
+      const result = await retireDemoCourses(prisma);
+      console.log(`Deleted ${result.deleted} unused marked demos; archived ${result.archived}; preserved history for ${result.protected}. Real courses and categories were preserved.`);
     }
   } catch (error) {
     if (['P2021', 'P2022'].includes(errorCode(error))) {
@@ -126,4 +186,4 @@ async function main() {
   }
 }
 if (require.main === module) main().catch(error => { console.error(error.message); process.exitCode = 1; });
-module.exports = { seedDemoCourses, removeDemoCourses, demoConnectionUrl, connectWithRetry };
+module.exports = { seedDemoCourses, removeDemoCourses, retireDemoCourses, demoConnectionUrl, connectWithRetry };

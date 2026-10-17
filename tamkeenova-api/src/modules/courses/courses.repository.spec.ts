@@ -1,3 +1,4 @@
+import { publicCourseWhere } from './public-course-policy';
 import { describe, expect, it, jest } from '@jest/globals';
 import { GUARDS_METADATA } from '@nestjs/common/constants';
 import { CoursesRepository } from './courses.repository';
@@ -15,7 +16,7 @@ describe('Course playback query boundaries', () => {
     } as unknown as PrismaService);
     await repository.getCourseAccess('course', 'student');
     const access = findFirst.mock.calls[0][0];
-    expect(access.where).toEqual({ slug: 'course', status: 'PUBLISHED' });
+    expect(access.where).toEqual({ slug: 'course', ...publicCourseWhere });
     expect(access.select.enrollments.where).toEqual({
       user_id: 'student',
       status: { in: ['ACTIVE', 'COMPLETED'] },
@@ -25,7 +26,7 @@ describe('Course playback query boundaries', () => {
     expect(query.where).toEqual({
       id: 'lesson',
       is_active: true,
-      courses: { slug: 'course', status: 'PUBLISHED' },
+      courses: { slug: 'course', ...publicCourseWhere },
     });
     expect(query.select.courses.select.enrollments.where).toEqual({
       user_id: 'student',
@@ -46,4 +47,63 @@ describe('Course playback query boundaries', () => {
       ),
     ).toContain(JwtAuthGuard);
   });
+});
+
+it('excludes retired demos consistently from category counts, catalog search, shelves, programs and direct video access', async () => {
+  const calls: any[] = [];
+  const capture = async (q: any) => {
+    calls.push(q);
+    return [];
+  };
+  const db: any = {
+    courses: {
+      findMany: capture,
+      count: async (q: any) => {
+        calls.push(q);
+        return 0;
+      },
+      findFirst: async (q: any) => {
+        calls.push(q);
+        return null;
+      },
+    },
+    course_categories: {
+      findMany: async () => [{ id: 'cat', children: [] }],
+      findFirst: async () => null,
+    },
+    course_collections: { findMany: capture },
+    learning_programs: { findMany: capture },
+    course_lessons: {
+      findFirst: async (q: any) => {
+        calls.push(q);
+        return null;
+      },
+    },
+  };
+  const repository = new CoursesRepository(db);
+  await repository.getCategories();
+  await repository.getCourses({ page: 1, limit: 24, search: 'real' } as any);
+  await repository.getCollections();
+  await repository.getLearningPrograms();
+  await repository.getCourseBySlug('course');
+  await repository.getCourseAccess('course', 'student');
+  await repository.getLessonPlayback('course', 'lesson', 'student');
+  expect(calls[0].where.NOT).toEqual(publicCourseWhere.NOT);
+  expect(calls[1].where.NOT).toEqual(publicCourseWhere.NOT);
+  expect(calls[1].where.OR).toHaveLength(6);
+  expect(calls[3].include.items.where.courses.NOT).toEqual(
+    publicCourseWhere.NOT,
+  );
+  expect(calls[4].include.course_links.where.courses.NOT).toEqual(
+    publicCourseWhere.NOT,
+  );
+  for (const call of calls.slice(5, 7))
+    expect(call.where.NOT).toEqual(publicCourseWhere.NOT);
+  expect(calls[7].where.courses.NOT).toEqual(publicCourseWhere.NOT);
+  expect(publicCourseWhere.NOT.AND).toEqual([
+    { slug: { startsWith: 'demo-catalog-v1-' } },
+    {
+      description_en: { startsWith: '[TAMKEENOVA_DEMO_CATALOG_V1]', not: null },
+    },
+  ]);
 });

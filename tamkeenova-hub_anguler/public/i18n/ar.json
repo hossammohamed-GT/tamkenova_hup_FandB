@@ -630,7 +630,7 @@
     "reviews_count": "تقييمات",
     "availability_count": "مواعيد متاحة",
     "average_rating": "متوسط التقييم",
-    "programs_link": "البرامج التدريبية",
+    "programs_link": "الكورسات والبرامج التي أقدّمها",
     "availability_link": "أوقات التوفر",
     "reviews_link": "التقييمات",
     "complete_profile": "أكمل ملفك الشخصي",
@@ -642,12 +642,12 @@
     "quick_actions": "إجراءات سريعة",
     "actions": {
       "edit_profile": "تعديل الملف الشخصي",
-      "add_program": "إضافة برنامج جديد",
+      "add_program": "إضافة كورس / برنامج",
       "set_availability": "تحديد المواعيد",
       "manage_consultations": "إدارة الاستشارات"
     },
     "overview": "نظرة عامة",
-    "programs_desc": "إدارة برامجك التدريبية",
+    "programs_desc": "أضف المحتوى والتصنيف والدروس، وتابع النشر وطلبات اعتماد إتمام الطلاب.",
     "availability_desc": "إدارة أوقات التوفر",
     "reviews_desc": "{{count}} تقييم من المتدربين",
     "profile_desc": "تعديل بياناتك الشخصية",
@@ -1900,8 +1900,9 @@
   "course_workflow": {
     "library": "مكتبتي التعليمية",
     "checkout": "التسجيل والدفع",
-    "studio": "استوديو الكورسات المسجلة",
+    "studio": "إضافة وإدارة الكورسات",
     "admin": "مراجعة الكورسات والمدفوعات",
-    "dashboard_hint": "الكورسات المسجلة والتقدم واعتماد الإتمام والشهادات"
+    "dashboard_hint": "الكورسات المسجلة والتقدم واعتماد الإتمام والشهادات",
+    "manage": "إدارة كورساتي وبرامجي"
   }
 }

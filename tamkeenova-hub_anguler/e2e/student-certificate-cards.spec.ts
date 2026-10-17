@@ -45,9 +45,11 @@ async function setup(
   await page.route('**/api/**', (route) =>
     route.fulfill({
       json:
-        new URL(route.request().url()).pathname === '/api/students/certificates'
-          ? { data: records, total: records.length }
-          : { data: [] },
+        new URL(route.request().url()).pathname === '/api/auth/me'
+          ? { data: { id: 'student', full_name: 'Layla Ahmed', role: 'STUDENT', is_active: true } }
+          : new URL(route.request().url()).pathname === '/api/students/certificates'
+            ? { data: records, total: records.length }
+            : { data: [] },
     }),
   );
 }

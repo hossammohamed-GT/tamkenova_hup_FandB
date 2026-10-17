@@ -75,9 +75,23 @@ test.beforeEach(async ({ page }) => {
     localStorage.setItem('tamkeenova-lang', 'en');
     localStorage.setItem('tamkeenova-theme', 'light');
   });
+  // Distinct, deterministic local logo fixtures; no dependency on removed partner assets.
+  await page.route('**/test-partner-*.png', (route) => {
+    const number = Number(new URL(route.request().url()).pathname.match(/-(\d+)\.png$/)![1]);
+    const image = new PNG({ width: 80, height: 40 });
+    for (let i = 0; i < image.data.length; i += 4) {
+      image.data.set([number * 40, 70, 210 - number * 20, 255], i);
+    }
+    return route.fulfill({ contentType: 'image/png', body: PNG.sync.write(image) });
+  });
   await page.route('**/api/**', async (route) => {
     const path = new URL(route.request().url()).pathname;
     let response: unknown = { data: [] };
+    // Current-role guards refresh /auth/me; mirror the signed-in administrator.
+    if (path === '/api/auth/me')
+      response = {
+        data: { id: 'admin', full_name: 'Test Administrator', role: 'ADMIN', is_active: true },
+      };
     if (path === '/api/admin/certificates')
       response =
         route.request().method() === 'POST'
@@ -90,7 +104,7 @@ test.beforeEach(async ({ page }) => {
         id: `550e8400-e29b-41d4-a716-44665544000${i + 1}`,
         name_en: `Sample partner ${i + 1}`,
         name_ar: `شريك تجريبي ${i + 1}`,
-        logo_url: `/images/partners/partners${i + 1}.png`,
+        logo_url: `/test-partner-${i + 1}.png`,
         is_active: true,
         display_order: i,
       }));
@@ -398,7 +412,7 @@ test('direct logo uploads can be removed, and corrupt uploads block issue until 
   await file.setInputFiles({
     name: 'Logo.png',
     mimeType: 'image/png',
-    buffer: readFileSync('public/certificates/brand-mark.png'),
+    buffer: readFileSync('public/images/icon-192.png'),
   });
   await expect(page.locator('.selected-partners li')).toHaveCount(1);
   await expect(page.locator('.studio-actions button[type=submit]')).toBeEnabled();
@@ -453,7 +467,7 @@ test('the previous bilingual edition remains downloadable without adopting a new
 test('unavailable library images never silently issue an incomplete partner selection', async ({
   page,
 }) => {
-  await page.route('**/images/partners/partners1.png', (route) => route.abort());
+  await page.route('**/test-partner-1.png', (route) => route.abort());
   await page.goto('/portal/admin/certificates');
   await page.locator('[data-template=TRAINING-en]').click();
   await page.locator('.partner-choice').first().click();
@@ -573,6 +587,13 @@ test('trainee wording and canonical routes keep the existing backend role and en
       'user',
       JSON.stringify({ id: 'trainee', full_name: 'Test Trainee', role: 'VOLUNTEER' }),
     ),
+  );
+  await page.route('**/api/auth/me', (route) =>
+    route.fulfill({
+      json: {
+        data: { id: 'trainee', full_name: 'Test Trainee', role: 'VOLUNTEER', is_active: true },
+      },
+    }),
   );
   let statusRequests = 0;
   await page.route('**/api/volunteers/me', (route) => {

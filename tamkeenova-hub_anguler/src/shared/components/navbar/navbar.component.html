@@ -152,9 +152,9 @@
           </div>
           <div class="user-dropdown-divider"></div>
           @if (!isAdminRole()) {
-              <a routerLink="/my-courses" class="user-dropdown-link" (click)="closeUserMenu()"
+              <a [routerLink]="authService.isTrainer() ? '/portal/trainer/courses' : '/my-courses'" class="user-dropdown-link" (click)="closeUserMenu()"
                 ><i class="fa-solid fa-circle-play" aria-hidden="true"></i
-                >{{ 'course_workflow.library' | translate }}</a
+                >{{ (authService.isTrainer() ? 'course_workflow.manage' : 'course_workflow.library') | translate }}</a
               >
           <a [routerLink]="profileRoute()" class="user-dropdown-link" (click)="closeUserMenu()">
             <i class="fa-solid fa-user"></i>
@@ -197,8 +197,8 @@
   <div class="mobile-panel chamfer-lg" [class.is-open]="isMobileMenuOpen()">
     <nav class="mobile-links" [attr.aria-label]="'nav.mobile_navigation' | translate">
       @if (isLoggedIn()) {
-        <a routerLink="/my-courses" class="mobile-link" (click)="closeMobileMenu()">{{
-          'course_workflow.library' | translate
+        <a [routerLink]="authService.isTrainer() ? '/portal/trainer/courses' : '/my-courses'" class="mobile-link" (click)="closeMobileMenu()">{{
+          (authService.isTrainer() ? 'course_workflow.manage' : 'course_workflow.library') | translate
         }}</a>
       }
       @for (link of navLinks; track link.route) {

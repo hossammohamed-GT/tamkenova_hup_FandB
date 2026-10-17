@@ -2,12 +2,12 @@
   <header class="workflow-header">
     <div>
       <span class="eyebrow">TamkeeNova • Instructor Studio</span>
-      <h1>{{ t('استوديو الكورسات', 'Course studio') }}</h1>
+      <h1>{{ t('الكورسات والبرامج التي أقدّمها', 'Courses & programs I teach') }}</h1>
       <p>
         {{
           t(
-            'جهّز المحتوى، ابعته للمراجعة، واعتمد إتمام طلابك.',
-            'Create content, submit it for review, and confirm learner completion.'
+            'أضف محتواك في كتالوج البرامج، تابع المراجعة، واعتمد إتمام طلابك.',
+            'Create courses in the programs catalog, track review, and approve learner completion.'
           )
         }}
       </p>
@@ -17,11 +17,8 @@
     </button>
   </header>
   <nav class="workflow-nav">
-    <a routerLink="/portal/trainer">{{ t('لوحة الأستاذ', 'Instructor dashboard') }}</a
-    ><a routerLink="/portal/trainer/programs">{{
-      t('البرامج التدريبية القديمة', 'Legacy training programs')
-    }}</a
-    ><a routerLink="/my-courses">{{ t('كورساتي كمتعلّم', 'My learning') }}</a
+    <a routerLink="/portal/trainer">{{ t('لوحة المدرب', 'Instructor dashboard') }}</a
+    ><a routerLink="/programs">{{ t('عرض كتالوج البرامج', 'View programs catalog') }}</a
     ><button type="button" (click)="load()" [disabled]="busy()">{{ t('تحديث', 'Refresh') }}</button>
   </nav>
   @if (error()) {
@@ -31,7 +28,7 @@
     <p class="success" role="status">{{ success() }}</p>
   }
   @if (editor()) {
-    <section class="panel">
+    <section class="panel" id="course-editor">
       <div class="row">
         <h2>{{ t('إعداد محتوى الكورس', 'Course content editor') }}</h2>
         <button type="button" (click)="editor.set(false)" [disabled]="busy()">
@@ -41,12 +38,13 @@
       <p class="notice">
         {{
           t(
-            'الحفظ لا ينشر الكورس. بعد الإرسال، أي أدمن يقدر يراجعه. لا يمكن تعديل المحتوى بعد النشر أو تسجيل طلاب.',
-            'Saving does not publish. Submit for an admin to review. Published courses and courses with learners are immutable.'
+            'أنت المدرب وصاحب المحتوى. هذا النموذج يضيف الكورس لنفس كتالوج البرامج بعد موافقة الأدمن، وليس للتسجيل كطالب. المسودة غير ظاهرة للجمهور.',
+            'You are the instructor and content owner. This form adds courses to the existing programs catalog after admin approval; it does not enroll you as a learner. Drafts are not public.'
           )
         }}
       </p>
       <form (ngSubmit)="save()" #editorForm="ngForm">
+        <h3>01 · {{ t('بيانات الكورس والغلاف', 'Course information & cover') }}</h3>
         <div class="form-grid">
           <label
             >{{ t('العنوان بالعربي', 'Arabic title')
@@ -56,8 +54,9 @@
               required
               minlength="3"
               maxlength="180"
-              dir="rtl" /></label
-          ><label
+              dir="rtl"
+          /></label>
+          <label
             >{{ t('العنوان بالإنجليزي', 'English title')
             }}<input
               name="title_en"
@@ -74,8 +73,9 @@
               [(ngModel)]="draft.description_ar"
               maxlength="10000"
               dir="rtl"
-            ></textarea></label
-          ><label
+            ></textarea>
+          </label>
+          <label
             >{{ t('الوصف بالإنجليزي', 'English description')
             }}<textarea
               name="description_en"
@@ -85,14 +85,89 @@
             ></textarea>
           </label>
           <label
-            >{{ t('المجال', 'Category')
-            }}<select name="category" [(ngModel)]="draft.category_id" required>
-              <option value="">{{ t('اختر المجال', 'Choose category') }}</option>
+            >{{ t('نبذة بطاقة الكورس بالعربي', 'Arabic course card summary')
+            }}<textarea
+              name="short_ar"
+              [(ngModel)]="draft.short_description_ar"
+              maxlength="500"
+            ></textarea>
+          </label>
+          <label
+            >{{ t('نبذة بطاقة الكورس بالإنجليزي', 'English course card summary')
+            }}<textarea
+              name="short_en"
+              [(ngModel)]="draft.short_description_en"
+              maxlength="500"
+            ></textarea>
+          </label>
+          <label
+            >{{ t('رابط صورة الغلاف', 'Cover image URL')
+            }}<input name="cover" [(ngModel)]="draft.cover_image_url" maxlength="1000" dir="ltr"
+          /></label>
+          <label
+            >{{ t('رابط المقدمة من يوتيوب', 'YouTube introduction URL')
+            }}<input
+              name="intro"
+              [(ngModel)]="draft.preview_video_url"
+              type="url"
+              maxlength="500"
+              dir="ltr"
+          /></label>
+        </div>
+        @if (draft.preview_video_url) {
+          <button type="button" (click)="preview.set(draft.preview_video_url)">
+            {{ t('معاينة المقدمة', 'Preview introduction') }}
+          </button>
+        }
+        <h3>02 · {{ t('تصنيف الكتالوج والتسعير', 'Catalog classification & pricing') }}</h3>
+        <div class="form-grid">
+          <label
+            >{{ t('المجال الرئيسي', 'Main category')
+            }}<select
+              name="category"
+              [attr.aria-label]="t('المجال الرئيسي', 'Main category')"
+              [ngModel]="selectedCategoryId"
+              (ngModelChange)="selectCategory($event)"
+              required
+              [disabled]="categoriesLoading()"
+            >
+              <option value="">
+                {{ t('اختر من مجالات صفحة البرامج', 'Choose a programs catalog category') }}
+              </option>
               @for (category of categories(); track category.id) {
                 <option [value]="category.id">{{ t(category.name_ar, category.name_en) }}</option>
               }
             </select></label
           >
+          @if (childCategories().length) {
+            <label
+              >{{ t('التصنيف الفرعي', 'Subcategory')
+              }}<select
+                name="subcategory"
+                [attr.aria-label]="t('التصنيف الفرعي', 'Subcategory')"
+                [(ngModel)]="draft.category_id"
+              >
+                <option [value]="selectedCategoryId">
+                  {{ t('المجال الرئيسي بدون تصنيف فرعي', 'Main category without subcategory') }}
+                </option>
+                @for (child of childCategories(); track child.id) {
+                  <option [value]="child.id">{{ t(child.name_ar, child.name_en) }}</option>
+                }
+              </select></label
+            >
+          }
+          @if (!categoriesLoading() && !categories().length) {
+            <p class="notice wide">
+              {{
+                t(
+                  'لم تُحمّل مجالات الكتالوج. راجع الاتصال أو إعداد المجالات ثم أعد المحاولة.',
+                  'No catalog categories loaded. Check the connection or category setup and retry.'
+                )
+              }}<button type="button" (click)="loadCategories()">
+                {{ t('إعادة تحميل المجالات', 'Reload categories') }}
+              </button>
+            </p>
+          }
           <label
             >{{ t('السعر بالجنيه المصري — صفر للمجاني', 'Price in EGP — zero for free')
             }}<input
@@ -105,24 +180,24 @@
               required
           /></label>
           <label
-            >{{ t('رابط المقدمة من يوتيوب', 'YouTube introduction URL')
-            }}<input
-              name="intro"
-              [(ngModel)]="draft.preview_video_url"
-              type="url"
-              maxlength="500"
-              dir="ltr" /></label
-          ><label
-            >{{ t('رابط صورة الغلاف', 'Cover image URL')
-            }}<input name="cover" [(ngModel)]="draft.cover_image_url" maxlength="1000" dir="ltr"
-          /></label>
+            >{{ t('نوع المحتوى', 'Content type')
+            }}<select
+              name="content_type"
+              [attr.aria-label]="t('نوع المحتوى', 'Content type')"
+              [(ngModel)]="draft.content_type"
+            >
+              <option value="VIDEO">{{ t('كورس فيديو', 'Video course') }}</option>
+              <option value="PODCOURSE">{{ t('بودكورس', 'Podcourse') }}</option>
+            </select></label
+          >
           <label
             >{{ t('لغة الكورس', 'Course language')
             }}<select name="language" [(ngModel)]="draft.language">
               <option value="ar">العربية</option>
               <option value="en">English</option>
             </select></label
-          ><label
+          >
+          <label
             >{{ t('المستوى', 'Level')
             }}<select name="level" [(ngModel)]="draft.level">
               <option value="BEGINNER">{{ t('مبتدئ', 'Beginner') }}</option>
@@ -132,19 +207,38 @@
             </select></label
           >
         </div>
-        @for (section of draft.sections; track $index; let s = $index) {
+        <h3>03 · {{ t('الأجزاء ودروس يوتيوب', 'Chapters & YouTube lessons') }}</h3>
+        <p class="muted">
+          {{
+            t(
+              'ترتيب الأجزاء والدروس هنا هو نفس ترتيب صفحة الكورس. تُحسب المدة وعدد الدروس تلقائيًا. المقدمة وكل روابط الدروس مطلوبة قبل الإرسال، لكن يمكنك حفظ مسودة قبل استكمالها.',
+              'The order below is the public course order. Duration and lesson count are calculated automatically. Intro and lesson URLs are required before submission, but drafts can be saved before they are ready.'
+            )
+          }}
+        </p>
+        @for (section of draft.sections; track section; let s = $index) {
           <div class="section-editor">
             <div class="row">
               <h2>{{ t('الجزء', 'Chapter') }} {{ s + 1 }}</h2>
-              <button type="button" class="danger" (click)="draft.sections.splice(s, 1)">
-                {{ t('حذف الجزء', 'Remove chapter') }}
-              </button>
+              <div class="actions">
+                <button type="button" (click)="move(draft.sections, s, -1)" [disabled]="s === 0">
+                  ↑ {{ t('تقديم الجزء', 'Move chapter up') }}</button
+                ><button
+                  type="button"
+                  (click)="move(draft.sections, s, 1)"
+                  [disabled]="s === draft.sections.length - 1"
+                >
+                  ↓ {{ t('تأخير الجزء', 'Move chapter down') }}</button
+                ><button type="button" class="danger" (click)="draft.sections.splice(s, 1)">
+                  {{ t('حذف الجزء', 'Remove chapter') }}
+                </button>
+              </div>
             </div>
             <div class="form-grid">
               <label
                 >{{ t('عنوان الجزء بالعربي', 'Arabic chapter title')
                 }}<input
-                  [name]="'chapter-ar-' + s"
+                  [name]="'chapter-ar-' + rowKey(section)"
                   [(ngModel)]="section.title_ar"
                   required
                   minlength="2"
@@ -152,26 +246,40 @@
               ><label
                 >{{ t('عنوان الجزء بالإنجليزي', 'English chapter title')
                 }}<input
-                  [name]="'chapter-en-' + s"
+                  [name]="'chapter-en-' + rowKey(section)"
                   [(ngModel)]="section.title_en"
                   required
                   minlength="2"
                   maxlength="180"
               /></label>
             </div>
-            @for (lesson of section.lessons; track $index; let l = $index) {
+            @for (lesson of section.lessons; track lesson; let l = $index) {
               <div class="lesson-editor">
                 <div class="row">
-                  <strong>{{ t('الدرس', 'Lesson') }} {{ l + 1 }}</strong
-                  ><button type="button" (click)="section.lessons.splice(l, 1)">
-                    {{ t('حذف الدرس', 'Remove lesson') }}
-                  </button>
+                  <strong>{{ t('الدرس', 'Lesson') }} {{ l + 1 }}</strong>
+                  <div class="actions">
+                    <button
+                      type="button"
+                      (click)="move(section.lessons, l, -1)"
+                      [disabled]="l === 0"
+                    >
+                      ↑ {{ t('تقديم الدرس', 'Move lesson up') }}</button
+                    ><button
+                      type="button"
+                      (click)="move(section.lessons, l, 1)"
+                      [disabled]="l === section.lessons.length - 1"
+                    >
+                      ↓ {{ t('تأخير الدرس', 'Move lesson down') }}</button
+                    ><button type="button" (click)="section.lessons.splice(l, 1)">
+                      {{ t('حذف الدرس', 'Remove lesson') }}
+                    </button>
+                  </div>
                 </div>
                 <div class="form-grid">
                   <label
                     >{{ t('العنوان بالعربي', 'Arabic title')
                     }}<input
-                      [name]="'lesson-ar-' + s + '-' + l"
+                      [name]="'lesson-ar-' + rowKey(lesson)"
                       [(ngModel)]="lesson.title_ar"
                       required
                       minlength="2"
@@ -179,7 +287,7 @@
                   ><label
                     >{{ t('العنوان بالإنجليزي', 'English title')
                     }}<input
-                      [name]="'lesson-en-' + s + '-' + l"
+                      [name]="'lesson-en-' + rowKey(lesson)"
                       [(ngModel)]="lesson.title_en"
                       required
                       minlength="2"
@@ -187,24 +295,39 @@
                   ><label
                     >{{ t('رابط يوتيوب', 'YouTube URL')
                     }}<input
-                      [name]="'url-' + s + '-' + l"
+                      [name]="'url-' + rowKey(lesson)"
                       [(ngModel)]="lesson.media_url"
                       type="url"
                       dir="ltr"
-                      required
                       maxlength="500" /></label
                   ><label
                     >{{ t('المدة بالدقائق', 'Duration in minutes')
                     }}<input
-                      [name]="'duration-' + s + '-' + l"
+                      [name]="'duration-' + rowKey(lesson)"
                       [(ngModel)]="lesson.duration_minutes"
                       type="number"
                       min="1"
                       max="600"
-                      required /></label
-                  ><label class="check"
+                      required
+                  /></label>
+                  <label
+                    >{{ t('وصف الدرس بالعربي', 'Arabic lesson description')
+                    }}<textarea
+                      [name]="'lesson-desc-ar-' + rowKey(lesson)"
+                      [(ngModel)]="lesson.description_ar"
+                      maxlength="4000"
+                    ></textarea></label
+                  ><label
+                    >{{ t('وصف الدرس بالإنجليزي', 'English lesson description')
+                    }}<textarea
+                      [name]="'lesson-desc-en-' + rowKey(lesson)"
+                      [(ngModel)]="lesson.description_en"
+                      maxlength="4000"
+                    ></textarea>
+                  </label>
+                  <label class="check"
                     ><input
-                      [name]="'preview-' + s + '-' + l"
+                      [name]="'preview-' + rowKey(lesson)"
                       type="checkbox"
                       [(ngModel)]="lesson.is_preview"
                     />{{ t('درس معاينة مجاني', 'Free preview lesson') }}</label
@@ -233,10 +356,31 @@
         <div class="actions">
           <button type="button" (click)="draft.sections.push(chapter())">
             ＋ {{ t('إضافة جزء', 'Add chapter') }}</button
-          ><button class="primary" type="submit" [disabled]="editorForm.invalid || busy()">
-            {{ t('حفظ المسودة', 'Save draft') }}
+          ><button
+            class="primary"
+            type="submit"
+            [disabled]="editorForm.invalid || busy() || categoriesLoading() || !draft.category_id"
+          >
+            {{ t('حفظ المسودة', 'Save draft') }}</button
+          ><button
+            class="gold"
+            type="button"
+            (click)="save(true)"
+            [disabled]="editorForm.invalid || busy() || categoriesLoading() || !draft.category_id"
+          >
+            {{ t('حفظ وإرسال للمراجعة', 'Save & submit for review') }}
           </button>
         </div>
+        @if (editorForm.invalid) {
+          <p class="muted">
+            {{
+              t(
+                'أكمل العناوين بالعربي والإنجليزي، واختر المجال، وحدد مدة كل درس والسعر لتفعيل الحفظ.',
+                'Complete the bilingual titles, category, lesson durations and price to enable saving.'
+              )
+            }}
+          </p>
+        }
       </form>
       @if (preview()) {
         <div class="preview-review">

@@ -36,7 +36,7 @@ export class CourseLearningActionsComponent {
     effect((onCleanup) => {
       const id = this.course().id;
       this.state.set(null);
-      if (!this.auth.isLoggedIn()) return;
+      if (!this.auth.isLoggedIn() || this.auth.role?.() === 'TRAINER') return;
       this.loading.set(true);
       const request = this.api.learning(id).subscribe({
         next: (row) => {

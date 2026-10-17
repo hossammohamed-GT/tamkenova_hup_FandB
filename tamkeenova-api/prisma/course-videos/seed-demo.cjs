@@ -115,6 +115,7 @@ async function seedDemoVideos(prisma) {
   );
 }
 async function main() {
+  if(process.env.ALLOW_DEMO_CATALOG_SEED!=='true')throw new Error('Demo video seeding is retired. Use real instructor-authored lessons. Isolated tests only: ALLOW_DEMO_CATALOG_SEED=true.');
   const { PrismaClient } = require('@prisma/client');
   const prisma = new PrismaClient({
     datasources: { db: { url: demoConnectionUrl() } },

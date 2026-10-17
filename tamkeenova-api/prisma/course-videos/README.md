@@ -14,25 +14,22 @@ Prisma DLL), then run from `tamkeenova-api`:
 ```bat
 npm run db:course-videos
 npm run prisma:generate
-npm run db:demo-course-videos
 npm run start:dev
 ```
 
-`db:demo-course-videos` is optional, for the marked catalog demos ONLY. It uses
-the user-supplied URL in `demo.json`, adding two explicitly demo chapters and four
-explicitly demo lessons per course (108 lessons for 27 demos). It preserves an
-existing introduction, does not overwrite existing lesson links and skips courses
-with pre-existing authored chapters/lessons. Reruns do not duplicate records.
-No durations are inferred from YouTube, no course completion is fabricated.
-Deleting demo courses with `db:demo-courses:remove` also removes their chapters
-and lessons by the course foreign keys; the same learner-history guard applies.
+**Temporary demo videos are retired.** Do not seed samples in deployment.
+Instructors now add real introductions, chapters and lessons in
+`/portal/trainer/courses`; see `../course-workflow/README.md` for approval and checkout.
+The old video seed remains an isolated test fixture and refuses execution without
+`ALLOW_DEMO_CATALOG_SEED=true`. `npm run db:demo-courses:remove` deletes unused
+marked demos and archives those with owners or learner/payment/certificate history.
 
 Both helpers use the CLI connection budget/retries from `demo-catalog/manage.cjs`.
 `DEMO_DATABASE_URL`, if present, must target the SAME branch/database as the
 backend. No secrets or actual production connection strings belong in Git.
 The schema helper can run with the old generated client because its new DDL is
 constant SQL executed through Prisma; generate the updated client immediately
-before running the video seed or starting the updated backend.
+before starting the updated backend.
 
 ## Edit your actual courses using Prisma Studio
 
@@ -65,7 +62,7 @@ Introductions and flagged preview lessons are public. All lessons in a free
 course are public. The public course API strips other lesson media URLs. For
 paid courses, the guarded access/playback endpoints require the authenticated
 user's ACTIVE or COMPLETED `course_enrollments` row; cancelled/suspended or
-another user's enrollment does not grant access. Payment/subscription checkout
-and automatic enrollment are NOT implemented by this feature.
+another user's enrollment does not grant access. Manual payment reporting, reviewed access and free enrollment are implemented by
+the separate course workflow; see `../course-workflow/README.md`.
 YouTube links are not DRM: authorized viewers can inspect/share URLs, and public
 YouTube videos remain available outside this site.

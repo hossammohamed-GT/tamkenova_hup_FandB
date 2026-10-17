@@ -663,3 +663,121 @@ describe('Validation and endpoint roles', () => {
       ).rejects.toBeInstanceOf(BadRequestException);
   });
 });
+
+it('saves catalog summaries, content type, category and ordered lesson descriptions under the current instructor', async () => {
+  const { db, service } = setup();
+  teacher(db);
+  db.course_categories.findFirst.mockResolvedValue({
+    id: 'subcategory',
+    parent_id: 'category',
+  });
+  db.courses.create.mockResolvedValue({ id: 'new' });
+  db.course_sections.create.mockResolvedValue({ id: 'chapter' });
+  const draft = {
+    title_ar: 'عنوان الكورس',
+    title_en: 'Real Course',
+    description_ar: 'وصف الكورس',
+    description_en: 'Course description',
+    short_description_ar: 'نبذة البطاقة',
+    short_description_en: 'Card summary',
+    content_type: 'PODCOURSE',
+    category_id: 'subcategory',
+    preview_video_url: 'https://youtu.be/5BciHXh074k',
+    price: 100,
+    language: 'ar',
+    level: 'BEGINNER',
+    sections: [
+      {
+        title_ar: 'جزء',
+        title_en: 'Chapter',
+        lessons: [
+          {
+            title_ar: 'درس أول',
+            title_en: 'First lesson',
+            description_ar: 'وصف الدرس',
+            description_en: 'Lesson description',
+            media_url: '',
+            duration_minutes: 10,
+            is_preview: false,
+          },
+          {
+            title_ar: 'درس ثان',
+            title_en: 'Second lesson',
+            media_url: 'https://youtu.be/5BciHXh074k',
+            duration_minutes: 20,
+            is_preview: true,
+          },
+        ],
+      },
+    ],
+  } as CourseDraftDto;
+  await service.saveCourse('teacher', draft);
+  expect(db.courses.create.mock.calls[0][0].data).toMatchObject({
+    owner_trainer_id: 'trainer',
+    status: 'DRAFT',
+    review_status: 'DRAFT',
+    price: 100,
+    content_type: 'PODCOURSE',
+    short_description_ar: 'نبذة البطاقة',
+    duration_minutes: 30,
+    lessons_count: 2,
+  });
+  expect(
+    db.course_category_links.create.mock.calls[0][0].data.category_id,
+  ).toBe('subcategory');
+  expect(
+    db.course_lessons.createMany.mock.calls[0][0].data.map((l: any) => [
+      l.position,
+      l.description_ar,
+    ]),
+  ).toEqual([
+    [0, 'وصف الدرس'],
+    [1, undefined],
+  ]);
+  expect(db.course_categories.findFirst.mock.calls[1][0].where).toEqual({
+    id: 'category',
+    parent_id: null,
+    is_active: true,
+  });
+  expect(db.notifications.createMany).not.toHaveBeenCalled();
+});
+
+it('rejects an inactive or missing subcategory parent before writing a draft', async () => {
+  const { db, service } = setup();
+  teacher(db);
+  db.course_categories.findFirst
+    .mockResolvedValueOnce({ id: 'child', parent_id: 'parent' })
+    .mockResolvedValueOnce(null);
+  await expect(
+    service.saveCourse('teacher', {
+      category_id: 'child',
+      sections: [],
+      title_ar: 'عنوان الكورس',
+      title_en: 'Course title',
+      description_ar: '',
+      description_en: '',
+      preview_video_url: '',
+      price: 0,
+      language: 'ar',
+      level: 'BEGINNER',
+    }),
+  ).rejects.toBeInstanceOf(BadRequestException);
+  expect(db.courses.create).not.toHaveBeenCalled();
+});
+it('a draft with unfinished lesson video cannot be submitted or notify administrators', async () => {
+  const { db, service } = setup();
+  teacher(db);
+  db.courses.findFirst.mockResolvedValue({
+    ...course,
+    status: 'DRAFT',
+    review_status: 'DRAFT',
+  });
+  db.course_sections.findMany.mockResolvedValue([
+    { lessons: [{ media_url: '', duration_minutes: 10 }] },
+  ]);
+  await expect(
+    service.submitCourse('teacher', 'course'),
+  ).rejects.toBeInstanceOf(BadRequestException);
+  expect(db.courses.updateMany).not.toHaveBeenCalled();
+  expect(db.notifications.createMany).not.toHaveBeenCalled();
+});

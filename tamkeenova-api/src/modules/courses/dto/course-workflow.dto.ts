@@ -17,6 +17,8 @@ import {
   ValidateNested,
 } from 'class-validator';
 export class LessonDraftDto {
+  @IsOptional() @IsString() @MaxLength(4000) description_ar?: string;
+  @IsOptional() @IsString() @MaxLength(4000) description_en?: string;
   @IsString() @Length(2, 180) title_ar!: string;
   @IsString() @Length(2, 180) title_en!: string;
   @IsString() @MaxLength(500) media_url!: string;
@@ -33,6 +35,10 @@ export class ChapterDraftDto {
   lessons!: LessonDraftDto[];
 }
 export class CourseDraftDto {
+  @IsOptional() @IsString() @MaxLength(500) short_description_ar?: string;
+  @IsOptional() @IsString() @MaxLength(500) short_description_en?: string;
+  @IsOptional() @IsIn(['VIDEO', 'PODCOURSE']) content_type?:
+    'VIDEO' | 'PODCOURSE';
   @IsString() @Length(3, 180) title_ar!: string;
   @IsString() @Length(3, 180) title_en!: string;
   @IsString() @MaxLength(10000) description_ar!: string;

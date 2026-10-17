@@ -630,7 +630,7 @@
     "reviews_count": "Reviews",
     "availability_count": "Available Slots",
     "average_rating": "Average Rating",
-    "programs_link": "Training Programs",
+    "programs_link": "Courses & programs I teach",
     "availability_link": "Availability",
     "reviews_link": "Reviews",
     "complete_profile": "Complete Your Profile",
@@ -642,12 +642,12 @@
     "quick_actions": "Quick Actions",
     "actions": {
       "edit_profile": "Edit Profile",
-      "add_program": "Add New Program",
+      "add_program": "Add course / program",
       "set_availability": "Set Availability",
       "manage_consultations": "Manage Consultations"
     },
     "overview": "Overview",
-    "programs_desc": "Manage your training programs",
+    "programs_desc": "Create categorized course content and lessons, track publication and approve learner completion.",
     "availability_desc": "Manage your availability",
     "reviews_desc": "{{count}} reviews from trainees",
     "profile_desc": "Edit your personal details",
@@ -1900,8 +1900,9 @@
   "course_workflow": {
     "library": "My course library",
     "checkout": "Enroll & pay",
-    "studio": "Recorded course studio",
+    "studio": "Create & manage courses",
     "admin": "Courses & payments",
-    "dashboard_hint": "Recorded courses, progress, completion approvals and certificates"
+    "dashboard_hint": "Recorded courses, progress, completion approvals and certificates",
+    "manage": "Manage my courses & programs"
   }
 }

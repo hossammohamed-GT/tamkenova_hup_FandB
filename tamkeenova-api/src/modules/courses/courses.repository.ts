@@ -1,3 +1,4 @@
+import { publicCourseWhere } from './public-course-policy';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CourseCatalogQueryDto } from './dto/course-catalog-query.dto';
@@ -74,7 +75,7 @@ export class CoursesRepository {
       categories.map((category) =>
         this.prisma.courses.count({
           where: {
-            status: 'PUBLISHED',
+            ...publicCourseWhere,
             category_links: {
               some: {
                 category_id: {
@@ -97,7 +98,7 @@ export class CoursesRepository {
   }
 
   async getCourses(query: CourseCatalogQueryDto) {
-    const where: any = { status: 'PUBLISHED' };
+    const where: any = { ...publicCourseWhere };
     const search = query.search?.trim();
 
     if (search) {
@@ -167,7 +168,7 @@ export class CoursesRepository {
       orderBy: [{ display_order: 'asc' }, { title_en: 'asc' }],
       include: {
         items: {
-          where: { courses: { status: 'PUBLISHED' } },
+          where: { courses: { ...publicCourseWhere } },
           orderBy: { position: 'asc' },
           include: {
             courses: { include: this.courseCardInclude() },
@@ -199,7 +200,7 @@ export class CoursesRepository {
           },
         },
         course_links: {
-          where: { courses: { status: 'PUBLISHED' } },
+          where: { courses: { ...publicCourseWhere } },
           orderBy: { position: 'asc' },
           include: {
             courses: { include: this.courseCardInclude() },
@@ -216,7 +217,7 @@ export class CoursesRepository {
 
   async getCourseBySlug(slug: string) {
     return this.prisma.courses.findFirst({
-      where: { slug, status: 'PUBLISHED' },
+      where: { slug, ...publicCourseWhere },
       include: {
         ...this.courseCardInclude(),
         sections: {
@@ -245,7 +246,7 @@ export class CoursesRepository {
 
   async getCourseAccess(slug: string, userId: string) {
     return this.prisma.courses.findFirst({
-      where: { slug, status: 'PUBLISHED' },
+      where: { slug, ...publicCourseWhere },
       select: {
         id: true,
         is_free: true,
@@ -263,7 +264,7 @@ export class CoursesRepository {
       where: {
         id: lessonId,
         is_active: true,
-        courses: { slug, status: 'PUBLISHED' },
+        courses: { slug, ...publicCourseWhere },
       },
       select: {
         id: true,

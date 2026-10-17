@@ -1,3 +1,4 @@
+import { courseLearnerGuard } from '../core/guards/course-learner.guard';
 import { Routes } from '@angular/router';
 import { HomeComponent } from '../features/home/home.component';
 import { NotFoundComponent } from '../features/not-found/not-found.component.js';
@@ -102,7 +103,7 @@ export const routes: Routes = [
 
   {
     path: 'my-courses',
-    canActivate: [authGuard],
+    canActivate: [authGuard, courseLearnerGuard],
     data: {
       seo: { titleKey: 'course_workflow.library', descriptionKey: 'seo.portal.description' },
     },
@@ -113,7 +114,7 @@ export const routes: Routes = [
   },
   {
     path: 'programs/course/:slug/checkout',
-    canActivate: [authGuard],
+    canActivate: [authGuard, courseLearnerGuard],
     data: {
       seo: { titleKey: 'course_workflow.checkout', descriptionKey: 'seo.portal.description' },
     },
@@ -279,7 +280,10 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'programs',
+        path: 'programs', redirectTo: '/portal/trainer/courses', pathMatch: 'full',
+      },
+      {
+        path: 'legacy-programs',
         data: { seo: { titleKey: 'trainer_programs.title', descriptionKey: 'seo.portal.description' } },
         canActivate: [trainerStatusGuard],
         loadComponent: () =>

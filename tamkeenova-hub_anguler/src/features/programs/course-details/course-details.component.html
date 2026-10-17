@@ -152,7 +152,9 @@
         }
       </div>
       <aside class="course-detail-aside">
-        <app-course-learning-actions [course]="item" [lesson]="selectedLesson()" />
+        @if(auth.role() === 'TRAINER') {
+          <section class="detail-panel"><h2>{{ 'course_workflow.manage' | translate }}</h2><a routerLink="/portal/trainer/courses">{{ 'course_workflow.studio' | translate }} →</a></section>
+        } @else {<app-course-learning-actions [course]="item" [lesson]="selectedLesson()" />}
         <section class="detail-panel curriculum-panel">
           <div class="curriculum-heading">
             <div>
@@ -177,7 +179,9 @@
           @if (accessNotice()) {
             <div class="access-notice" role="alert">
               <p>{{ 'programs.video.enrollment_required' | translate }}</p>
-              @if (!auth.isLoggedIn()) {
+              @if (auth.role() === 'TRAINER') {
+                <a routerLink="/portal/trainer/courses">{{ 'course_workflow.manage' | translate }} →</a>
+              } @else if (!auth.isLoggedIn()) {
                 <a
                   routerLink="/login"
                   [queryParams]="{ returnUrl: '/programs/course/' + item.slug }"

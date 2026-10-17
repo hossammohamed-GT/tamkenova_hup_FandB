@@ -86,6 +86,51 @@ describe('Workflow HTTP authentication, current roles and DTO boundary', () => {
     active = true;
     for (const fn of Object.values(service)) (fn as any).mockClear();
   });
+  it('trainers cannot enter learner checkout, enrollment, library or completion routes', async () => {
+    role = 'TRAINER';
+    for (const path of [
+      `checkout/${id}`,
+      'library',
+      'library/payments',
+      `learning/${id}`,
+    ])
+      await request(app.getHttpServer())
+        .get('/api/course-workflow/' + path)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(403);
+    for (const path of [
+      `enroll/${id}/free`,
+      `checkout/${id}/report`,
+      `learning/${id}/completion`,
+    ])
+      await request(app.getHttpServer())
+        .post('/api/course-workflow/' + path)
+        .set('Authorization', `Bearer ${token}`)
+        .send({})
+        .expect(403);
+    expect(service.enrollFree).not.toHaveBeenCalled();
+    expect(service.reportTransfer).not.toHaveBeenCalled();
+  });
+  it('preserves learner access for every existing non-trainer role, including clients', async () => {
+    for (const learnerRole of [
+      'STUDENT',
+      'CLIENT',
+      'ADMIN',
+      'SUPER_ADMIN',
+      'EMPLOYEE',
+      'VOLUNTEER',
+    ]) {
+      role = learnerRole;
+      await request(app.getHttpServer())
+        .get('/api/course-workflow/library')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+      await request(app.getHttpServer())
+        .get(`/api/course-workflow/checkout/${id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+    }
+  });
   afterAll(async () => {
     await app?.close();
     if (oldSecret === undefined) delete process.env.JWT_SECRET;

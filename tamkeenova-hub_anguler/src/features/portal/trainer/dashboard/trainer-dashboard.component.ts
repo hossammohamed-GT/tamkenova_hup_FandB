@@ -44,7 +44,7 @@ export class TrainerDashboardComponent implements OnInit {
     const avg = typeof s.average_rating === 'string' ? parseFloat(s.average_rating as any) : (s.average_rating ?? 0);
     return [
       { key: 'profile', labelKey: 'trainer_dashboard.steps_profile', icon: 'fa-user-pen', done: true, route: '/portal/trainer/profile' },
-      { key: 'programs', labelKey: 'trainer_dashboard.steps_programs', icon: 'fa-book', done: (s.programs_count ?? 0) > 0, route: '/portal/trainer/programs', count: s.programs_count },
+      { key: 'programs', labelKey: 'trainer_dashboard.steps_programs', icon: 'fa-book', done: (s.programs_count ?? 0) > 0, route: '/portal/trainer/courses', count: s.programs_count },
       { key: 'availability', labelKey: 'trainer_dashboard.steps_availability', icon: 'fa-calendar-days', done: (s.availability_count ?? 0) > 0, route: '/portal/trainer/availability', count: s.availability_count },
       { key: 'reviews', labelKey: 'trainer_dashboard.steps_reviews', icon: 'fa-star', done: (s.reviews_count ?? 0) > 0, route: '/portal/trainer/reviews', count: s.reviews_count },
       { key: 'rating', labelKey: 'trainer_dashboard.steps_rating', icon: 'fa-chart-line', done: avg > 0, route: '/portal/trainer/reviews', count: avg },
@@ -80,7 +80,8 @@ export class TrainerDashboardComponent implements OnInit {
     {
       icon: 'fa-book-medical',
       labelKey: 'trainer_dashboard.actions.add_program',
-      route: '/portal/trainer/programs',
+      route: '/portal/trainer/courses',
+      queryParams: { new: '1' },
     },
     {
       icon: 'fa-calendar-plus',
