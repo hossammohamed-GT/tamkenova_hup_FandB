@@ -28,9 +28,12 @@ credentials.
   and the existing additive catalog SQL before applying a backed-up migration.
   Never reset the database or seed fake courses to hide a load failure.
 
-The exact deployed failure is **not established by the original screenshot**. This
-change improves error-state correctness and diagnosis; it is not evidence that the
-remote API, database or hosting configuration has been repaired.
+The original screenshot alone did **not** establish the deployed HTTP failure.
+The user subsequently confirmed that categories loaded normally after refreshing
+the backend runtime / clearing its cached state. No database edits were needed.
+The frontend failure-state safeguards are retained to avoid misleading empty states
+if another loading failure occurs. Live recovery was reported by the user, not
+independently verified against their deployment.
 
 ## Local verification
 

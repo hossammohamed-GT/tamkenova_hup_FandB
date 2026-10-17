@@ -138,8 +138,8 @@ export class CourseCategoriesComponent {
         );
       default:
         return this.t(
-          'تعذّر تحميل التصنيفات من الخادم. أعد المحاولة، وإن استمر الخطأ افحص سجلات الباك إند واتصال قاعدة البيانات باستخدام حالة الطلب أدناه. لم يتم حذف أي بيانات.',
-          'Categories could not be loaded from the server. Retry; if this persists, check backend logs and database connectivity using the status below. No data has been deleted.',
+          'تعذّر تحميل التصنيفات من الخادم. أعد المحاولة، وإن استمر الخطأ افحص سجلات الباك إند واتصال قاعدة البيانات باستخدام حالة الطلب أدناه. فشل التحميل لا يعني عدم وجود تصنيفات.',
+          'Categories could not be loaded from the server. Retry; if this persists, check backend logs and database connectivity using the status below. A failed load does not mean the catalog is empty.',
         );
     }
   }
