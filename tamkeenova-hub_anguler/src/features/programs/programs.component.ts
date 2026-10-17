@@ -246,7 +246,7 @@ export class ProgramsComponent {
   }
 
   /** Pin the *bottom* of the preceding content, including very tall category grids.
-   * The next normal-flow panel then scrolls over it; no scroll hijacking or per-frame JS. */
+   * The next normal-flow panel then scrolls over it; no JS-driven visual animation. */
   private setupCatalogStack(): void {
     const underlay = this.catalogUnderlay?.nativeElement;
     const marker = this.catalogCoverMarker?.nativeElement;
@@ -256,6 +256,17 @@ export class ProgramsComponent {
     const resize = () => underlay.style.setProperty('--underlay-pin-top',
       `${Math.min(72, window.innerHeight - underlay.offsetHeight)}px`);
     const updateFocus = () => { underlay.inert = !motion.matches && marker.getBoundingClientRect().top < 72; };
+    // A jump can carry the 1px marker from below to above the viewport between
+    // observer samples (non-intersecting in both). Coalesce a passive scroll
+    // check for keyboard accessibility only; sticky/cover motion stays pure CSS.
+    let coverFocusFrame = 0;
+    const onCoverScroll = () => {
+      if (coverFocusFrame || motion.matches) return;
+      coverFocusFrame = window.requestAnimationFrame(() => {
+        coverFocusFrame = 0;
+        updateFocus();
+      });
+    };
     let focusFrame = 0;
     const revealFocusedControl = (event: FocusEvent) => {
       const target = event.target;
@@ -283,12 +294,15 @@ export class ProgramsComponent {
     resizeObserver.observe(underlay);
     coverObserver.observe(marker);
     window.addEventListener('resize', resize, { passive: true });
+    window.addEventListener('scroll', onCoverScroll, { passive: true });
     motion.addEventListener('change', updateFocus);
     resize();
     this.stackingReady.set(true);
     this.destroyRef.onDestroy(() => {
       resizeObserver.disconnect(); coverObserver.disconnect();
       window.cancelAnimationFrame(focusFrame);
+      window.cancelAnimationFrame(coverFocusFrame);
+      window.removeEventListener('scroll', onCoverScroll);
       underlay.removeEventListener('focusin', revealFocusedControl);
       window.removeEventListener('resize', resize);
       motion.removeEventListener('change', updateFocus);

@@ -22,6 +22,25 @@ selected-category image flight, curated shelves and learning paths are preserved
   If storage fails, the toggle works for the session and announces that explicitly.
   This action never enrolls a learner, initiates payment or grants access.
 
+## Full-width reference refinement
+
+The workspace deliberately overrides the shared centered `content-width` cap. It
+fills the viewport with small responsive gutters; the sidebar stays bounded while
+the grid uses three columns on standard desktops, four from 1900px and five from
+2400px. Tablet/mobile retain the existing single-workspace responsive layout.
+
+The card uses a shorter photo-to-information ratio, 48px panel overlap, a clipped
+sloping information face, a larger gradient/faceted category emblem, thin wire
+nodes and translucent crystals rather than a strong continuous rounded rim.
+Metadata and actions stay real HTML. RTL mirrors the decorative geometry and photo
+clip **only**, never the photograph or text. No stock screenshot is used as a
+flattened card and no reference-only badge, instructor or rating is invented.
+
+Full-suite verification exposed a pre-existing keyboard race in the navbar: the
+ArrowDown animation frame could move focus into a closing menu after Escape had
+restored the trigger. Closing/destroying the navbar now cancels that frame, and a
+late callback checks that the menu is still open. Unit tests cover this sequence.
+
 ## Scroll hand-off
 
 The earlier content is grouped in `.catalog-underlay`. When supported, a
@@ -29,7 +48,9 @@ ResizeObserver computes `min(72px, viewportHeight - underlayHeight)` as its stic
 inset, so even a category grid taller than the screen pins at its bottom. The next
 opaque, rounded catalog section stays in normal document flow with a higher layer
 and naturally scrolls up over it. There is no wheel/touch interception, artificial
-scroll loop or per-frame scroll handler.
+scroll loop or JavaScript-driven visual animation. A passive, animation-frame-coalesced
+scroll check updates keyboard inertness only, covering jumps that skip the 1px
+IntersectionObserver marker between samples.
 
 IntersectionObserver makes the underlay inert only when fully covered, so keyboard
 focus cannot disappear behind the catalog. During partial overlap, focusing a
@@ -52,7 +73,8 @@ continue to apply. No schema changes, database seeds or new runtime dependencies
 - `npm run build`
 
 Browser design fixtures are explicitly mocked in the test file only; they are not
-public catalog content. Tests cover AR/EN, 320–1440px, dark/light, actual sticky
+public catalog content. Tests cover AR/EN, 320–2560px, dark/light, actual sticky
 geometry and overlay motion, keyboard bookmarks and persistence, query continuity,
-error/empty/retry, pagination, image fallbacks, and reduced motion. The full browser
+error/empty/retry, pagination, image fallbacks, reduced motion, full viewport width,
+adaptive desktop columns, panel overlap and real action hit-testing. The full browser
 suite also protects category geometry, menu synchronization, videos and workflows.

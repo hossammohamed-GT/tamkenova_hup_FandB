@@ -374,3 +374,42 @@ test('unavailable photo and avatar degrade to designed category artwork and init
   await expect(card.locator('.instructor-placeholder')).toHaveText('T');
   await expect(card.locator('.course-title-link')).toHaveText(courses[0].title_en);
 });
+
+for (const width of [1440, 1920, 2560]) {
+  test(`catalog uses the entire ${width}px workspace without oversized cards`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1100 });
+    await setup(page);
+    const workspace = page.locator('.catalog-workspace');
+    const box = await workspace.boundingBox();
+    expect(box!.width).toBeCloseTo(width, 0);
+    expect(box!.x).toBeCloseTo(0, 0);
+    const grid = page.locator('.geometric-course-grid');
+    const columns = await grid.evaluate(
+      (el) => getComputedStyle(el).gridTemplateColumns.split(' ').length,
+    );
+    expect(columns).toBe(width >= 2400 ? 5 : width >= 1900 ? 4 : 3);
+    const card = page.locator('.geometric-course-card').first();
+    expect((await card.boundingBox())!.width).toBeLessThan(440);
+    const overlap = await card.evaluate((el) => {
+      const photo = el.querySelector('.course-photo-area')!.getBoundingClientRect();
+      const body = el.querySelector('.course-card-body')!.getBoundingClientRect();
+      return photo.bottom - body.top;
+    });
+    expect(overlap).toBeGreaterThanOrEqual(47);
+    await card.scrollIntoViewIfNeeded();
+    for (const selector of ['.course-title-link', '.bookmark-control', '.course-arrow']) {
+      const target = card.locator(selector);
+      await target.scrollIntoViewIfNeeded();
+      expect(
+        await target.evaluate((el) => {
+          const b = el.getBoundingClientRect();
+          const hit = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2);
+          return !!hit && (el === hit || el.contains(hit));
+        }),
+      ).toBe(true);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
+      true,
+    );
+  });
+}

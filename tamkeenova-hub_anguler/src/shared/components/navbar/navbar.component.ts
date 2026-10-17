@@ -59,6 +59,8 @@ export class NavbarComponent {
   private readonly destroyRef = inject(DestroyRef);
   private programsCloseTimer: ReturnType<typeof setTimeout> | null = null;
 
+  private programsFocusFrame: number | null = null;
+
   isScrolled = signal(false);
   isMobileMenuOpen = signal(false);
   isUserMenuOpen = signal(false);
@@ -85,7 +87,7 @@ export class NavbarComponent {
         this.isProgramsRoute.set(event.urlAfterRedirects.split('?')[0].startsWith('/programs'));
         this.closeProgramsMenu();
       });
-    this.destroyRef.onDestroy(() => this.cancelProgramsClose());
+    this.destroyRef.onDestroy(() => this.closeProgramsMenu());
     effect(() => {
       if (!this.isLoggedIn()) return;
       this.notificationsService.refreshUnreadCount();
@@ -169,7 +171,15 @@ export class NavbarComponent {
   focusProgramsMenu(event: Event): void {
     event.preventDefault();
     this.openProgramsMenu();
-    requestAnimationFrame(() => this.elementRef.nativeElement.querySelector('.mega-category, .mega-browse-all')?.focus());
+    if (this.programsFocusFrame !== null) cancelAnimationFrame(this.programsFocusFrame);
+    this.programsFocusFrame = requestAnimationFrame(() => {
+      this.programsFocusFrame = null;
+      // Escape can close the menu before this frame runs. Never move focus into
+      // the closing panel after restoring it to the navigation trigger.
+      if (this.isProgramsMenuOpen()) {
+        this.elementRef.nativeElement.querySelector('.mega-category, .mega-browse-all')?.focus();
+      }
+    });
   }
 
   cancelProgramsClose(): void {
@@ -186,6 +196,8 @@ export class NavbarComponent {
 
   closeProgramsMenu(): void {
     this.cancelProgramsClose();
+    if (this.programsFocusFrame !== null) cancelAnimationFrame(this.programsFocusFrame);
+    this.programsFocusFrame = null;
     this.isProgramsMenuOpen.set(false);
   }
 

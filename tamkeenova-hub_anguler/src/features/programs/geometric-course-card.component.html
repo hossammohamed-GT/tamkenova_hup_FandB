@@ -9,9 +9,9 @@
   <svg class="card-frame" viewBox="0 0 400 414" preserveAspectRatio="none" aria-hidden="true">
     <defs>
       <linearGradient [id]="uid + '-rim'" x1="0" y1="0" x2="1" y2="1">
-        <stop stop-color="var(--card-light)" stop-opacity=".8" />
+        <stop stop-color="var(--card-light)" stop-opacity=".24" />
         <stop offset=".48" stop-color="var(--card-color)" stop-opacity=".1" />
-        <stop offset="1" stop-color="var(--card-light)" stop-opacity=".7" />
+        <stop offset="1" stop-color="var(--card-light)" stop-opacity=".2" />
       </linearGradient>
     </defs>
     <path [attr.d]="outline()" class="frame-fill" />
@@ -22,6 +22,40 @@
       stroke-width="1.2"
       vector-effect="non-scaling-stroke"
     />
+  </svg>
+  <svg
+    class="card-crystal-scene"
+    viewBox="0 0 400 414"
+    preserveAspectRatio="none"
+    aria-hidden="true"
+  >
+    <g class="crystal-faces">
+      <path d="m-10 133 27-17 34 20-1 73-30 19-30-18Z" fill="var(--card-color)" opacity=".48" />
+      <path
+        d="m-10 133 30 18 31-15M20 151v77"
+        fill="none"
+        stroke="var(--card-light)"
+        stroke-width="1"
+        opacity=".8"
+      />
+      <path d="m344 92 38-20 29 18v77l-29 18-38-22Z" fill="var(--card-light)" opacity=".28" />
+      <path
+        d="m382 72 1 75 28 20M344 92l39 19 28-21"
+        fill="none"
+        stroke="var(--card-color)"
+        stroke-width=".7"
+        opacity=".4"
+      />
+      <path d="m-8 229 27-16 26 16v34l-26 15-27-16Z" fill="var(--card-light)" opacity=".24" />
+    </g>
+    <g fill="none" stroke="#bfa06b" stroke-width=".6" opacity=".45">
+      <path d="M-8 178v-95l32-21M392 153l18 12v121l-20 13M-8 83l30 17" />
+    </g>
+    <g fill="#bfa06b" opacity=".7">
+      <circle cx="-8" cy="83" r="1.8" />
+      <circle cx="410" cy="286" r="1.8" />
+      <circle cx="24" cy="62" r="1.5" />
+    </g>
   </svg>
   <span class="accent-cube cube-one" aria-hidden="true"></span>
   <span class="accent-cube cube-two" aria-hidden="true"></span>
@@ -41,6 +75,7 @@
           <clipPath [id]="uid + '-photo'">
             <path
               d="M40 5H315Q330 5 341 16L385 52Q396 61 396 78V216L332 239H40L4 211V49Q4 36 16 25Z"
+              [attr.transform]="english() ? null : 'translate(400 0) scale(-1 1)'"
             />
           </clipPath>
           <linearGradient [id]="uid + '-shade'" x2="0" y2="1">
@@ -127,17 +162,33 @@
     }
     <span class="category-emblem" aria-hidden="true">
       <svg class="emblem-outline" viewBox="0 0 100 110">
+        <defs>
+          <linearGradient [id]="uid + '-emblem'" x1="0" y1="0" x2="1" y2="1">
+            <stop stop-color="var(--card-light)" />
+            <stop offset=".38" stop-color="var(--card-color)" />
+            <stop offset="1" stop-color="var(--card-color)" />
+          </linearGradient>
+        </defs>
         <path
+          [attr.fill]="ref('emblem')"
           d="m50 3 41 23q6 3 6 10v39q0 7-6 10l-35 21q-6 3-12 0L9 85q-6-3-6-10V36q0-7 6-10L44 3q6-3 12 0Z"
+        />
+        <path d="m50 5 44 25v49l-44 26V55L6 30Z" fill="#fff" opacity=".09" stroke="none" />
+        <path
+          d="M50 55 94 30M50 55v50"
+          fill="none"
+          stroke="#fff"
+          stroke-opacity=".14"
+          stroke-width=".6"
         />
       </svg>
       <svg class="emblem-icon" viewBox="0 0 24 24"><path [attr.d]="theme().icon" /></svg>
     </span>
   </div>
   <div class="course-card-body">
-    <svg class="frosted-panel" viewBox="0 0 400 280" preserveAspectRatio="none" aria-hidden="true">
+    <svg class="frosted-panel" viewBox="0 0 400 240" preserveAspectRatio="none" aria-hidden="true">
       <path
-        d="M4 22Q4 2 26 2H258Q271 2 283 11L383 66Q396 74 396 90V233Q396 246 383 253L338 277H43Q31 277 23 268L10 253Q4 247 4 232Z"
+        d="M4 22Q4 6 23 6H244Q259 6 274 16L381 72Q396 80 396 99V201Q396 214 385 220L361 234Q352 239 341 239H43Q33 239 26 231L10 213Q4 206 4 194Z"
       />
     </svg>
     <div class="course-copy">

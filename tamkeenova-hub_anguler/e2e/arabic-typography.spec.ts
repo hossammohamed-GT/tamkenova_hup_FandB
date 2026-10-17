@@ -185,10 +185,14 @@ test('switching locale restores English typography; Arabic glyph fallback remain
     nodeId: root.nodeId,
     selector: '#arabic-fallback-probe',
   });
-  const { fonts } = await cdp.send('CSS.getPlatformFontsForNode', { nodeId });
-  expect(fonts.some((f) => f.familyName === family && f.isCustomFont && f.glyphCount > 0)).toBe(
-    true,
-  );
+  // The probe was just inserted: wait for Chromium to lay out and paint its
+  // fallback glyphs, not merely for the node to exist in the DOM.
+  await expect
+    .poll(async () => {
+      const { fonts } = await cdp.send('CSS.getPlatformFontsForNode', { nodeId });
+      return fonts.some((f) => f.familyName === family && f.isCustomFont && f.glyphCount > 0);
+    })
+    .toBe(true);
   await cdp.detach();
   await toggle.click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'ar');

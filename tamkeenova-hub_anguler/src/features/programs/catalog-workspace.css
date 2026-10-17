@@ -574,3 +574,36 @@
 :host-context([data-theme='dark']) .editorial-copy .section-kicker {
   color: #e7bd74;
 }
+
+/* This is a full-page workspace, not a centered 1360px content column. */
+.catalog-workspace.content-width {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: clamp(16px, 1.5vw, 32px);
+  grid-template-columns: clamp(210px, 16vw, 250px) minmax(0, 1fr);
+  gap: clamp(22px, 2vw, 34px);
+}
+.geometric-course-grid {
+  gap: 30px 26px;
+}
+@media (min-width: 1900px) {
+  .catalog-section .geometric-course-grid:not(.is-list) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (min-width: 2400px) {
+  .catalog-section .geometric-course-grid:not(.is-list) {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+@media (max-width: 1099px) {
+  .catalog-workspace.content-width {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 680px) {
+  .geometric-course-grid {
+    gap: 24px;
+  }
+}
