@@ -116,8 +116,10 @@ for (const [language, width] of [['en', 1024], ['ar', 1024], ['en', 1280], ['ar'
         range.selectNodeContents(card.querySelector('.category-name')!);
         return Array.from(range.getClientRects()).every(r => r.right <= a.left || a.right <= r.left || r.bottom <= a.top || a.bottom <= r.top);
       })).toBe(true);
-      await arrow.scrollIntoViewIfNeeded();
-      expect(await arrow.evaluate((el) => {
+      // Focusing a sticky category must reveal it above the rising catalog.
+      // Native scrollIntoView alone can move the cover over a pinned child.
+      await cards.nth(index).focus();
+      await expect.poll(() => arrow.evaluate((el) => {
         const rect = el.getBoundingClientRect();
         return document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2)?.closest('.category-tile') === el.closest('.category-tile');
       })).toBe(true);

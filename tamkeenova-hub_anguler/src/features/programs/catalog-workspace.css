@@ -1,0 +1,576 @@
+/* A real layered hand-off: the previous chapter pins at its bottom while this
+   opaque, normal-flow workspace rises over it. overflow:clip is not a scrollport. */
+.programs-page {
+  overflow: clip;
+}
+.catalog-underlay {
+  position: relative;
+  z-index: 0;
+}
+.stacking-ready .catalog-underlay {
+  position: sticky;
+  top: var(--underlay-pin-top, 72px);
+}
+.catalog-section {
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100svh;
+  margin: 0;
+  padding: 26px 0 64px;
+  border-radius: 34px 34px 0 0;
+  background: #f6f6f2;
+  box-shadow: 0 -18px 48px #122f3c19;
+  scroll-margin-top: 72px;
+}
+.catalog-section::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  content: '';
+  background:
+    radial-gradient(ellipse at 100% 10%, #e5c28d1c, transparent 50%),
+    repeating-linear-gradient(30deg, transparent 0 199px, #b2997010 200px, transparent 201px 400px),
+    repeating-linear-gradient(150deg, transparent 0 199px, #b2997010 200px, transparent 201px 400px);
+}
+.catalog-cover-marker {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+.catalog-panel-handle {
+  width: 46px;
+  height: 3px;
+  margin: 0 auto 27px;
+  border-radius: 8px;
+  background: #c49a53;
+}
+.catalog-workspace {
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr);
+  align-items: start;
+  gap: 28px;
+}
+.catalog-sidebar {
+  position: sticky;
+  top: 82px;
+  min-width: 0;
+  max-height: calc(100svh - 98px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.catalog-directory {
+  padding: 17px 10px 13px;
+  border: 1px solid #ffffffbc;
+  border-radius: 22px;
+  background: #ffffffd6;
+  box-shadow: 0 12px 35px #132e380a;
+}
+.catalog-directory h2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px 15px;
+  color: #142e3b;
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+.catalog-directory h2 svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: #546c78;
+  stroke-width: 1.5;
+}
+.catalog-directory nav {
+  display: grid;
+  gap: 5px;
+}
+.catalog-directory button {
+  position: relative;
+  width: 100%;
+  min-height: 49px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 10px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  text-align: start;
+  font: inherit;
+  font-size: 0.68rem;
+  line-height: 1.8;
+  font-weight: 600;
+  cursor: pointer;
+  color: #193947;
+  background: transparent;
+  transition:
+    background 200ms ease,
+    color 200ms ease,
+    box-shadow 200ms ease;
+}
+.catalog-directory button.is-active {
+  color: #fff;
+  background: linear-gradient(110deg, #073d51, #007b86);
+  box-shadow: 0 5px 14px #00657724;
+}
+.catalog-directory button:not(.is-active):hover {
+  background: #e9f0ee;
+}
+.directory-icon {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.directory-chevron {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+  margin-inline-start: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+.catalog-directory .directory-all {
+  min-height: 36px;
+  padding-block: 7px;
+  font-size: 0.64rem;
+}
+.catalog-note {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 25px 21px;
+  margin: 22px 4px 0;
+  border-radius: 20px 35px 20px 35px;
+  color: white;
+  background: #0d3443;
+}
+.catalog-note::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: '';
+  background: linear-gradient(35deg, transparent 50%, #24707844 50% 74%, #c6a26428 74%);
+}
+.note-mark {
+  font-size: 31px;
+  line-height: 1;
+  color: #e7bd74;
+}
+.catalog-note h3 {
+  margin: 16px 0 9px;
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+.catalog-note p {
+  font-size: 0.71rem;
+  line-height: 1.9;
+  color: #d1e2e7;
+}
+.note-line {
+  display: block;
+  width: 44px;
+  height: 2px;
+  margin-top: 20px;
+  background: #e7bd74;
+}
+.catalog-results {
+  min-width: 0;
+}
+.catalog-editorial {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  min-height: 213px;
+  margin-bottom: 24px;
+}
+.editorial-copy {
+  position: relative;
+  z-index: 1;
+  padding: 18px 0 22px;
+}
+.editorial-title {
+  font-weight: 750;
+  font-size: clamp(1.6rem, 2.5vw, 2.35rem);
+  line-height: 1.65;
+  margin: 12px 0;
+  color: #122f3c;
+  text-wrap: balance;
+}
+.editorial-title em {
+  display: block;
+  font-style: normal;
+  color: #a57022;
+}
+.editorial-description {
+  max-width: 470px;
+  font-size: 0.76rem;
+  line-height: 1.9;
+  color: #4a6471;
+}
+.editorial-art {
+  position: relative;
+  margin-inline-start: -42px;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 12px 30px 16px 30px;
+  clip-path: polygon(11% 0, 90% 0, 100% 14%, 100% 89%, 90% 100%, 0 100%, 0 15%);
+}
+.editorial-art img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  object-fit: cover;
+}
+.editorial-art::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: linear-gradient(90deg, #f6f6f2 0%, #f6f6f200 35%, #092e3d55 100%);
+}
+.editorial-facet {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(140deg, transparent 55%, #063947b0 55% 79%, #e5b66f55 79%);
+}
+.editorial-motto {
+  position: absolute;
+  z-index: 2;
+  inset-inline-end: 18px;
+  bottom: 27px;
+  color: #fff4db;
+  max-width: 95px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: 1.8;
+  white-space: pre-line;
+  transform: rotate(-7deg);
+}
+.catalog-heading {
+  margin-bottom: 18px;
+  gap: 16px;
+}
+.catalog-heading h2 {
+  font-size: 1.35rem;
+  line-height: 1.8;
+}
+.catalog-heading .section-kicker {
+  font-size: 0.62rem;
+}
+.catalog-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 17px 0 14px;
+}
+.catalog-search {
+  min-width: 0;
+  flex: 1;
+  max-width: 650px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 9px 5px 17px;
+  border: 1px solid #dce2e3;
+  border-radius: 30px;
+  background: #e9ecec96;
+}
+.catalog-search > svg {
+  flex: 0 0 19px;
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: var(--color-text);
+  stroke-width: 1.8;
+}
+.catalog-search input {
+  min-width: 0;
+  width: 100%;
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.73rem;
+  color: var(--color-text);
+}
+.catalog-search input:focus {
+  outline-offset: 3px;
+}
+.catalog-search button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--color-text);
+  background: #ffffff9e;
+  cursor: pointer;
+}
+.catalog-search button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+}
+.catalog-view-controls {
+  display: flex;
+  gap: 5px;
+  margin-inline-start: auto;
+}
+.catalog-view-controls button {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 12px;
+  border: 0;
+  border-radius: 13px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.catalog-view-controls button[aria-pressed='true'] {
+  color: #fff;
+  background: #064c5c;
+  box-shadow: 0 5px 13px #00556b24;
+}
+.catalog-view-controls svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+}
+.mobile-category-picker {
+  display: none;
+}
+.catalog-section .filter-bar {
+  border: 0;
+  border-radius: 14px;
+  background: #ffffff80;
+  padding: 9px;
+  margin-bottom: 25px;
+}
+.geometric-course-grid {
+  gap: 25px 20px;
+  align-items: stretch;
+}
+.geometric-course-grid.is-list {
+  grid-template-columns: 1fr;
+}
+.catalog-section .course-card-skeleton {
+  clip-path: polygon(9% 0, 85% 0, 100% 11%, 100% 93%, 89% 100%, 6% 100%, 0 94%, 0 10%);
+  border: 0;
+  min-height: 410px;
+}
+.catalog-section a:focus-visible,
+.catalog-section button:focus-visible,
+.catalog-section select:focus-visible {
+  outline: 3px solid var(--color-accent-text);
+  outline-offset: 3px;
+}
+:host-context([data-theme='dark']) .catalog-section {
+  background: #102832;
+}
+:host-context([data-theme='dark']) .catalog-directory {
+  background: #19343e;
+  border-color: #33515a;
+}
+:host-context([data-theme='dark']) .catalog-directory h2,
+:host-context([data-theme='dark']) .catalog-directory button {
+  color: #e6f0ef;
+}
+:host-context([data-theme='dark']) .catalog-directory button:not(.is-active):hover {
+  background: #274750;
+}
+:host-context([data-theme='dark']) .editorial-title {
+  color: #f0f3ed;
+}
+:host-context([data-theme='dark']) .editorial-title em {
+  color: #e7bd74;
+}
+:host-context([data-theme='dark']) .editorial-description {
+  color: #b5c9cd;
+}
+:host-context([data-theme='dark']) .editorial-art::after {
+  background: linear-gradient(90deg, #102832, transparent 55%, #092e3d55);
+}
+:host-context([data-theme='dark']) .catalog-section .filter-bar {
+  background: #1c3943;
+}
+:host-context([data-theme='dark']) .catalog-search {
+  background: #18343d;
+  border-color: #33515a;
+}
+:host-context([data-theme='dark']) .catalog-search button {
+  background: #284953;
+  color: #eff7f6;
+}
+@media (max-width: 1199px) {
+  .catalog-workspace {
+    grid-template-columns: 195px minmax(0, 1fr);
+    gap: 20px;
+  }
+  .catalog-section .course-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .catalog-section .course-grid.is-list {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 1099px) {
+  .catalog-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .catalog-sidebar {
+    display: none;
+  }
+  .mobile-category-picker {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    color: var(--color-text);
+    font-size: 0.73rem;
+  }
+  .mobile-category-picker select {
+    min-width: 0;
+    max-width: 65%;
+    padding: 9px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 0;
+    border-radius: 8px;
+    font: inherit;
+  }
+}
+@media (max-width: 680px) {
+  .catalog-section {
+    border-radius: 26px 26px 0 0;
+    padding-top: 20px;
+  }
+  .catalog-workspace {
+    width: calc(100% - 32px);
+  }
+  .catalog-editorial {
+    display: block;
+    min-height: 250px;
+  }
+  .editorial-copy {
+    max-width: 100%;
+    padding: 15px 0;
+  }
+  .editorial-title {
+    font-size: 1.65rem;
+    max-width: 90%;
+  }
+  .editorial-description {
+    max-width: 90%;
+  }
+  .editorial-art {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0.13;
+    z-index: -1;
+  }
+  .editorial-motto {
+    display: none;
+  }
+  .catalog-toolbar {
+    gap: 6px;
+  }
+  .catalog-search {
+    padding-inline-start: 12px;
+    gap: 7px;
+  }
+  .catalog-search input {
+    font-size: 0.66rem;
+  }
+  .catalog-view-controls {
+    gap: 1px;
+  }
+  .catalog-view-controls button {
+    width: 36px;
+    height: 36px;
+    padding: 9px;
+  }
+  .catalog-section .course-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  .catalog-section .course-card-skeleton {
+    display: block;
+    min-height: 420px;
+  }
+  .catalog-section .course-card-skeleton > span {
+    height: 190px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stacking-ready .catalog-underlay {
+    position: relative;
+    top: auto;
+  }
+  .catalog-directory button {
+    transition: none;
+  }
+}
+
+.catalog-editorial {
+  min-height: 185px;
+  margin-bottom: 16px;
+}
+.editorial-copy {
+  padding-block: 12px 16px;
+}
+.editorial-title {
+  font-size: clamp(1.5rem, 2.15vw, 2rem);
+  line-height: 1.5;
+  margin-block: 9px;
+}
+.catalog-heading {
+  align-items: center;
+  margin-bottom: 5px;
+}
+.catalog-heading h2 {
+  font-size: 1.05rem;
+}
+.catalog-heading p {
+  font-size: 0.65rem;
+}
+.catalog-heading .section-kicker {
+  display: none;
+}
+.catalog-toolbar {
+  margin-block: 12px 11px;
+}
+
+.editorial-copy .section-kicker {
+  color: #7d5c1e;
+}
+:host-context([data-theme='dark']) .editorial-copy .section-kicker {
+  color: #e7bd74;
+}

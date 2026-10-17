@@ -142,6 +142,29 @@
     "soonPlaceholder": "Chat is unavailable right now…"
   },
   "programs": {
+    "geometric": {
+      "explore": "Explore programs",
+      "eyebrow": "YOUR NEXT CHAPTER",
+      "hero_one": "Skills today.",
+      "hero_two": "A brighter tomorrow.",
+      "hero_text": "Practical courses, expert instructors, and learning that moves you forward. Find your next step.",
+      "motto": "Grow.\nLearn.\nAchieve.",
+      "note_title": "Your potential, unlocked.",
+      "note_text": "Choose a field that inspires you. Start with one course, and build something extraordinary.",
+      "new": "New",
+      "save": "Save {{title}} on this device",
+      "unsave": "Remove {{title}} from saved courses",
+      "device_hint": "Saved courses are kept on this device, not synced to your account.",
+      "saved_device": "Course saved on this device.",
+      "saved_session": "Course saved for this session. Device storage is unavailable.",
+      "removed": "Course removed from saved courses.",
+      "rating": "Rated {{rating}} out of 5 from {{count}} reviews",
+      "currency": "EGP",
+      "search": "Search the course catalog",
+      "view": "Course layout",
+      "grid": "Grid view",
+      "list": "List view"
+    },
     "header": {
       "eyebrow": "Directory of Certified Training Programs & Courses",
       "title": "Training Programs & Grants",

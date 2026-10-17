@@ -1,4 +1,5 @@
-<main class="programs-page">
+<main class="programs-page" [class.stacking-ready]="stackingReady()">
+  <div class="catalog-underlay" #catalogUnderlay>
   @if (!selectedCategory()) {
   <section class="catalog-hero">
     <div class="hero-art" aria-hidden="true"></div>
@@ -270,12 +271,37 @@
     </section>
   }
 
-  <section class="catalog-section content-width" id="course-list" aria-labelledby="catalog-heading">
+  </div>
+  <section class="catalog-section" id="course-list" #catalogSection aria-labelledby="catalog-heading">
+    <span class="catalog-cover-marker" #catalogCoverMarker aria-hidden="true"></span>
+    <div class="catalog-panel-handle" aria-hidden="true"></div>
+    <div class="catalog-workspace content-width">
+      <aside class="catalog-sidebar" [attr.aria-label]="'programs.geometric.explore' | translate">
+        <div class="catalog-directory">
+          <h2>{{ 'programs.geometric.explore' | translate }} <svg class="directional-arrow arrow-forward" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></h2>
+          <nav>
+            <button class="directory-all" type="button" [class.is-active]="!selectedCategory()" [attr.aria-current]="!selectedCategory() ? 'true' : null" (click)="selectCatalogCategory('')">{{ 'programs.catalog.all_courses' | translate }}</button>
+            @for (category of displayedCategories(); track category.id) {
+              <button type="button" [class.is-active]="selectedCategory() === category.slug" [attr.aria-current]="selectedCategory() === category.slug ? 'true' : null" (click)="selectCatalogCategory(category.slug)">
+                <svg class="directory-icon" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="categoryArtworkIcon(category.slug)"/></svg>
+                <span>{{ categoryName(category) }}</span><svg class="directory-chevron directional-arrow arrow-forward" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+              </button>
+            }
+          </nav>
+          @if (categoriesUnavailable()) { <button type="button" class="directory-retry" (click)="loadCategories()">{{ 'programs.catalog.try_again' | translate }}</button> }
+        </div>
+        <div class="catalog-note"><span class="note-mark" aria-hidden="true">✦</span><h3>{{ 'programs.geometric.note_title' | translate }}</h3><p>{{ 'programs.geometric.note_text' | translate }}</p><span class="note-line" aria-hidden="true"></span></div>
+      </aside>
+      <div class="catalog-results" [attr.aria-busy]="isLoading() || isLoadingMore()">
+        <div class="catalog-editorial">
+          <div class="editorial-copy"><span class="section-kicker">{{ selectedCategoryName() || ('programs.geometric.eyebrow' | translate) }}</span><p class="editorial-title">{{ 'programs.geometric.hero_one' | translate }} <em>{{ 'programs.geometric.hero_two' | translate }}</em></p><p class="editorial-description">{{ 'programs.geometric.hero_text' | translate }}</p></div>
+          <div class="editorial-art" aria-hidden="true"><img [src]="selectedCategoryRecord() ? categoryCardImage(selectedCategoryRecord()!) : '/assets/course-categories/business-professional-skills.jpg'" alt="" loading="lazy"/><span class="editorial-facet"></span><span class="editorial-motto">{{ 'programs.geometric.motto' | translate }}</span></div>
+        </div>
     <div class="section-heading catalog-heading">
       <div>
         <span class="section-kicker">{{ (selectedCategory() ? 'programs.catalog.category_courses' : 'programs.catalog.learn_something_new') | translate }}</span>
         <h2 id="catalog-heading">{{ selectedCategory() ? selectedCategoryName() : ('programs.catalog.all_courses' | translate) }}</h2>
-        <p>{{ 'programs.catalog.results_summary' | translate: { count: totalCourses() } }}</p>
+        <p role="status" aria-live="polite">{{ 'programs.catalog.results_summary' | translate: { count: totalCourses() } }}</p>
         @if (selectedCategory()) {
           <button type="button" class="category-return-link text-link" (click)="showAllCategories()">
             <i class="directional-arrow arrow-back" aria-hidden="true">←</i>
@@ -294,6 +320,11 @@
       </label>
     </div>
 
+    <div class="catalog-toolbar">
+      <form class="catalog-search" (ngSubmit)="submitSearch()"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></svg><input type="search" name="catalogSearch" [(ngModel)]="searchInput" [placeholder]="'programs.catalog.search_placeholder' | translate" [attr.aria-label]="'programs.geometric.search' | translate"/><button type="submit" [attr.aria-label]="'programs.geometric.search' | translate"><svg class="directional-arrow arrow-forward" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg></button></form>
+      <div class="catalog-view-controls" role="group" [attr.aria-label]="'programs.geometric.view' | translate"><button type="button" [attr.aria-pressed]="catalogLayout() === 'grid'" [attr.aria-label]="'programs.geometric.grid' | translate" (click)="catalogLayout.set('grid')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 0h7v7h-7z"/></svg></button><button type="button" [attr.aria-pressed]="catalogLayout() === 'list'" [attr.aria-label]="'programs.geometric.list' | translate" (click)="catalogLayout.set('list')"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h13M8 12h13M8 19h13M3 5h1m-1 7h1m-1 7h1"/></svg></button></div>
+    </div>
+    <label class="mobile-category-picker"><span>{{ 'programs.geometric.explore' | translate }}</span><select [value]="selectedCategory()" (change)="selectCatalogCategory($any($event.target).value)"><option value="">{{ 'programs.catalog.all_courses' | translate }}</option>@for (category of displayedCategories(); track category.id) { <option [value]="category.slug">{{ categoryName(category) }}</option> }</select></label>
     <div class="filter-bar">
       <label class="filter-select">
         <i class="fa-solid fa-signal"></i>
@@ -362,11 +393,9 @@
         </button>
       </div>
     } @else if (courses().length) {
-      <div class="course-grid">
+      <div class="course-grid geometric-course-grid" [class.is-list]="catalogLayout() === 'list'">
         @for (course of courses(); track course.id) {
-          <ng-container
-            *ngTemplateOutlet="courseCard; context: { $implicit: course }"
-          ></ng-container>
+          <app-geometric-course-card [course]="course" [categories]="categories()" [compact]="catalogLayout() === 'list'" />
         }
       </div>
       @if (hasMore()) {
@@ -400,6 +429,8 @@
         }
       </div>
     }
+      </div>
+    </div>
   </section>
 
   <ng-template #courseCard let-course>

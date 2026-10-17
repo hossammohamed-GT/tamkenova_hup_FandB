@@ -101,3 +101,34 @@ describe('Programs category loading', () => {
     expect(fixture.componentInstance.categories()).toEqual([]);
   });
 });
+
+describe('Catalog request lifecycle', () => {
+  it('ignores superseded search responses rather than replacing the latest results', async () => {
+    const first = new Subject<any>(), latest = new Subject<any>();
+    const getCourses = vi.fn().mockReturnValueOnce(first).mockReturnValue(latest);
+    await TestBed.configureTestingModule({ imports: [ProgramsComponent], providers: [
+      provideRouter([]), provideTranslateService(),
+      { provide: CourseCatalogService, useValue: { getCategories: () => NEVER, getCollections: () => NEVER, getLearningPrograms: () => NEVER, getCourses } },
+      { provide: TrainersService, useValue: { getAll: () => NEVER } },
+    ] }).compileComponents();
+    const f = TestBed.createComponent(ProgramsComponent);
+    f.componentInstance.searchInput = 'new search'; f.componentInstance.submitSearch();
+    first.next({ data: [{ id: 'stale' }], meta: { total: 900 } });
+    expect(f.componentInstance.courses()).toEqual([]);
+    latest.next({ data: [], meta: { total: 2, total_pages: 1, page: 1 } });
+    expect(f.componentInstance.totalCourses()).toBe(2);
+    expect(f.componentInstance.catalogUnavailable()).toBe(false);
+    f.destroy();
+  });
+  it('cancels in-flight course requests on navigation away', async () => {
+    const pending = new Subject<any>();
+    await TestBed.configureTestingModule({ imports: [ProgramsComponent], providers: [
+      provideRouter([]), provideTranslateService(),
+      { provide: CourseCatalogService, useValue: { getCategories: () => NEVER, getCollections: () => NEVER, getLearningPrograms: () => NEVER, getCourses: () => pending } },
+      { provide: TrainersService, useValue: { getAll: () => NEVER } },
+    ] }).compileComponents();
+    const f = TestBed.createComponent(ProgramsComponent); f.destroy();
+    pending.next({ data: [{ id: 'late' }], meta: { total: 50 } });
+    expect(f.componentInstance.courses()).toEqual([]);
+  });
+});

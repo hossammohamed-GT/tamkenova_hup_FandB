@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, ViewChild, afterNextRender, computed, inject, signal } from '@angular/core';
+import { Subscription, filter, take } from 'rxjs';
+import { GeometricCourseCardComponent } from './geometric-course-card.component';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, Scroll } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -34,9 +36,9 @@ const CATEGORY_RECTANGLE_CLIP_PATH =
 @Component({
   selector: 'app-programs',
   standalone: true,
-  imports: [CommonModule, TranslatePipe, FormsModule, RouterLink, CategoryArtworkComponent],
+  imports: [CommonModule, TranslatePipe, FormsModule, RouterLink, CategoryArtworkComponent, GeometricCourseCardComponent],
   templateUrl: './programs.component.html',
-  styleUrl: './programs.component.css',
+  styleUrls: ['./programs.component.css', './catalog-workspace.css'],
 })
 export class ProgramsComponent {
   private readonly route = inject(ActivatedRoute);
@@ -45,6 +47,13 @@ export class ProgramsComponent {
   private readonly catalogService = inject(CourseCatalogService);
   private readonly trainersService = inject(TrainersService);
   private readonly translate = inject(TranslateService);
+  private courseRequest?: Subscription;
+  private catalogScrollRestore?: Subscription;
+  readonly catalogLayout = signal<'grid' | 'list'>('grid');
+  readonly stackingReady = signal(false);
+  @ViewChild('catalogUnderlay') private catalogUnderlay?: ElementRef<HTMLElement>;
+  @ViewChild('catalogCoverMarker') private catalogCoverMarker?: ElementRef<HTMLElement>;
+  @ViewChild('catalogSection') private catalogSection?: ElementRef<HTMLElement>;
   private categoryScrollTimer: number | null = null;
 
   @ViewChild('categoryGrid') private categoryGrid?: ElementRef<HTMLDivElement>;
@@ -122,6 +131,7 @@ export class ProgramsComponent {
   ];
 
   constructor() {
+    afterNextRender(() => this.setupCatalogStack());
     this.loadLandingContent();
     let initialized = false;
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
@@ -181,15 +191,17 @@ export class ProgramsComponent {
   }
 
   loadCourses(reset = true): void {
+    this.courseRequest?.unsubscribe();
     if (reset) {
       this.isLoading.set(true);
+      this.isLoadingMore.set(false);
       this.page.set(1);
     } else {
       this.isLoadingMore.set(true);
     }
 
     const nextPage = reset ? 1 : this.page() + 1;
-    this.catalogService
+    this.courseRequest = this.catalogService
       .getCourses({
         search: this.searchInput.trim() || undefined,
         category: this.selectedCategory() || undefined,
@@ -200,6 +212,7 @@ export class ProgramsComponent {
         page: nextPage,
         limit: this.selectedCategory() ? 60 : this.pageSize,
       })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           this.courses.update((current) =>
@@ -230,6 +243,84 @@ export class ProgramsComponent {
           this.hasMore.set(false);
         },
       });
+  }
+
+  /** Pin the *bottom* of the preceding content, including very tall category grids.
+   * The next normal-flow panel then scrolls over it; no scroll hijacking or per-frame JS. */
+  private setupCatalogStack(): void {
+    const underlay = this.catalogUnderlay?.nativeElement;
+    const marker = this.catalogCoverMarker?.nativeElement;
+    if (!underlay || !marker || typeof ResizeObserver === 'undefined' ||
+        typeof IntersectionObserver === 'undefined') return;
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const resize = () => underlay.style.setProperty('--underlay-pin-top',
+      `${Math.min(72, window.innerHeight - underlay.offsetHeight)}px`);
+    const updateFocus = () => { underlay.inert = !motion.matches && marker.getBoundingClientRect().top < 72; };
+    let focusFrame = 0;
+    const revealFocusedControl = (event: FocusEvent) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement) || motion.matches) return;
+      window.cancelAnimationFrame(focusFrame);
+      const reveal = (attempt = 0) => {
+        const coverTop = marker.getBoundingClientRect().top;
+        const targetBottom = target.getBoundingClientRect().bottom;
+        // Native scrollIntoView cannot reveal a sticky child by centering it:
+        // it can scroll the covering panel further over the focused control.
+        if (coverTop < targetBottom + 16 && coverTop < window.innerHeight && window.scrollY > 0) {
+          const root = document.documentElement;
+          const previous = root.style.scrollBehavior;
+          root.style.scrollBehavior = 'auto';
+          window.scrollBy(0, coverTop - targetBottom - 24);
+          root.style.scrollBehavior = previous;
+          if (attempt < 2) focusFrame = window.requestAnimationFrame(() => reveal(attempt + 1));
+        }
+      };
+      focusFrame = window.requestAnimationFrame(() => reveal());
+    };
+    underlay.addEventListener('focusin', revealFocusedControl);
+    const resizeObserver = new ResizeObserver(resize);
+    const coverObserver = new IntersectionObserver(updateFocus, { rootMargin: '-72px 0px 0px 0px', threshold: 0 });
+    resizeObserver.observe(underlay);
+    coverObserver.observe(marker);
+    window.addEventListener('resize', resize, { passive: true });
+    motion.addEventListener('change', updateFocus);
+    resize();
+    this.stackingReady.set(true);
+    this.destroyRef.onDestroy(() => {
+      resizeObserver.disconnect(); coverObserver.disconnect();
+      window.cancelAnimationFrame(focusFrame);
+      underlay.removeEventListener('focusin', revealFocusedControl);
+      window.removeEventListener('resize', resize);
+      motion.removeEventListener('change', updateFocus);
+      underlay.inert = false;
+    });
+  }
+
+  selectCatalogCategory(slug: string): void {
+    if (slug === this.selectedCategory()) return;
+    const section = this.catalogSection?.nativeElement;
+    const before = section?.getBoundingClientRect().top;
+    this.cancelCategoryPageScroll();
+    // Restore after RouterScroller has applied query-navigation scrolling,
+    // not before it (which would get overwritten by the router's scroll-to-top).
+    this.catalogScrollRestore?.unsubscribe();
+    this.catalogScrollRestore = this.router.events.pipe(
+      filter(event => event instanceof Scroll &&
+        (this.router.parseUrl(event.routerEvent.url).queryParams['category'] || '') === slug),
+      take(1), takeUntilDestroyed(this.destroyRef),
+    ).subscribe(() => {
+      const frame = window.requestAnimationFrame(() => {
+        if (!section || before === undefined) return;
+        const root = document.documentElement;
+        const previous = root.style.scrollBehavior;
+        root.style.scrollBehavior = 'auto';
+        window.scrollBy(0, section.getBoundingClientRect().top - before);
+        root.style.scrollBehavior = previous;
+      });
+      this.destroyRef.onDestroy(() => window.cancelAnimationFrame(frame));
+    });
+    if (slug) this.activateCategory(slug);
+    else this.resetCatalogFilters();
   }
 
   selectCategory(slug: string): void {

@@ -33,6 +33,7 @@ export interface CourseInstructor {
 }
 
 export interface Course {
+  published_at?: string | null;
   id: string;
   slug: string;
   title_ar: string;

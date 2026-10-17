@@ -1,0 +1,214 @@
+<article
+  class="course-card geometric-course-card"
+  [class.is-list]="compact()"
+  [style.--card-color]="theme().color"
+  [style.--card-light]="theme().light"
+  [attr.data-theme]="theme().variant"
+  [attr.aria-labelledby]="uid + '-title'"
+>
+  <svg class="card-frame" viewBox="0 0 400 414" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <linearGradient [id]="uid + '-rim'" x1="0" y1="0" x2="1" y2="1">
+        <stop stop-color="var(--card-light)" stop-opacity=".8" />
+        <stop offset=".48" stop-color="var(--card-color)" stop-opacity=".1" />
+        <stop offset="1" stop-color="var(--card-light)" stop-opacity=".7" />
+      </linearGradient>
+    </defs>
+    <path [attr.d]="outline()" class="frame-fill" />
+    <path
+      [attr.d]="outline()"
+      fill="none"
+      [attr.stroke]="ref('rim')"
+      stroke-width="1.2"
+      vector-effect="non-scaling-stroke"
+    />
+  </svg>
+  <span class="accent-cube cube-one" aria-hidden="true"></span>
+  <span class="accent-cube cube-two" aria-hidden="true"></span>
+  <div class="course-photo-area">
+    <a
+      class="course-cover-link"
+      [routerLink]="['/programs/course', course().slug]"
+      [attr.aria-label]="title()"
+    >
+      <svg
+        class="course-photo-art"
+        viewBox="0 0 400 240"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <defs>
+          <clipPath [id]="uid + '-photo'">
+            <path
+              d="M40 5H315Q330 5 341 16L385 52Q396 61 396 78V216L332 239H40L4 211V49Q4 36 16 25Z"
+            />
+          </clipPath>
+          <linearGradient [id]="uid + '-shade'" x2="0" y2="1">
+            <stop stop-color="#061c28" stop-opacity="0" />
+            <stop offset="1" stop-color="#061c28" stop-opacity=".67" />
+          </linearGradient>
+        </defs>
+        <g [attr.clip-path]="ref('photo')">
+          <rect width="400" height="240" fill="var(--card-color)" />
+          @if (course().cover_image_url && !photoFailed()) {
+            <image
+              class="course-cover"
+              [attr.href]="course().cover_image_url"
+              width="400"
+              height="240"
+              preserveAspectRatio="xMidYMid slice"
+              (error)="photoFailed.set(true)"
+            />
+          } @else {
+            <path d="M0 180 155 0 400 135 240 260Z" fill="var(--card-light)" opacity=".2" />
+            <path
+              [attr.d]="theme().icon"
+              transform="translate(158 64) scale(3.5)"
+              fill="none"
+              stroke="#fff"
+              stroke-width="1"
+              opacity=".45"
+            />
+          }
+          <rect width="400" height="240" [attr.fill]="ref('shade')" />
+          <path
+            class="glass-facet facet-one"
+            d="M0 135 78 93 158 140 90 225 0 195Z"
+            fill="var(--card-color)"
+            opacity=".65"
+          />
+          <path
+            class="glass-facet facet-two"
+            d="m298 0 102 63v93l-100-55-65-41Z"
+            fill="var(--card-light)"
+            opacity=".18"
+          />
+          <path
+            d="m3 130 76-38 79 48m141-39 97 55"
+            fill="none"
+            stroke="var(--card-light)"
+            stroke-width="1"
+            opacity=".7"
+          />
+        </g>
+      </svg>
+    </a>
+    <div class="course-badges">
+      @if (course().is_free) {
+        <span class="cover-badge badge-free">{{ 'programs.catalog.free' | translate }}</span>
+      } @else if (isNew()) {
+        <span class="cover-badge badge-new">{{ 'programs.geometric.new' | translate }}</span>
+      }
+      @if (course().content_type === 'PODCOURSE') {
+        <span class="cover-badge">{{ 'programs.catalog.podcourse' | translate }}</span>
+      }
+    </div>
+    <button
+      type="button"
+      class="bookmark-control"
+      [class.is-saved]="bookmarks.has(course().id)"
+      [attr.aria-pressed]="bookmarks.has(course().id)"
+      [attr.aria-label]="
+        (bookmarks.has(course().id) ? 'programs.geometric.unsave' : 'programs.geometric.save')
+          | translate: { title: title() }
+      "
+      [attr.title]="'programs.geometric.device_hint' | translate"
+      (click)="toggleBookmark()"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4Z" /></svg>
+    </button>
+    @if (course().duration_minutes > 0) {
+      <span class="duration-badge"
+        ><svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 6v6l4 2" /></svg
+        >{{ duration() }}</span
+      >
+    }
+    <span class="category-emblem" aria-hidden="true">
+      <svg class="emblem-outline" viewBox="0 0 100 110">
+        <path
+          d="m50 3 41 23q6 3 6 10v39q0 7-6 10l-35 21q-6 3-12 0L9 85q-6-3-6-10V36q0-7 6-10L44 3q6-3 12 0Z"
+        />
+      </svg>
+      <svg class="emblem-icon" viewBox="0 0 24 24"><path [attr.d]="theme().icon" /></svg>
+    </span>
+  </div>
+  <div class="course-card-body">
+    <svg class="frosted-panel" viewBox="0 0 400 280" preserveAspectRatio="none" aria-hidden="true">
+      <path
+        d="M4 22Q4 2 26 2H258Q271 2 283 11L383 66Q396 74 396 90V233Q396 246 383 253L338 277H43Q31 277 23 268L10 253Q4 247 4 232Z"
+      />
+    </svg>
+    <div class="course-copy">
+      @if (category(); as category) {
+        <span class="course-category-label">{{
+          english() ? category.name_en : category.name_ar
+        }}</span>
+      }
+      <a class="course-title-link" [routerLink]="['/programs/course', course().slug]"
+        ><h3 [id]="uid + '-title'">{{ title() }}</h3></a
+      >
+      <p class="course-summary">{{ summary() }}</p>
+      <div class="course-card-bottom">
+        <div class="course-instructor">
+          @if (instructor()?.users?.profile_image && !avatarFailed()) {
+            <img
+              [src]="instructor()!.users!.profile_image!"
+              alt=""
+              loading="lazy"
+              (error)="avatarFailed.set(true)"
+            />
+          } @else {
+            <span class="instructor-placeholder" aria-hidden="true">{{
+              instructorName().slice(0, 1)
+            }}</span>
+          }
+          <div>
+            <span class="instructor-name">{{ instructorName() }}</span>
+            @if (specialization()) {
+              <small>{{ specialization() }}</small>
+            }
+          </div>
+        </div>
+        <div class="course-card-footer">
+          <div class="course-evidence">
+            @if (rating()) {
+              <span
+                class="course-rating"
+                [attr.aria-label]="
+                  'programs.geometric.rating'
+                    | translate: { rating: rating(), count: course().ratings_count }
+                "
+              >
+                <span class="rating-star" aria-hidden="true">★</span><bdi>{{ rating() }}</bdi
+                ><small>({{ course().ratings_count }})</small>
+              </span>
+            }
+            @if (levelKey()) {
+              <span class="level-badge">{{ levelKey() | translate }}</span>
+            }
+          </div>
+          <div class="course-entry">
+            @if (!course().is_free && course().price) {
+              <span class="course-price"
+                ><bdi>{{ course().price }}</bdi>
+                {{ 'programs.geometric.currency' | translate }}</span
+              >
+            }
+            <a
+              class="course-arrow"
+              [routerLink]="['/programs/course', course().slug]"
+              [attr.aria-label]="('programs.catalog.view_course' | translate) + ': ' + title()"
+            >
+              <svg class="directional-arrow arrow-forward" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 12h16m-6-6 6 6-6 6" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="visually-hidden" role="status" aria-live="polite">{{ announcement() }}</span>
+</article>
