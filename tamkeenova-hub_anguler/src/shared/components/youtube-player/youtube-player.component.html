@@ -36,14 +36,13 @@
     </div>
   }
 </div>
-<div class="video-help">
-  <span>{{ 'programs.video.youtube_note' | translate }}</span>
-  @if (external(); as link) {
+@if (external(); as link) {
+  <div class="video-help">
     <a [href]="link" target="_blank" rel="noopener noreferrer"
       >{{ 'programs.video.open_youtube' | translate }} ↗</a
     >
-  }
-</div>
+  </div>
+}
 @if (fullscreenError()) {
   <p class="fullscreen-error" role="status">{{ 'programs.video.fullscreen_error' | translate }}</p>
 }

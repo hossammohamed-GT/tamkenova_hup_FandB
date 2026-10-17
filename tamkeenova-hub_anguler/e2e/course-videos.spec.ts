@@ -104,6 +104,9 @@ for (const [language, width, theme] of [
       /youtube-nocookie.com\/embed\/5BciHXh074k\?/,
     );
     await expect(player.locator('iframe')).not.toHaveAttribute('src', /list=/);
+    await expect(player.locator('.video-help span')).toHaveCount(0);
+    await expect(player).not.toContainText(/فيديو من يوتيوب|YouTube video ·/);
+    await expect(player.locator('.video-help a')).toHaveAttribute('href', /youtube.com\/watch\?v=/);
     await expect(player.locator('.video-brand img')).toHaveAttribute('src', '/images/logo.svg');
     const brand = await player.locator('.video-brand').boundingBox(),
       frame = await player.locator('iframe').boundingBox();
@@ -121,6 +124,7 @@ for (const [language, width, theme] of [
     });
     await page.locator('.free-previews button').click();
     await expect(player.locator('iframe')).toHaveAttribute('src', /embed\/M7lc1UVf-VE/);
+    await expect(player).not.toContainText(/فيديو من يوتيوب|YouTube video ·/);
     await expect(page.locator('.lesson-button').first()).toHaveAttribute('aria-current', 'true');
     await page.locator('.expand-all').click();
     await page.locator('.lesson-button.is-locked').click();

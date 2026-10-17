@@ -78,3 +78,18 @@ geometry and overlay motion, keyboard bookmarks and persistence, query continuit
 error/empty/retry, pagination, image fallbacks, reduced motion, full viewport width,
 adaptive desktop columns, panel overlap and real action hit-testing. The full browser
 suite also protects category geometry, menu synchronization, videos and workflows.
+
+## Pinned directory and clean video footer
+
+The desktop directory pins at 72px, below the navbar, in either scroll direction.
+Its heading and decorative note no longer share a scrolling outer wrapper: only
+category links scroll inside the available viewport height. Scroll chaining is
+contained within that list, and keyboard focus can reveal every category. On short
+desktop viewports (680px or less), the decorative note is hidden to prioritize the
+functional list; mobile retains its category picker. The sidebar remains scoped
+to the catalog rather than floating over unrelated page sections.
+
+The shared YouTube player no longer renders the redundant YouTube/embed disclaimer
+in either language. Its independent external fallback link remains available; an
+invalid URL has no empty help footer. Introduction and lesson playback both use
+this shared component. No media URLs or playback/access policies were changed.

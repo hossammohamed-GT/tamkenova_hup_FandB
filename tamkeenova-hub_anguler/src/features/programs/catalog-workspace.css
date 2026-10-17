@@ -58,13 +58,22 @@
 }
 .catalog-sidebar {
   position: sticky;
-  top: 82px;
+  top: 72px;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
-  max-height: calc(100svh - 98px);
-  overflow-y: auto;
-  scrollbar-width: thin;
+  max-height: calc(100svh - 88px);
+  /* The sidebar itself must not scroll its heading out of view. Only the
+     category links scroll when there are more than the viewport can hold. */
+  overflow: visible;
 }
 .catalog-directory {
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow: hidden;
   padding: 17px 10px 13px;
   border: 1px solid #ffffffbc;
   border-radius: 22px;
@@ -72,6 +81,7 @@
   box-shadow: 0 12px 35px #132e380a;
 }
 .catalog-directory h2 {
+  flex: 0 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -90,6 +100,14 @@
 }
 .catalog-directory nav {
   display: grid;
+  align-content: start;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
+  scroll-padding-block: 4px;
+  padding: 4px;
   gap: 5px;
 }
 .catalog-directory button {
@@ -148,6 +166,7 @@
   font-size: 0.64rem;
 }
 .catalog-note {
+  flex: 0 0 auto;
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -605,5 +624,12 @@
 @media (max-width: 680px) {
   .geometric-course-grid {
     gap: 24px;
+  }
+}
+
+/* Decorative copy should never crowd the usable directory on short laptops. */
+@media (min-width: 1100px) and (max-height: 680px) {
+  .catalog-note {
+    display: none;
   }
 }

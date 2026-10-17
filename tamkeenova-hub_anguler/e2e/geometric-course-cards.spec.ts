@@ -413,3 +413,85 @@ for (const width of [1440, 1920, 2560]) {
     );
   });
 }
+
+for (const [language, height] of [
+  ['en', 900],
+  ['ar', 600],
+] as const) {
+  test(`category directory stays pinned below the header in both scroll directions: ${language} ${height}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height });
+    await setup(page, language);
+    const rows = Array.from({ length: 3 }, (_, batch) =>
+      courses.map((course) => ({
+        ...course,
+        id: `${course.id}-${batch}`,
+        slug: `${course.slug}-${batch}`,
+      })),
+    ).flat();
+    await page.route('**/api/courses?**', (route) =>
+      route.fulfill({
+        json: {
+          success: true,
+          data: rows,
+          meta: { page: 1, total: rows.length, total_pages: 1 },
+        },
+      }),
+    );
+    await page.locator('.sort-control select').selectOption('popular');
+    await expect(page.locator('.geometric-course-card')).toHaveCount(18);
+    const sidebar = page.locator('.catalog-sidebar');
+    const workspaceTop = await page
+      .locator('.catalog-workspace')
+      .evaluate((el) => el.getBoundingClientRect().top + scrollY);
+    await page.evaluate((y) => {
+      document.documentElement.style.scrollBehavior = 'auto';
+      scrollTo(0, y + 120);
+    }, workspaceTop);
+    await expect
+      .poll(() => sidebar.evaluate((el) => el.getBoundingClientRect().top))
+      .toBeCloseTo(72, 0);
+    expect((await sidebar.boundingBox())!.height).toBeLessThanOrEqual(height - 88 + 1);
+    const cardTop = await page
+      .locator('.geometric-course-card')
+      .first()
+      .evaluate((el) => el.getBoundingClientRect().top);
+    await page.evaluate(() => scrollBy(0, 220));
+    await expect
+      .poll(() => sidebar.evaluate((el) => el.getBoundingClientRect().top))
+      .toBeCloseTo(72, 0);
+    await expect
+      .poll(() =>
+        page
+          .locator('.geometric-course-card')
+          .first()
+          .evaluate((el) => el.getBoundingClientRect().top),
+      )
+      .toBeCloseTo(cardTop - 220, 0);
+    await page.evaluate(() => scrollBy(0, -140));
+    await expect
+      .poll(() => sidebar.evaluate((el) => el.getBoundingClientRect().top))
+      .toBeCloseTo(72, 0);
+    const headingTop = await sidebar.locator('h2').evaluate((el) => el.getBoundingClientRect().top);
+    const nav = sidebar.locator('nav');
+    const pageScroll = await page.evaluate(() => scrollY);
+    await nav.hover();
+    await page.mouse.wheel(0, 1600);
+    await expect.poll(() => nav.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+    await expect
+      .poll(() => sidebar.locator('h2').evaluate((el) => el.getBoundingClientRect().top))
+      .toBeCloseTo(headingTop, 0);
+    expect(await page.evaluate(() => scrollY)).toBeCloseTo(pageScroll, 0);
+    // The last real category stays keyboard-reachable within the bounded list.
+    await nav.locator('button').last().focus();
+    await expect(nav.locator('button').last()).toBeFocused();
+    expect(
+      await nav.evaluate((el) => {
+        const last = el.querySelector('button:last-child')!.getBoundingClientRect();
+        const bounds = el.getBoundingClientRect();
+        return last.top >= bounds.top - 1 && last.bottom <= bounds.bottom + 1;
+      }),
+    ).toBe(true);
+  });
+}

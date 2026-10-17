@@ -307,7 +307,6 @@
       "fullscreen": "Full screen with TamkeeNova branding",
       "fullscreen_error": "Full screen is not available in this browser.",
       "unavailable": "A YouTube video has not been added yet, or this link is not supported.",
-      "youtube_note": "YouTube video · If embedding is unavailable, open the video on YouTube.",
       "open_youtube": "Open on YouTube",
       "demo_note": "Temporary demo content: the introduction and lessons use the supplied test video, not the actual training material.",
       "not_found": "This course could not be found.",

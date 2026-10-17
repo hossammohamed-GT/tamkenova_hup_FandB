@@ -20,6 +20,8 @@ describe('Branded YouTube player', () => {
       'https://www.youtube-nocookie.com/embed/5BciHXh074k?rel=0&playsinline=1',
     );
     expect(iframe.title).toBe('Introduction');
+    expect(host.querySelector('.video-help span')).toBeNull();
+    expect(host.textContent).not.toContain('programs.video.youtube_note');
     expect(host.querySelector('.video-brand img')?.getAttribute('src')).toBe('/images/logo.svg');
     expect(host.querySelector('.video-help a')?.getAttribute('href')).toBe(
       'https://www.youtube.com/watch?v=5BciHXh074k',
@@ -30,7 +32,7 @@ describe('Branded YouTube player', () => {
     fixture.componentRef.setInput('url', 'https://evil.test/embed/5BciHXh074k');
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('iframe')).toBeNull();
-    expect(fixture.nativeElement.querySelector('.video-help a')).toBeNull();
+    expect(fixture.nativeElement.querySelector('.video-help')).toBeNull();
   });
   it('requests fullscreen on the entire branded component and handles unsupported browsers', async () => {
     const fixture = TestBed.createComponent(YoutubePlayerComponent);
