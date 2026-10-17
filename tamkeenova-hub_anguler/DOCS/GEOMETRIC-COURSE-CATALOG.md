@@ -93,3 +93,21 @@ The shared YouTube player no longer renders the redundant YouTube/embed disclaim
 in either language. Its independent external fallback link remains available; an
 invalid URL has no empty help footer. Introduction and lesson playback both use
 this shared component. No media URLs or playback/access policies were changed.
+
+### Delayed-response sticky boundary regression
+
+A delayed empty/few-course response can replace the taller skeleton grid with a
+short result. Previously the sidebar itself defined that grid row's height, so
+its sticky containing block collapsed to exactly its own height. The page still
+had 144px of trailing section/main padding outside that block; at the document
+bottom the sidebar top moved from 72px to about -56px, underneath the navbar.
+
+A stretched `.catalog-sidebar-rail` now contains the sticky aside and the trailing
+space. The same trailing space belongs to `.catalog-results`, not section/main
+padding outside the sticky boundary. This preserves the visual bottom spacing
+without inventing courses, fixing the card count, or switching to a floating
+fixed-position sidebar. The rail is hidden as a unit with the mobile picker.
+
+Browser regressions hold an API response for 2.2 seconds with normal motion,
+then return zero or one course. They verify actual layout shrinkage, the 72px
+sidebar position after settlement, at document bottom, and on reverse scrolling.

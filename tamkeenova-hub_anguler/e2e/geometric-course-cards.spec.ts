@@ -243,9 +243,16 @@ test('catalog search, filters and sidebar use the live query without jumping out
   await expect(page.locator('.geometric-course-card')).toHaveCount(1);
   await expect(page).toHaveURL(/category=technology-innovation/);
   expect(requests.at(-1)).toContain('category=technology-innovation');
+  // scrollBy rounds to physical scroll pixels, while layout bounds retain
+  // fractional CSS pixels. Preserve the same position within one CSS pixel.
   await expect
-    .poll(() => page.locator('#course-list').evaluate((el) => el.getBoundingClientRect().top))
-    .toBeCloseTo(before, 0);
+    .poll(async () =>
+      Math.abs(
+        (await page.locator('#course-list').evaluate((el) => el.getBoundingClientRect().top)) -
+          before,
+      ),
+    )
+    .toBeLessThanOrEqual(1);
   await page.locator('.sort-control select').selectOption('rating');
   await expect.poll(() => requests.at(-1)).toContain('sort=rating');
 });
@@ -493,5 +500,62 @@ for (const [language, height] of [
         return last.top >= bounds.top - 1 && last.bottom <= bounds.bottom + 1;
       }),
     ).toBe(true);
+  });
+}
+
+for (const count of [0, 1]) {
+  test(`directory stays pinned after a delayed ${count}-course response shrinks the loading grid`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await setup(page, 'ar', 'light', false);
+    // Hold a real query response while the taller loading grid is on screen.
+    let release!: () => void;
+    const responseReady = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route('**/api/courses?**', async (route) => {
+      await responseReady;
+      await route.fulfill({
+        json: {
+          success: true,
+          data: courses.slice(0, count),
+          meta: { page: 1, total: count, total_pages: 1 },
+        },
+      });
+    });
+    await page.locator('.sort-control select').selectOption('popular');
+    await expect(page.locator('.course-card-skeleton').first()).toBeVisible();
+    const workspace = page.locator('.catalog-workspace');
+    const top = await workspace.evaluate((el) => el.getBoundingClientRect().top + scrollY);
+    await page.evaluate((y) => {
+      document.documentElement.style.scrollBehavior = 'auto';
+      scrollTo(0, y + 120);
+    }, top);
+    const sidebar = page.locator('.catalog-sidebar');
+    await expect
+      .poll(() => sidebar.evaluate((el) => el.getBoundingClientRect().top))
+      .toBeCloseTo(72, 0);
+    const loadingHeight = await workspace.evaluate((el) => el.getBoundingClientRect().height);
+    // Exercise the reported timing, with actual animations enabled.
+    await page.waitForTimeout(2200);
+    release();
+    await expect(page.locator('.catalog-results')).toHaveAttribute('aria-busy', 'false');
+    await expect(page.locator('.geometric-course-card')).toHaveCount(count);
+    await expect
+      .poll(() => workspace.evaluate((el) => el.getBoundingClientRect().height))
+      .toBeLessThan(loadingHeight);
+    await expect
+      .poll(() => sidebar.evaluate((el) => el.getBoundingClientRect().top))
+      .toBeCloseTo(72, 0);
+    // Even at the actual document bottom the sidebar must clear the navbar.
+    await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+    await expect
+      .poll(() => sidebar.evaluate((el) => el.getBoundingClientRect().top))
+      .toBeCloseTo(72, 0);
+    await page.evaluate(() => scrollBy(0, -60));
+    await expect
+      .poll(() => sidebar.evaluate((el) => el.getBoundingClientRect().top))
+      .toBeCloseTo(72, 0);
   });
 }

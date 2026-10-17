@@ -276,6 +276,7 @@
     <span class="catalog-cover-marker" #catalogCoverMarker aria-hidden="true"></span>
     <div class="catalog-panel-handle" aria-hidden="true"></div>
     <div class="catalog-workspace content-width">
+      <div class="catalog-sidebar-rail">
       <aside class="catalog-sidebar" [attr.aria-label]="'programs.geometric.explore' | translate">
         <div class="catalog-directory">
           <h2>{{ 'programs.geometric.explore' | translate }} <svg class="directional-arrow arrow-forward" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></h2>
@@ -292,6 +293,7 @@
         </div>
         <div class="catalog-note"><span class="note-mark" aria-hidden="true">✦</span><h3>{{ 'programs.geometric.note_title' | translate }}</h3><p>{{ 'programs.geometric.note_text' | translate }}</p><span class="note-line" aria-hidden="true"></span></div>
       </aside>
+      </div>
       <div class="catalog-results" [attr.aria-busy]="isLoading() || isLoadingMore()">
         <div class="catalog-editorial">
           <div class="editorial-copy"><span class="section-kicker">{{ selectedCategoryName() || ('programs.geometric.eyebrow' | translate) }}</span><p class="editorial-title">{{ 'programs.geometric.hero_one' | translate }} <em>{{ 'programs.geometric.hero_two' | translate }}</em></p><p class="editorial-description">{{ 'programs.geometric.hero_text' | translate }}</p></div>

@@ -1,7 +1,9 @@
 /* A real layered hand-off: the previous chapter pins at its bottom while this
    opaque, normal-flow workspace rises over it. overflow:clip is not a scrollport. */
 .programs-page {
+  --catalog-bottom-space: 144px;
   overflow: clip;
+  padding-bottom: 0;
 }
 .catalog-underlay {
   position: relative;
@@ -18,7 +20,7 @@
   width: 100%;
   min-height: 100svh;
   margin: 0;
-  padding: 26px 0 64px;
+  padding: 26px 0 0;
   border-radius: 34px 34px 0 0;
   background: #f6f6f2;
   box-shadow: 0 -18px 48px #122f3c19;
@@ -55,6 +57,19 @@
   grid-template-columns: 216px minmax(0, 1fr);
   align-items: start;
   gap: 28px;
+}
+/* The sticky containing block must include the page's trailing space, not
+   just the results' current height. A delayed empty/small response can shrink
+   the grid after the sidebar has already pinned. Keep that space in the rail
+   and results instead of outside the sticky boundary on section/main. */
+.catalog-sidebar-rail {
+  align-self: stretch;
+  min-width: 0;
+}
+.catalog-sidebar-rail::after {
+  display: block;
+  height: var(--catalog-bottom-space);
+  content: '';
 }
 .catalog-sidebar {
   position: sticky;
@@ -207,6 +222,7 @@
 }
 .catalog-results {
   min-width: 0;
+  padding-bottom: var(--catalog-bottom-space);
 }
 .catalog-editorial {
   position: relative;
@@ -459,7 +475,7 @@
   .catalog-workspace {
     grid-template-columns: minmax(0, 1fr);
   }
-  .catalog-sidebar {
+  .catalog-sidebar-rail {
     display: none;
   }
   .mobile-category-picker {
