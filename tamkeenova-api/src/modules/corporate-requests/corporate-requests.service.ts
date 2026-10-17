@@ -14,7 +14,7 @@ import { corporate_status } from '@prisma/client';
 @Injectable()
 export class CorporateRequestsService {
 
-  // Initialize instance
+
   constructor(
     private readonly corporateRepo: CorporateRequestsRepository,
     private readonly notificationsService: NotificationsService,
@@ -25,7 +25,7 @@ export class CorporateRequestsService {
 
 
 
-  // Handle create request
+
   async createRequest(userId: string, dto: CreateCorporateRequestDto) {
     const request = await this.corporateRepo.createRequest({
       requester_id: userId,
@@ -48,7 +48,7 @@ export class CorporateRequestsService {
 
 
 
-  // Handle upload attachment
+
   async uploadAttachment(
     userId: string,
     requestId: string,
@@ -113,7 +113,7 @@ export class CorporateRequestsService {
 
 
 
-  // Handle get my requests
+
   async getMyRequests(userId: string, status?: corporate_status) {
     const requests = await this.corporateRepo.getStudentRequests(
       userId,
@@ -128,7 +128,7 @@ export class CorporateRequestsService {
 
 
 
-  // Handle get request details
+
   async getRequestDetails(userId: string, requestId: string) {
     const request = await this.corporateRepo.getRequestById(requestId);
 
@@ -146,7 +146,7 @@ export class CorporateRequestsService {
 
 
 
-  // Handle notify admins
+
   private async notifyAdmins(
     requestId: string,
     companyName: string,

@@ -4,7 +4,7 @@ import { VerificationService } from './verification.service';
 @Controller('verify')
 export class VerificationController {
 
-  // Initialize instance
+
   constructor(private readonly verificationService: VerificationService) {}
 
 
@@ -13,7 +13,7 @@ export class VerificationController {
 
 
 
-  // Handle verify certificate
+
   @Get('certificate/:code')
   async verifyCertificate(@Param('code') code: string) {
     return this.verificationService.verifyCertificate(code);
@@ -25,7 +25,7 @@ export class VerificationController {
 
 
 
-  // Handle verify user
+
   @Get('user/:username')
   async verifyUser(@Param('username') username: string) {
     return this.verificationService.verifyUser(username);

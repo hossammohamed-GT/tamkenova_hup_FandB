@@ -58,4 +58,5 @@ test('compiled main starts and serves health with deployed Node options', () => 
   );
   assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
   assert.match(result.stdout, /RUNTIME_SMOKE_OK/);
+  assert.doesNotMatch(result.stdout + result.stderr, /do-not-log/);
 });

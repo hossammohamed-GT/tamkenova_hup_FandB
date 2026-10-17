@@ -64,7 +64,7 @@ for (const [language, width, theme] of [['en', 1440, 'light'], ['ar', 1280, 'lig
     await expect(page.locator('#selected-category-heading')).toHaveText(language === 'en' ? names[1][1] : names[1][2]);
     await expect(panel).toBeHidden();
     if (width > 1040) {
-      // Keyboard and Escape preserve an accessible, predictable focus target.
+
       await page.locator('#programs-menu-trigger').focus();
       await page.keyboard.press('ArrowDown');
       await expect(panel).toBeVisible();

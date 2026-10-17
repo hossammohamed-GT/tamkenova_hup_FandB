@@ -1,5 +1,9 @@
 import {
   IsArray,
+  ArrayMaxSize,
+  IsNumber,
+  Min,
+  Max,
   IsInt,
   IsOptional,
   IsString,
@@ -13,7 +17,7 @@ export class TrainerDocumentDto {
   @IsString()
   file_name: string;
 
-  @IsUrl()
+  @IsUrl({ protocols: ['https', 'http'], require_protocol: true })
   file_url: string;
 
   @IsString()
@@ -42,36 +46,48 @@ export class UpdateTrainerProfileDto {
   cover_letter?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ protocols: ['https', 'http'], require_protocol: true })
   linkedin_url?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ protocols: ['https', 'http'], require_protocol: true })
   facebook_url?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ protocols: ['https', 'http'], require_protocol: true })
   website_url?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsUrl({ protocols: ['https', 'http'], require_protocol: true })
   portfolio_url?: string;
 
   @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(10000000)
   consultation_price_from?: number;
 
   @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(10000000)
   consultation_price_to?: number;
 
   @IsOptional()
   @IsInt()
+  @Min(5)
+  @Max(1440)
   consultation_duration?: number;
 
   @IsOptional()
   @IsArray()
+  @ArrayMaxSize(20)
+  @IsUrl({ protocols: ['https', 'http'], require_protocol: true }, { each: true })
   certificate_urls?: string[];
 
   @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(20)
   @ValidateNested({ each: true })
   @Type(() => TrainerDocumentDto)
   documents?: TrainerDocumentDto[];

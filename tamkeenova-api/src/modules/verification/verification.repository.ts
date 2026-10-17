@@ -4,13 +4,13 @@ import { PrismaService } from '../../prisma/prisma.service';
 @Injectable()
 export class VerificationRepository {
 
-  // Initialize instance
+
   constructor(private readonly prisma: PrismaService) {}
 
 
 
 
-  // Handle get certificate by code
+
   async getCertificateByCode(code: string) {
     return this.prisma.certificates.findUnique({
       where: { verification_code: code },
@@ -78,7 +78,7 @@ export class VerificationRepository {
 
 
 
-  // Handle get user for verification
+
   async getUserForVerification(username: string) {
     return this.prisma.users.findUnique({
       where: {

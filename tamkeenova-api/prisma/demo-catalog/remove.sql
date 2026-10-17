@@ -1,4 +1,4 @@
--- Removes ONLY this seed's marked courses. Never touches categories or training_programs.
+
 BEGIN;
 DO $$ BEGIN
   IF EXISTS (

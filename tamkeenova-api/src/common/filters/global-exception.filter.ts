@@ -31,7 +31,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       this.logger.logError({
         event: 'HTTP_EXCEPTION',
         error: exception,
-        endpoint: request.url,
+        endpoint: request.path ?? request.url?.split('?')[0],
         ip: request.ip,
         details: { method: request.method, status },
       });
@@ -66,7 +66,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     this.logger.logError({
       event: 'GLOBAL_EXCEPTION',
       error: exception,
-      endpoint: request.url,
+      endpoint: request.path ?? request.url?.split('?')[0],
       ip: request.ip,
       details: { method: request.method, status, infrastructure },
     });

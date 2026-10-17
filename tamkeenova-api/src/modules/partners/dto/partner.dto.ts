@@ -13,8 +13,8 @@ import {
 const trim = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.trim() : value;
 
-// Empty string (e.g. untouched optional inputs sent as "") must be treated as
-// "not provided" — @IsOptional() only skips null/undefined, so "" would fail @IsUrl().
+
+
 const trimOptionalUrl = ({ value }: { value: unknown }) => {
   if (typeof value !== 'string') return value;
   const trimmed = value.trim();

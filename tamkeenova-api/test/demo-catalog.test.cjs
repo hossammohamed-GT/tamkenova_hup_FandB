@@ -9,7 +9,7 @@ const remove = readFileSync(join(base, 'demo-catalog/remove.sql'), 'utf8');
 const fixture = JSON.parse(readFileSync(join(base, 'demo-catalog/courses.json'), 'utf8'));
 async function setup() {
   const db = new PGlite();
-  // Reuse the real enum/category/course DDL, isolating unrelated legacy tables.
+
   const schema = readFileSync(join(base, 'course-catalog.sql'), 'utf8').split('CREATE TABLE IF NOT EXISTS course_lessons')[0];
   await db.exec(schema + `
     CREATE TABLE course_category_links (course_id uuid REFERENCES courses(id) ON DELETE CASCADE,

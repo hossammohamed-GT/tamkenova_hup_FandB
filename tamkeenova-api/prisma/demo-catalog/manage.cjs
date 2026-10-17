@@ -1,10 +1,10 @@
-// Data only: uses the models in schema.prisma; never creates/alters tables.
+
 const fixture = require('./courses.json');
 const PREFIX = 'demo-catalog-v1-';
 const MARKER = '[TAMKEENOVA_DEMO_CATALOG_V1]';
 const marked = { slug: { startsWith: PREFIX }, description_en: { startsWith: MARKER } };
 
-// Standalone CLI connection budget; never changes .env or the backend pool.
+
 function demoConnectionUrl(env = process.env) {
   const source = env.DEMO_DATABASE_URL || env.DATABASE_URL;
   if (!source) throw new Error('DATABASE_URL is missing. Configure it locally in .env.');
@@ -28,7 +28,7 @@ async function connectWithRetry(prisma, {
       await prisma.$connect();
       return;
     } catch (error) {
-      // Retry connection setup ONLY: never replay writes or a cleanup transaction.
+
       if (!['P1001', 'P1002', 'P2024'].includes(errorCode(error)) || attempt === 3) throw error;
       await prisma.$disconnect().catch(() => {});
       log('Connection is not ready; retrying before any data changes.');
@@ -61,7 +61,7 @@ async function seedDemoCourses(prisma) {
       };
     }));
     const inserted = await tx.courses.createMany({ data: rows, skipDuplicates: true });
-    // A slug collision with a non-demo course must never modify or link that course.
+
     const courses = await tx.courses.findMany({
       where: { ...marked, slug: { in: rows.map(row => row.slug) } }, select: { id: true, slug: true },
     });
@@ -89,13 +89,13 @@ async function removeDemoCourses(prisma) {
     if (courses.some(course => course._count.enrollments || course._count.reviews)) {
       throw new Error('Demo courses have enrollments/reviews. Removal cancelled to protect learner data.');
     }
-    // Delete by marker as well as id, so real courses cannot enter the cleanup set.
+
     return tx.courses.deleteMany({ where: { ...marked, id: { in: courses.map(course => course.id) } } });
   }, { maxWait: 60000, timeout: 60000, isolationLevel: 'Serializable' });
 }
 
-// Production retirement: delete only untouched marked demos, archive anything with history.
-// The public course policy excludes both-marker demos immediately, even before this CLI is run.
+
+
 async function retireDemoCourses(prisma) {
   return prisma.$transaction(
     async (tx) => {

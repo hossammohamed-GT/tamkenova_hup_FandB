@@ -1,4 +1,4 @@
-/** Only known YouTube URLs/IDs may enter the trusted iframe URL. */
+
 export function youtubeVideoId(value?: string | null): string | null {
   const input = value?.trim();
   if (!input) return null;

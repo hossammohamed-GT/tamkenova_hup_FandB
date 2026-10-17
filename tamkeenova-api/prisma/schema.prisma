@@ -651,8 +651,8 @@ model strategic_partners {
   @@index([is_active, display_order], map: "idx_strategic_partners_active_order")
 }
 
-/// Editorial taxonomy for the self-paced course catalog. parent_id supports
-/// the large category + subcategory structure used by the reference catalog.
+
+
 model course_categories {
   id             String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   parent_id      String?             @db.Uuid
@@ -677,8 +677,8 @@ model course_categories {
   @@index([is_active, display_order], map: "idx_course_categories_active_order")
 }
 
-/// Self-paced, subscription-style courses; kept separate from the existing
-/// trainer-led training_programs table so current enrollments/certificates remain intact.
+
+
 model courses {
   owner_trainer_id     String?                   @db.Uuid
   price                Decimal                   @default(0) @db.Decimal(10, 2)
@@ -730,7 +730,7 @@ model courses {
   @@index([enrollments_count], map: "idx_courses_enrollments_count")
 }
 
-/// Ordered chapters for a course. Legacy lessons can remain ungrouped.
+
 model course_sections {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   course_id   String   @db.Uuid
@@ -847,8 +847,8 @@ model course_reviews {
   @@index([student_id], map: "idx_course_reviews_student")
 }
 
-/// Reusable, manually ordered shelves such as Top Courses of the Week,
-/// Trending, Newly Released, Free Courses, and Podcourses.
+
+
 model course_collections {
   id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   slug           String   @unique @db.VarChar(160)
@@ -880,8 +880,8 @@ model course_collection_items {
   @@index([course_id], map: "idx_course_collection_items_course")
 }
 
-/// Bundle of individual self-paced courses; deliberately distinct from the
-/// existing trainer-led training_programs used for registrations and certificates.
+
+
 model learning_programs {
   id                   String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   category_id          String?     @db.Uuid
@@ -964,7 +964,7 @@ model course_payment_requests {
   courses             courses   @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_course_payment_course")
 
   @@unique([method, confirmed_reference], map: "course_payment_confirmed_reference_unique")
-  /// SQL-only partial unique index course_payment_one_pending(user_id,course_id) WHERE status=PENDING must also be preserved.
+
   @@index([status, created_at], map: "idx_course_payment_queue")
   @@index([user_id, course_id, status], map: "idx_course_payment_user_course")
 }

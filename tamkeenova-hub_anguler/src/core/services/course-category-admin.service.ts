@@ -34,7 +34,7 @@ export class CourseCategoryAdminService {
   list() {
     return this.http.get<CourseCatalogResponse<ManagedCategory[]>>(this.endpoint).pipe(
       map((r) => {
-        // A stale API or a proxy serving the SPA must not look like an empty catalog.
+
         if (
           !Array.isArray(r?.data) ||
           r.data.some(

@@ -355,7 +355,7 @@ input[type='checkbox'] {
   min-width: 0;
 }
 
-/* Keep actions away from fields/headings, including nested authoring rows. */
+
 .form-grid { margin-block: 16px; }
 .actions { margin-block-start: var(--action-separation, 18px); }
 .row > .actions { margin-block: 0; }

@@ -174,8 +174,8 @@ export class NavbarComponent {
     if (this.programsFocusFrame !== null) cancelAnimationFrame(this.programsFocusFrame);
     this.programsFocusFrame = requestAnimationFrame(() => {
       this.programsFocusFrame = null;
-      // Escape can close the menu before this frame runs. Never move focus into
-      // the closing panel after restoring it to the navigation trigger.
+
+
       if (this.isProgramsMenuOpen()) {
         this.elementRef.nativeElement.querySelector('.mega-category, .mega-browse-all')?.focus();
       }
@@ -216,7 +216,7 @@ export class NavbarComponent {
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement | null;
     if (!target || typeof (target as any).closest !== 'function') {
-      // Non-element click
+
       this.isUserMenuOpen.set(false);
       if (!this.isNotifHovering()) {
         this.isNotifDropdownOpen.set(false);
@@ -310,7 +310,7 @@ export class NavbarComponent {
     return 'tone-' + notificationTone(type);
   }
 
-  // Backend sends English only
+
   titleFor(notif: AppNotification): string {
     const key = notificationTypeKey(notif.type);
     const fullKey = 'notifications.types.' + key;
@@ -407,7 +407,7 @@ export class NavbarComponent {
         error: () => this.isLoadingDetail.set(false),
       });
     } else {
-      // No entity endpoint here
+
       this.isLoadingDetail.set(false);
     }
   }
@@ -492,7 +492,7 @@ export class NavbarComponent {
     return '/portal/student/profile';
   });
 
-  // No admin profile page
+
   isAdminRole = computed(() => {
     const role = this.authService.role();
     return role === 'ADMIN' || role === 'SUPER_ADMIN';

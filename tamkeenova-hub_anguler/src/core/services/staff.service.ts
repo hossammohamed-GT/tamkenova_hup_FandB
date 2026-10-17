@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-// Safe for every role
+
 @Injectable({ providedIn: 'root' })
 export class StaffService {
   private http = inject(HttpClient);

@@ -1,4 +1,4 @@
-// Never show backend messages
+
 
 type ErrRule = {
   key: string;
@@ -92,7 +92,7 @@ const RULES: ErrRule[] = [
 export function apiErrorKey(err: unknown, fallback?: string): string {
   const e = err as { status?: number; statusText?: string; url?: string; error?: { message?: string | string[] } } | null;
 
-  // Request never reached server
+
   if (e && typeof e === 'object' && 'status' in e && (e.status === 0 || e.status === -1) && !e.statusText) {
     return 'errors.S_OFFLINE';
   }
@@ -108,7 +108,7 @@ export function apiErrorKey(err: unknown, fallback?: string): string {
     if (rule.msg && messages.some((m) => rule.msg!.test(m))) return `errors.${rule.key}`;
   }
 
-  // Array means validation errors
+
   if (Array.isArray(raw) && raw.length > 0) return 'errors.VALIDATION';
 
   if (status === 401) return 'errors.AUTH_SESSION_EXPIRED';

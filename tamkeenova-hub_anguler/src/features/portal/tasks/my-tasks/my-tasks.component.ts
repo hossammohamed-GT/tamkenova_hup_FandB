@@ -135,14 +135,14 @@ export class MyTasksComponent implements OnInit {
     this.hasError.set(false);
     this.tasksService.getMyTasks().subscribe({
       next: (list) => {
-        // Unfinished first, then order
+
         const sorted = [...list].sort((a, b) => {
           const done = (t: MyTaskItem) => t.status === 'APPROVED';
           if (done(a) !== done(b)) return done(a) ? 1 : -1;
           return (a.task_order ?? 0) - (b.task_order ?? 0);
         });
         this.tasks.set(sorted);
-        // Sync open modal
+
         const openId = this.selected()?.id;
         if (openId) {
           const fresh = sorted.find((t) => t.id === openId);

@@ -5,7 +5,7 @@ import { PNG } from 'pngjs';
 import { test, expect } from '@playwright/test';
 import { CERTIFICATE_TEMPLATES } from '../src/core/certificates/certificate-template';
 
-// Fixtures only, no writes
+
 const user = {
   id: '550e8400-e29b-41d4-a716-446655440000',
   full_name: 'Layla Ahmed Hassan',
@@ -75,7 +75,7 @@ test.beforeEach(async ({ page }) => {
     localStorage.setItem('tamkeenova-lang', 'en');
     localStorage.setItem('tamkeenova-theme', 'light');
   });
-  // Distinct, deterministic local logo fixtures; no dependency on removed partner assets.
+
   await page.route('**/test-partner-*.png', (route) => {
     const number = Number(new URL(route.request().url()).pathname.match(/-(\d+)\.png$/)![1]);
     const image = new PNG({ width: 80, height: 40 });
@@ -87,7 +87,7 @@ test.beforeEach(async ({ page }) => {
   await page.route('**/api/**', async (route) => {
     const path = new URL(route.request().url()).pathname;
     let response: unknown = { data: [] };
-    // Current-role guards refresh /auth/me; mirror the signed-in administrator.
+
     if (path === '/api/auth/me')
       response = {
         data: { id: 'admin', full_name: 'Test Administrator', role: 'ADMIN', is_active: true },
@@ -199,7 +199,7 @@ test('training preview changes only designated rectangles; issue, edit and PDF e
 
   const pdfBytes = readFileSync(testInfo.outputPath('training.pdf'));
   expect(pdfBytes.length).toBeLessThan(10 * 1024 * 1024);
-  // Verify embedded QR
+
   const start = pdfBytes.indexOf(Buffer.from([255, 216, 255]));
   const end = pdfBytes.indexOf(Buffer.from([255, 217]), start) + 2;
   expect(start).toBeGreaterThan(0);

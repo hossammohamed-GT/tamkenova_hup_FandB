@@ -7,7 +7,7 @@ export const trainerStatusGuard: CanActivateFn = (route) => {
   const trainerService = inject(TrainerService);
   const router = inject(Router);
 
-  // Cached approval
+
   if (trainerService.isApprovedCached) {
     return true;
   }
@@ -23,11 +23,11 @@ export const trainerStatusGuard: CanActivateFn = (route) => {
     }),
     catchError((err) => {
       console.error('Error checking trainer status:', err);
-      // Interceptor handles 401
+
       if (err?.status === 401) {
         return of(true);
       }
-      // Fail open, avoid lockout
+
       return of(true);
     }),
   );

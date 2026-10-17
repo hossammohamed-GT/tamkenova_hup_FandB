@@ -1,6 +1,3 @@
-// Native Node smoke test for the compiled entrypoint, not a Jest transform.
-// Only external services/configuration are replaced; no real credentials or DB
-// connections are needed. main.js still applies its real middleware and routes.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 require('reflect-metadata');
@@ -19,6 +16,8 @@ const config = {
 };
 
 process.env.VERCEL = '1';
+process.env.NODE_ENV = 'production';
+process.env.JWT_SECRET = config.JWT_SECRET;
 fs.mkdirSync = fs.createWriteStream = () => {
   throw Object.assign(new Error('read-only file system'), { code: 'EROFS' });
 };
@@ -41,13 +40,44 @@ NestFactory.create = async (rootModule, options) => {
     .compile();
 
   const app = fixture.createNestApplication(options);
-  // Don't open a persistent server. Supertest uses an ephemeral test listener.
+
   app.listen = async () => {
     try {
       await app.init();
       const health = await request(app.getHttpServer())
         .get('/api/health')
-        .expect(200);
+        .expect(200)
+        .expect('Cache-Control', 'private, no-store')
+        .expect('X-Robots-Tag', /noindex/)
+        .expect('X-Content-Type-Options', 'nosniff')
+        .expect('X-Frame-Options', 'DENY')
+        .expect('Content-Security-Policy', /default-src 'none'/);
+      assert.equal(health.headers['x-powered-by'], undefined);
+      await request(app.getHttpServer())
+        .get('/api/health')
+        .set('Origin', 'https://tamkeenova-hub.vercel.app')
+        .expect(200)
+        .expect(
+          'Access-Control-Allow-Origin',
+          'https://tamkeenova-hub.vercel.app',
+        );
+      for (const origin of [
+        'https://evil.example.test',
+        'http://localhost:4200',
+      ]) {
+        const denied = await request(app.getHttpServer())
+          .get('/api/health?token=do-not-log')
+          .set('Origin', origin)
+          .expect(403)
+          .expect('Cache-Control', 'private, no-store')
+          .expect('X-Robots-Tag', /noindex/);
+        assert.equal(denied.headers['access-control-allow-origin'], undefined);
+      }
+      await request(app.getHttpServer())
+        .get('/api/admin/users')
+        .expect(401)
+        .expect('Cache-Control', 'private, no-store')
+        .expect('X-Robots-Tag', /noindex/);
       assert.deepEqual(health.body, { success: true, status: 'ok' });
       const root = await request(app.getHttpServer()).get('/api').expect(200);
       assert.equal(root.body.message, 'Tamkeenova API Running');

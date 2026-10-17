@@ -57,7 +57,7 @@ describe('2026.3 paired certificate contract without schema changes', () => {
       'recipient_name_en',
       'signature_name',
     ])
-      expect(data).not.toHaveProperty(key); // no nonexistent Prisma columns
+      expect(data).not.toHaveProperty(key);
   });
   it('accepts one bilingual issue request without a selected issue language', async () => {
     await expect(

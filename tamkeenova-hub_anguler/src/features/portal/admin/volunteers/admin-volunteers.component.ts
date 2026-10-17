@@ -28,7 +28,7 @@ export class AdminVolunteersComponent implements OnInit {
   volunteers = signal<AdminVolunteer[]>([]);
   activeFilter = signal<VolunteerFilter>('ALL');
 
-  // Status key varies
+
   statusOf(v: AdminVolunteer): VolunteerStatus {
     return ((v as AdminVolunteer).volunteer_status ?? v.status ?? 'PENDING') as VolunteerStatus;
   }

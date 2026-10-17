@@ -5,13 +5,13 @@ import { VerificationRepository } from './verification.repository';
 @Injectable()
 export class VerificationService {
 
-  // Initialize instance
+
   constructor(private readonly verificationRepo: VerificationRepository) {}
 
 
 
 
-  // Handle verify certificate
+
   async verifyCertificate(code: string) {
     const certificate = await this.verificationRepo.getCertificateByCode(code);
 
@@ -77,7 +77,7 @@ export class VerificationService {
 
 
 
-  // Handle verify user
+
   async verifyUser(username: string) {
     const user = await this.verificationRepo.getUserForVerification(username);
 

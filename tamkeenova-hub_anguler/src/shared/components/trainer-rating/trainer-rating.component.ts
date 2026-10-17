@@ -151,9 +151,9 @@ export class TrainerRatingComponent {
     if (!(event.currentTarget as HTMLElement).contains(event.relatedTarget as Node)) this.close();
   }
   private finish() {
-    // Keep focus on a persistent control before the five-star picker becomes
-    // the read-only confirmation. Disabling/removing the focused star must not
-    // dismiss the confirmation or send keyboard focus back to the document.
+
+
+
     if (this.open()) this.trigger?.nativeElement.focus({ preventScroll: true });
     this.busy.set(false);
   }

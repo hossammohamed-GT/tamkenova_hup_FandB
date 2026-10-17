@@ -22,7 +22,7 @@ for (const [language, width] of [['en', 1024], ['ar', 1024], ['en', 1280], ['ar'
       meta: { total: 0, total_pages: 0, page: 1 },
     } }));
     await page.goto('/programs');
-    // The category scene itself is full bleed, not constrained by content-width.
+
     expect(await page.locator('.category-section').evaluate(el => {
       const r = el.getBoundingClientRect();
       return Math.abs(r.left) < 1 && Math.abs(r.right - document.documentElement.clientWidth) < 1;
@@ -41,14 +41,14 @@ for (const [language, width] of [['en', 1024], ['ar', 1024], ['en', 1280], ['ar'
     expect(await page.locator('.category-arrow svg').first().evaluate((el) => getComputedStyle(el).scale))
       .toBe(language === 'en' ? '1' : '-1 1');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    // Every category is present immediately; no carousel controls or horizontal scroll.
+
     await expect(page.locator('.category-controls, .category-nav')).toHaveCount(0);
-    // Each category is a separate clipped-photo sculpture on its own small setting.
+
     const silhouettes = await page.locator('.sculpture-rim').evaluateAll((paths) => paths.map(p => p.getAttribute('d')));
     expect(new Set(silhouettes).size).toBe(6);
     await expect(page.locator('.category-setting')).toHaveCount(9);
     await expect(page.locator('.sculpture-reflection')).toHaveCount(9);
-    // The complete surrounding settings, not just the cards, must have separate cells.
+
     const settings = await page.locator('.category-setting').evaluateAll((els) => els.map(el => {
       const r = el.getBoundingClientRect();
       return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
@@ -80,7 +80,7 @@ for (const [language, width] of [['en', 1024], ['ar', 1024], ['en', 1280], ['ar'
       expect(floorAfter.width).toBeCloseTo(floorBefore.width, 1);
       expect(floorAfter.height).toBeCloseTo(floorBefore.height, 1);
       expect((await sculpture.boundingBox())!.y).toBeLessThan(bodyBefore.y - 5);
-      // Read both animated transforms in one browser frame; separate round trips race the transition.
+
       await expect.poll(() => first.evaluate(card =>
         getComputedStyle(card.querySelector('.category-foreground')!).transform ===
         getComputedStyle(card.querySelector('.category-sculpture')!).transform,
@@ -101,13 +101,13 @@ for (const [language, width] of [['en', 1024], ['ar', 1024], ['en', 1280], ['ar'
       await expect.poll(() => neon.evaluate(el => getComputedStyle(el).opacity)).toBe('0');
       expect(await orbit.evaluate(el => getComputedStyle(el).animationPlayState)).toBe('paused');
       await expect.poll(() => sculpture.evaluate(el => getComputedStyle(el).transform)).toBe('none');
-      // Keyboard users get the same affordance without lifting the platform.
+
       await first.focus();
       await expect.poll(() => neon.evaluate(el => getComputedStyle(el).opacity)).toBe('1');
       expect((await setting.boundingBox())!.y).toBeCloseTo(floorBefore.y, 1);
       await first.evaluate(el => (el as HTMLElement).blur());
     }
-    // All actions remain unobstructed.
+
     for (let index = 0; index < 9; index++) {
       const arrow = cards.nth(index).locator('.category-arrow');
       expect(await cards.nth(index).evaluate((card) => {
@@ -116,8 +116,8 @@ for (const [language, width] of [['en', 1024], ['ar', 1024], ['en', 1280], ['ar'
         range.selectNodeContents(card.querySelector('.category-name')!);
         return Array.from(range.getClientRects()).every(r => r.right <= a.left || a.right <= r.left || r.bottom <= a.top || a.bottom <= r.top);
       })).toBe(true);
-      // Focusing a sticky category must reveal it above the rising catalog.
-      // Native scrollIntoView alone can move the cover over a pinned child.
+
+
       await cards.nth(index).focus();
       await expect.poll(() => arrow.evaluate((el) => {
         const rect = el.getBoundingClientRect();

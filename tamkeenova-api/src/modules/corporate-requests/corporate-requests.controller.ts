@@ -19,7 +19,7 @@ import { corporate_status } from '@prisma/client';
 @Controller('corporate-requests')
 export class CorporateRequestsController {
 
-  // Initialize instance
+
   constructor(
     private readonly corporateRequestsService: CorporateRequestsService,
   ) {}
@@ -29,7 +29,7 @@ export class CorporateRequestsController {
 
 
 
-  // Handle create request
+
   @UseGuards(JwtAuthGuard)
   @Post()
   async createRequest(
@@ -44,7 +44,7 @@ export class CorporateRequestsController {
 
 
 
-  // Handle upload attachment
+
   @UseGuards(JwtAuthGuard)
   @Post(':id/attachments')
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }))
@@ -65,7 +65,7 @@ export class CorporateRequestsController {
 
 
 
-  // Handle get my requests
+
   @UseGuards(JwtAuthGuard)
   @Get()
   async getMyRequests(
@@ -80,7 +80,7 @@ export class CorporateRequestsController {
 
 
 
-  // Handle get request details
+
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getRequestDetails(

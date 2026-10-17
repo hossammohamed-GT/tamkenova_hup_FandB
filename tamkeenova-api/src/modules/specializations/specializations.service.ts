@@ -13,7 +13,7 @@ import { RequestSpecializationDto } from './dto/request-specialization.dto';
 @Injectable()
 export class SpecializationsService {
 
-  // Initialize instance
+
   constructor(
     private readonly specializationsRepository: SpecializationsRepository,
     private readonly notificationsService: NotificationsService,
@@ -21,14 +21,14 @@ export class SpecializationsService {
 
 
 
-  // Handle get all
+
   async getAll() {
     return this.specializationsRepository.getAll();
   }
 
 
 
-  // Handle get by id
+
   async getById(id: string) {
     const specialization =
       await this.specializationsRepository.getById(id);
@@ -44,7 +44,7 @@ export class SpecializationsService {
 
 
 
-  // Handle request specialization
+
   async requestSpecialization(
     userId: string,
     dto: RequestSpecializationDto,

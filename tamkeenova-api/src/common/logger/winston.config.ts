@@ -5,8 +5,8 @@ export type LogCategory = 'auth' | 'errors' | 'security';
 export function createLoggerConfig(
   category: LogCategory,
 ): winston.LoggerOptions {
-  // Vercel Functions have a read-only application filesystem. Use stdout/stderr
-  // so logs are available in Vercel Logs without creating files at startup.
+
+
   const transport =
     process.env.VERCEL === '1'
       ? new winston.transports.Console({ stderrLevels: ['error'] })

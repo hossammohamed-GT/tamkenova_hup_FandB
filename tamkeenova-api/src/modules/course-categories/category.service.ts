@@ -81,7 +81,7 @@ export class CategoryService {
             'انقل التصنيفات الفرعية أولًا / Move child categories before changing this parent',
           );
       }
-      // Explicit projection: never persist client-provided counts, IDs or timestamps.
+
       const data = {
         name_ar: dto.name_ar,
         name_en: dto.name_en,
@@ -124,7 +124,7 @@ export class CategoryService {
         throw new ConflictException(
           'التصنيف مرتبط بكورسات أو برامج أو تصنيفات فرعية؛ أخفه بدل الحذف أو انقل الارتباطات أولًا / This category has courses, programs or children; hide it instead, or move its references first',
         );
-      // Relation predicates and serializable isolation protect against concurrent new references.
+
       await tx.course_categories.delete({
         where: {
           id,

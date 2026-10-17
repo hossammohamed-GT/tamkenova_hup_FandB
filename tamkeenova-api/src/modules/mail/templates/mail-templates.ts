@@ -42,7 +42,7 @@ const BASE = {
 
 
 
-// Handle esc
+
 function esc(value: string): string {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -54,14 +54,14 @@ function esc(value: string): string {
 
 
 
-// Handle spacer
+
 function spacer(height = 14): string {
   return `<div style="height:${height}px; line-height:${height}px; font-size:1px;">&nbsp;</div>`;
 }
 
 
 
-// Handle section title
+
 function sectionTitle(text: string): string {
   return `<p style="margin:0 0 12px; color:${BASE.text}; font-size:14.5px; font-weight:800;">
     <span style="display:inline-block; vertical-align:middle; width:16px; height:4px; border-radius:2px; background-color:${BASE.gold}; margin:0 0 2px 8px;"></span>${esc(text)}
@@ -77,7 +77,7 @@ type Row = {
 };
 
 
-// Handle info card
+
 function infoCard(rows: Row[], accent?: Variant): string {
   const accentColor = accent ? PALETTE[accent].dark : BASE.gold;
   const rowsHtml = rows
@@ -100,7 +100,7 @@ function infoCard(rows: Row[], accent?: Variant): string {
 
 
 
-// Handle quote
+
 function quote(text: string): string {
   return `
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:${BASE.surface}; border:1.5px dashed ${BASE.border}; border-radius:12px;">
@@ -112,7 +112,7 @@ function quote(text: string): string {
 
 
 
-// Handle cta button
+
 function ctaButton(text: string, url: string): string {
   return `
               <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
@@ -126,14 +126,14 @@ function ctaButton(text: string, url: string): string {
 
 
 
-// Handle note
+
 function note(text: string): string {
   return `<p style="margin:18px 0 0; color:${BASE.textMuted}; font-size:12.5px; line-height:1.9; text-align:center;">${esc(text)}</p>`;
 }
 
 
 
-// Handle chips
+
 function chips(items: string[]): string {
   return items
     .map(
@@ -154,7 +154,7 @@ const PRIORITY_META: Record<
 };
 
 
-// Handle priority badge
+
 function priorityBadge(priority?: string): string {
   const key = (priority || 'MEDIUM').toUpperCase();
   const meta = PRIORITY_META[key] || PRIORITY_META.MEDIUM;
@@ -165,7 +165,7 @@ function priorityBadge(priority?: string): string {
 
 
 
-// Handle hero section
+
 function heroSection(
   variant: Variant,
   eyebrow: string,
@@ -208,7 +208,7 @@ function heroSection(
 
 
 
-// Handle wrap email
+
 function wrapEmail(
   variant: Variant,
   heroHtml: string,
@@ -275,7 +275,7 @@ function wrapEmail(
 
 
 
-// Handle get otp email template
+
 export function getPasswordResetEmailTemplate(otp: string): string {
   const p = PALETTE.primary;
   const hero = heroSection(
@@ -352,7 +352,7 @@ export function getOtpEmailTemplate(otp: string): string {
 
 
 
-// Handle get trainer request email template
+
 export function getTrainerRequestEmailTemplate(
   trainerName: string,
   trainerEmail: string,
@@ -392,7 +392,7 @@ export function getTrainerRequestEmailTemplate(
 
 
 
-// Handle get trainer approved email template
+
 export function getTrainerApprovedEmailTemplate(trainerName?: string): string {
   const hero = heroSection(
     'success',
@@ -420,7 +420,7 @@ export function getTrainerApprovedEmailTemplate(trainerName?: string): string {
 
 
 
-// Handle get trainer rejected email template
+
 export function getTrainerRejectedEmailTemplate(reason: string): string {
   const hero = heroSection(
     'danger',
@@ -450,7 +450,7 @@ export function getTrainerRejectedEmailTemplate(reason: string): string {
 
 
 
-// Handle get consultation request email template
+
 export function getConsultationRequestEmailTemplate(args: {
   studentName: string;
   studentEmail: string;
@@ -540,7 +540,7 @@ export function getConsultationRequestEmailTemplate(args: {
 
 
 
-// Handle get corporate request admin email template
+
 export function getCorporateRequestAdminEmailTemplate(
   companyName: string,
   serviceType: string,
@@ -580,7 +580,7 @@ export function getCorporateRequestAdminEmailTemplate(
 
 
 
-// Handle get volunteer request email template
+
 export function getVolunteerRequestEmailTemplate(
   volunteerName: string,
   volunteerEmail: string,
@@ -620,7 +620,7 @@ export function getVolunteerRequestEmailTemplate(
 
 
 
-// Handle get volunteer approved email template
+
 export function getVolunteerApprovedEmailTemplate(
   volunteerName?: string,
 ): string {
@@ -650,7 +650,7 @@ export function getVolunteerApprovedEmailTemplate(
 
 
 
-// Handle get volunteer rejected email template
+
 export function getVolunteerRejectedEmailTemplate(reason: string): string {
   const hero = heroSection(
     'danger',
@@ -680,7 +680,7 @@ export function getVolunteerRejectedEmailTemplate(reason: string): string {
 
 
 
-// Handle get task assigned email template
+
 export function getTaskAssignedEmailTemplate(args: {
   assigneeName: string;
   taskTitle: string;
@@ -730,7 +730,7 @@ export function getTaskAssignedEmailTemplate(args: {
 
 
 
-// Handle get task submitted admin email template
+
 export function getTaskSubmittedAdminEmailTemplate(
   assigneeName: string,
   taskTitle: string,
@@ -770,7 +770,7 @@ export function getTaskSubmittedAdminEmailTemplate(
 
 
 
-// Handle get certificate issued email template
+
 export function getCertificateIssuedEmailTemplate(
   holderName: string,
   certificateTitle: string,

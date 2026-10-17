@@ -5,13 +5,13 @@ import { enrollment_status } from '@prisma/client';
 @Injectable()
 export class StudentsRepository {
 
-  // Initialize instance
+
   constructor(private readonly prisma: PrismaService) {}
 
 
 
 
-  // Handle get profile
+
   async getProfile(userId: string) {
     return this.prisma.users.findUnique({
       where: { id: userId },
@@ -61,7 +61,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle update profile
+
   async updateProfile(userId: string, data: {
     full_name?: string;
     bio?: string;
@@ -87,7 +87,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle update avatar
+
   async updateAvatar(userId: string, imageUrl: string) {
     return this.prisma.users.update({
       where: { id: userId },
@@ -105,7 +105,7 @@ export class StudentsRepository {
 
 
 
-  // Handle get password hash
+
   async getPasswordHash(userId: string) {
     const user = await this.prisma.users.findUnique({
       where: { id: userId },
@@ -115,7 +115,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle update password
+
   async updatePassword(userId: string, hashedPassword: string) {
     return this.prisma.users.update({
       where: { id: userId },
@@ -127,7 +127,7 @@ export class StudentsRepository {
 
 
 
-  // Handle get contact info
+
   async getContactInfo(userId: string) {
     return this.prisma.users.findUnique({
       where: { id: userId },
@@ -143,7 +143,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle update contact info
+
   async updateContactInfo(userId: string, data: {
     phone?: string;
     whatsapp?: string;
@@ -169,7 +169,7 @@ export class StudentsRepository {
 
 
 
-  // Handle find user by email
+
   async findUserByEmail(email: string) {
     return this.prisma.users.findUnique({
       where: { email },
@@ -178,7 +178,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle find user by username
+
   async findUserByUsername(username: string) {
     return this.prisma.users.findUnique({
       where: { username },
@@ -187,7 +187,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle find user by phone
+
   async findUserByPhone(phone: string) {
     return this.prisma.users.findUnique({
       where: { phone },
@@ -198,7 +198,7 @@ export class StudentsRepository {
 
 
 
-  // Handle search trainers
+
   async searchTrainers(params: {
     search?: string;
     specialization_id?: string;
@@ -306,7 +306,7 @@ export class StudentsRepository {
 
 
 
-  // Handle search programs
+
   async searchPrograms(params: {
     search?: string;
     level?: string;
@@ -402,7 +402,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle get program by id
+
   async getProgramById(programId: string) {
     return this.prisma.training_programs.findUnique({
       where: { id: programId },
@@ -450,7 +450,7 @@ export class StudentsRepository {
 
 
 
-  // Handle find enrollment
+
   async findEnrollment(studentId: string, programId: string) {
     return this.prisma.student_enrollments.findUnique({
       where: {
@@ -463,7 +463,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle create enrollment
+
   async createEnrollment(studentId: string, programId: string) {
     return this.prisma.student_enrollments.create({
       data: {
@@ -498,7 +498,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle get student enrollments
+
   async getStudentEnrollments(studentId: string, status?: enrollment_status) {
     const where: any = { student_id: studentId };
     if (status) {
@@ -545,7 +545,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle get enrollment by id
+
   async getEnrollmentById(enrollmentId: string, studentId: string) {
     return this.prisma.student_enrollments.findFirst({
       where: {
@@ -599,7 +599,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle cancel enrollment
+
   async cancelEnrollment(enrollmentId: string) {
     return this.prisma.student_enrollments.update({
       where: { id: enrollmentId },
@@ -616,7 +616,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle complete enrollment
+
   async completeEnrollment(enrollmentId: string, trainerNotes?: string) {
     return this.prisma.student_enrollments.update({
       where: { id: enrollmentId },
@@ -632,7 +632,7 @@ export class StudentsRepository {
 
 
 
-  // Handle get student certificates
+
   async getStudentCertificates(studentId: string) {
     return this.prisma.certificates.findMany({
       where: { student_id: studentId },
@@ -680,7 +680,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle get certificate by verification code
+
   async getCertificateByVerificationCode(code: string) {
     return this.prisma.certificates.findUnique({
       where: { verification_code: code },
@@ -731,7 +731,7 @@ export class StudentsRepository {
 
 
 
-  // Handle get my reviews
+
   async getMyReviews(studentId: string) {
     return this.prisma.trainer_reviews.findMany({
       where: { student_id: studentId },
@@ -758,7 +758,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle get review by id
+
   async getReviewById(reviewId: string, studentId: string) {
     return this.prisma.trainer_reviews.findFirst({
       where: {
@@ -777,7 +777,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle update review
+
   async updateReview(reviewId: string, data: { rating?: number; comment?: string }) {
     return this.prisma.trainer_reviews.update({
       where: { id: reviewId },
@@ -792,7 +792,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle delete review
+
   async deleteReview(reviewId: string) {
     return this.prisma.trainer_reviews.delete({
       where: { id: reviewId },
@@ -800,7 +800,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle get trainer average rating
+
   async getTrainerAverageRating(trainerId: string) {
     const result = await this.prisma.trainer_reviews.aggregate({
       where: { trainer_id: trainerId },
@@ -814,7 +814,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle update trainer rating
+
   async updateTrainerRating(trainerId: string, average: number, count: number) {
     return this.prisma.trainers.update({
       where: { id: trainerId },
@@ -828,7 +828,7 @@ export class StudentsRepository {
 
 
 
-  // Handle get public profile by username
+
   async getPublicProfileByUsername(username: string) {
     return this.prisma.users.findUnique({
       where: {
@@ -922,7 +922,7 @@ export class StudentsRepository {
 
 
 
-  // Handle get trainer user id
+
   async getTrainerUserId(trainerId: string) {
     const trainer = await this.prisma.trainers.findUnique({
       where: { id: trainerId },
@@ -932,7 +932,7 @@ export class StudentsRepository {
   }
 
 
-  // Handle get program trainer id
+
   async getProgramTrainerId(programId: string) {
     const program = await this.prisma.training_programs.findUnique({
       where: { id: programId },

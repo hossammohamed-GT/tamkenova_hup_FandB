@@ -1,7 +1,7 @@
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import type { ValidationError } from 'class-validator';
 
-/** No target/value objects in responses: only stable, nested field paths. */
+
 export function fieldValidationException(fields: Record<string, string[]>) {
   return new BadRequestException({
     error_code: 'VALIDATION_FAILED',

@@ -77,7 +77,7 @@ export class CoursesService {
   async getCourseBySlug(slug: string) {
     const course = await this.repository.getCourseBySlug(slug);
     if (!course) throw new NotFoundException('Course not found');
-    // Never publish paid lesson URLs through the public course endpoint.
+
     const lessons = course.lessons.map((lesson) => ({
       ...lesson,
       media_url: course.is_free || lesson.is_preview ? lesson.media_url : null,

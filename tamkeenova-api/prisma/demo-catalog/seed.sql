@@ -1,5 +1,5 @@
--- Temporary presentation data only. No paid content, trainers, reviews or users are invented.
--- Re-runnable and additive: existing rows are never updated. Requires db:course-catalog first.
+
+
 BEGIN;
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM course_categories WHERE is_active) THEN

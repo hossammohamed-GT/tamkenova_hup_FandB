@@ -1,4 +1,15 @@
 User-agent: *
 Allow: /
+Disallow: /portal
+Disallow: /my-courses
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-otp
+Disallow: /verify
+Disallow: /u/
+Disallow: /api/
+Disallow: /programs/course/*/checkout
 
 Sitemap: https://tamkeenova-hub.vercel.app/sitemap.xml

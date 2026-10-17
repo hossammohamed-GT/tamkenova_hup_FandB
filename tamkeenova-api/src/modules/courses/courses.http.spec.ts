@@ -14,7 +14,7 @@ describe('Protected lesson HTTP boundary', () => {
   beforeAll(async () => {
     oldSecret = process.env.JWT_SECRET;
     process.env.JWT_SECRET = 'local-course-playback-test-secret';
-    token = jwt.sign({ sub: 'student', tv: 0 }, process.env.JWT_SECRET);
+    token = jwt.sign({ sub: 'student', tv: 0 }, process.env.JWT_SECRET, { expiresIn: '1h' });
     const db = {
       users: {
         findUnique: jest

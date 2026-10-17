@@ -31,7 +31,7 @@ export class GalleryShowcaseComponent implements OnInit, OnDestroy {
   marqueeRowTop = computed(() => this.buildMarqueeRow(0));
   marqueeRowBottom = computed(() => this.buildMarqueeRow(1));
 
-  // Seamless -50% loop
+
   private buildMarqueeRow(offset: 0 | 1): string[] {
     const all = this.heroImages();
     const row = all.filter((_, i) => i % 2 === offset);
@@ -144,7 +144,7 @@ export class GalleryShowcaseComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.lightboxIndex.update((i) => (i + dir + total) % total);
       this.imgVisible.set(true);
-    }, 180); 
+    }, 180);
   }
 
   @HostListener('document:keydown', ['$event'])

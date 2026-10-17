@@ -5,7 +5,7 @@ export class AppController {
 
 
 
-  // Handle root
+
   @Get()
   root() {
     return {
@@ -18,7 +18,7 @@ export class AppController {
 
 
 
-  // Handle health
+
   @Get('health')
   health() {
     return {

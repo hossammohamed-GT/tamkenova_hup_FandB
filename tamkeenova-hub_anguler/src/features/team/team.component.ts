@@ -39,8 +39,8 @@ export class TeamComponent implements OnInit {
       ).values(),
     ),
   );
-  // Four decorative slots keep the hero balanced even without uploaded photos.
-  // These are illustrations, not extra instructors or fabricated catalog data.
+
+
   readonly portraits = computed(() =>
     Array.from({ length: 4 }, (_, index) => this.trainers()[index]?.users?.profile_image ?? null),
   );

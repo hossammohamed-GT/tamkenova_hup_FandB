@@ -1,17 +1,17 @@
-# note
 
-# note
+
+
 /dist
 /tmp
 /out-tsc
 /bazel-out
 
-# note
+
 /node_modules
 npm-debug.log
 yarn-error.log
 
-# note
+
 .idea/
 .project
 .classpath
@@ -20,7 +20,7 @@ yarn-error.log
 .settings/
 *.sublime-workspace
 
-# note
+
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -29,7 +29,7 @@ yarn-error.log
 !.vscode/mcp.json
 .history/*
 
-# note
+
 /.angular/cache
 .sass-cache/
 /connect.lock
@@ -39,7 +39,7 @@ testem.log
 /typings
 __screenshots__/
 
-# note
+
 .DS_Store
 Thumbs.db
 

@@ -23,10 +23,12 @@ export class MailService {
   private transporter;
 
 
-  // Initialize instance
+
   constructor(private readonly configService: ConfigService) {
     this.transporter = nodemailer.createTransport({
       service: 'gmail',
+      disableFileAccess: true,
+      disableUrlAccess: true,
       auth: {
         user: this.configService.get('MAIL_USER'),
         pass: this.configService.get('MAIL_PASSWORD'),
@@ -36,7 +38,7 @@ export class MailService {
 
 
 
-  // Handle send email
+
   private async sendEmail(
     to: string,
     subject: string,
@@ -59,7 +61,7 @@ export class MailService {
 
 
 
-  // Handle send otp
+
   async sendPasswordResetOtp(email: string, otp: string) {
     await this.sendEmail(
       email,
@@ -80,7 +82,7 @@ export class MailService {
 
 
 
-  // Handle send trainer request email
+
   async sendTrainerRequestEmail(
     adminEmail: string,
     trainerName: string,
@@ -95,7 +97,7 @@ export class MailService {
 
 
 
-  // Handle send trainer approved email
+
   async sendTrainerApprovedEmail(email: string, trainerName?: string) {
     await this.sendEmail(
       email,
@@ -106,7 +108,7 @@ export class MailService {
 
 
 
-  // Handle send trainer rejected email
+
   async sendTrainerRejectedEmail(email: string, reason: string) {
     await this.sendEmail(
       email,
@@ -117,7 +119,7 @@ export class MailService {
 
 
 
-  // Handle send consultation request email
+
   async sendConsultationRequestEmail(
     trainerEmail: string,
     studentName: string,
@@ -151,7 +153,7 @@ export class MailService {
 
 
 
-  // Handle send corporate request admin email
+
   async sendCorporateRequestAdminEmail(
     adminEmail: string,
     companyName: string,
@@ -166,7 +168,7 @@ export class MailService {
 
 
 
-  // Handle send volunteer request email
+
   async sendVolunteerRequestEmail(
     adminEmail: string,
     volunteerName: string,
@@ -181,7 +183,7 @@ export class MailService {
 
 
 
-  // Handle send volunteer approved email
+
   async sendVolunteerApprovedEmail(email: string, volunteerName?: string) {
     await this.sendEmail(
       email,
@@ -192,7 +194,7 @@ export class MailService {
 
 
 
-  // Handle send volunteer rejected email
+
   async sendVolunteerRejectedEmail(email: string, reason: string) {
     await this.sendEmail(
       email,
@@ -203,7 +205,7 @@ export class MailService {
 
 
 
-  // Handle send task assigned email
+
   async sendTaskAssignedEmail(
     assigneeEmail: string,
     assigneeName: string,
@@ -225,7 +227,7 @@ export class MailService {
 
 
 
-  // Handle send task submitted admin email
+
   async sendTaskSubmittedAdminEmail(
     adminEmail: string,
     assigneeName: string,
@@ -240,7 +242,7 @@ export class MailService {
 
 
 
-  // Handle send certificate issued email
+
   async sendCertificateIssuedEmail(
     email: string,
     holderName: string,

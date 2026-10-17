@@ -2,7 +2,7 @@ import { Injectable, signal } from '@angular/core';
 
 const KEY = 'tamkeenova-course-bookmarks-v1';
 
-/** Device-local reading list, not an enrollment or a server-synced wishlist. */
+
 @Injectable({ providedIn: 'root' })
 export class CourseBookmarksService {
   private readonly state = signal<ReadonlySet<string>>(this.read());
@@ -21,7 +21,7 @@ export class CourseBookmarksService {
       localStorage.setItem(KEY, JSON.stringify([...next]));
       persisted = true;
     } catch {
-      /* Storage disabled/full: retain a clearly announced session-only list. */
+
     }
     this.state.set(next);
     return { saved: next.has(id), persisted };

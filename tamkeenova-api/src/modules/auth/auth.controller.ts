@@ -1,3 +1,4 @@
+import { AvailabilityDto } from './dto/availability.dto';
 import { Body, Controller, Post, Get, UseGuards, Query } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
@@ -30,12 +31,8 @@ export class AuthController {
 
   @Get('availability')
   @Throttle({ default: { limit: 20, ttl: 60000 } })
-  async availability(
-    @Query('email') email?: string,
-    @Query('username') username?: string,
-    @Query('phone') phone?: string,
-  ) {
-    return this.authService.checkAvailability({ email, username, phone });
+  async availability(@Query() query: AvailabilityDto) {
+    return this.authService.checkAvailability(query);
   }
 
   @Post('verify-email')

@@ -113,7 +113,7 @@ export class StudentNotificationsComponent {
         error: () => this.isLoadingDetail.set(false),
       });
     } else {
-      // No entity endpoint here
+
       this.isLoadingDetail.set(false);
     }
   }
@@ -144,7 +144,7 @@ export class StudentNotificationsComponent {
     return 'tone-' + notificationTone(type);
   }
 
-  // Backend sends English only
+
   titleFor(notif: AppNotification): string {
     const key = notificationTypeKey(notif.type);
     const fullKey = 'notifications.types.' + key;

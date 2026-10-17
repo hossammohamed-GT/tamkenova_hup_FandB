@@ -25,7 +25,7 @@ import { SpecializationDto } from './dto/specialization.dto';
 @Injectable()
 export class AdminService {
 
-  // Initialize instance
+
   constructor(
     private readonly adminRepo: AdminRepository,
     private readonly mailService: MailService,
@@ -35,7 +35,7 @@ export class AdminService {
 
 
 
-  // Handle list users
+
   async listUsers(query: {
     search?: string;
     role?: string;
@@ -72,7 +72,7 @@ export class AdminService {
   }
 
 
-  // Handle get user
+
   async getUser(id: string) {
     const user = await this.adminRepo.getUserById(id);
     if (!user) throw new NotFoundException('User not found');
@@ -80,7 +80,7 @@ export class AdminService {
   }
 
 
-  // Handle change user role
+
   async changeUserRole(adminId: string, id: string, dto: ChangeRoleDto) {
     const user = await this.adminRepo.getUserById(id);
     if (!user) throw new NotFoundException('User not found');
@@ -120,7 +120,7 @@ export class AdminService {
   }
 
 
-  // Handle set user active
+
   async setUserActive(adminId: string, id: string, dto: SetUserActiveDto) {
     const user = await this.adminRepo.getUserById(id);
     if (!user) throw new NotFoundException('User not found');
@@ -145,7 +145,7 @@ export class AdminService {
   }
 
 
-  // Handle get user activity
+
   async getUserActivity(id: string) {
     const user = await this.adminRepo.getUserById(id);
     if (!user) throw new NotFoundException('User not found');
@@ -157,14 +157,14 @@ export class AdminService {
 
 
 
-  // Handle list trainers
+
   async listTrainers(status?: string) {
     const trainers = await this.adminRepo.getTrainers(status);
     return { data: trainers, total: trainers.length };
   }
 
 
-  // Handle get trainer
+
   async getTrainer(id: string) {
     const trainer = await this.adminRepo.getTrainerById(id);
     if (!trainer) throw new NotFoundException('Trainer not found');
@@ -172,7 +172,7 @@ export class AdminService {
   }
 
 
-  // Handle approve trainer
+
   async approveTrainer(adminId: string, id: string) {
     const trainer = await this.adminRepo.getTrainerById(id);
     if (!trainer) throw new NotFoundException('Trainer not found');
@@ -211,7 +211,7 @@ export class AdminService {
   }
 
 
-  // Handle reject trainer
+
   async rejectTrainer(adminId: string, id: string, dto: RejectReasonDto) {
     const trainer = await this.adminRepo.getTrainerById(id);
     if (!trainer) throw new NotFoundException('Trainer not found');
@@ -250,7 +250,7 @@ export class AdminService {
   }
 
 
-  // Handle suspend trainer
+
   async suspendTrainer(adminId: string, id: string) {
     const trainer = await this.adminRepo.getTrainerById(id);
     if (!trainer) throw new NotFoundException('Trainer not found');
@@ -277,7 +277,7 @@ export class AdminService {
   }
 
 
-  // Handle activate trainer
+
   async activateTrainer(adminId: string, id: string) {
     const trainer = await this.adminRepo.getTrainerById(id);
     if (!trainer) throw new NotFoundException('Trainer not found');
@@ -304,7 +304,7 @@ export class AdminService {
   }
 
 
-  // Handle update trainer
+
   async updateTrainer(adminId: string, id: string, dto: UpdateTrainerAdminDto) {
     const trainer = await this.adminRepo.getTrainerById(id);
     if (!trainer) throw new NotFoundException('Trainer not found');
@@ -322,7 +322,7 @@ export class AdminService {
   }
 
 
-  // Handle add trainer certificate
+
   async addTrainerCertificate(
     adminId: string,
     trainerId: string,
@@ -347,14 +347,14 @@ export class AdminService {
   }
 
 
-  // Handle delete trainer certificate
+
   async deleteTrainerCertificate(id: string) {
     await this.adminRepo.deleteTrainerCertificate(id);
     return { success: true, message: 'Trainer certificate deleted' };
   }
 
 
-  // Handle add trainer document
+
   async addTrainerDocument(
     adminId: string,
     trainerId: string,
@@ -376,7 +376,7 @@ export class AdminService {
   }
 
 
-  // Handle delete trainer document
+
   async deleteTrainerDocument(id: string) {
     await this.adminRepo.deleteTrainerDocument(id);
     return { success: true, message: 'Trainer document deleted' };
@@ -385,14 +385,14 @@ export class AdminService {
 
 
 
-  // Handle list volunteers
+
   async listVolunteers(status?: string) {
     const volunteers = await this.adminRepo.getVolunteers(status);
     return { data: volunteers, total: volunteers.length };
   }
 
 
-  // Handle get volunteer
+
   async getVolunteer(id: string) {
     const volunteer = await this.adminRepo.getVolunteerById(id);
     if (!volunteer) throw new NotFoundException('Volunteer not found');
@@ -400,7 +400,7 @@ export class AdminService {
   }
 
 
-  // Handle approve volunteer
+
   async approveVolunteer(adminId: string, id: string) {
     const volunteer = await this.adminRepo.getVolunteerById(id);
     if (!volunteer) throw new NotFoundException('Volunteer not found');
@@ -438,7 +438,7 @@ export class AdminService {
   }
 
 
-  // Handle reject volunteer
+
   async rejectVolunteer(adminId: string, id: string, dto: RejectReasonDto) {
     const volunteer = await this.adminRepo.getVolunteerById(id);
     if (!volunteer) throw new NotFoundException('Volunteer not found');
@@ -479,14 +479,14 @@ export class AdminService {
 
 
 
-  // Handle list certificates
+
   async listCertificates() {
     const certificates = await this.adminRepo.getCertificates();
     return { data: certificates, total: certificates.length };
   }
 
 
-  // Handle issue certificate
+
   async issueCertificate(adminId: string, dto: IssueCertificateDto) {
     const holder = await this.adminRepo.getUserById(dto.user_id);
     if (!holder) throw new NotFoundException('User not found');
@@ -533,12 +533,12 @@ export class AdminService {
   }
 
 
-  // Handle update certificate
+
   async updateCertificate(id: string, dto: UpdateCertificateDto) {
     const existing = await this.adminRepo.getCertificateById(id);
     if (!existing) throw new NotFoundException('Certificate not found');
 
-    // Older records must be explicitly completed by an administrator before conversion.
+
     const data = certificateData({
       ...existing,
       ...dto,
@@ -551,7 +551,7 @@ export class AdminService {
   }
 
 
-  // Handle revoke certificate
+
   async revokeCertificate(id: string) {
     const existing = await this.adminRepo.getCertificateById(id);
     if (!existing) throw new NotFoundException('Certificate not found');
@@ -569,7 +569,7 @@ export class AdminService {
   }
 
 
-  // Handle delete certificate
+
   async deleteCertificate(id: string) {
     const existing = await this.adminRepo.getCertificateById(id);
     if (!existing) throw new NotFoundException('Certificate not found');
@@ -587,14 +587,14 @@ export class AdminService {
   }
 
 
-  // Handle list corporate requests
+
   async listCorporateRequests(status?: string) {
     const requests = await this.adminRepo.getCorporateRequests(status);
     return { data: requests, total: requests.length };
   }
 
 
-  // Handle get corporate request
+
   async getCorporateRequest(id: string) {
     const request = await this.adminRepo.getCorporateRequestById(id);
     if (!request) throw new NotFoundException('Corporate request not found');
@@ -602,7 +602,7 @@ export class AdminService {
   }
 
 
-  // Handle update corporate request status
+
   async updateCorporateRequestStatus(
     adminId: string,
     id: string,
@@ -667,14 +667,14 @@ export class AdminService {
 
 
 
-  // Handle list specialization requests
+
   async listSpecializationRequests() {
     const requests = await this.adminRepo.getSpecializationRequests();
     return { data: requests, total: requests.length };
   }
 
 
-  // Handle approve specialization request
+
   async approveSpecializationRequest(adminId: string, id: string) {
     const request = await this.adminRepo.getSpecializationRequestById(id);
     if (!request) throw new NotFoundException('Specialization request not found');
@@ -711,7 +711,7 @@ export class AdminService {
   }
 
 
-  // Handle reject specialization request
+
   async rejectSpecializationRequest(adminId: string, id: string) {
     const request = await this.adminRepo.getSpecializationRequestById(id);
     if (!request) throw new NotFoundException('Specialization request not found');
@@ -731,7 +731,7 @@ export class AdminService {
   }
 
 
-  // Handle create specialization
+
   async createSpecialization(adminId: string, dto: SpecializationDto) {
     const existing = await this.adminRepo.findSpecializationByName(dto.name_ar);
     if (existing) throw new BadRequestException('Specialization already exists');
@@ -749,7 +749,7 @@ export class AdminService {
   }
 
 
-  // Handle update specialization
+
   async updateSpecialization(
     adminId: string,
     id: string,
@@ -771,7 +771,7 @@ export class AdminService {
   }
 
 
-  // Handle delete specialization
+
   async deleteSpecialization(adminId: string, id: string) {
     const existing = await this.adminRepo.getSpecializationById(id);
     if (!existing) throw new NotFoundException('Specialization not found');
@@ -791,14 +791,14 @@ export class AdminService {
 
 
 
-  // Handle list programs
+
   async listPrograms() {
     const programs = await this.adminRepo.getPrograms();
     return { data: programs, total: programs.length };
   }
 
 
-  // Handle update program
+
   async updateProgram(adminId: string, id: string, dto: any) {
     const program = await this.adminRepo.getProgramById(id);
     if (!program) throw new NotFoundException('Program not found');
@@ -816,7 +816,7 @@ export class AdminService {
   }
 
 
-  // Handle set program visibility
+
   async setProgramVisibility(adminId: string, id: string, isActive: boolean) {
     const program = await this.adminRepo.getProgramById(id);
     if (!program) throw new NotFoundException('Program not found');
@@ -847,7 +847,7 @@ export class AdminService {
   }
 
 
-  // Handle delete program
+
   async deleteProgram(adminId: string, id: string) {
     const program = await this.adminRepo.getProgramById(id);
     if (!program) throw new NotFoundException('Program not found');
@@ -867,7 +867,7 @@ export class AdminService {
 
 
 
-  // Handle get dashboard
+
   async getDashboard() {
     const stats = await this.adminRepo.getDashboardStats();
     return { success: true, data: stats };
@@ -876,7 +876,7 @@ export class AdminService {
 
 
 
-  // Handle notify user
+
   private async notifyUser(
     userId: string,
     title: string,
@@ -900,7 +900,7 @@ export class AdminService {
   }
 
 
-  // Handle generate verification code
+
   private generateVerificationCode() {
     const code = crypto.randomBytes(8).toString('hex').toUpperCase();
     return `TAM-${code}`;

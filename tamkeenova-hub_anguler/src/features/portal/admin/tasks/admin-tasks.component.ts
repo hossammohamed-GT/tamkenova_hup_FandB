@@ -86,7 +86,7 @@ export class AdminTasksComponent implements OnInit {
   private roster = signal<TaskAssignee[]>([]);
   private submissionsRaw = signal<any[]>([]);
   submissionsLoading = signal(false);
-  // Replay cache, refresh silently
+
   private submissionsCache = new Map<string, any[]>();
   comments = signal<TaskComment[]>([]);
   isLoadingComments = signal(false);
@@ -369,7 +369,7 @@ export class AdminTasksComponent implements OnInit {
     this.reviewTarget.set(null);
     this.detailMemberResults.set([]);
     this.detailsLoadError.set(false);
-    // Seed instantly, hydrate silently
+
     this.roster.set(task.task_assignees ?? []);
     const cachedSubs = this.submissionsCache.get(task.id) ?? [];
     this.submissionsRaw.set(cachedSubs);
@@ -381,19 +381,19 @@ export class AdminTasksComponent implements OnInit {
     this.loadComments(task.id);
   }
 
-  // Partial results never erase
+
   private fetchAssignees(taskId: string): void {
     this.tasksService.getById(taskId).subscribe({
       next: (task) => {
         if (this.details()?.id !== taskId) return;
         const rows = Array.isArray(task?.task_assignees) ? task.task_assignees : [];
         if (rows.length > 0) this.roster.set(rows);
-        // Reuse embedded comments
+
         if (this.isLoadingComments() && this.comments().length === 0) {
           const seeded = Array.isArray(task?.task_comments) ? task.task_comments : [];
           if (seeded.length > 0) this.comments.set(seeded);
         }
-        // Empty roster is valid
+
         this.detailsLoadError.set(false);
         this.isLoadingDetails.set(false);
       },
@@ -441,7 +441,7 @@ export class AdminTasksComponent implements OnInit {
     return submissionFiles(submission as any);
   }
 
-  // Score in two places
+
   scoreOf(assignee: TaskAssignee): number | null {
     const row = assignee as any;
     const value = row.score ?? this.submissionOf(assignee)?.score;
@@ -539,7 +539,7 @@ export class AdminTasksComponent implements OnInit {
 
 
   openReview(row: AssigneeRow): void {
-    // Reset before revealing
+
     const previousScore = this.scoreOf(row.assignee);
     this.reviewForm.reset({
       score: previousScore !== null ? previousScore : null,
@@ -566,7 +566,7 @@ export class AdminTasksComponent implements OnInit {
         return;
       }
       if (required !== null && required !== undefined && raw.score < required) {
-        // Low score means rejection
+
         this.showToast('admin_tasks.score_below_required', true);
         return;
       }

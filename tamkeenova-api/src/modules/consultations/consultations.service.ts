@@ -19,7 +19,7 @@ import { consultation_status } from '@prisma/client';
 @Injectable()
 export class ConsultationsService {
 
-  // Initialize instance
+
   constructor(
     private readonly consultationsRepo: ConsultationsRepository,
     private readonly notificationsService: NotificationsService,
@@ -29,7 +29,7 @@ export class ConsultationsService {
 
 
 
-  // Handle create consultation
+
   async createConsultation(studentId: string, dto: CreateConsultationDto) {
 
     const consultation = await this.consultationsRepo.createConsultation({
@@ -97,7 +97,7 @@ export class ConsultationsService {
 
 
 
-  // Handle get my consultations
+
   async getMyConsultations(studentId: string, status?: consultation_status) {
     const consultations = await this.consultationsRepo.getStudentConsultations(
       studentId,
@@ -110,7 +110,7 @@ export class ConsultationsService {
   }
 
 
-  // Handle get consultation details
+
   async getConsultationDetails(
     userId: string,
     consultationId: string,
@@ -138,7 +138,7 @@ export class ConsultationsService {
 
 
 
-  // Handle cancel consultation
+
   async cancelConsultation(studentId: string, consultationId: string) {
     const consultation = await this.consultationsRepo.getConsultationById(
       consultationId,
@@ -187,7 +187,7 @@ export class ConsultationsService {
 
 
 
-  // Handle create review
+
   async createReview(
     studentId: string,
     consultationId: string,
@@ -233,7 +233,7 @@ export class ConsultationsService {
 
 
 
-  // Handle update consultation status
+
   async updateConsultationStatus(
     trainerUserId: string,
     consultationId: string,
@@ -319,7 +319,7 @@ export class ConsultationsService {
 
 
 
-  // Handle get trainer consultations
+
   async getTrainerConsultations(
     trainerUserId: string,
     status?: consultation_status,
@@ -338,7 +338,7 @@ export class ConsultationsService {
 
 
 
-  // Handle get trainer reviews
+
   async getTrainerReviews(trainerUserId: string) {
     const reviews = await this.consultationsRepo.getTrainerConsultationReviews(
       trainerUserId,

@@ -1,5 +1,5 @@
-const DEFAULT_ORIGINS = [
-  'https://tamkeenova-hub.vercel.app',
+const PUBLIC_ORIGIN = 'https://tamkeenova-hub.vercel.app';
+const LOCAL_ORIGINS = [
   'http://localhost:4200',
   'http://127.0.0.1:4200',
   'http://localhost:3000',
@@ -9,12 +9,17 @@ const DEFAULT_ORIGINS = [
 export function allowedCorsOrigins(): string[] {
   const extra = (process.env.FRONTEND_ORIGINS || '')
     .split(',')
-    .map((s) => s.trim())
+    .map((value) => value.trim())
     .filter(Boolean);
-  return [...new Set([...DEFAULT_ORIGINS, ...extra])];
+  return [
+    ...new Set([
+      PUBLIC_ORIGIN,
+      ...(process.env.NODE_ENV === 'production' ? [] : LOCAL_ORIGINS),
+      ...extra,
+    ]),
+  ];
 }
 
 export function isAllowedOrigin(origin: string | undefined): boolean {
-  if (!origin) return true;
-  return allowedCorsOrigins().includes(origin.replace(/\/$/, ''));
+  return origin === undefined || allowedCorsOrigins().includes(origin);
 }

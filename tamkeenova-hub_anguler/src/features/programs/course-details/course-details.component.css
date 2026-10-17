@@ -125,7 +125,7 @@
   .enrollment-card h2 { font-size: 0.85rem; }
   .signup-button { padding: 0.65rem; font-size: 0.75rem; }
 }
-/* In-page learning experience: introduction first, ordered chapters alongside. */
+
 .content-width { width: min(1320px, calc(100% - 48px)); }
 .course-detail-hero { min-height: 300px; padding: 6.5rem 0 2.5rem; }
 .detail-tags { margin-top: 1.2rem; }

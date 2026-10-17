@@ -15,10 +15,10 @@ export class VolunteersService {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiUrl}/volunteers`;
 
-  // Cached approval
+
   isApprovedCached = false;
 
-  // Try endpoint aliases
+
   getMyStatus(): Observable<VolunteerStatusData> {
     return this.tryStatus(`${this.baseUrl}/me`).pipe(
       catchError((err) => {
@@ -45,7 +45,7 @@ export class VolunteersService {
     );
   }
 
-  // Null instead of errors
+
   silent(): Observable<VolunteerStatusData | null> {
     return this.getMyStatus().pipe(catchError(() => of(null)));
   }

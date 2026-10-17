@@ -116,7 +116,7 @@ export class TrainerService {
     );
   }
 
-  // New reviews are one-time submissions; the server returns 409 for duplicates.
+
   createReview(trainerId: string, payload: { rating: number; comment: string }) {
     return this.http.post<ReviewSubmitResponse>(`${this.baseUrl}/${trainerId}/reviews`, payload);
   }

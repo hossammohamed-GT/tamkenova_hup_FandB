@@ -1,7 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 
-// Hand-drawn outlines: deliberately not six copies of a regular hexagon.
-// Coordinates share a 360 × 340 artboard, so type and controls stay aligned.
+
+
 export const CATEGORY_SHAPES: Readonly<Record<string, string>> = {
   'business-professional-skills': 'M20 104 L157 24 Q175 14 193 26 L333 111 Q350 120 350 141 L350 234 Q350 253 332 264 L186 325 Q164 336 144 325 L16 253 Q4 246 4 226 L4 130 Q4 113 20 104Z',
   'technology-innovation': 'M22 85 L169 4 Q184 -3 199 7 L334 89 Q352 101 352 121 L348 233 Q346 248 331 259 L174 335 Q158 342 142 331 L12 251 Q3 244 3 228 L7 111 Q8 95 22 85Z',
@@ -31,7 +31,7 @@ export class CategoryArtworkComponent {
   readonly image = input<string | null>(null);
   readonly outline = computed(() => CATEGORY_SHAPES[this.slug()] ?? DEFAULT_SHAPE);
   readonly front = computed(() => CATEGORY_FRONTS[this.slug()] ?? CATEGORY_FRONTS['business-professional-skills']);
-  // Slugs come from the API; encode every character to make valid, collision-free SVG IDs.
+
   readonly uid = computed(() => 'category-art-' + Array.from(this.slug()).map(c => c.codePointAt(0)!.toString(16)).join('-'));
   ref(name: string): string { return `url(#${this.uid()}-${name})`; }
 }

@@ -264,7 +264,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     );
 
     const prefersReduced = typeof window !== 'undefined' && window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)').matches : false;
-    // Single logo, nothing rotates
+
     if (prefersReduced || this.partnerCards.length <= 1) return;
 
     const startDelay = setTimeout(() => {
@@ -296,15 +296,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     const current = this.slots();
     if (!current[idx]) return;
     const next = this.pickNextCard(idx);
-    // Skip same-logo slide
+
     if (next.img === current[idx].currentImg) return;
 
-    // Swap image before sliding
+
     const updated = [...current];
     updated[idx] = { ...updated[idx], nextImg: next.img, nextHref: next.href, nextAlt: next.alt };
     this.slots.set(updated);
 
-    // Slide on next frame
+
     const raf = requestAnimationFrame(() => {
       const s = this.slots();
       if (!s[idx] || s[idx].sliding) return;

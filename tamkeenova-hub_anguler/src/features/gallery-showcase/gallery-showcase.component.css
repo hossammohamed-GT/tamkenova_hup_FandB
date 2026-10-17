@@ -69,14 +69,14 @@
 .gmarquee-row {
   overflow: hidden;
   width: 100%;
-  /* LTR required for loop */
+
   direction: ltr;
 }
 
 .gmarquee-track {
   display: flex;
   width: max-content;
-  /* Gap breaks loop point */
+
   gap: 0;
   will-change: transform;
 }

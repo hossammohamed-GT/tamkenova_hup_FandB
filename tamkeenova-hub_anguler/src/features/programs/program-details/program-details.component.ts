@@ -85,7 +85,7 @@ export class ProgramDetailsComponent {
       return;
     }
 
-    // Guests search public list
+
     this.programsService.getAllPublic().subscribe({
       next: (programs) => {
         const found = (programs ?? []).find((p) => p.id === id);
@@ -160,6 +160,7 @@ export class ProgramDetailsComponent {
 
   private pushSeo(): void {
     const p = this.program();
+    this.seo.setPageIndexable(!!p);
     if (!p) return;
     this.translate.currentLang();
     const url = this.seo.absoluteUrl(`/programs/${p.id}`);
@@ -192,9 +193,7 @@ export class ProgramDetailsComponent {
         '@type': 'Offer',
         price: Number(p.price) || 0,
         priceCurrency: 'EGP',
-        availability: p.is_active
-          ? 'https://schema.org/InStock'
-          : 'https://schema.org/OutOfStock',
+        availability: p.is_active ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
         url,
       },
     });

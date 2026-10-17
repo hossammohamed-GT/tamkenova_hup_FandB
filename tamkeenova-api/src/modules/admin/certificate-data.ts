@@ -78,7 +78,7 @@ export function legacyCertificateData(input: CertificateInput) {
     program_name: program,
     training_hours: input.training_hours!,
     issued_at: new Date(`${date}T00:00:00.000Z`),
-    // Compatibility metadata for lists/notifications, not artwork content.
+
     title:
       program ??
       (input.certificate_language === 'ar'
@@ -107,7 +107,7 @@ export interface BilingualCertificateInput extends CertificateInput {
   template_version?: string | null;
 }
 export const BILINGUAL_SCHEMA = 'tamkeenova.certificate/2026.3';
-/** Only read our own versioned envelope, never interpret historical free text. */
+
 export function bilingualMetadata(record: {
   description?: string | null;
   template_version?: string | null;
@@ -120,7 +120,7 @@ export function bilingualMetadata(record: {
     return null;
   }
 }
-/** Both language editions are ONE record: shared ownership, QR and revocation. No schema migration. */
+
 export function certificateData(input: BilingualCertificateInput) {
   const saved = bilingualMetadata(input);
   const merged = { ...saved, ...input };

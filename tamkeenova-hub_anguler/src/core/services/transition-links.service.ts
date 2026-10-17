@@ -13,7 +13,7 @@ export class TransitionLinksService {
   init(): void {
     if (this.attached || typeof window === 'undefined') return;
     this.attached = true;
-    // Capture clicks before router
+
     this.doc.addEventListener('click', (e) => this.onCapture(e as MouseEvent), true);
   }
 
@@ -26,7 +26,7 @@ export class TransitionLinksService {
     if (anchor.hasAttribute('download')) return;
     const href = anchor.getAttribute('href') || '';
     if (!href.startsWith('/')) return;
-    // Keep native anchor scroll
+
     const hashIdx = href.indexOf('#');
     if (hashIdx >= 0) {
       const pathOnly = href.slice(0, hashIdx);

@@ -1,6 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 
-// Browser-only design fixtures. Never seeded into the database or public catalog.
+
 const slugs = [
   'business-professional-skills',
   'technology-innovation',
@@ -183,7 +183,7 @@ for (const [language, width, theme] of [
         }),
       ).toBe(true);
     }
-    await expect(cards.last().locator('.course-rating')).toHaveCount(0); // No fabricated rating.
+    await expect(cards.last().locator('.course-rating')).toHaveCount(0);
     await expect(cards.nth(1).locator('.badge-new')).toBeVisible();
     await expect(cards.nth(2).locator('.badge-new')).toHaveCount(0);
     const bookmark = cards.first().locator('.bookmark-control');
@@ -243,8 +243,8 @@ test('catalog search, filters and sidebar use the live query without jumping out
   await expect(page.locator('.geometric-course-card')).toHaveCount(1);
   await expect(page).toHaveURL(/category=technology-innovation/);
   expect(requests.at(-1)).toContain('category=technology-innovation');
-  // scrollBy rounds to physical scroll pixels, while layout bounds retain
-  // fractional CSS pixels. Preserve the same position within one CSS pixel.
+
+
   await expect
     .poll(async () =>
       Math.abs(
@@ -490,7 +490,7 @@ for (const [language, height] of [
       .poll(() => sidebar.locator('h2').evaluate((el) => el.getBoundingClientRect().top))
       .toBeCloseTo(headingTop, 0);
     expect(await page.evaluate(() => scrollY)).toBeCloseTo(pageScroll, 0);
-    // The last real category stays keyboard-reachable within the bounded list.
+
     await nav.locator('button').last().focus();
     await expect(nav.locator('button').last()).toBeFocused();
     expect(
@@ -509,7 +509,7 @@ for (const count of [0, 1]) {
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await setup(page, 'ar', 'light', false);
-    // Hold a real query response while the taller loading grid is on screen.
+
     let release!: () => void;
     const responseReady = new Promise<void>((resolve) => {
       release = resolve;
@@ -537,7 +537,7 @@ for (const count of [0, 1]) {
       .poll(() => sidebar.evaluate((el) => el.getBoundingClientRect().top))
       .toBeCloseTo(72, 0);
     const loadingHeight = await workspace.evaluate((el) => el.getBoundingClientRect().height);
-    // Exercise the reported timing, with actual animations enabled.
+
     await page.waitForTimeout(2200);
     release();
     await expect(page.locator('.catalog-results')).toHaveAttribute('aria-busy', 'false');
@@ -548,7 +548,7 @@ for (const count of [0, 1]) {
     await expect
       .poll(() => sidebar.evaluate((el) => el.getBoundingClientRect().top))
       .toBeCloseTo(72, 0);
-    // Even at the actual document bottom the sidebar must clear the navbar.
+
     await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
     await expect
       .poll(() => sidebar.evaluate((el) => el.getBoundingClientRect().top))

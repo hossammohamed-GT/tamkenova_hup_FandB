@@ -1,3 +1,4 @@
+import { publicTrainerFields, publicReviewFields } from '../../common/security/public-trainer-fields';
 import { publicCourseWhere } from '../courses/public-course-policy';
 import { Injectable } from '@nestjs/common';
 
@@ -6,11 +7,11 @@ import { PrismaService } from '../../prisma/prisma.service';
 @Injectable()
 export class TrainersRepository {
 
-  // Initialize instance
+
   constructor(private readonly prisma: PrismaService) {}
 
 
-  // Handle get trainer profile
+
   getTrainerProfile(userId: string) {
     return this.prisma.trainers.findUnique({
       where: {
@@ -43,7 +44,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle update trainer
+
   async updateTrainer(trainerId: string, data: any) {
     return this.prisma.trainers.update({
       where: {
@@ -54,7 +55,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle delete trainer certificates
+
   async deleteTrainerCertificates(trainerId: string) {
     return this.prisma.trainer_certificates.deleteMany({
       where: {
@@ -64,7 +65,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle delete trainer documents
+
   async deleteTrainerDocuments(trainerId: string) {
     return this.prisma.trainer_documents.deleteMany({
       where: {
@@ -74,7 +75,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle create trainer certificates
+
   async createTrainerCertificates(trainerId: string, urls: string[]) {
     if (!urls?.length) return;
 
@@ -87,7 +88,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle create trainer documents
+
   async createTrainerDocuments(
     trainerId: string,
     documents: {
@@ -109,7 +110,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle create program
+
   async createProgram(data: any) {
     return this.prisma.training_programs.create({
       data,
@@ -117,7 +118,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle get programs by trainer
+
   async getProgramsByTrainer(trainerId: string) {
     return this.prisma.training_programs.findMany({
       where: {
@@ -131,7 +132,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle get program by id
+
   async getProgramById(id: string) {
     return this.prisma.training_programs.findUnique({
       where: {
@@ -141,7 +142,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle update program
+
   async updateProgram(id: string, data: any) {
     return this.prisma.training_programs.update({
       where: {
@@ -152,7 +153,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle delete program
+
   async deleteProgram(id: string) {
     return this.prisma.training_programs.delete({
       where: {
@@ -162,7 +163,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle get trainer status
+
   getTrainerStatus(userId: string) {
     return this.prisma.trainers.findUnique({
       where: {
@@ -178,7 +179,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle create availability
+
   createAvailability(data: {
     trainer_id: string;
     day_of_week: number;
@@ -191,7 +192,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle get trainer availability
+
   getTrainerAvailability(trainerId: string) {
     return this.prisma.trainer_availability.findMany({
       where: {
@@ -207,7 +208,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle update availability
+
   updateAvailability(availabilityId: string, data: any) {
     return this.prisma.trainer_availability.update({
       where: {
@@ -219,7 +220,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle delete availability
+
   deleteAvailability(id: string) {
     return this.prisma.trainer_availability.delete({
       where: {
@@ -229,7 +230,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle find availability by id
+
   findAvailabilityById(id: string) {
     return this.prisma.trainer_availability.findUnique({
       where: {
@@ -239,7 +240,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle create booking
+
   createBooking(data: any) {
     return this.prisma.trainer_bookings.create({
       data,
@@ -247,7 +248,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle get trainer bookings
+
   getTrainerBookings(trainerId: string) {
     return this.prisma.trainer_bookings.findMany({
       where: {
@@ -272,7 +273,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle find booking by id
+
   findBookingById(id: string) {
     return this.prisma.trainer_bookings.findUnique({
       where: {
@@ -287,7 +288,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle update booking
+
   updateBooking(id: string, data: any) {
     return this.prisma.trainer_bookings.update({
       where: {
@@ -299,7 +300,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle create review
+
   async createReview(data: {
     trainer_id: string;
     student_id: string;
@@ -312,7 +313,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle find user by id (role check for reviews)
+
   findUserById(id: string) {
     return this.prisma.users.findUnique({
       where: {
@@ -327,7 +328,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle find review by trainer and student
+
   findReviewByTrainerAndStudent(trainerId: string, studentId: string) {
     return this.prisma.trainer_reviews.findUnique({
       where: {
@@ -347,7 +348,7 @@ export class TrainersRepository {
     });
   }
 
-  // Handle update review
+
   updateReview(id: string, data: { rating?: number; comment?: string }) {
     return this.prisma.trainer_reviews.update({
       where: {
@@ -359,31 +360,17 @@ export class TrainersRepository {
   }
 
 
-  // Handle get trainer reviews
+
   getTrainerReviews(trainerId: string) {
     return this.prisma.trainer_reviews.findMany({
-      where: {
-        trainer_id: trainerId,
-      },
-
-      include: {
-        users: {
-          select: {
-            id: true,
-            full_name: true,
-            profile_image: true,
-          },
-        },
-      },
-
-      orderBy: {
-        created_at: 'desc',
-      },
+      where: { trainer_id: trainerId, trainers: { trainer_status: 'APPROVED' } },
+      select: publicReviewFields,
+      orderBy: { created_at: 'desc' },
+      take: 100,
     });
   }
 
 
-  // Handle update trainer rating
   async updateTrainerRating(trainerId: string) {
     const reviews = await this.prisma.trainer_reviews.findMany({
       where: {
@@ -416,7 +403,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle find trainer by id
+
   findTrainerById(id: string) {
     return this.prisma.trainers.findUnique({
       where: {
@@ -426,7 +413,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle get dashboard stats
+
   async getDashboardStats(userId: string) {
     const trainer = await this.prisma.trainers.findUnique({
       where: {
@@ -479,7 +466,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle update user profile image
+
   async updateUserProfileImage(userId: string, imageUrl: string) {
     return this.prisma.users.update({
       where: {
@@ -493,7 +480,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle get all programs
+
   getAllPrograms() {
     return this.prisma.training_programs.findMany({
       where: {
@@ -506,7 +493,8 @@ export class TrainersRepository {
 
       include: {
         trainers: {
-          include: {
+          select: {
+            ...publicTrainerFields,
             users: {
               select: {
                 id: true,
@@ -524,7 +512,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle get all public trainers
+
   async getAllPublicTrainers() {
     return this.prisma.trainers.findMany({
       where: {
@@ -535,7 +523,8 @@ export class TrainersRepository {
         average_rating: 'desc',
       },
 
-      include: {
+      select: {
+        ...publicTrainerFields,
         users: {
           select: {
             id: true,
@@ -560,7 +549,7 @@ export class TrainersRepository {
   }
 
 
-  // Handle get public trainer profile
+
   async getPublicTrainerProfile(slug: string) {
     return this.prisma.trainers.findFirst({
       where: {
@@ -568,7 +557,8 @@ export class TrainersRepository {
         trainer_status: 'APPROVED',
       },
 
-      include: {
+      select: {
+        ...publicTrainerFields,
         users: {
           select: {
             id: true,
@@ -602,18 +592,9 @@ export class TrainersRepository {
         },
 
         trainer_reviews: {
-          include: {
-            users: {
-              select: {
-                full_name: true,
-                profile_image: true,
-              },
-            },
-          },
-
-          orderBy: {
-            created_at: 'desc',
-          },
+          select: publicReviewFields,
+          orderBy: { created_at: 'desc' },
+          take: 100,
         },
 
         training_programs: {

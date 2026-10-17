@@ -19,7 +19,7 @@ import { consultation_status } from '@prisma/client';
 @Controller('consultations')
 export class ConsultationsController {
 
-  // Initialize instance
+
   constructor(private readonly consultationsService: ConsultationsService) {}
 
 
@@ -29,7 +29,7 @@ export class ConsultationsController {
 
 
 
-  // Handle create consultation
+
   @UseGuards(JwtAuthGuard)
   @Post()
   async createConsultation(
@@ -44,7 +44,7 @@ export class ConsultationsController {
 
 
 
-  // Handle get my consultations
+
   @UseGuards(JwtAuthGuard)
   @Get()
   async getMyConsultations(
@@ -59,7 +59,7 @@ export class ConsultationsController {
 
 
 
-  // Handle get consultation details
+
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   async getConsultationDetails(
@@ -78,7 +78,7 @@ export class ConsultationsController {
 
 
 
-  // Handle cancel consultation
+
   @UseGuards(JwtAuthGuard)
   @Patch(':id/cancel')
   async cancelConsultation(
@@ -93,7 +93,7 @@ export class ConsultationsController {
 
 
 
-  // Handle create review
+
   @UseGuards(JwtAuthGuard)
   @Post(':id/review')
   async createReview(
@@ -111,7 +111,7 @@ export class ConsultationsController {
 
 
 
-  // Handle get trainer consultations
+
   @UseGuards(JwtAuthGuard)
   @Get('trainer/all')
   async getTrainerConsultations(
@@ -126,7 +126,7 @@ export class ConsultationsController {
 
 
 
-  // Handle update status
+
   @UseGuards(JwtAuthGuard)
   @Patch(':id/status')
   async updateStatus(
@@ -146,7 +146,7 @@ export class ConsultationsController {
 
 
 
-  // Handle get trainer reviews
+
   @UseGuards(JwtAuthGuard)
   @Get('trainer/reviews')
   async getTrainerReviews(@CurrentUser() user: any) {

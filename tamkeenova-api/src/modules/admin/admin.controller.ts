@@ -35,13 +35,13 @@ import { UpdateProgramDto } from '../trainers/dto/update-program.dto';
 @Roles('ADMIN', 'SUPER_ADMIN')
 export class AdminController {
 
-  // Initialize instance
+
   constructor(private readonly adminService: AdminService) {}
 
 
 
 
-  // Handle list users
+
   @Get('users')
   listUsers(
     @Query('search') search?: string,
@@ -54,14 +54,14 @@ export class AdminController {
   }
 
 
-  // Handle get user
+
   @Get('users/:id')
   getUser(@Param('id') id: string) {
     return this.adminService.getUser(id);
   }
 
 
-  // Handle change user role
+
   @Patch('users/:id/role')
   changeUserRole(
     @CurrentUser() admin: any,
@@ -72,7 +72,7 @@ export class AdminController {
   }
 
 
-  // Handle set user active
+
   @Patch('users/:id/status')
   setUserActive(
     @CurrentUser() admin: any,
@@ -83,7 +83,7 @@ export class AdminController {
   }
 
 
-  // Handle get user activity
+
   @Get('users/:id/activity')
   getUserActivity(@Param('id') id: string) {
     return this.adminService.getUserActivity(id);
@@ -92,28 +92,28 @@ export class AdminController {
 
 
 
-  // Handle list trainers
+
   @Get('trainers')
   listTrainers(@Query('status') status?: string) {
     return this.adminService.listTrainers(status);
   }
 
 
-  // Handle get trainer
+
   @Get('trainers/:id')
   getTrainer(@Param('id') id: string) {
     return this.adminService.getTrainer(id);
   }
 
 
-  // Handle approve trainer
+
   @Patch('trainers/:id/approve')
   approveTrainer(@CurrentUser() admin: any, @Param('id') id: string) {
     return this.adminService.approveTrainer(admin.sub, id);
   }
 
 
-  // Handle reject trainer
+
   @Patch('trainers/:id/reject')
   rejectTrainer(
     @CurrentUser() admin: any,
@@ -124,21 +124,21 @@ export class AdminController {
   }
 
 
-  // Handle suspend trainer
+
   @Patch('trainers/:id/suspend')
   suspendTrainer(@CurrentUser() admin: any, @Param('id') id: string) {
     return this.adminService.suspendTrainer(admin.sub, id);
   }
 
 
-  // Handle activate trainer
+
   @Patch('trainers/:id/activate')
   activateTrainer(@CurrentUser() admin: any, @Param('id') id: string) {
     return this.adminService.activateTrainer(admin.sub, id);
   }
 
 
-  // Handle update trainer
+
   @Patch('trainers/:id')
   updateTrainer(
     @CurrentUser() admin: any,
@@ -149,7 +149,7 @@ export class AdminController {
   }
 
 
-  // Handle add trainer certificate
+
   @Post('trainers/:id/certificates')
   addTrainerCertificate(
     @CurrentUser() admin: any,
@@ -160,14 +160,14 @@ export class AdminController {
   }
 
 
-  // Handle delete trainer certificate
+
   @Delete('trainers/certificates/:id')
   deleteTrainerCertificate(@Param('id') id: string) {
     return this.adminService.deleteTrainerCertificate(id);
   }
 
 
-  // Handle add trainer document
+
   @Post('trainers/:id/documents')
   addTrainerDocument(
     @CurrentUser() admin: any,
@@ -178,7 +178,7 @@ export class AdminController {
   }
 
 
-  // Handle delete trainer document
+
   @Delete('trainers/documents/:id')
   deleteTrainerDocument(@Param('id') id: string) {
     return this.adminService.deleteTrainerDocument(id);
@@ -187,28 +187,28 @@ export class AdminController {
 
 
 
-  // Handle list volunteers
+
   @Get('volunteers')
   listVolunteers(@Query('status') status?: string) {
     return this.adminService.listVolunteers(status);
   }
 
 
-  // Handle get volunteer
+
   @Get('volunteers/:id')
   getVolunteer(@Param('id') id: string) {
     return this.adminService.getVolunteer(id);
   }
 
 
-  // Handle approve volunteer
+
   @Patch('volunteers/:id/approve')
   approveVolunteer(@CurrentUser() admin: any, @Param('id') id: string) {
     return this.adminService.approveVolunteer(admin.sub, id);
   }
 
 
-  // Handle reject volunteer
+
   @Patch('volunteers/:id/reject')
   rejectVolunteer(
     @CurrentUser() admin: any,
@@ -221,14 +221,14 @@ export class AdminController {
 
 
 
-  // Handle list certificates
+
   @Get('certificates')
   listCertificates() {
     return this.adminService.listCertificates();
   }
 
 
-  // Handle issue certificate
+
   @Post('certificates')
   issueCertificate(
     @CurrentUser() admin: any,
@@ -238,7 +238,7 @@ export class AdminController {
   }
 
 
-  // Handle update certificate
+
   @Patch('certificates/:id')
   updateCertificate(
     @Param('id') id: string,
@@ -248,14 +248,14 @@ export class AdminController {
   }
 
 
-  // Handle revoke certificate
+
   @Patch('certificates/:id/revoke')
   revokeCertificate(@Param('id') id: string) {
     return this.adminService.revokeCertificate(id);
   }
 
 
-  // Handle delete certificate
+
   @Delete('certificates/:id')
   deleteCertificate(@Param('id') id: string) {
     return this.adminService.deleteCertificate(id);
@@ -264,21 +264,21 @@ export class AdminController {
 
 
 
-  // Handle list corporate requests
+
   @Get('corporate-requests')
   listCorporateRequests(@Query('status') status?: string) {
     return this.adminService.listCorporateRequests(status);
   }
 
 
-  // Handle get corporate request
+
   @Get('corporate-requests/:id')
   getCorporateRequest(@Param('id') id: string) {
     return this.adminService.getCorporateRequest(id);
   }
 
 
-  // Handle update corporate request status
+
   @Patch('corporate-requests/:id/status')
   updateCorporateRequestStatus(
     @CurrentUser() admin: any,
@@ -291,14 +291,14 @@ export class AdminController {
 
 
 
-  // Handle list specialization requests
+
   @Get('specializations/requests')
   listSpecializationRequests() {
     return this.adminService.listSpecializationRequests();
   }
 
 
-  // Handle approve specialization request
+
   @Patch('specializations/requests/:id/approve')
   approveSpecializationRequest(
     @CurrentUser() admin: any,
@@ -308,7 +308,7 @@ export class AdminController {
   }
 
 
-  // Handle reject specialization request
+
   @Patch('specializations/requests/:id/reject')
   rejectSpecializationRequest(
     @CurrentUser() admin: any,
@@ -318,7 +318,7 @@ export class AdminController {
   }
 
 
-  // Handle create specialization
+
   @Post('specializations')
   createSpecialization(
     @CurrentUser() admin: any,
@@ -328,7 +328,7 @@ export class AdminController {
   }
 
 
-  // Handle update specialization
+
   @Patch('specializations/:id')
   updateSpecialization(
     @CurrentUser() admin: any,
@@ -339,7 +339,7 @@ export class AdminController {
   }
 
 
-  // Handle delete specialization
+
   @Delete('specializations/:id')
   deleteSpecialization(
     @CurrentUser() admin: any,
@@ -351,14 +351,14 @@ export class AdminController {
 
 
 
-  // Handle list programs
+
   @Get('programs')
   listPrograms() {
     return this.adminService.listPrograms();
   }
 
 
-  // Handle update program
+
   @Patch('programs/:id')
   updateProgram(
     @CurrentUser() admin: any,
@@ -380,21 +380,21 @@ export class AdminController {
   }
 
 
-  // Handle hide program
+
   @Patch('programs/:id/hide')
   hideProgram(@CurrentUser() admin: any, @Param('id') id: string) {
     return this.adminService.setProgramVisibility(admin.sub, id, false);
   }
 
 
-  // Handle show program
+
   @Patch('programs/:id/show')
   showProgram(@CurrentUser() admin: any, @Param('id') id: string) {
     return this.adminService.setProgramVisibility(admin.sub, id, true);
   }
 
 
-  // Handle delete program
+
   @Delete('programs/:id')
   deleteProgram(@CurrentUser() admin: any, @Param('id') id: string) {
     return this.adminService.deleteProgram(admin.sub, id);
@@ -403,7 +403,7 @@ export class AdminController {
 
 
 
-  // Handle get dashboard
+
   @Get('dashboard')
   getDashboard() {
     return this.adminService.getDashboard();

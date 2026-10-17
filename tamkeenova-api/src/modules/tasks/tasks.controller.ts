@@ -32,14 +32,14 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class TasksController {
 
-  // Initialize instance
+
   constructor(private readonly tasksService: TasksService) {}
 
 
 
 
 
-  // Handle get my tasks
+
   @Get('my')
   @Roles('EMPLOYEE', 'VOLUNTEER')
   getMyTasks(@CurrentUser() user: any) {
@@ -47,7 +47,7 @@ export class TasksController {
   }
 
 
-  // Handle get dashboard
+
   @Get('dashboard')
   @Roles('EMPLOYEE', 'VOLUNTEER')
   getDashboard(@CurrentUser() user: any) {
@@ -57,7 +57,7 @@ export class TasksController {
 
 
 
-  // Handle create task
+
   @Post()
   @Roles('ADMIN', 'SUPER_ADMIN')
   createTask(@CurrentUser() admin: any, @Body() dto: CreateTaskDto) {
@@ -65,7 +65,7 @@ export class TasksController {
   }
 
 
-  // Handle list tasks
+
   @Get()
   @Roles('ADMIN', 'SUPER_ADMIN')
   listTasks(@Query('status') status?: string) {
@@ -75,7 +75,7 @@ export class TasksController {
 
 
 
-  // Handle review submission
+
   @Patch('assignees/:id/review')
   @Roles('ADMIN', 'SUPER_ADMIN')
   reviewSubmission(
@@ -89,7 +89,7 @@ export class TasksController {
 
 
 
-  // Handle update task
+
   @Patch(':id')
   @Roles('ADMIN', 'SUPER_ADMIN')
   updateTask(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
@@ -97,7 +97,7 @@ export class TasksController {
   }
 
 
-  // Handle delete task
+
   @Delete(':id')
   @Roles('ADMIN', 'SUPER_ADMIN')
   deleteTask(@Param('id') id: string) {
@@ -105,7 +105,7 @@ export class TasksController {
   }
 
 
-  // Handle add assignee
+
   @Post(':id/assignees')
   @Roles('ADMIN', 'SUPER_ADMIN')
   addAssignee(@Param('id') id: string, @Body() dto: AssigneeDto) {
@@ -113,7 +113,7 @@ export class TasksController {
   }
 
 
-  // Handle remove assignee
+
   @Delete(':id/assignees/:userId')
   @Roles('ADMIN', 'SUPER_ADMIN')
   removeAssignee(@Param('id') id: string, @Param('userId') userId: string) {
@@ -121,7 +121,7 @@ export class TasksController {
   }
 
 
-  // Handle get task submissions
+
   @Get(':id/submissions')
   @Roles('ADMIN', 'SUPER_ADMIN')
   getTaskSubmissions(@Param('id') id: string) {
@@ -131,7 +131,7 @@ export class TasksController {
 
 
 
-  // Handle start task
+
   @Patch(':id/start')
   @Roles('EMPLOYEE', 'VOLUNTEER')
   startTask(@CurrentUser() user: any, @Param('id') id: string) {
@@ -139,7 +139,7 @@ export class TasksController {
   }
 
 
-  // Handle submit task
+
   @Post(':id/submit')
   @Roles('EMPLOYEE', 'VOLUNTEER')
   @UseInterceptors(FilesInterceptor('files', 10, { limits: { fileSize: 10 * 1024 * 1024 } }))
@@ -155,7 +155,7 @@ export class TasksController {
 
 
 
-  // Handle get comments
+
   @Get(':id/comments')
   @Roles('ADMIN', 'SUPER_ADMIN', 'EMPLOYEE', 'VOLUNTEER')
   getComments(
@@ -166,7 +166,7 @@ export class TasksController {
   }
 
 
-  // Handle add comment
+
   @Post(':id/comments')
   @Roles('ADMIN', 'SUPER_ADMIN', 'EMPLOYEE', 'VOLUNTEER')
   addComment(
@@ -178,7 +178,7 @@ export class TasksController {
   }
 
 
-  // Handle get task details
+
   @Get(':id')
   @Roles('ADMIN', 'SUPER_ADMIN', 'EMPLOYEE', 'VOLUNTEER')
   getTaskDetails(

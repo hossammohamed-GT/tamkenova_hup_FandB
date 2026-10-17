@@ -380,7 +380,7 @@
   outline-offset: 3px;
 }
 
-/* SVG-based, no @property */
+
 .service-ring {
   position: absolute;
   inset: 0;

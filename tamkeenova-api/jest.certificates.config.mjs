@@ -1,4 +1,4 @@
-// Nest 12 is ESM. Run this suite with Node's VM module support.
+
 export default {
   testEnvironment: 'node',
   testMatch: ['**/src/modules/admin/*certificate*.spec.ts'],

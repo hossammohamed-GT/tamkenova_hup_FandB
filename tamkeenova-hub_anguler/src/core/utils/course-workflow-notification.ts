@@ -1,5 +1,5 @@
 import { AppNotification } from '../models/student.model';
-/** Only local, known routes; never navigate to an arbitrary server-provided URL. */
+
 export function courseWorkflowNotificationTarget(notification: AppNotification) {
   const type = (notification.reference_type || '').toUpperCase();
   if (type === 'COURSE_REVIEW')

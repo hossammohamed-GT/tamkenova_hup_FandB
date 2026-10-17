@@ -5,7 +5,7 @@ const client = new Client({
 });
 
 
-// Handle test
+
 async function test() {
   try {
     await client.connect();

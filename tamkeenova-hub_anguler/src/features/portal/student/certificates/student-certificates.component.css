@@ -23,7 +23,7 @@
   align-items: start;
   gap: 1.75rem;
 }
-/* Local overrides only */
+
 .portal-page .cert-card {
   min-width: 0;
   background: var(--color-surface) !important;

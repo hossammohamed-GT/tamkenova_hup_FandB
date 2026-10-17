@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { createClient } from '@supabase/supabase-js';
-import { safeStorageName } from '../../common/security/file-upload';
+import { assertSafeAttachment, safeStorageName } from '../../common/security/file-upload';
 
 @Injectable()
 export class StorageService {
@@ -19,6 +19,7 @@ export class StorageService {
     fileBuffer: Buffer,
     contentType: string,
   ) {
+    assertSafeAttachment(fileBuffer, contentType);
     const safe = safeStorageName(contentType);
     const path = `${folder}/${safe}`;
 

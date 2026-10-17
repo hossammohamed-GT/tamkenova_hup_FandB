@@ -8,15 +8,15 @@
 @media (max-width: 680px) { .category-setting { width: 100%; left: 0; opacity: .85; } }
 @media (prefers-reduced-motion: reduce) { .sculpture-photo { transition: none; } }
 
-/* Only the painted, clipped sculpture is a mouse target; its surrounding garden is not. */
+
 .sculpture-hit-area { pointer-events: visiblePainted; cursor: pointer; }
 
-/* Stationary reflection layers give the tinted front a polished mirror finish. */
+
 .sculpture-polish { opacity: .8; transition: opacity 220ms ease; pointer-events: none; }
 :host-context(.category-tile:hover) .sculpture-polish { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .sculpture-polish { transition: none; } }
 
-/* The floor, furniture, plants and pins above never receive a hover transform. */
+
 .sculpture-hover-surface {
   position: absolute;
   inset: 0;

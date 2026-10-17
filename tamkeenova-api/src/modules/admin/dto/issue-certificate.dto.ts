@@ -30,7 +30,7 @@ export class CertificatePartnerLogoDto {
   source_id?: string;
 }
 
-// Fixed headings, descriptions and institutional signature remain uneditable.
+
 export class IssueCertificateDto {
   @IsString()
   @MaxLength(120)

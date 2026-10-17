@@ -27,7 +27,7 @@ import { enrollment_status } from '@prisma/client';
 @Controller('students')
 export class StudentsController {
 
-  // Initialize instance
+
   constructor(private readonly studentsService: StudentsService) {}
 
 
@@ -38,7 +38,7 @@ export class StudentsController {
 
 
 
-  // Handle get public profile
+
   @Get('u/:username')
   async getPublicProfile(@Param('username') username: string) {
     return this.studentsService.getPublicProfile(username);
@@ -50,7 +50,7 @@ export class StudentsController {
 
 
 
-  // Handle get profile
+
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async getProfile(@CurrentUser() user: any) {
@@ -61,7 +61,7 @@ export class StudentsController {
 
 
 
-  // Handle update profile
+
   @UseGuards(JwtAuthGuard)
   @Patch('profile')
   async updateProfile(
@@ -75,7 +75,7 @@ export class StudentsController {
 
 
 
-  // Handle upload avatar
+
   @UseGuards(JwtAuthGuard)
   @Patch('avatar')
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
@@ -92,7 +92,7 @@ export class StudentsController {
 
 
 
-  // Handle change password
+
   @UseGuards(JwtAuthGuard)
   @Patch('change-password')
   async changePassword(
@@ -108,7 +108,7 @@ export class StudentsController {
 
 
 
-  // Handle get contact info
+
   @UseGuards(JwtAuthGuard)
   @Get('contact-info')
   async getContactInfo(@CurrentUser() user: any) {
@@ -119,7 +119,7 @@ export class StudentsController {
 
 
 
-  // Handle update contact info
+
   @UseGuards(JwtAuthGuard)
   @Patch('contact-info')
   async updateContactInfo(
@@ -135,7 +135,7 @@ export class StudentsController {
 
 
 
-  // Handle search trainers
+
   @UseGuards(JwtAuthGuard)
   @Get('trainers')
   async searchTrainers(@Query() dto: SearchTrainersDto) {
@@ -148,7 +148,7 @@ export class StudentsController {
 
 
 
-  // Handle search programs
+
   @UseGuards(JwtAuthGuard)
   @Get('programs')
   async searchPrograms(@Query() dto: SearchProgramsDto) {
@@ -159,7 +159,7 @@ export class StudentsController {
 
 
 
-  // Handle get program details
+
   @UseGuards(JwtAuthGuard)
   @Get('programs/:id')
   async getProgramDetails(@Param('id') id: string) {
@@ -172,7 +172,7 @@ export class StudentsController {
 
 
 
-  // Handle enroll in program
+
   @UseGuards(JwtAuthGuard)
   @Post('enrollments')
   async enrollInProgram(
@@ -186,7 +186,7 @@ export class StudentsController {
 
 
 
-  // Handle get my enrollments
+
   @UseGuards(JwtAuthGuard)
   @Get('enrollments')
   async getMyEnrollments(
@@ -200,7 +200,7 @@ export class StudentsController {
 
 
 
-  // Handle get enrollment details
+
   @UseGuards(JwtAuthGuard)
   @Get('enrollments/:id')
   async getEnrollmentDetails(
@@ -214,7 +214,7 @@ export class StudentsController {
 
 
 
-  // Handle cancel enrollment
+
   @UseGuards(JwtAuthGuard)
   @Patch('enrollments/:id/cancel')
   async cancelEnrollment(
@@ -231,7 +231,7 @@ export class StudentsController {
 
 
 
-  // Handle get my reviews
+
   @UseGuards(JwtAuthGuard)
   @Get('reviews')
   async getMyReviews(@CurrentUser() user: any) {
@@ -243,7 +243,7 @@ export class StudentsController {
 
 
 
-  // Handle edit review
+
   @UseGuards(JwtAuthGuard)
   @Patch('reviews/:id')
   async editReview(
@@ -259,7 +259,7 @@ export class StudentsController {
 
 
 
-  // Handle delete review
+
   @UseGuards(JwtAuthGuard)
   @Delete('reviews/:id')
   async deleteReview(
@@ -275,7 +275,7 @@ export class StudentsController {
 
 
 
-  // Handle get my certificates
+
   @UseGuards(JwtAuthGuard)
   @Get('certificates')
   async getMyCertificates(@CurrentUser() user: any) {
@@ -287,7 +287,7 @@ export class StudentsController {
 
 
 
-  // Handle verify certificate
+
   @Get('certificates/verify/:code')
   async verifyCertificate(@Param('code') code: string) {
     return this.studentsService.verifyCertificate(code);

@@ -1,3 +1,4 @@
+import { assertSafeAttachment } from '../../common/security/file-upload';
 import {
   BadRequestException,
   ForbiddenException,
@@ -24,7 +25,7 @@ const TEAM_ROLES = ['EMPLOYEE', 'VOLUNTEER'];
 @Injectable()
 export class TasksService {
 
-  // Initialize instance
+
   constructor(
     private readonly tasksRepo: TasksRepository,
     private readonly notificationsService: NotificationsService,
@@ -35,7 +36,7 @@ export class TasksService {
 
 
 
-  // Handle create task
+
   async createTask(adminId: string, dto: CreateTaskDto) {
     if (!dto.assignees || dto.assignees.length === 0) {
       throw new BadRequestException('At least one assignee is required');
@@ -94,14 +95,14 @@ export class TasksService {
   }
 
 
-  // Handle list tasks
+
   async listTasks(status?: string) {
     const tasks = await this.tasksRepo.listTasks(status);
     return { data: tasks, total: tasks.length };
   }
 
 
-  // Handle update task
+
   async updateTask(id: string, dto: UpdateTaskDto) {
     const task = await this.tasksRepo.getTaskById(id);
     if (!task) throw new NotFoundException('Task not found');
@@ -115,7 +116,7 @@ export class TasksService {
   }
 
 
-  // Handle delete task
+
   async deleteTask(id: string) {
     const task = await this.tasksRepo.getTaskById(id);
     if (!task) throw new NotFoundException('Task not found');
@@ -125,7 +126,7 @@ export class TasksService {
   }
 
 
-  // Handle add assignee
+
   async addAssignee(taskId: string, dto: AssigneeDto) {
     const task = await this.tasksRepo.getTaskById(taskId);
     if (!task) throw new NotFoundException('Task not found');
@@ -160,7 +161,7 @@ export class TasksService {
   }
 
 
-  // Handle remove assignee
+
   async removeAssignee(taskId: string, userId: string) {
     const task = await this.tasksRepo.getTaskById(taskId);
     if (!task) throw new NotFoundException('Task not found');
@@ -170,7 +171,7 @@ export class TasksService {
   }
 
 
-  // Handle get task submissions
+
   async getTaskSubmissions(taskId: string) {
     const task = await this.tasksRepo.getTaskById(taskId);
     if (!task) throw new NotFoundException('Task not found');
@@ -180,7 +181,7 @@ export class TasksService {
   }
 
 
-  // Handle review submission
+
   async reviewSubmission(
     adminId: string,
     assigneeId: string,
@@ -309,7 +310,7 @@ export class TasksService {
 
 
 
-  // Handle get my tasks
+
   async getMyTasks(userId: string) {
     const assignments = await this.tasksRepo.getMyAssignments(userId);
 
@@ -350,7 +351,7 @@ export class TasksService {
   }
 
 
-  // Handle get task details
+
   async getTaskDetails(userId: string, role: string, taskId: string) {
     const task = await this.tasksRepo.getTaskById(taskId);
     if (!task) throw new NotFoundException('Task not found');
@@ -368,7 +369,7 @@ export class TasksService {
   }
 
 
-  // Handle start task
+
   async startTask(userId: string, taskId: string) {
     const assignment = await this.tasksRepo.getAssignmentByTaskAndUser(
       taskId,
@@ -396,7 +397,7 @@ export class TasksService {
   }
 
 
-  // Handle submit task
+
   async submitTask(
     userId: string,
     taskId: string,
@@ -419,6 +420,7 @@ export class TasksService {
       );
     }
 
+    for (const file of files ?? []) assertSafeAttachment(file.buffer, file.mimetype);
     const wasRejected = assignment.status === 'REJECTED';
 
 
@@ -495,7 +497,7 @@ export class TasksService {
 
 
 
-  // Handle add comment
+
   async addComment(
     userId: string,
     role: string,
@@ -522,7 +524,7 @@ export class TasksService {
   }
 
 
-  // Handle get comments
+
   async getComments(userId: string, role: string, taskId: string) {
     const task = await this.tasksRepo.getTaskById(taskId);
     if (!task) throw new NotFoundException('Task not found');
@@ -541,7 +543,7 @@ export class TasksService {
 
 
 
-  // Handle get dashboard
+
   async getDashboard(userId: string, role: string) {
     const assignments = await this.tasksRepo.getMyAssignments(userId);
     const now = new Date();
@@ -579,7 +581,7 @@ export class TasksService {
   }
 
 
-  // Handle build volunteer stats
+
   private async buildVolunteerStats(userId: string, assignments: any[]) {
     const volunteer = await this.tasksRepo.getVolunteerByUserId(userId);
 
@@ -627,7 +629,7 @@ export class TasksService {
 
 
 
-  // Handle is locked
+
   private isLocked(taskOrder: number, assignments: any[]): boolean {
     return assignments.some(
       (a) => a.task_order < taskOrder && a.status !== 'APPROVED',
@@ -635,7 +637,7 @@ export class TasksService {
   }
 
 
-  // Handle notify assignees
+
   private async notifyAssignees(
     task: { id: string; title: string; deadline: Date | null; priority: string },
     assignees: { user_id: string; task_order?: number }[],
@@ -668,7 +670,7 @@ export class TasksService {
   }
 
 
-  // Handle notify admins of submission
+
   private async notifyAdminsOfSubmission(taskTitle: string, assigneeUserId: string) {
     try {
       const admins = await this.notificationsService.getAdminUsers();

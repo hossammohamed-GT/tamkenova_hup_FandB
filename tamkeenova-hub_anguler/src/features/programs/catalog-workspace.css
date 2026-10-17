@@ -1,5 +1,5 @@
-/* A real layered hand-off: the previous chapter pins at its bottom while this
-   opaque, normal-flow workspace rises over it. overflow:clip is not a scrollport. */
+
+
 .programs-page {
   --catalog-bottom-space: 144px;
   overflow: clip;
@@ -58,10 +58,10 @@
   align-items: start;
   gap: 28px;
 }
-/* The sticky containing block must include the page's trailing space, not
-   just the results' current height. A delayed empty/small response can shrink
-   the grid after the sidebar has already pinned. Keep that space in the rail
-   and results instead of outside the sticky boundary on section/main. */
+
+
+
+
 .catalog-sidebar-rail {
   align-self: stretch;
   min-width: 0;
@@ -79,8 +79,8 @@
   flex-direction: column;
   min-width: 0;
   max-height: calc(100svh - 88px);
-  /* The sidebar itself must not scroll its heading out of view. Only the
-     category links scroll when there are more than the viewport can hold. */
+
+
   overflow: visible;
 }
 .catalog-directory {
@@ -610,7 +610,7 @@
   color: #e7bd74;
 }
 
-/* This is a full-page workspace, not a centered 1360px content column. */
+
 .catalog-workspace.content-width {
   width: 100%;
   max-width: none;
@@ -643,7 +643,7 @@
   }
 }
 
-/* Decorative copy should never crowd the usable directory on short laptops. */
+
 @media (min-width: 1100px) and (max-height: 680px) {
   .catalog-note {
     display: none;

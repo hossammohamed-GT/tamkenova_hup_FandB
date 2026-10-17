@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-// Explicit local API fixtures: no actual bank transfers, publication or database writes.
+
 const id = '11111111-1111-4111-a111-111111111111';
 const sample = {
   id,

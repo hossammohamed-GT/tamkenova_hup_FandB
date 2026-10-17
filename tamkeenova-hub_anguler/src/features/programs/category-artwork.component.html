@@ -1,4 +1,4 @@
-<!-- Each category owns a little architectural setting, independent of the page background. -->
+
 <svg class="category-setting" viewBox="0 0 460 380" aria-hidden="true" focusable="false">
   <defs>
     <linearGradient [id]="uid() + '-stone'" x1="0" y1="0" x2="1" y2="1">
@@ -30,7 +30,7 @@
       <path d="M0 0 16 10 32 0M16 10v20" fill="none" stroke="#fff6dc" stroke-opacity=".3" stroke-width=".6"/>
     </g>
   </defs>
-  <!-- Fine construction lines, inset brass pins and stone courses tie the scene together. -->
+
   <path class="setting-line" d="M8 192 207 78 451 216 248 338 8 201ZM26 215 224 102 435 224M47 232 243 121M245 338V92M8 192v17M451 216v17"/>
   <path d="M29 226 233 108 425 219v32L220 369 29 258Z" fill="#b6ab95" opacity=".13"/>
   <path d="M29 218 234 101 429 214 224 333Z" [attr.fill]="ref('stone')" stroke="#ded3bf" stroke-width=".8"/>
@@ -38,7 +38,7 @@
   <path d="M224 333 429 214v23L224 356Z" fill="#c7b89d"/>
   <path d="M29 218 234 101 429 214 224 333Z" [attr.fill]="ref('grain')"/>
   <path d="m34 228 190 113 199-115M34 235 224 349l199-116" fill="none" stroke="#faf6ed" stroke-opacity=".7" stroke-width="1"/>
-  <!-- Small rear wall / desk-height stone return, not a giant generic hexagonal block. -->
+
   <path d="m346 112 35-20 30 18v109l-35 20-30-18Z" [attr.fill]="ref('stone')" stroke="#ddd2bd" stroke-width=".6"/>
   <path d="m346 112 30 18 35-20M376 130v109" fill="none" stroke="#fcf9ef" stroke-width="1"/>
   <path d="m346 112 35-20 30 18-35 20Z" fill="#fffaf0"/>
@@ -70,8 +70,8 @@
     }
   }
 </svg>
-<!-- A stationary, transparent copy of the silhouette keeps hover stable when
-     the floating body lifts away from the pointer. It does not cover the garden. -->
+
+
 <svg class="sculpture-hover-surface" viewBox="0 0 360 340" preserveAspectRatio="none" aria-hidden="true" focusable="false">
   <path [attr.d]="outline()" fill="transparent" />
 </svg>
@@ -83,7 +83,7 @@
       <stop stop-color="#fff3cf" stop-opacity=".28"/><stop offset=".18" stop-color="currentColor" stop-opacity=".88"/>
       <stop offset=".64" stop-color="currentColor" stop-opacity=".84"/><stop offset="1" stop-color="currentColor" stop-opacity=".9"/>
     </linearGradient>
-    <!-- Broad reflected light alternates with dark strips like a polished tinted mirror. -->
+
     <linearGradient [id]="uid() + '-sheen'" x1="0" y1="0" x2="1" y2=".32">
       <stop stop-color="#ffefd2" stop-opacity=".5"/><stop offset=".12" stop-color="#fffaf0" stop-opacity=".04"/>
       <stop offset=".48" stop-color="#fffaf0" stop-opacity="0"/><stop offset=".62" stop-color="#d9eced" stop-opacity=".08"/>
@@ -107,15 +107,15 @@
     @if (image()) {
       <image class="sculpture-photo" [attr.href]="image()" x="0" y="0" width="360" height="251" preserveAspectRatio="xMidYMid slice"/>
     }
-    <!-- Rear glass return remains visible beside the overlapping, curved front panel. -->
+
     <path d="M282 167 353 131V247L182 331 168 303 298 224Z" fill="currentColor" fill-opacity=".48" stroke="#fff2cf" stroke-opacity=".22"/>
     <path d="M308 185 353 156V240L186 323 177 313 320 230Z" fill="#fcf2d8" fill-opacity=".14"/>
     <g [attr.clip-path]="ref('front')">
       <path [attr.d]="outline()" fill="currentColor" fill-opacity=".88"/>
       <path [attr.d]="outline()" [attr.fill]="ref('glass')"/>
       @if (image()) {
-        <!-- Render ABOVE the tint so the reflection is visible, but fade it away
-             behind the label to preserve white-text contrast. -->
+
+
         <g [attr.mask]="ref('reflection-mask')">
           <image class="sculpture-reflection" [attr.href]="image()" x="0" y="-440" width="360" height="290" transform="scale(1 -1)" preserveAspectRatio="xMidYMid slice" opacity=".3"/>
         </g>
@@ -126,8 +126,8 @@
     <path [attr.d]="front()" fill="none" stroke="#ffedc8" stroke-opacity=".46" stroke-width="1.1"/>
   </g>
   <path class="sculpture-rim" [attr.d]="outline()" fill="none" [attr.stroke]="ref('rim')" stroke-width="1.2"/>
-  <!-- Normalized arc length follows each custom outline at a constant pace,
-       rather than rotating a rectangular gradient around the artboard. -->
+
+
   <g class="sculpture-neon" fill="none" aria-hidden="true">
     <path class="neon-halo neon-orbit" [attr.d]="outline()" pathLength="100" />
     <path class="neon-trail neon-orbit" [attr.d]="outline()" pathLength="100" />

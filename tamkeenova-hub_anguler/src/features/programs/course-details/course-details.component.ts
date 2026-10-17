@@ -1,7 +1,8 @@
+import { SeoService } from '../../../core/seo/seo.service';
 import { courseManagementRoute } from '../../../core/utils/course-role';
 import { CourseLearningActionsComponent } from '../../course-workflow/course-learning-actions.component';
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -24,11 +25,18 @@ import { YoutubePlayerComponent } from '../../../shared/components/youtube-playe
 @Component({
   selector: 'app-course-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslatePipe, YoutubePlayerComponent, CourseLearningActionsComponent],
+  imports: [
+    CommonModule,
+    RouterLink,
+    TranslatePipe,
+    YoutubePlayerComponent,
+    CourseLearningActionsComponent,
+  ],
   templateUrl: './course-details.component.html',
   styleUrl: './course-details.component.css',
 })
 export class CourseDetailsComponent {
+  private readonly seo = inject(SeoService);
   private readonly route = inject(ActivatedRoute);
   private readonly catalogService = inject(CourseCatalogService);
   private readonly translate = inject(TranslateService);
@@ -87,6 +95,7 @@ export class CourseDetailsComponent {
   readonly isDemo = computed(() => this.course()?.slug.startsWith('demo-catalog-v1-') ?? false);
 
   constructor() {
+    effect(() => this.updateSeo());
     this.selections
       .pipe(
         switchMap((lesson) => {
@@ -149,7 +158,7 @@ export class CourseDetailsComponent {
                   this.isLoading.set(false);
                   this.canWatch.set(course.is_free);
                   this.expanded.set(new Set([course.sections?.[0]?.id || 'ungrouped']));
-                  this.selections.next(null); // Always start with the introduction, not the last lesson.
+                  this.selections.next(null);
                 }),
                 switchMap((course) => {
                   if (course.is_free || !this.auth.isLoggedIn())
@@ -176,6 +185,66 @@ export class CourseDetailsComponent {
         this.accessLoading.set(false);
       });
   }
+  private updateSeo(): void {
+    const course = this.course();
+    this.seo.setPageIndexable(!!course && !this.isDemo());
+    if (!course) return;
+    const name = this.isEnglish()
+      ? course.title_en || course.title_ar
+      : course.title_ar || course.title_en;
+    const description = this.isEnglish()
+      ? course.short_description_en || course.description_en || course.short_description_ar || ''
+      : course.short_description_ar || course.description_ar || course.short_description_en || '';
+    const url = this.seo.absoluteUrl(`/programs/course/${encodeURIComponent(course.slug)}`);
+    this.seo.setDynamic({
+      title: `${name} | TamkeeNova HUB`,
+      description,
+      image: course.cover_image_url,
+      type: 'article',
+    });
+    this.seo.setBreadcrumbJsonLd([
+      { name: this.translate.instant('nav.home'), url: this.seo.absoluteUrl('/') },
+      { name: this.translate.instant('nav.programs'), url: this.seo.absoluteUrl('/programs') },
+      { name, url },
+    ]);
+    const price = Number(course.price);
+    const rating = Number(course.average_rating);
+    this.seo.setJsonLd('page', {
+      '@context': 'https://schema.org',
+      '@type': 'Course',
+      name,
+      description,
+      url,
+      provider: {
+        '@type': 'EducationalOrganization',
+        name: 'TamkeeNova HUB',
+        url: this.seo.absoluteUrl('/'),
+      },
+      ...(course.cover_image_url ? { image: this.seo.absoluteUrl(course.cover_image_url) } : {}),
+      ...(course.duration_minutes > 0 ? { timeRequired: `PT${course.duration_minutes}M` } : {}),
+      ...(course.language ? { inLanguage: course.language } : {}),
+      ...(course.is_free || (Number.isFinite(price) && price >= 0)
+        ? {
+            offers: {
+              '@type': 'Offer',
+              price: course.is_free ? 0 : price,
+              priceCurrency: 'EGP',
+              url,
+            },
+          }
+        : {}),
+      ...(rating >= 1 && rating <= 5 && course.ratings_count > 0
+        ? {
+            aggregateRating: {
+              '@type': 'AggregateRating',
+              ratingValue: rating,
+              ratingCount: course.ratings_count,
+            },
+          }
+        : {}),
+    });
+  }
+
   retry(): void {
     this.reload.next();
   }

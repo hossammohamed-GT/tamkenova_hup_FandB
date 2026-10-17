@@ -4,11 +4,11 @@ import { NotificationsRepository } from './notifications.repository';
 @Injectable()
 export class NotificationsService {
 
-  // Initialize instance
+
   constructor(private readonly notificationsRepo: NotificationsRepository) {}
 
 
-  // Handle get my notifications
+
   async getMyNotifications(userId: string) {
     const notifications = await this.notificationsRepo.getUserNotifications(userId);
     const unreadCount = await this.notificationsRepo.getUnreadCount(userId);
@@ -21,7 +21,7 @@ export class NotificationsService {
   }
 
 
-  // Handle mark as read
+
   async markAsRead(notificationId: string, userId: string) {
     const notification = await this.notificationsRepo.getNotificationById(
       notificationId,
@@ -36,7 +36,7 @@ export class NotificationsService {
   }
 
 
-  // Handle mark all as read
+
   async markAllAsRead(userId: string) {
     const result = await this.notificationsRepo.markAllAsRead(userId);
     return {
@@ -46,7 +46,7 @@ export class NotificationsService {
   }
 
 
-  // Handle get unread count
+
   async getUnreadCount(userId: string) {
     const count = await this.notificationsRepo.getUnreadCount(userId);
     return { unread_count: count };
@@ -55,7 +55,7 @@ export class NotificationsService {
 
 
 
-  // Handle create notification
+
   async createNotification(data: {
     user_id: string;
     title: string;
@@ -68,7 +68,7 @@ export class NotificationsService {
   }
 
 
-  // Handle create bulk notifications
+
   async createBulkNotifications(
     userIds: string[],
     data: {
@@ -91,7 +91,7 @@ export class NotificationsService {
   }
 
 
-  // Handle get admin users
+
   async getAdminUsers() {
     return this.notificationsRepo.getAdminUsers();
   }

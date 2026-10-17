@@ -24,7 +24,7 @@ import { enrollment_status } from '@prisma/client';
 @Injectable()
 export class StudentsService {
 
-  // Initialize instance
+
   constructor(
     private readonly studentsRepo: StudentsRepository,
     private readonly storageService: StorageService,
@@ -34,7 +34,7 @@ export class StudentsService {
 
 
 
-  // Handle get profile
+
   async getProfile(userId: string) {
     const profile = await this.studentsRepo.getProfile(userId);
 
@@ -67,7 +67,7 @@ export class StudentsService {
   }
 
 
-  // Handle update profile
+
   async updateProfile(userId: string, dto: UpdateProfileDto) {
     if (dto.username) {
       const existingUser = await this.studentsRepo.findUserByUsername(
@@ -82,7 +82,7 @@ export class StudentsService {
   }
 
 
-  // Handle upload avatar
+
   async uploadAvatar(userId: string, file: Express.Multer.File) {
     const mime = assertSafeImage(file);
     const result = await this.storageService.uploadFile(
@@ -98,7 +98,7 @@ export class StudentsService {
 
 
 
-  // Handle change password
+
   async changePassword(userId: string, dto: ChangePasswordDto) {
     const currentHash = await this.studentsRepo.getPasswordHash(userId);
 
@@ -131,13 +131,13 @@ export class StudentsService {
 
 
 
-  // Handle get contact info
+
   async getContactInfo(userId: string) {
     return this.studentsRepo.getContactInfo(userId);
   }
 
 
-  // Handle update contact info
+
   async updateContactInfo(userId: string, dto: UpdateContactInfoDto) {
     if (dto.phone) {
       const existingPhone = await this.studentsRepo.findUserByPhone(dto.phone);
@@ -152,7 +152,7 @@ export class StudentsService {
 
 
 
-  // Handle search trainers
+
   async searchTrainers(dto: SearchTrainersDto) {
     return this.studentsRepo.searchTrainers({
       search: dto.search,
@@ -166,7 +166,7 @@ export class StudentsService {
 
 
 
-  // Handle search programs
+
   async searchPrograms(dto: SearchProgramsDto) {
     return this.studentsRepo.searchPrograms({
       search: dto.search,
@@ -180,7 +180,7 @@ export class StudentsService {
   }
 
 
-  // Handle get program details
+
   async getProgramDetails(programId: string) {
     const program = await this.studentsRepo.getProgramById(programId);
 
@@ -198,7 +198,7 @@ export class StudentsService {
 
 
 
-  // Handle enroll in program
+
   async enrollInProgram(studentId: string, dto: EnrollProgramDto) {
 
     const program = await this.studentsRepo.getProgramById(dto.program_id);
@@ -244,7 +244,7 @@ export class StudentsService {
   }
 
 
-  // Handle get my enrollments
+
   async getMyEnrollments(studentId: string, status?: enrollment_status) {
     const enrollments = await this.studentsRepo.getStudentEnrollments(
       studentId,
@@ -258,7 +258,7 @@ export class StudentsService {
   }
 
 
-  // Handle get enrollment details
+
   async getEnrollmentDetails(studentId: string, enrollmentId: string) {
     const enrollment = await this.studentsRepo.getEnrollmentById(
       enrollmentId,
@@ -273,7 +273,7 @@ export class StudentsService {
   }
 
 
-  // Handle cancel enrollment
+
   async cancelEnrollment(studentId: string, enrollmentId: string) {
 
     const enrollment = await this.studentsRepo.getEnrollmentById(
@@ -304,7 +304,7 @@ export class StudentsService {
 
 
 
-  // Handle get my certificates
+
   async getMyCertificates(studentId: string) {
     const certificates = await this.studentsRepo.getStudentCertificates(
       studentId,
@@ -317,7 +317,7 @@ export class StudentsService {
   }
 
 
-  // Handle verify certificate
+
   async verifyCertificate(verificationCode: string) {
     const certificate = await this.studentsRepo.getCertificateByVerificationCode(
       verificationCode,
@@ -336,7 +336,7 @@ export class StudentsService {
 
 
 
-  // Handle get my reviews
+
   async getMyReviews(studentId: string) {
     const reviews = await this.studentsRepo.getMyReviews(studentId);
     return {
@@ -346,7 +346,7 @@ export class StudentsService {
   }
 
 
-  // Handle edit review
+
   async editReview(studentId: string, reviewId: string, dto: EditReviewDto) {
 
     const review = await this.studentsRepo.getReviewById(reviewId, studentId);
@@ -383,7 +383,7 @@ export class StudentsService {
   }
 
 
-  // Handle delete review
+
   async deleteReview(studentId: string, reviewId: string) {
 
     const review = await this.studentsRepo.getReviewById(reviewId, studentId);
@@ -413,7 +413,7 @@ export class StudentsService {
 
 
 
-  // Handle get public profile
+
   async getPublicProfile(username: string) {
     const profile = await this.studentsRepo.getPublicProfileByUsername(username);
 
@@ -488,7 +488,7 @@ export class StudentsService {
 
 
 
-  // Handle generate verification code
+
   generateVerificationCode(): string {
 
     return `TAM-${randomBytes(8).toString('hex').toUpperCase()}`;

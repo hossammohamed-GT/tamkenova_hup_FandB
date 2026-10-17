@@ -3,7 +3,7 @@ import { IsOptional, IsString, IsUrl } from 'class-validator';
 
 
 
-// Handle normalize link
+
 function normalizeLink(value: unknown): unknown {
   if (typeof value !== 'string') return value;
 

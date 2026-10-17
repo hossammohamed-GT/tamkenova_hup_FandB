@@ -1,4 +1,4 @@
-// Local, licensed-in-repository photos are embedded; no remote image service is required.
+
 import { readFile, mkdir, writeFile } from 'node:fs/promises';
 import { Resvg } from '@resvg/resvg-js';
 import jpeg from 'jpeg-js';

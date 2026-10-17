@@ -8,7 +8,7 @@ export interface SubmissionFile {
 
 type Json = Record<string, any>;
 
-// Two endpoints, different shapes
+
 export function mergeSubmissionsIntoAssignees(
   assignees: Array<Json | null | undefined> | null | undefined,
   submissions: Array<Json | null | undefined> | null | undefined,
@@ -44,21 +44,21 @@ export function mergeSubmissionsIntoAssignees(
   return [...rows.values()];
 }
 
-// Backend keys vary
+
 export function submissionOfAssignee(assignee: Json | null | undefined): any | null {
   if (!assignee) return null;
   const raw = assignee['submission'] ?? assignee['task_submission'] ?? assignee['submission_data'];
   return raw ?? null;
 }
 
-// Backend stores relative paths
+
 export function absoluteFileUrl(url: string): string {
   if (!url) return '';
   if (/^https?:\/\//i.test(url) || url.startsWith('blob:') || url.startsWith('data:')) return url;
   return `${environment.apiUrl}/${url.replace(/^\/+/, '')}`;
 }
 
-// Normalize attachment shapes
+
 export function submissionFiles(submission: Json | null | undefined): SubmissionFile[] {
   if (!submission) return [];
   const rawList =

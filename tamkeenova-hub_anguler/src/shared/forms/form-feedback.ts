@@ -1,6 +1,6 @@
 import { signal } from '@angular/core';
 export type FieldErrors = Record<string, string[]>;
-/** Shared form state. Never retries writes or strips fields rejected by an older API. */
+
 export class FormFeedback {
   readonly fields = signal<FieldErrors>({});
   readonly general = signal('');
@@ -67,7 +67,7 @@ export class FormFeedback {
     } else {
       for (const message of Array.isArray(body?.message) ? body.message : [body?.message]) {
         if (typeof message !== 'string') continue;
-        // Nest's legacy nested whitelist format: sections.0.lessons.1.property description_ar ...
+
         const normalized = message.replace(/(^|\.)property\s+/g, '$1');
         const match = normalized.match(
           /^([a-zA-Z_]\w*(?:\.(?:\w+))*)(?::\s*|\s+)((?:should|must|has|is|Use|Enter|أدخل|اختر).*)$/,

@@ -16,8 +16,8 @@ import { CourseCatalogService } from '../../core/services/course-catalog.service
 import { CategoryArtworkComponent } from './category-artwork.component';
 import { TrainersService } from '../../core/services/trainers.service';
 
-// Category records still come from the API; this only supplies local artwork if
-// the database row has not been seeded with image_url yet.
+
+
 const CATEGORY_CARD_IMAGE_FALLBACKS: Readonly<Record<string, string>> = {
   'business-professional-skills': '/assets/course-categories/business-professional-skills.jpg',
   'technology-innovation': '/assets/course-categories/technology-innovation.jpg',
@@ -155,8 +155,8 @@ export class ProgramsComponent {
   }
 
   private loadLandingContent(): void {
-    // Start categories first and publish each response independently. A slow
-    // trainer/collection request must never hold the category section back.
+
+
     this.loadCategories();
     this.catalogService.getCollections().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (collections) => this.collections.set(collections),
@@ -245,8 +245,8 @@ export class ProgramsComponent {
       });
   }
 
-  /** Pin the *bottom* of the preceding content, including very tall category grids.
-   * The next normal-flow panel then scrolls over it; no JS-driven visual animation. */
+
+
   private setupCatalogStack(): void {
     const underlay = this.catalogUnderlay?.nativeElement;
     const marker = this.catalogCoverMarker?.nativeElement;
@@ -256,9 +256,9 @@ export class ProgramsComponent {
     const resize = () => underlay.style.setProperty('--underlay-pin-top',
       `${Math.min(72, window.innerHeight - underlay.offsetHeight)}px`);
     const updateFocus = () => { underlay.inert = !motion.matches && marker.getBoundingClientRect().top < 72; };
-    // A jump can carry the 1px marker from below to above the viewport between
-    // observer samples (non-intersecting in both). Coalesce a passive scroll
-    // check for keyboard accessibility only; sticky/cover motion stays pure CSS.
+
+
+
     let coverFocusFrame = 0;
     const onCoverScroll = () => {
       if (coverFocusFrame || motion.matches) return;
@@ -275,8 +275,8 @@ export class ProgramsComponent {
       const reveal = (attempt = 0) => {
         const coverTop = marker.getBoundingClientRect().top;
         const targetBottom = target.getBoundingClientRect().bottom;
-        // Native scrollIntoView cannot reveal a sticky child by centering it:
-        // it can scroll the covering panel further over the focused control.
+
+
         if (coverTop < targetBottom + 16 && coverTop < window.innerHeight && window.scrollY > 0) {
           const root = document.documentElement;
           const previous = root.style.scrollBehavior;
@@ -315,8 +315,8 @@ export class ProgramsComponent {
     const section = this.catalogSection?.nativeElement;
     const before = section?.getBoundingClientRect().top;
     this.cancelCategoryPageScroll();
-    // Restore after RouterScroller has applied query-navigation scrolling,
-    // not before it (which would get overwritten by the router's scroll-to-top).
+
+
     this.catalogScrollRestore?.unsubscribe();
     this.catalogScrollRestore = this.router.events.pipe(
       filter(event => event instanceof Scroll &&
@@ -362,8 +362,8 @@ export class ProgramsComponent {
           )
         : null;
 
-    // Render the selected page immediately. The copied image first squares its
-    // corners in place, then flies into the hero as the page scrolls to the top.
+
+
     this.isCategoryImageAnimating.set(!!flightImage);
     this.activateCategory(slug);
 

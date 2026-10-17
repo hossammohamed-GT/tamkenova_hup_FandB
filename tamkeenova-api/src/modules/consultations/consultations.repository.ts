@@ -5,13 +5,13 @@ import { consultation_status } from '@prisma/client';
 @Injectable()
 export class ConsultationsRepository {
 
-  // Initialize instance
+
   constructor(private readonly prisma: PrismaService) {}
 
 
 
 
-  // Handle create consultation
+
   async createConsultation(data: {
     student_id: string;
     trainer_id: string;
@@ -65,7 +65,7 @@ export class ConsultationsRepository {
   }
 
 
-  // Handle get student consultations
+
   async getStudentConsultations(studentId: string, status?: consultation_status) {
     const where: any = { student_id: studentId };
     if (status) where.status = status;
@@ -102,7 +102,7 @@ export class ConsultationsRepository {
   }
 
 
-  // Handle get consultation by id
+
   async getConsultationById(consultationId: string) {
     return this.prisma.consultations.findUnique({
       where: { id: consultationId },
@@ -163,7 +163,7 @@ export class ConsultationsRepository {
   }
 
 
-  // Handle update consultation status
+
   async updateConsultationStatus(
     consultationId: string,
     status: consultation_status,
@@ -199,7 +199,7 @@ export class ConsultationsRepository {
 
 
 
-  // Handle get trainer consultations
+
   async getTrainerConsultations(trainerId: string, status?: consultation_status) {
     const where: any = { trainer_id: trainerId };
     if (status) where.status = status;
@@ -236,7 +236,7 @@ export class ConsultationsRepository {
 
 
 
-  // Handle find consultation review
+
   async findConsultationReview(consultationId: string) {
     return this.prisma.consultation_reviews.findUnique({
       where: { consultation_id: consultationId },
@@ -244,7 +244,7 @@ export class ConsultationsRepository {
   }
 
 
-  // Handle create review
+
   async createReview(data: {
     consultation_id: string;
     student_id: string;
@@ -268,7 +268,7 @@ export class ConsultationsRepository {
   }
 
 
-  // Handle get trainer consultation reviews
+
   async getTrainerConsultationReviews(trainerId: string) {
     return this.prisma.consultation_reviews.findMany({
       where: {

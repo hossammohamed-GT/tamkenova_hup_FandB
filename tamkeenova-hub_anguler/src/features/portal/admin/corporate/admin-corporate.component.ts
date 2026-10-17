@@ -205,7 +205,7 @@ export class AdminCorporateComponent implements OnInit {
           this.isUpdating.set(false);
           this.showToast('admin_corporate.updated');
           this.refresh();
-          // Sync open modal
+
           this.adminService.getCorporateRequest(current.id).subscribe({
             next: (full) => {
               if (this.details()?.id === current.id && full) this.details.set(full);

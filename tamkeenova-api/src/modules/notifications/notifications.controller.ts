@@ -13,14 +13,14 @@ import { NotificationsService } from './notifications.service';
 @UseGuards(JwtAuthGuard)
 export class NotificationsController {
 
-  // Initialize instance
+
   constructor(private readonly notificationsService: NotificationsService) {}
 
 
 
 
 
-  // Handle get my notifications
+
   @Get()
   async getMyNotifications(@CurrentUser() user: any) {
     return this.notificationsService.getMyNotifications(user.sub);
@@ -30,7 +30,7 @@ export class NotificationsController {
 
 
 
-  // Handle get unread count
+
   @Get('unread-count')
   async getUnreadCount(@CurrentUser() user: any) {
     return this.notificationsService.getUnreadCount(user.sub);
@@ -40,7 +40,7 @@ export class NotificationsController {
 
 
 
-  // Handle mark as read
+
   @Patch(':id/read')
   async markAsRead(
     @CurrentUser() user: any,
@@ -53,7 +53,7 @@ export class NotificationsController {
 
 
 
-  // Handle mark all as read
+
   @Patch('read-all')
   async markAllAsRead(@CurrentUser() user: any) {
     return this.notificationsService.markAllAsRead(user.sub);

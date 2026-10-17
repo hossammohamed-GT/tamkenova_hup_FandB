@@ -30,7 +30,7 @@ export class ProgramsMegaMenuComponent {
   readonly english = computed(() => this.theme.language() === 'en');
   readonly sorts = [{ value: 'popular', key: 'popular' }, { value: 'newest', key: 'new' }, { value: 'rating', key: 'rated' }];
   private readonly requests = new Subject<{ category: string; sort: string } | null>();
-  // Mounted with the navbar, not recreated by hover. Never cache failed requests.
+
   private readonly inFlight = new Map<string, Observable<Course[]>>();
   private readonly cache = new Map<string, Course[]>();
   readonly categoryImage = computed(() => {
@@ -73,7 +73,7 @@ export class ProgramsMegaMenuComponent {
         this.loadingCategories.set(false);
         if (categories.length) {
           this.selectCategory(categories.find(category => category.slug === previousSlug) ?? categories[0]);
-          // Warm popular courses for every remaining category, with bounded concurrency.
+
           from(categories.filter(category => category.slug !== this.selected()?.slug)).pipe(
             mergeMap(category => this.fetchCourses(category.slug, 'popular').pipe(catchError(() => EMPTY)), 3),
             takeUntilDestroyed(this.destroyRef),
@@ -93,7 +93,7 @@ export class ProgramsMegaMenuComponent {
       tap(courses => this.cache.set(key, courses)),
       takeUntilDestroyed(this.destroyRef),
       finalize(() => this.inFlight.delete(key)),
-      // Continue warming even when the visitor switches categories mid-request.
+
       shareReplay({ bufferSize: 1, refCount: false }),
     );
     this.inFlight.set(key, request);

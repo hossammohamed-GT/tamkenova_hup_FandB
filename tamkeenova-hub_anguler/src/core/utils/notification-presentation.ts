@@ -30,7 +30,7 @@ export function notificationTone(type: string | null | undefined): NotificationT
   return 'neutral';
 }
 
-// Fallback title key
+
 export function notificationTypeKey(type: string | null | undefined): string {
   const t = (type ?? '').toUpperCase();
   if (t.includes('PROGRAM')) return 'program_submitted';
@@ -51,7 +51,7 @@ export function notificationTypeKey(type: string | null | undefined): string {
   return 'update';
 }
 
-// Backend sends English only
+
 export function isKnownNotificationType(type: string | null | undefined): boolean {
   return notificationTypeKey(type) !== 'update';
 }

@@ -19,14 +19,14 @@ import { RequestSpecializationDto } from './dto/request-specialization.dto';
 @Controller('specializations')
 export class SpecializationsController {
 
-  // Initialize instance
+
   constructor(
     private readonly specializationsService: SpecializationsService,
   ) {}
 
 
 
-  // Handle get all
+
   @Get()
   getAll() {
     return this.specializationsService.getAll();
@@ -34,7 +34,7 @@ export class SpecializationsController {
 
 
 
-  // Handle get by id
+
   @Get(':id')
   getById(@Param('id') id: string) {
     return this.specializationsService.getById(id);
@@ -42,7 +42,7 @@ export class SpecializationsController {
 
 
 
-  // Handle request specialization
+
   @Post('request')
   @UseGuards(JwtAuthGuard)
   requestSpecialization(

@@ -1,3 +1,4 @@
+import { redactLog } from './log-redaction';
 import { Injectable, OnModuleDestroy } from '@nestjs/common';
 import * as winston from 'winston';
 
@@ -17,19 +18,19 @@ export class LoggerService implements OnModuleDestroy {
   }
 
   logAuth(data: AuthLogData) {
-    this.authLogger.info(data);
+    this.authLogger.info(redactLog(data));
   }
 
   logSecurity(data: SecurityLogData) {
-    this.securityLogger.warn(data);
+    this.securityLogger.warn(redactLog(data));
   }
 
   logError(data: ErrorLogData) {
-    this.errorLogger.error({
+    this.errorLogger.error(redactLog({
       ...data,
       stack: data.error?.stack,
       message: data.error?.message,
-    });
+    }));
   }
 
   onModuleDestroy() {

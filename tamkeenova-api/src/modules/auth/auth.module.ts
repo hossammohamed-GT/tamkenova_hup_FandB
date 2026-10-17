@@ -20,6 +20,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
           secret: config.getOrThrow<string>('JWT_SECRET'),
 
           signOptions: {
+            algorithm: 'HS256',
             expiresIn: config.getOrThrow<string>('JWT_EXPIRES_IN') as any,
           },
         };

@@ -1,4 +1,4 @@
-// Constant additive DDL aligned with schema.prisma. No resets or legacy rewrites.
+
 module.exports = [
   `ALTER TABLE courses ADD COLUMN IF NOT EXISTS owner_trainer_id uuid, ADD COLUMN IF NOT EXISTS price decimal(10,2) NOT NULL DEFAULT 0,
  ADD COLUMN IF NOT EXISTS review_status varchar(30) NOT NULL DEFAULT 'DRAFT', ADD COLUMN IF NOT EXISTS revision integer NOT NULL DEFAULT 1,

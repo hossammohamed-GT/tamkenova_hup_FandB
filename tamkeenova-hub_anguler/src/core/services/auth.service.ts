@@ -124,7 +124,7 @@ export class AuthService {
         return { changed, role: fresh.role };
       }),
       catchError((err) => {
-        // Logout on 401 only
+
         if (err?.status === 401) {
           this.logout(false);
           this.router.navigate(['/login']);

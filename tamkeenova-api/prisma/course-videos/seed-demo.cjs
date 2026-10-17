@@ -73,7 +73,7 @@ async function seedDemoVideos(prisma) {
           )
         ) {
           skipped.push(course.slug);
-          continue; // Never rearrange pre-existing authored content.
+          continue;
         }
         ids.push(course.id);
         sections.push(...sample.sections);

@@ -49,7 +49,7 @@ export class RouteTransitionService {
   }
 
   private reveal(navigated: boolean): void {
-    // Paint first, then unwind
+
     requestAnimationFrame(() => {
       setTimeout(() => {
         this.phase.set('collapse');

@@ -42,6 +42,7 @@ describe('Category HTTP roles, strict validation and upload boundaries', () => {
     token = jwt.sign(
       { sub: id, tv: 0, role: 'SUPER_ADMIN' },
       process.env.JWT_SECRET,
+      { expiresIn: '1h' },
     );
     const module = await Test.createTestingModule({ imports: [CategoryModule] })
       .overrideProvider(PrismaService)

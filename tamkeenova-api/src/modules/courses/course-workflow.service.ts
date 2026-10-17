@@ -874,7 +874,7 @@ export class CourseWorkflowService {
     return this.mutate(async (tx) => {
       const enrollment = await this.activeEnrollment(tx, userId, courseId);
       if (enrollment.status === 'COMPLETED') return { progress: 100 };
-      // Lock this enrollment before counting progress: simultaneous lesson marks cannot overwrite a newer percentage.
+
       const locked = await tx.course_enrollments.updateMany({
         where: { id: enrollment.id, status: 'ACTIVE' },
         data: { last_accessed_at: new Date() },
@@ -947,7 +947,7 @@ export class CourseWorkflowService {
         throw new BadRequestException(
           'Finish and mark every lesson first / أكمل كل الدروس أولًا',
         );
-      // Validate template input before queuing an unfulfillable certificate request.
+
       certificateData({
         certificate_type: 'TRAINING',
         recipient_name_ar: dto.recipient_name_ar,

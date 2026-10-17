@@ -1142,7 +1142,7 @@ html[dir='rtl'] .mobile-link-icon {
   color: var(--color-primary);
 }
 
-/* The Programs panel is anchored to the header, not to a narrow nav item. */
+
 .programs-entry { display: flex; align-items: center; align-self: stretch; }
 .programs-trigger { cursor: pointer; font-family: inherit; }
 .programs-trigger svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 1.8; transition: transform 180ms ease; }

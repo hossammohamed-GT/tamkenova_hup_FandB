@@ -1,4 +1,4 @@
-// Build-time artwork only
+
 import { readFileSync, writeFileSync, readdirSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
 const root = new URL('../public/certificates/', import.meta.url);
@@ -79,7 +79,7 @@ for (const type of ['training', 'volunteer']) {
       .render()
       .asPng(),
   );
-  // A4 landscape, 300dpi
+
   writeFileSync(
     new URL(`${type}-v1.png`, root),
     new Resvg(svg, {

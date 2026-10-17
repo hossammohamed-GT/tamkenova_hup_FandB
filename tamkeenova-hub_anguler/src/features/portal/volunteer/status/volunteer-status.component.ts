@@ -39,7 +39,7 @@ export class VolunteerStatusComponent {
       },
       error: (err) => {
         if (err?.status !== 401) {
-          // Assume pending on error
+
           this.status.set({ status: 'PENDING' });
         }
         this.isLoading.set(false);

@@ -54,7 +54,7 @@ describe('Programs menu deferred keyboard focus', () => {
     component.focusProgramsMenu(new Event('keydown'));
     component.onEscape();
     expect(cancel).toHaveBeenCalledWith(1);
-    callbacks[0](0); // Simulate an already-dispatched frame during panel teardown.
+    callbacks[0](0);
     expect(component.isProgramsMenuOpen()).toBe(false);
     expect(focus).not.toHaveBeenCalled();
   });

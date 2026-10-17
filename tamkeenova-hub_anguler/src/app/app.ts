@@ -23,7 +23,7 @@ export class App implements OnDestroy {
   private routerSub: Subscription;
 
   constructor() {
-    // Initial brand splash
+
     this.loader.show();
     setTimeout(() => this.loader.hide(), 500);
 
@@ -33,7 +33,7 @@ export class App implements OnDestroy {
         event instanceof NavigationCancel ||
         event instanceof NavigationError
       ) {
-        // Keep hidden after navigation
+
         this.loader.hide();
       }
     });

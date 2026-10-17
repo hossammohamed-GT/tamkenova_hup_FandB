@@ -435,7 +435,7 @@ export class AdminCertificatesComponent implements OnInit {
     this.isSaving.set(true);
     this.formError.set(null);
     try {
-      // Fit both before sending
+
       await Promise.all(
         this.languages.map((language) => this.renderer.render(this.values(false, language), 900)),
       );
@@ -537,7 +537,7 @@ export class AdminCertificatesComponent implements OnInit {
       await navigator.clipboard.writeText(code);
       this.showToast('common.copied');
     } catch {
-      // Clipboard optional
+
     }
   }
   private showToast(key: string, error = false): void {

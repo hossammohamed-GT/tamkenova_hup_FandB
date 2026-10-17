@@ -48,7 +48,7 @@ test('additive workflow DDL reruns safely and enforces payment, lesson and certi
       "INSERT INTO course_payment_requests(user_id,course_id,method,recipient_account,expected_amount,reported_amount,sender_account,transferred_at) VALUES($1,$2,'INSTAPAY','test-only@instapay',100,100,'sender',now()) RETURNING id";
     const first = (await db.query(insert, [u, c])).rows[0].id;
     await assert.rejects(db.query(insert, [u, c]), /unique/i);
-    // Reports do not grant access. Only approval's atomic enrollment operation may do that.
+
     assert.equal(
       (await db.query('SELECT count(*)::int n FROM course_enrollments')).rows[0]
         .n,
@@ -110,7 +110,7 @@ test('additive workflow DDL reruns safely and enforces payment, lesson and certi
       ),
       /unique/i,
     );
-    // One admin wins publication even if another submits the same revision.
+
     await db.query(
       "UPDATE courses SET status='DRAFT',review_status='PENDING' WHERE id=$1",
       [c],

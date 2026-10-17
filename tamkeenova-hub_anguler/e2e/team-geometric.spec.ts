@@ -1,8 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-// Design-only fixtures. Cropped reference portraits are served by this test route
-// only; no invented instructors, reviews or portraits enter the public catalog.
+
 const trainerId = '11111111-1111-4111-a111-111111111111';
 const names = [
   'Ahmed Rashed',
@@ -480,7 +479,7 @@ test('reduced transparency preserves opaque, readable panels and functional rati
   page,
 }) => {
   await setup(page);
-  // Playwright does not expose reduced-transparency in emulateMedia.
+
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('Emulation.setEmulatedMedia', {
     features: [{ name: 'prefers-reduced-transparency', value: 'reduce' }],
@@ -510,4 +509,31 @@ test('reduced transparency preserves opaque, readable panels and functional rati
       .evaluate((el) => getComputedStyle(el).backdropFilter),
   ).toBe('none');
   await cdp.detach();
+});
+
+test('trainer SEO survives navigation, strips tracking parameters and removes obsolete or missing-resource schemas', async ({
+  page,
+}) => {
+  await setup(page, { language: 'en', role: '' });
+  await page.goto('/team?tracking=private#directory');
+  await page.locator('.trainer-card-view-details').first().click();
+  await expect(page).toHaveTitle('Ahmed Rashed | TamkeeNova HUB');
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://tamkeenova-hub.vercel.app/team/test-instructor-0',
+  );
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+  await expect(page.locator('script[data-jsonld="page"]')).toHaveCount(1);
+  const person = JSON.parse((await page.locator('script[data-jsonld="page"]').textContent())!);
+  expect(person['@type']).toBe('Person');
+  expect(person.aggregateRating).toBeUndefined();
+  expect(person.sameAs).not.toContain('javascript:alert(1)');
+  await page.goBack();
+  await expect(page.locator('.trainer-card')).toHaveCount(8);
+  await expect(page.locator('script[data-jsonld="page"]')).toHaveCount(0);
+  await expect(page).not.toHaveTitle(/Ahmed Rashed/);
+  await page.goto('/team/missing?tracking=private');
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+  await expect(page.locator('script[data-jsonld="page"]')).toHaveCount(0);
 });

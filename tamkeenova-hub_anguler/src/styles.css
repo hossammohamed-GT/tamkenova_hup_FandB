@@ -1,5 +1,5 @@
-/* Self-hosted Noto Kufi Arabic (OFL-1.1); see public/fonts/noto-kufi-arabic/README.md. */
-/* noto-kufi-arabic-arabic-wght-normal */
+
+
 @font-face {
   font-family: 'Noto Kufi Arabic';
   font-style: normal;
@@ -9,7 +9,7 @@
   unicode-range: U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1;
 }
 
-/* noto-kufi-arabic-latin-ext-wght-normal */
+
 @font-face {
   font-family: 'Noto Kufi Arabic';
   font-style: normal;
@@ -19,7 +19,7 @@
   unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
 }
 
-/* noto-kufi-arabic-latin-wght-normal */
+
 @font-face {
   font-family: 'Noto Kufi Arabic';
   font-style: normal;
@@ -35,7 +35,7 @@
   --color-accent: #be8a3f;
   --color-accent-hover: #a8783a;
 
-  /* 4.5:1 text-safe colors */
+
   --color-action: #004265;
   --color-action-hover: #01597f;
   --color-accent-text: #7d5c1e;
@@ -86,13 +86,13 @@
   --text-display-lg: clamp(1.8rem, 1.3rem + 1.9vw, 2.6rem);       --leading-display-lg: 1.1;
   --text-display-xl: clamp(2rem, 1.45rem + 2.3vw, 3rem);          --leading-display-xl: 1.05;
 
-  /* Max weight 700 */
+
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
   --weight-bold: 700;
 
-  /* Zero tracking in RTL */
+
   --tracking-tight: -0.02em;
   --tracking-normal: 0;
   --tracking-wide: 0.06em;
@@ -121,7 +121,7 @@
   --duration-fast: 150ms;
   --duration-base: 250ms;
   --duration-slow: 400ms;
-  /* legacy aliases */
+
   --transition-fast: var(--duration-fast) ease;
   --transition-base: var(--duration-base) ease;
   --transition-slow: var(--duration-slow) ease;
@@ -154,7 +154,7 @@
   --color-border: #4c4b45;
   --color-border-strong: #5f5e55;
 
-  /* Navy fills only */
+
   --color-primary: #004265;
   --color-primary-hover: #01597f;
   --color-action: #6fb3d8;
@@ -209,8 +209,8 @@ a {
   color: #fff;
 }
 
-/* Override the typography tokens, not every element: headings, portals, menus,
-   dialogs and controls inherit the Arabic face; icon fonts keep their own face. */
+
+
 html[lang='ar'],
 html[dir='rtl'] {
   --font-sans: var(--font-arabic);
@@ -727,7 +727,7 @@ button.card-action:hover {
   margin-bottom: var(--space-2);
 }
 
-/* Legacy shims */
+
 .chamfer-lg {
   border-radius: var(--radius-lg);
 }
@@ -753,7 +753,7 @@ html[dir='rtl'] .marquee-track {
   to { transform: translateX(-50%); }
 }
 
-/* Never hide content */
+
 @supports (animation-timeline: view()) {
   [appScrollReveal] {
     animation: scroll-reveal linear both;
@@ -773,7 +773,7 @@ html[dir='rtl'] .marquee-track {
   }
 }
 
-/* Right-facing send/logout symbols use the same logical mirroring convention. */
+
 .rtl-flip { scale: 1 1; }
 .rtl-flip:dir(rtl) { scale: -1 1; }
 
@@ -845,7 +845,7 @@ html {
   background-clip: padding-box;
 }
 
-/* Active during unwind only */
+
 body.route-enter {
   overflow-x: clip;
 }
@@ -866,7 +866,7 @@ body.route-enter router-outlet + * {
   }
 }
 
-/* Temporary image copy for the immediate category-to-hero flight animation. */
+
 .category-image-flight {
   position: fixed;
   z-index: 2147483647;
@@ -881,7 +881,7 @@ body.route-enter router-outlet + * {
 }
 
 
-/* Programs geometric category cards and selected-category hero. */
+
 .programs-page .category-section {
   position: relative;
   isolation: isolate;
@@ -969,14 +969,14 @@ body.route-enter router-outlet + * {
 .programs-page .text-link i { transition: transform 160ms ease; }
 .programs-page .text-link:hover i { transform: translateX(3px); }
 
-/* Category icons are local SVGs: no external icon-font loading dependency. */
+
 .programs-page .category-icon-badge svg,
 .programs-page .category-arrow svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 .programs-page .category-section .category-icon-badge svg { width: 100%; height: 100%; }
-/* Transparent corners must not steal clicks from another sculpture behind them. */
+
 .programs-page .category-tile:not(.category-skeleton) { pointer-events: none; }
 .programs-page .category-tile .category-content { pointer-events: auto; }
-/* Each scene has its own outline, glass return and architectural setting. */
+
 .programs-page .category-section {
   width: 100%;
   max-width: none;
@@ -987,8 +987,8 @@ body.route-enter router-outlet + * {
 .programs-page .category-heading-copy { max-width: 100%; }
 .programs-page .category-heading-copy h2 { font-size: clamp(1.5rem, 2.15vw, 2rem); }
 .programs-page .category-heading-copy p { max-width: 560px; }
-/* All API categories wrap in place. Reserve a full cell for each sculpture AND
-   its 120%-wide setting, so neither cards nor their gardens can overlap. */
+
+
 .programs-page .category-grid {
   position: relative;
   --category-columns: 5;
@@ -1043,8 +1043,8 @@ body.route-enter router-outlet + * {
 .programs-page .category-tile[data-category='soft-skills'] { --category-tint: #554b75; }
 .programs-page .category-tile:hover,
 .programs-page .category-tile:focus-visible { z-index: 4; }
-/* Only the floating sculpture and its foreground share this transform.
-   The architectural setting remains in the stationary artwork host. */
+
+
 .programs-page .category-foreground {
   position: absolute;
   inset: 0;
@@ -1074,7 +1074,7 @@ body.route-enter router-outlet + * {
 .programs-page .category-content { position: absolute; z-index: 2; inset-inline: 13% 12%; top: 36%; bottom: 19%; display: block; }
 .programs-page .category-card-info { display: flex; min-width: 0; flex: 1; flex-direction: column; align-items: flex-start; gap: .2rem; }
 .programs-page .category-icon-badge { display: grid; place-items: center; width: 26px; height: 26px; margin-bottom: .1rem; background: transparent; border: 0; border-radius: 0; color: #fff6d5; font-size: 1.65rem; }
-/* Leave room for the Kufi ascenders above the label and below the action row. */
+
 .programs-page .category-name { color: white; font-size: clamp(.72rem, .95vw, 1rem); font-weight: 750; margin-block-start: .35em; line-height: 1.5; text-shadow: 0 1px 3px rgba(0,0,0,.12); }
 .programs-page .category-course-count { color: rgba(255,255,255,.78); font-size: clamp(.62rem, .78vw, .78rem); line-height: 1.3; }
 .programs-page .category-arrow { position: absolute; inset-inline-end: 0; top: 0; display: grid; place-items: center; width: 26px; height: 26px; margin-bottom: 3%; border: 1px solid rgba(255,255,255,.65); border-radius: 50%; background: transparent; color: white; font-size: .75rem; transition: background 180ms ease, transform 180ms ease; }
@@ -1232,7 +1232,7 @@ body.route-enter router-outlet + * {
   to { opacity: 1; transform: scale(1); }
 }
 
-/* Shared inline feedback: directly below the affected control, in RTL and LTR. */
+
 .field-error, .form-feedback-error {
   display: block; color: var(--color-error, #c43838); font-size: .875rem;
   line-height: 1.6; margin-block: .35rem .65rem; overflow-wrap: anywhere;
@@ -1244,8 +1244,8 @@ body.route-enter router-outlet + * {
 .form-feedback-fields { border: 0; padding: 0; margin: 0; min-width: 0; }
 
 
-/* Logical navigation: source glyph points right for forward, left for back.
-   Use individual scale, so a hover translate/animation cannot undo RTL mirroring. */
+
+
 .directional-arrow {
   display: inline-block;
   direction: ltr;
@@ -1258,7 +1258,7 @@ body.route-enter router-outlet + * {
 }
 .directional-arrow:dir(rtl) { scale: -1 1; }
 
-/* Site-wide action rhythm. No blanket margins on icons or navigation items. */
+
 :root { --action-gap: 12px; --action-separation: 18px; }
 :root body :is(.actions, .form-actions, .modal-actions, .dialog-actions,
   .success-actions, .notfound-actions, .button-group, .btn-group,

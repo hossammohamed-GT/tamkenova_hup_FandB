@@ -462,7 +462,7 @@ button:focus-visible {
   stroke-linejoin: round;
 }
 
-/* Opaque fallback keeps every control legible without backdrop-filter support. */
+
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .team-hero-copy,
   .team-toolbar {

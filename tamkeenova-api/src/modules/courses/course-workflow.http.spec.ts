@@ -56,6 +56,7 @@ describe('Workflow HTTP authentication, current roles and DTO boundary', () => {
     token = jwt.sign(
       { sub: id, tv: 0, role: 'SUPER_ADMIN' },
       process.env.JWT_SECRET,
+      { expiresIn: '1h' },
     );
     const module = await Test.createTestingModule({ imports: [CoursesModule] })
       .overrideProvider(PrismaService)

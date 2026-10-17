@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
 import { VolunteersService } from '../services/volunteers.service';
 
-// Block until admin approval
+
 export const volunteerStatusGuard: CanActivateFn = () => {
   const volunteersService = inject(VolunteersService);
   const router = inject(Router);
@@ -22,9 +22,9 @@ export const volunteerStatusGuard: CanActivateFn = () => {
       return router.createUrlTree(['/portal/trainee/status']);
     }),
     catchError((err) => {
-      // Interceptor handles 401
+
       if (err?.status === 401) return of(true);
-      // Fail open, avoid lockout
+
       return of(true);
     }),
   );

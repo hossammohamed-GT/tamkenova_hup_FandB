@@ -7,7 +7,7 @@ import {
   inject,
 } from '@angular/core';
 
-// Focus trap for editor
+
 @Directive({ selector: '[certificateDialog]', standalone: true })
 export class CertificateDialogDirective implements AfterViewInit, OnDestroy {
   private element = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;

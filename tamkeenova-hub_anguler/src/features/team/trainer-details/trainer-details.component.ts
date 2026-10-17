@@ -177,6 +177,7 @@ export class TrainerDetailsComponent implements OnInit {
 
   private pushSeo(): void {
     const t = this.trainer();
+    this.seo.setPageIndexable(!!t);
     if (!t) return;
     this.translate.currentLang();
     const url = this.seo.absoluteUrl(`/team/${t.slug}`);
@@ -192,8 +193,6 @@ export class TrainerDetailsComponent implements OnInit {
       { name: this.translate.instant('nav.team'), url: this.seo.absoluteUrl('/team') },
       { name: this.name(), url },
     ]);
-    const rating = this.rating();
-    const count = this.ratingsCount();
     this.seo.setJsonLd('page', {
       '@context': 'https://schema.org',
       '@type': 'Person',
@@ -207,15 +206,6 @@ export class TrainerDetailsComponent implements OnInit {
         name: 'TamkeeNova HUB',
         url: this.seo.absoluteUrl('/'),
       },
-      ...(rating > 0 && count > 0
-        ? {
-            aggregateRating: {
-              '@type': 'AggregateRating',
-              ratingValue: rating,
-              reviewCount: count,
-            },
-          }
-        : {}),
       ...(this.socials().length > 0 ? { sameAs: this.socials().map((s) => s.url) } : {}),
     });
   }

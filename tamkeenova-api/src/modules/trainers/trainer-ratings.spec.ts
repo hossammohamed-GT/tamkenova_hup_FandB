@@ -121,10 +121,14 @@ describe('Trainer public-profile and private status data selection', () => {
       slug: 'real-instructor',
       trainer_status: 'APPROVED',
     });
-    expect(query.include.course_instructors.where.courses.is).toEqual(
+    expect(query.select.course_instructors.where.courses.is).toEqual(
       publicCourseWhere,
     );
-    const fields = query.include.course_instructors.select.courses.select;
+    const fields = query.select.course_instructors.select.courses.select;
+    expect(query.select.cover_letter).toBeUndefined();
+    expect(query.select.rejection_reason).toBeUndefined();
+    expect(query.select.approved_by).toBeUndefined();
+    expect(query.select.trainer_reviews.select.users.select.password).toBeUndefined();
     expect(fields.slug).toBe(true);
     expect(fields.media_url).toBeUndefined();
     expect(fields.lessons).toBeUndefined();

@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { courseManagementRoute } from '../utils/course-role';
-/** Revalidate the current role; admins review, trainers author, learners enroll. */
+
 export const courseLearnerGuard: CanActivateFn = () => {
   const auth = inject(AuthService),
     router = inject(Router);

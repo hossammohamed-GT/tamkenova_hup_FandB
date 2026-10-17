@@ -60,7 +60,7 @@ export class TrainerConsultationsComponent implements OnInit {
     const f = this.activeFilter();
     if (f !== 'ALL') params = params.set('status', f);
 
-    // Try endpoints in order
+
     const endpoints = [
       `${this.baseUrl}/trainer/all`,
       `${this.baseUrl}/trainer`,
@@ -195,7 +195,7 @@ export class TrainerConsultationsComponent implements OnInit {
       action: act,
     };
 
-    // Fallback on 404
+
     this.http.patch<any>(`${this.baseUrl}/${sel.id}/status`, payload).subscribe({
       next: (res) => this.handleUpdateSuccess(res, sel),
       error: (err) => {

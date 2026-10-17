@@ -16,23 +16,37 @@ export class JwtAuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const authHeader = request.headers.authorization;
 
-    if (!authHeader) {
+    if (typeof authHeader !== 'string') {
       throw new UnauthorizedException('Authorization header missing');
     }
 
-    const [type, token] = authHeader.split(' ');
-    if (type !== 'Bearer' || !token) {
+    const [type, token, extra] = authHeader.split(' ');
+    if (type !== 'Bearer' || !token || extra !== undefined) {
       throw new UnauthorizedException('Invalid token format');
     }
 
     let payload: JwtPayload;
     try {
-      payload = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+      payload = jwt.verify(token, process.env.JWT_SECRET!, {
+        algorithms: ['HS256'],
+      }) as JwtPayload;
     } catch {
       throw new UnauthorizedException('Invalid or expired token');
     }
 
-    const userId = String(payload.sub || '');
+    if (
+      !payload ||
+      typeof payload !== 'object' ||
+      typeof payload.sub !== 'string' ||
+      !payload.sub ||
+      payload.sub.length > 128 ||
+      !Number.isFinite(payload.exp) ||
+      !Number.isSafeInteger(payload.tv) ||
+      payload.tv < 0
+    ) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+    const userId = payload.sub;
     const user = await this.prisma.users.findUnique({
       where: { id: userId },
       select: {
@@ -60,8 +74,6 @@ export class JwtAuthGuard implements CanActivate {
       throw new UnauthorizedException('Invalid or expired token');
     }
 
-    // Full profile (same query, no extra round-trip) so /auth/me returns a
-    // complete user and clients never clobber the cached session.
     request.user = {
       sub: user.id,
       id: user.id,

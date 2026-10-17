@@ -33,7 +33,7 @@ export class RouteTransitionComponent {
 
   private play(from: number, to: number, ms: number): void {
     this.stop();
-    // Wait for @if render
+
     let attempts = 0;
     const wait = () => {
       const pathEl = this.path()?.nativeElement;

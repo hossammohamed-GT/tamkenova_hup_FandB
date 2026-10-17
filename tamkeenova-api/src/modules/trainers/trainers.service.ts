@@ -30,7 +30,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 @Injectable()
 export class TrainersService {
 
-  // Initialize instance
+
   constructor(
     private readonly trainersRepository: TrainersRepository,
     private readonly storageService: StorageService,
@@ -39,14 +39,14 @@ export class TrainersService {
 
 
 
-  // Handle get my profile
+
   async getMyProfile(userId: string) {
     return this.trainersRepository.getTrainerProfile(userId);
   }
 
 
 
-  // Handle update my profile
+
   async updateMyProfile(userId: string, dto: UpdateTrainerProfileDto) {
     const trainer = await this.trainersRepository.getTrainerProfile(userId);
 
@@ -101,7 +101,7 @@ export class TrainersService {
 
 
 
-  // Handle create program
+
   async createProgram(userId: string, dto: CreateProgramDto) {
     const trainer = await this.trainersRepository.getTrainerProfile(userId);
 
@@ -134,7 +134,7 @@ export class TrainersService {
       duration_hours: dto.duration_hours || 0,
 
       level: dto.level || 'BEGINNER',
-      // Programs stay hidden until an administrator reviews them.
+
       is_active: false,
     }).then(async (program) => {
       try {
@@ -147,7 +147,7 @@ export class TrainersService {
           reference_type: 'PROGRAM',
         });
       } catch {
-        // A notification outage must not make a successfully saved program look failed.
+
       }
       return program;
     });
@@ -155,7 +155,7 @@ export class TrainersService {
 
 
 
-  // Handle get my programs
+
   async getMyPrograms(userId: string) {
     const trainer = await this.trainersRepository.getTrainerProfile(userId);
 
@@ -168,7 +168,7 @@ export class TrainersService {
 
 
 
-  // Handle update program
+
   async updateProgram(
     userId: string,
     programId: string,
@@ -195,7 +195,7 @@ export class TrainersService {
 
 
 
-  // Handle delete program
+
   async deleteProgram(userId: string, programId: string) {
     const trainer = await this.trainersRepository.getTrainerProfile(userId);
 
@@ -223,7 +223,7 @@ export class TrainersService {
 
 
 
-  // Handle get application status
+
   async getApplicationStatus(userId: string) {
     const trainer = await this.trainersRepository.getTrainerStatus(userId);
 
@@ -246,7 +246,7 @@ export class TrainersService {
 
 
 
-  // Handle create availability
+
   async createAvailability(userId: string, dto: CreateAvailabilityDto) {
     const trainer = await this.trainersRepository.getTrainerProfile(userId);
 
@@ -267,7 +267,7 @@ export class TrainersService {
 
 
 
-  // Handle get availability
+
   async getAvailability(userId: string) {
     const trainer = await this.trainersRepository.getTrainerProfile(userId);
 
@@ -280,7 +280,7 @@ export class TrainersService {
 
 
 
-  // Handle update availability
+
   async updateAvailability(
     userId: string,
     availabilityId: string,
@@ -320,7 +320,7 @@ export class TrainersService {
 
 
 
-  // Handle delete availability
+
   async deleteAvailability(userId: string, availabilityId: string) {
     const trainer = await this.trainersRepository.getTrainerProfile(userId);
 
@@ -349,7 +349,7 @@ export class TrainersService {
 
 
 
-  // Handle get bookings
+
   async getBookings(userId: string) {
     const trainer = await this.trainersRepository.getTrainerProfile(userId);
 
@@ -362,7 +362,7 @@ export class TrainersService {
 
 
 
-  // Handle get booking details
+
   async getBookingDetails(userId: string, bookingId: string) {
     const trainer = await this.trainersRepository.getTrainerProfile(userId);
 
@@ -385,7 +385,7 @@ export class TrainersService {
 
 
 
-  // Handle update booking status
+
   async updateBookingStatus(
     userId: string,
     bookingId: string,
@@ -416,7 +416,7 @@ export class TrainersService {
 
 
 
-  // A card submits one review per learner. Explicit review management is separate.
+
   async createReview(userId: string, trainerId: string, dto: CreateReviewDto) {
     const user = await this.trainersRepository.findUserById(userId);
     if (!user || (user.role !== 'STUDENT' && user.role !== 'CLIENT')) {
@@ -445,7 +445,7 @@ export class TrainersService {
         await this.trainersRepository.updateTrainerRating(trainerId);
       return { success: true, updated: false, data: { review, ...stats } };
     } catch (error) {
-      // The existing database unique constraint also protects concurrent tabs.
+
       if ((error as { code?: string })?.code === 'P2002')
         throw new ConflictException('You have already rated this trainer');
       throw error;
@@ -459,14 +459,14 @@ export class TrainersService {
     };
   }
 
-  // Handle get trainer reviews
+
   async getTrainerReviews(trainerId: string) {
     return this.trainersRepository.getTrainerReviews(trainerId);
   }
 
 
 
-  // Handle get dashboard stats
+
   async getDashboardStats(userId: string) {
     const stats = await this.trainersRepository.getDashboardStats(userId);
 
@@ -482,7 +482,7 @@ export class TrainersService {
 
 
 
-  // Handle upload profile image
+
   async uploadProfileImage(userId: string, file: Express.Multer.File) {
     const trainer = await this.trainersRepository.getTrainerProfile(userId);
 
@@ -508,7 +508,7 @@ export class TrainersService {
 
 
 
-  // Handle get all programs
+
   async getAllPrograms() {
     const programs = await this.trainersRepository.getAllPrograms();
 
@@ -520,7 +520,7 @@ export class TrainersService {
   }
 
 
-  // Handle get all public trainers
+
   async getAllPublicTrainers() {
     const trainers = await this.trainersRepository.getAllPublicTrainers();
 
@@ -532,7 +532,7 @@ export class TrainersService {
   }
 
 
-  // Handle get public trainer profile
+
   async getPublicTrainerProfile(slug: string) {
     const trainer = await this.trainersRepository.getPublicTrainerProfile(slug);
 

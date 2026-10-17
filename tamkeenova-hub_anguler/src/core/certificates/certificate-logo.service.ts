@@ -9,7 +9,7 @@ export class CertificateLogoService {
   }
 
   async fromLibrary(url: string, name: string, source_id: string): Promise<PartnerLogo> {
-    // Client-side fetch only
+
     const parsed = new URL(url, window.location.origin);
     if (!['http:', 'https:'].includes(parsed.protocol))
       throw new Error('certificate_studio.partner_load_error');
@@ -56,7 +56,7 @@ export class CertificateLogoService {
     try {
       if (image.width * image.height > 16000000)
         throw new Error('certificate_studio.partner_invalid');
-      // Trim transparent padding only
+
       const probe = document.createElement('canvas');
       const probeScale = Math.min(1, 1024 / image.width, 1024 / image.height);
       probe.width = Math.max(1, Math.round(image.width * probeScale));
@@ -87,7 +87,7 @@ export class CertificateLogoService {
         sy = (top * image.height) / probe.height;
       const sourceWidth = ((right - left) * image.width) / probe.width,
         sourceHeight = ((bottom - top) * image.height) / probe.height;
-      // Self-contained PNG snapshot
+
       for (const width of [512, 384, 256]) {
         const scale = Math.min(1, width / sourceWidth, width / 2 / sourceHeight);
         const canvas = document.createElement('canvas');

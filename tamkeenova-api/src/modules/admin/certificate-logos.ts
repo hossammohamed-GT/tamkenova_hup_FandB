@@ -9,7 +9,7 @@ export type CertificatePartnerLogo = {
 export const MAX_CERTIFICATE_LOGOS = 4;
 export const MAX_LOGO_DATA_LENGTH = 90000;
 
-/** Validate and normalize image bytes, without fetching ANY remote URL. */
+
 export function certificateLogos(input: unknown): CertificatePartnerLogo[] {
   if (input === undefined) return [];
   if (!Array.isArray(input) || input.length > MAX_CERTIFICATE_LOGOS)
@@ -31,7 +31,7 @@ export function certificateLogos(input: unknown): CertificatePartnerLogo[] {
       logo.data_url.slice('data:image/png;base64,'.length),
       'base64',
     );
-    // Check dimensions BEFORE PNG decompression to bound allocations.
+
     if (
       bytes.length < 33 ||
       !bytes
@@ -50,7 +50,7 @@ export function certificateLogos(input: unknown): CertificatePartnerLogo[] {
     let data_url: string;
     try {
       const png = PNG.sync.read(bytes, { checkCRC: true });
-      // Re-encoding discards arbitrary metadata and ensures a complete decodable image.
+
       data_url =
         'data:image/png;base64,' + PNG.sync.write(png).toString('base64');
     } catch {

@@ -1,5 +1,5 @@
-// Additive DDL matching course_sections and course_lessons in schema.prisma.
-// Applied in one Prisma transaction; no DROP, reset, or changes to existing rows.
+
+
 module.exports = [
   `CREATE TABLE IF NOT EXISTS course_sections (
     id uuid NOT NULL DEFAULT gen_random_uuid(), course_id uuid NOT NULL,

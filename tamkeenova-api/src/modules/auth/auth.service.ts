@@ -19,7 +19,7 @@ import { LoginDto } from './dto/login.dto';
 @Injectable()
 export class AuthService {
 
-  // Initialize instance
+
   constructor(
     private readonly authRepository: AuthRepository,
     private readonly mailService: MailService,
@@ -28,7 +28,7 @@ export class AuthService {
 
 
 
-  // Handle register
+
   async register(dto: RegisterDto) {
     if (dto.password !== dto.confirm_password) {
       throw new BadRequestException('Passwords do not match');
@@ -79,7 +79,7 @@ export class AuthService {
 
         specializationId = specialization.id;
       } else if (dto.specialization_name_ar) {
-        // A new specialization is reviewed by admins instead of being created immediately.
+
         await this.authRepository.createSpecializationRequest({
           user_id: user.id,
           name_ar: dto.specialization_name_ar,
@@ -171,7 +171,7 @@ export class AuthService {
 
 
 
-  // Handle register volunteer
+
   async registerVolunteer(dto: RegisterVolunteerDto) {
     if (dto.password !== dto.confirm_password) {
       throw new BadRequestException('Passwords do not match');
@@ -282,12 +282,13 @@ export class AuthService {
       await this.authRepository.incrementOtpAttempts(otpRecord.id);
       throw new BadRequestException('Invalid OTP');
     }
-    await this.authRepository.markOtpUsed(otpRecord.id);
+    const consumed = await this.authRepository.markOtpUsed(otpRecord.id);
+    if (consumed.count !== 1) throw new BadRequestException('Invalid OTP');
     return otpRecord;
   }
 
 
-  // Handle verify email
+
   async verifyEmail(dto: VerifyEmailDto) {
     const otpRecord = await this.consumeOtp(dto.email, dto.otp, 'EMAIL_VERIFY');
     await this.authRepository.verifyUser(otpRecord.user_id);
@@ -299,7 +300,7 @@ export class AuthService {
 
 
 
-  // Handle resend otp
+
   async resendOtp(dto: { email: string }) {
     const user = await this.authRepository.findUserByEmail(dto.email);
 
@@ -344,7 +345,7 @@ export class AuthService {
 
 
 
-  // Handle login
+
   async login(dto: LoginDto) {
     const user = await this.authRepository.findUserForLogin(dto.email);
 
@@ -363,9 +364,7 @@ export class AuthService {
     const passwordMatched = await bcrypt.compare(dto.password, user.password);
 
     if (!passwordMatched) {
-      const attempts = (user.failed_login_attempts || 0) + 1;
-      const lockedUntil = attempts >= 5 ? new Date(Date.now() + 15 * 60 * 1000) : null;
-      await this.authRepository.recordFailedLogin(user.id, attempts, lockedUntil);
+      await this.authRepository.recordFailedLogin(user.id);
       throw new BadRequestException('Invalid email or password');
     }
 

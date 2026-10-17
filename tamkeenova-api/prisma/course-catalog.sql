@@ -1,6 +1,6 @@
--- Additive course catalog schema for the self-paced almentor-style experience.
--- Safe to run more than once. Existing training_programs/enrollments/certificates
--- are deliberately left untouched.
+
+
+
 
 BEGIN;
 
@@ -264,8 +264,8 @@ CREATE INDEX IF NOT EXISTS idx_learning_programs_published
 CREATE INDEX IF NOT EXISTS idx_learning_program_courses_course
   ON learning_program_courses(course_id);
 
--- Seed the nine top-level catalog categories discovered during the site review.
--- Child categories can be added later by setting parent_id to one of these rows.
+
+
 INSERT INTO course_categories (slug, name_ar, name_en, display_order, image_url)
 VALUES
   ('business-professional-skills', 'المهارات المهنية والأعمال', 'Business & Professional Skills', 1, '/assets/course-categories/business-professional-skills.jpg'),
@@ -287,7 +287,7 @@ ON CONFLICT (slug) DO UPDATE SET
   END,
   updated_at = now();
 
--- Empty, ordered shelves are ready for course cards to be assigned in the admin/API.
+
 INSERT INTO course_collections (slug, title_ar, title_en, display_order)
 VALUES
   ('weekly-top-courses', 'أفضل الدورات هذا الأسبوع', 'Top Courses of the Week', 1),

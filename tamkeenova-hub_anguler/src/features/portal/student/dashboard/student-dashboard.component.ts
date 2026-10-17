@@ -65,8 +65,8 @@ export class StudentDashboardComponent {
 
   constructor() {
     const profile$ = this.studentService.getProfile().pipe(
-      // Never fail forkJoin
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
       catchError(() => of(null as any)),
     );
     const enrollments$ = this.studentService.getEnrollments().pipe(catchError(() => of({ data: [] as Enrollment[], total: 0 })));

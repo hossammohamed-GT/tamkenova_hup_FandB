@@ -49,8 +49,8 @@ export class TasksService {
     return this.http.delete<void>(`${this.baseUrl}/${taskId}/assignees/${userId}`);
   }
 
-  // Review uses assignee id
-  // API nests refreshed assignee
+
+
   review(assigneeId: string, payload: ReviewPayload): Observable<TaskAssignee> {
     return this.unwrap(
       this.http
@@ -87,7 +87,7 @@ export class TasksService {
     return this.unwrap(this.http.patch<any>(`${this.baseUrl}/${taskId}/start`, {}));
   }
 
-  // Files go multipart
+
   submit(taskId: string, content: string | null, linkUrl: string | null, files: File[]): Observable<unknown> {
     if (files.length > 0) {
       const fd = new FormData();

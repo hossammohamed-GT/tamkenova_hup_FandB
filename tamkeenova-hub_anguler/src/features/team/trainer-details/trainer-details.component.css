@@ -851,7 +851,7 @@ button:focus-visible {
   color: #e8a83d;
 }
 
-/* Keep the summary and actual learner comments on the same editorial row. */
+
 .profile-reviews-content {
   display: grid;
   grid-template-columns: minmax(260px, 1fr) minmax(0, 1fr);

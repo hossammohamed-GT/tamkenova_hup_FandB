@@ -174,7 +174,7 @@ test('the real page CSP permits the inline YouTube document, not just an iframe 
   let embeddedRequests = 0;
   await page.route('https://www.youtube-nocookie.com/embed/**', (route) => {
     embeddedRequests++;
-    // Explicit embedded-document fixture, NOT a claim of live YouTube playback.
+
     return route.fulfill({
       contentType: 'text/html',
       body: '<!doctype html><html><body><button>Embedded player ready</button></body></html>',
@@ -266,4 +266,35 @@ test('allowing YouTube frames still blocks unrelated external iframes', async ({
     directive: 'frame-src',
     url: 'https://untrusted-frame.example.test',
   });
+});
+
+test('course SEO uses real loaded data, a clean public canonical and safe structured data; missing courses are not indexed', async ({
+  page,
+}) => {
+  await page.addInitScript(() => localStorage.setItem('tamkeenova-lang', 'en'));
+  await mock(page);
+  await page.goto('/programs/course/' + sample.slug + '?tracking=private#chapters');
+  await expect(page).toHaveTitle(sample.title_en + ' | TamkeeNova HUB');
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://tamkeenova-hub.vercel.app/programs/course/' + sample.slug,
+  );
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    'content',
+    sample.short_description_en,
+  );
+  await expect(page.locator('script[data-jsonld="page"]')).toHaveCount(1);
+  const course = JSON.parse((await page.locator('script[data-jsonld="page"]').textContent())!);
+  expect(course['@type']).toBe('Course');
+  expect(course.name).toBe(sample.title_en);
+  expect(course.aggregateRating).toBeUndefined();
+  expect(course.url).not.toContain('tracking');
+  await page.route('**/api/courses/' + sample.slug, (r) =>
+    r.fulfill({ status: 404, json: { message: 'Not found' } }),
+  );
+  await page.reload();
+  await expect(page.locator('.details-state h1')).toBeVisible();
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/);
+  await expect(page.locator('script[data-jsonld="page"]')).toHaveCount(0);
 });

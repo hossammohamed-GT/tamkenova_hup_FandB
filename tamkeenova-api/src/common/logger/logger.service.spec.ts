@@ -35,8 +35,13 @@ describe('LoggerService deployment compatibility', () => {
       .spyOn(fs, 'createWriteStream')
       .mockImplementation(readOnlyFilesystem);
     const fileTransport = jest.spyOn(winston.transports, 'File');
-    const stdout = jest.spyOn(process.stdout, 'write').mockReturnValue(true);
-    const stderr = jest.spyOn(process.stderr, 'write').mockReturnValue(true);
+    const output: unknown[] = [];
+    jest
+      .spyOn(winston.transports.Console.prototype, 'log')
+      .mockImplementation((info, callback) => {
+        output.push(JSON.parse(info[Symbol.for('message')]));
+        callback?.();
+      });
 
     service = new LoggerService();
     service.logAuth({ event: 'login_success', userId: 'test-user' });
@@ -47,10 +52,7 @@ describe('LoggerService deployment compatibility', () => {
     expect(fileTransport).not.toHaveBeenCalled();
     expect(mkdir).not.toHaveBeenCalled();
     expect(stream).not.toHaveBeenCalled();
-    // Jest may route both console streams to the same underlying stream.
-    const output = [...stdout.mock.calls, ...stderr.mock.calls].map(([line]) =>
-      JSON.parse(String(line)),
-    );
+
     expect(output).toEqual([
       expect.objectContaining({
         category: 'auth',
@@ -92,7 +94,7 @@ describe('LoggerService deployment compatibility', () => {
     (vercel) => {
       if (vercel === undefined) delete process.env.VERCEL;
       else process.env.VERCEL = vercel;
-      // Avoid writing to the repository while verifying the local transport setup.
+
       const fileTransport = jest
         .spyOn(winston.transports, 'File')
         .mockImplementation(

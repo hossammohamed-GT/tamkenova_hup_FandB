@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-// Explicit local fixtures; no live trainer data or remote icon fonts required.
+
 for (const language of ['ar', 'en'])
   for (const width of [320, 1440]) {
     test(`trainer card forward arrow survives hover without external fonts: ${language}, ${width}px`, async ({
@@ -45,7 +45,7 @@ for (const language of ['ar', 'en'])
       await expect(arrow).toHaveCSS('scale', language === 'ar' ? '-1 1' : '1');
       await card.hover();
       await expect(arrow).toHaveCSS('scale', language === 'ar' ? '-1 1' : '1');
-      // Hover may translate the icon, but must never add another horizontal flip.
+
       const transform = await arrow.evaluate((el) => getComputedStyle(el).transform);
       expect(transform === 'none' || transform.startsWith('matrix(1, 0, 0, 1,')).toBe(true);
       await expect(arrow).not.toHaveClass(/fa-/);

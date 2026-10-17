@@ -151,7 +151,7 @@
             @let imageUrl = categoryCardImage(category);
             <app-category-artwork [slug]="category.slug" [image]="imageUrl" />
             @if (imageUrl) {
-              <!-- Retain a decoded local image for the existing image-to-hero transition. -->
+
               <img class="category-image category-flight-source" [src]="imageUrl" alt="" loading="eager" decoding="async" />
             }
             <span class="category-foreground">

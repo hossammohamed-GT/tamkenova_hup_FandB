@@ -1,3 +1,4 @@
+import { validateRuntimeConfig } from './common/security/runtime-config';
 import { CategoryModule } from './modules/course-categories/category.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -31,6 +32,7 @@ import { CoursesModule } from './modules/courses/courses.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validate: validateRuntimeConfig,
     }),
     ThrottlerModule.forRoot({
       throttlers: [{ name: 'default', ttl: 60000, limit: 80 }],

@@ -292,7 +292,7 @@ test('hiding a parent refreshes an already mounted menu and preserves its child 
   expect(state.getRows()[1].parent_id).toBe(rows[0].id);
   const child = page.locator('.category-row').nth(1);
   await expect(child.locator('.status')).toHaveText('Hidden');
-  await expect(child.getByRole('button', { name: 'Show', exact: true })).toHaveCount(0); // Child itself stays active; inherited hiding is reversible.
+  await expect(child.getByRole('button', { name: 'Show', exact: true })).toHaveCount(0);
   await page
     .locator('.category-row')
     .first()

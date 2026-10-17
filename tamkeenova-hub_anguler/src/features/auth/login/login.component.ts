@@ -70,7 +70,7 @@ export class LoginComponent {
         this.isLoading.set(false);
 
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-        // Only known, internal learning URLs; never redirect to an external host.
+
         if (returnUrl && (/^\/programs\/course\/[a-zA-Z0-9_-]+(?:\/checkout)?$/.test(returnUrl) || returnUrl === '/my-courses')) {
           this.router.navigateByUrl(returnUrl);
           return;

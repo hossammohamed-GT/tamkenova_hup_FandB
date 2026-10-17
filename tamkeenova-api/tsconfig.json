@@ -2,8 +2,6 @@
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    
-
     "ignoreDeprecations": "6.0",
     "esModuleInterop": true,
     "isolatedModules": true,
@@ -17,7 +15,7 @@
       "node",
       "jest"
     ],
-    "sourceMap": true,
+    "sourceMap": false,
     "outDir": "./dist",
     "incremental": true,
     "skipLibCheck": true,

@@ -10,7 +10,6 @@
   },
   "scripts": {
     "build": "prisma generate && nest build",
-    "deploy": "nest deploy",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "prisma generate && nest start --watch",
@@ -38,11 +37,11 @@
     "db:demo-course-videos": "node --env-file-if-exists=.env prisma/course-videos/seed-demo.cjs",
     "test:course-videos": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.courses.config.mjs --runInBand && node --test test/course-video-schema.test.cjs test/course-video-demo.test.cjs",
     "db:course-workflow": "node --env-file-if-exists=.env prisma/course-workflow/apply.cjs",
-    "test:course-workflow": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.courses.config.mjs --runInBand && node --test test/course-workflow-schema.test.cjs"
+    "test:course-workflow": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.courses.config.mjs --runInBand && node --test test/course-workflow-schema.test.cjs",
+    "test:security": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.security.config.mjs --runInBand"
   },
   "dependencies": {
     "@codegenie/serverless-express": "^5.0.0",
-    "@nestjs-modules/mailer": "^2.3.7",
     "@nestjs/common": "^12.0.1",
     "@nestjs/config": "^12.0.0",
     "@nestjs/core": "^12.0.1",
@@ -60,7 +59,7 @@
     "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.3.0",
-    "nodemailer": "^9.1.1",
+    "nodemailer": "^10.1.2",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "pg": "^8.23.0",
@@ -74,7 +73,6 @@
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.10",
     "@nestjs/cli": "^12.0.0",
-    "@nestjs/mau": "^0.2.6",
     "@nestjs/schematics": "^12.0.0",
     "@nestjs/testing": "^12.0.1",
     "@types/bcrypt": "^6.0.0",
@@ -97,5 +95,10 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0"
+  },
+  "overrides": {
+    "@prisma/config": {
+      "deepmerge-ts": "^8.0.0"
+    }
   }
 }

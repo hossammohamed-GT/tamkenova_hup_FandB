@@ -141,7 +141,7 @@ export const routes: Routes = [
         (m) => m.AdminCourseWorkflowComponent,
       ),
   },
-  // Shared by all roles
+
   {
     path: 'portal/certificates',
     data: { seo: { titleKey: 'student_certificates.title', descriptionKey: 'seo.portal.description' } },
@@ -150,7 +150,7 @@ export const routes: Routes = [
   },
   {
     path: 'portal',
-    // Redirects run before guards
+
     redirectTo: () => {
       try {
         if (typeof localStorage === 'undefined') return '/login';

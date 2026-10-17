@@ -30,10 +30,10 @@ export class AppLoaderComponent implements AfterViewInit, OnDestroy {
   private hasMounted = false;
 
   constructor() {
-    
+
     effect(() => {
       const visible = this.loader.isVisible();
-      if (!this.hasMounted) return; 
+      if (!this.hasMounted) return;
       if (visible) this.playIntro();
       else this.playLeave();
     });
@@ -70,7 +70,7 @@ export class AppLoaderComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    // jsdom lacks getTotalLength
+
     if (typeof gate.getTotalLength !== 'function' || typeof t.getTotalLength !== 'function') {
       root.classList.add('is-filled', 'is-revealing', 'is-loading');
       return;

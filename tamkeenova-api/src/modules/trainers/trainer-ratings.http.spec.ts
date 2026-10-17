@@ -24,7 +24,7 @@ describe('Authenticated trainer rating HTTP boundary', () => {
   beforeAll(async () => {
     oldSecret = process.env.JWT_SECRET;
     process.env.JWT_SECRET = 'test-only-trainer-rating-secret';
-    token = jwt.sign({ sub: id, tv: 0 }, process.env.JWT_SECRET);
+    token = jwt.sign({ sub: id, tv: 0 }, process.env.JWT_SECRET, { expiresIn: '1h' });
     const module = await Test.createTestingModule({
       controllers: [TrainersController],
       providers: [

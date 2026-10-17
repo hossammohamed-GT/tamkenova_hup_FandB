@@ -31,7 +31,7 @@ async function setup(page: Page, role = '', language = 'ar') {
     },
     { role, language },
   );
-  // Font files must work without any third-party font/CDN being reachable.
+
   await page.route(/^https:\/\//, (route) => route.abort());
   await page.route('**/api/**', (route) => {
     const path = new URL(route.request().url()).pathname.replace('/api', '');
@@ -67,8 +67,8 @@ async function expectActualArabicFont(page: Page, selector: string) {
       getComputedStyle(el).fontFamily.split(',')[0].replaceAll('"', '').trim(),
     ),
   ).toBe(family);
-  // Computed font-family alone can pass while the file is missing. Check the
-  // font Chromium actually used to draw the glyphs, as in Rendered Fonts.
+
+
   const cdp = await page.context().newCDPSession(page);
   await cdp.send('DOM.enable');
   await cdp.send('CSS.enable');
@@ -185,8 +185,8 @@ test('switching locale restores English typography; Arabic glyph fallback remain
     nodeId: root.nodeId,
     selector: '#arabic-fallback-probe',
   });
-  // The probe was just inserted: wait for Chromium to lay out and paint its
-  // fallback glyphs, not merely for the node to exist in the DOM.
+
+
   await expect
     .poll(async () => {
       const { fonts } = await cdp.send('CSS.getPlatformFontsForNode', { nodeId });

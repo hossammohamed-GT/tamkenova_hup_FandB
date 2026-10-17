@@ -188,7 +188,7 @@
     </div>
   </div>
 
-  <!-- Keep mounted: preload on entry and retain data across hover/close. -->
+
     <div [hidden]="!isProgramsMenuOpen()" class="programs-mega-shell" [style.--programs-anchor]="programsAnchor() + 'px'" (mouseenter)="cancelProgramsClose()" (mouseleave)="scheduleProgramsClose()">
       <button class="programs-mobile-close" type="button" (click)="onEscape()" [attr.aria-label]="'nav.mega.close' | translate">×</button>
       <app-programs-mega-menu (closed)="closeProgramsMenu()" />

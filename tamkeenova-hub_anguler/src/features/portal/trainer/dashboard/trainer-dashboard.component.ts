@@ -32,10 +32,10 @@ export class TrainerDashboardComponent implements OnInit {
     if ((s.programs_count ?? 0) > 0) completed++;
     if ((s.availability_count ?? 0) > 0) completed++;
     if ((s.reviews_count ?? 0) > 0) completed++;
-    completed++; // Profile always done
+    completed++;
     const avg = typeof s.average_rating === 'string' ? parseFloat(s.average_rating as any) : (s.average_rating ?? 0);
     if (avg > 0) completed++;
-    completed++; // Consultations always done
+    completed++;
     return Math.round((completed / total) * 100);
   });
 
@@ -53,7 +53,7 @@ export class TrainerDashboardComponent implements OnInit {
   });
 
 
-  // Zeros when empty
+
   displayStats = computed(() => {
     const s = this.stats();
     if (s) return s;
@@ -100,7 +100,7 @@ export class TrainerDashboardComponent implements OnInit {
     this.trainerService.getDashboardStats().subscribe({
       next: (res) => {
         const data = (res as any).data ?? res;
-        // Unwrap nested responses
+
         const statsData = (data as any).data ?? data;
         const finalStats = statsData && typeof statsData.programs_count !== 'undefined' ? statsData : data;
         this.stats.set(finalStats as TrainerDashboardStats);
@@ -112,7 +112,7 @@ export class TrainerDashboardComponent implements OnInit {
         this.hasError.set(true);
         this.isLoading.set(false);
         this.hasLoaded.set(true);
-        // Zeros on error
+
         if (!this.stats()) {
           this.stats.set({
             programs_count: 0,

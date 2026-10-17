@@ -4,11 +4,11 @@ import { PrismaService } from '../../prisma/prisma.service';
 @Injectable()
 export class AuthRepository {
 
-  // Initialize instance
+
   constructor(private readonly prisma: PrismaService) {}
 
 
-  // Handle find user by email
+
   findUserByEmail(email: string) {
     return this.prisma.users.findUnique({
       where: { email },
@@ -16,7 +16,7 @@ export class AuthRepository {
   }
 
 
-  // Handle find user by username
+
   findUserByUsername(username: string) {
     return this.prisma.users.findUnique({
       where: { username },
@@ -24,7 +24,7 @@ export class AuthRepository {
   }
 
 
-  // Handle create user
+
   createUser(data: any) {
     return this.prisma.users.create({
       data,
@@ -32,7 +32,7 @@ export class AuthRepository {
   }
 
 
-  // Handle create otp
+
   createOtp(data: {
     user_id: string;
     otp_code: string;
@@ -50,7 +50,7 @@ export class AuthRepository {
   }
 
 
-  // Handle invalidate old otps
+
   invalidateOldOtps(userId: string, purpose = 'EMAIL_VERIFY') {
     return this.prisma.email_otps.updateMany({
       where: {
@@ -77,8 +77,8 @@ export class AuthRepository {
   }
 
   incrementOtpAttempts(id: string) {
-    return this.prisma.email_otps.update({
-      where: { id },
+    return this.prisma.email_otps.updateMany({
+      where: { id, is_used: false, attempt_count: { lt: 5 } },
       data: { attempt_count: { increment: 1 } },
     });
   }
@@ -97,10 +97,16 @@ export class AuthRepository {
     });
   }
 
-  recordFailedLogin(userId: string, attempts: number, lockedUntil: Date | null) {
-    return this.prisma.users.update({
-      where: { id: userId },
-      data: { failed_login_attempts: attempts, locked_until: lockedUntil },
+  recordFailedLogin(userId: string) {
+    return this.prisma.$transaction(async (transaction) => {
+      const user = await transaction.users.update({
+        where: { id: userId },
+        data: { failed_login_attempts: { increment: 1 } },
+        select: { failed_login_attempts: true },
+      });
+      if (user.failed_login_attempts >= 5) {
+        await transaction.users.update({ where: { id: userId }, data: { locked_until: new Date(Date.now() + 15 * 60 * 1000) } });
+      }
     });
   }
 
@@ -112,7 +118,7 @@ export class AuthRepository {
   }
 
 
-  // Handle verify user
+
   verifyUser(userId: string) {
     return this.prisma.users.update({
       where: {
@@ -125,7 +131,7 @@ export class AuthRepository {
   }
 
 
-  // Handle update last login
+
   updateLastLogin(userId: string) {
     return this.prisma.users.update({
       where: {
@@ -138,7 +144,7 @@ export class AuthRepository {
   }
 
 
-  // Handle find user for login
+
   findUserForLogin(email: string) {
     return this.prisma.users.findUnique({
       where: {
@@ -148,20 +154,15 @@ export class AuthRepository {
   }
 
 
-  // Handle mark otp used
+
   markOtpUsed(id: string) {
-    return this.prisma.email_otps.update({
-      where: {
-        id,
-      },
-      data: {
-        is_used: true,
-      },
+    return this.prisma.email_otps.updateMany({
+      where: { id, is_used: false, expires_at: { gt: new Date() }, attempt_count: { lt: 5 } },
+      data: { is_used: true },
     });
   }
 
 
-  // Handle find first admin
   findFirstAdmin() {
     return this.prisma.users.findFirst({
       where: {
@@ -172,7 +173,7 @@ export class AuthRepository {
   }
 
 
-  // Handle get pending trainers
+
   getPendingTrainers() {
     return this.prisma.trainers.findMany({
       where: {
@@ -193,7 +194,7 @@ export class AuthRepository {
   }
 
 
-  // Handle approve trainer
+
   approveTrainer(trainerId: string, adminId: string) {
     return this.prisma.trainers.update({
       where: {
@@ -214,7 +215,7 @@ export class AuthRepository {
   }
 
 
-  // Handle reject trainer
+
   rejectTrainer(trainerId: string, adminId: string, reason: string) {
     return this.prisma.trainers.update({
       where: {
@@ -234,7 +235,7 @@ export class AuthRepository {
   }
 
 
-  // Handle create trainer
+
   async createTrainer(data: any) {
     return this.prisma.trainers.create({
       data,
@@ -242,7 +243,7 @@ export class AuthRepository {
   }
 
 
-  // Handle create volunteer
+
   createVolunteer(data: {
     user_id: string;
     volunteer_status: 'PENDING' | 'APPROVED' | 'REJECTED';
@@ -253,7 +254,7 @@ export class AuthRepository {
     });
   }
 
-  // Handle create trainer certificates
+
   async createTrainerCertificates(trainerId: string, urls: string[]) {
     if (!urls?.length) return;
 
@@ -266,7 +267,7 @@ export class AuthRepository {
   }
 
 
-  // Handle create trainer documents
+
   async createTrainerDocuments(
     trainerId: string,
     documents: {
@@ -291,7 +292,7 @@ export class AuthRepository {
   }
 
 
-  // Handle find trainer by user id
+
   findTrainerByUserId(userId: string) {
     return this.prisma.trainers.findUnique({
       where: {
@@ -301,7 +302,7 @@ export class AuthRepository {
   }
 
 
-  // Handle find user by phone
+
   findUserByPhone(phone: string) {
     return this.prisma.users.findUnique({
       where: {
@@ -311,7 +312,7 @@ export class AuthRepository {
   }
 
 
-  // Handle create notification
+
   async createNotification(data: { user_id: string; title: string; message: string; type?: string; reference_id?: string; reference_type?: string }) {
     return this.prisma.notifications.create({
       data: { user_id: data.user_id, title: data.title, message: data.message, type: data.type, reference_id: data.reference_id, reference_type: data.reference_type },
@@ -323,7 +324,7 @@ export class AuthRepository {
   }
 
 
-  // Handle find specialization by id
+
   findSpecializationById(id: string) {
     return this.prisma.specializations.findUnique({
       where: {
@@ -333,7 +334,7 @@ export class AuthRepository {
   }
 
 
-  // Handle create specialization
+
   createSpecialization(data: { name_ar: string; name_en: string }) {
     return this.prisma.specializations.create({
       data,

@@ -11,7 +11,7 @@ export class PrismaService
 
 
 
-  // Handle on module init
+
   async onModuleInit() {
     const maxRetries = 5;
 
@@ -37,7 +37,7 @@ export class PrismaService
 
 
 
-  // Handle on module destroy
+
   async onModuleDestroy() {
     await this.$disconnect();
   }

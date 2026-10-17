@@ -39,12 +39,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 @Controller('trainers')
 export class TrainersController {
 
-  // Initialize instance
+
   constructor(private readonly trainersService: TrainersService) {}
 
 
 
-  // Handle get my profile
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
   @Get('me')
@@ -54,7 +54,7 @@ export class TrainersController {
 
 
 
-  // Handle update my profile
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
   @Patch('me')
@@ -64,7 +64,7 @@ export class TrainersController {
 
 
 
-  // Handle create program
+
   @Post('programs')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
@@ -74,7 +74,7 @@ export class TrainersController {
 
 
 
-  // Handle get my programs
+
   @Get('programs')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
@@ -84,7 +84,7 @@ export class TrainersController {
 
 
 
-  // Handle update program
+
   @Put('programs/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
@@ -98,7 +98,7 @@ export class TrainersController {
 
 
 
-  // Handle delete program
+
   @Delete('programs/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
@@ -108,7 +108,7 @@ export class TrainersController {
 
 
 
-  // Handle get application status
+
   @Get('application-status')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
@@ -118,7 +118,7 @@ export class TrainersController {
 
 
 
-  // Handle create availability
+
   @Post('availability')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
@@ -131,7 +131,7 @@ export class TrainersController {
 
 
 
-  // Handle get availability
+
   @Get('availability')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
@@ -141,7 +141,7 @@ export class TrainersController {
 
 
 
-  // Handle update availability
+
   @Patch('availability/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
@@ -155,7 +155,7 @@ export class TrainersController {
 
 
 
-  // Handle delete availability
+
   @Delete('availability/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
@@ -165,7 +165,7 @@ export class TrainersController {
 
 
 
-  // Handle get bookings
+
   @Get('bookings')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
@@ -175,7 +175,7 @@ export class TrainersController {
 
 
 
-  // Handle get booking details
+
   @Get('bookings/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
@@ -185,7 +185,7 @@ export class TrainersController {
 
 
 
-  // Handle update booking status
+
   @Patch('bookings/:id/status')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
@@ -208,7 +208,7 @@ export class TrainersController {
     return this.trainersService.getMyReviewStatus(user.sub);
   }
 
-  // Handle create review
+
   @Post(':trainerId/reviews')
   @UseGuards(JwtAuthGuard)
   createReview(
@@ -220,7 +220,7 @@ export class TrainersController {
   }
 
 
-  // Handle get all public trainers
+
   @Get()
   getAllPublicTrainers() {
     return this.trainersService.getAllPublicTrainers();
@@ -228,7 +228,7 @@ export class TrainersController {
 
 
 
-  // Handle get trainer reviews
+
   @Get(':trainerId/reviews')
   getTrainerReviews(@Param('trainerId') trainerId: string) {
     return this.trainersService.getTrainerReviews(trainerId);
@@ -236,7 +236,7 @@ export class TrainersController {
 
 
 
-  // Handle get dashboard
+
   @UseGuards(JwtAuthGuard)
   @Get('dashboard')
   getDashboard(@CurrentUser() user: any) {
@@ -245,7 +245,7 @@ export class TrainersController {
 
 
 
-  // Handle upload profile image
+
   @Post('upload-profile-image')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('TRAINER')
@@ -259,14 +259,14 @@ export class TrainersController {
 
 
 
-  // Handle get all programs
+
   @Get('/programs/all')
   getAllPrograms() {
     return this.trainersService.getAllPrograms();
   }
 
 
-  // Handle get public trainer profile
+
   @Get('profile/:slug')
   getPublicTrainerProfile(@Param('slug') slug: string) {
     return this.trainersService.getPublicTrainerProfile(slug);

@@ -225,8 +225,8 @@
   flex-direction: column;
   min-width: 0;
 }
-/* The reference's face starts with the title, not an extra metadata row. The
-   category remains accessible and is represented visually by the emblem. */
+
+
 .course-category-label {
   position: absolute;
   width: 1px;

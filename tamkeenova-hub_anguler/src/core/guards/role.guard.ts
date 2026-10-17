@@ -14,7 +14,7 @@ export function roleGuard(allowedRoles: UserRole[]): CanActivateFn {
       return false;
     }
 
-    // Never trust cached role
+
     return authService.syncSession().pipe(
       map(({ role }) => {
         if (!role || !allowedRoles.includes(role)) {

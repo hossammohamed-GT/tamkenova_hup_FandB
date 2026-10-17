@@ -1,5 +1,10 @@
+import {
+  ResponseSecurityInterceptor,
+  apiSecurityHeaders,
+} from './common/security/response-security.interceptor';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { applicationValidationPipe } from './common/validation/field-validation';
+import { ForbiddenException } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
@@ -11,12 +16,18 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bodyParser: false,
   });
-  app.useBodyParser('json', { limit: '1mb' });
-  app.useBodyParser('urlencoded', { extended: true, limit: '1mb' });
+  app.disable('x-powered-by');
+  app.use(apiSecurityHeaders);
 
   app.use(
     helmet({
-      contentSecurityPolicy: false,
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'none'"],
+          baseUri: ["'none'"],
+          frameAncestors: ["'none'"],
+        },
+      },
       frameguard: { action: 'deny' },
       hsts: { maxAge: 15552000, includeSubDomains: true },
       referrerPolicy: { policy: 'no-referrer' },
@@ -29,18 +40,21 @@ async function bootstrap() {
         callback(null, true);
         return;
       }
-      callback(new Error('Not allowed by CORS'));
+      callback(new ForbiddenException('Origin not allowed'));
     },
-    credentials: true,
+    credentials: false,
   });
 
+  app.useBodyParser('json', { limit: '1mb' });
+  app.useBodyParser('urlencoded', { extended: true, limit: '1mb' });
+  app.useGlobalInterceptors(new ResponseSecurityInterceptor());
   app.setGlobalPrefix('api');
 
   app.useGlobalFilters(new GlobalExceptionFilter(app.get(LoggerService)));
 
   app.useGlobalPipes(applicationValidationPipe());
 
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(process.env.PORT || 3000, '0.0.0.0');
 }
 
 bootstrap();

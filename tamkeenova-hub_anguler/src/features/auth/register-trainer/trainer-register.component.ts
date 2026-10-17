@@ -48,7 +48,7 @@ export class TrainerRegisterComponent {
   requestingSpecialization = signal(false);
 
   private touchedFields = signal<Set<string>>(new Set());
-  // Inline field error
+
   serverFieldError = signal<{ field: string; key: string } | null>(null);
 
   readonly passwordRequirements = PASSWORD_REQUIREMENTS;
@@ -322,7 +322,7 @@ export class TrainerRegisterComponent {
         this.isLoading.set(false);
         const key = apiErrorKey(err, 'auth.errors.generic');
         this.errorMessage.set(key);
-        // Jump to owning step
+
         const fieldByError: Record<string, string> = {
           'errors.AUTH_EMAIL_EXISTS': 'email',
           'errors.AUTH_USERNAME_EXISTS': 'username',

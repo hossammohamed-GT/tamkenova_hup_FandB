@@ -28,7 +28,7 @@ export class CourseCatalogService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/courses`;
 
-  // Shared between the eager navbar and Programs page; failed requests remain retryable.
+
   private readonly categoryRefresh = new Subject<void>();
   private readonly categories$ = this.categoryRefresh.pipe(
     startWith(undefined),
