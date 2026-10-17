@@ -1,0 +1,135 @@
+:host {
+  display: block;
+  position: relative;
+  z-index: 4;
+  min-width: 0;
+}
+.rating-zone {
+  position: relative;
+}
+.rating-trigger {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font: inherit;
+  min-height: 40px;
+}
+.gold-star {
+  color: #e9a631;
+  font-size: 25px;
+  line-height: 1;
+}
+.rating-trigger strong {
+  display: block;
+  font-size: 0.76rem;
+}
+.rating-trigger small {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: 0.6rem;
+  line-height: 1.4;
+}
+.rated-check {
+  color: #21815d;
+  font-size: 12px;
+}
+.rating-popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  inset-inline-start: 50%;
+  transform: translateX(-50%);
+  width: 224px;
+  max-width: calc(100vw - 32px);
+  padding: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 15px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 12px 35px #062d3930;
+  font-size: 0.73rem;
+  line-height: 1.8;
+  z-index: 30;
+  text-align: center;
+}
+.rating-popover::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  inset-inline: 0;
+  height: 12px;
+}
+.rating-popover p {
+  margin: 0 0 7px;
+}
+.rating-stars,
+.saved-stars {
+  display: flex;
+  justify-content: center;
+  direction: ltr;
+  gap: 1px;
+}
+.rating-star-btn {
+  width: 38px;
+  height: 42px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #adb9bf;
+  font-size: 31px;
+  cursor: pointer;
+  transition:
+    color 150ms,
+    transform 150ms;
+}
+.rating-star-btn.filled,
+.saved-stars .filled {
+  color: #e9a631;
+}
+.rating-star-btn:hover {
+  transform: translateY(-2px);
+}
+.rating-star-btn:disabled,
+.rating-star-btn[aria-disabled='true'] {
+  cursor: wait;
+}
+.saved-stars {
+  font-size: 28px;
+  color: #adb9bf;
+}
+.already-rated {
+  color: var(--color-text);
+}
+.already-rated > span {
+  color: #21815d;
+}
+.rating-error {
+  color: var(--color-danger);
+}
+.rating-popover a,
+.rating-popover button:not(.rating-star-btn) {
+  color: var(--color-accent-text);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid var(--color-accent-text);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+:host-context([dir='rtl']) .rating-popover {
+  transform: translateX(50%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .rating-star-btn {
+    transition: none;
+    transform: none !important;
+  }
+}

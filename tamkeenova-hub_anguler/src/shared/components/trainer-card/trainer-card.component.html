@@ -1,121 +1,96 @@
-<a [routerLink]="['/team', trainer().slug]" class="trainer-card surface chamfer-sm" [style.--i]="index()">
-
+<article
+  class="trainer-card"
+  [style.--trainer-color]="visual().color"
+  [style.--trainer-light]="visual().light"
+>
+  <span class="trainer-crystal crystal-one" aria-hidden="true"></span
+  ><span class="trainer-crystal crystal-two" aria-hidden="true"></span>
   <div class="trainer-card-cover">
-    @if (avatar()) {
-    <img [src]="avatar()" [alt]="name()" class="trainer-card-avatar-img" loading="lazy" />
-    } @else {
-    <div class="trainer-card-avatar-fallback">{{ initials() }}</div>
+    <a
+      [routerLink]="['/team', trainer().slug]"
+      [attr.aria-label]="name()"
+      class="trainer-photo-link"
+    >
+      @if (avatar() && !imageFailed()) {
+        <img [src]="avatar()" alt="" loading="lazy" (error)="imageFailed.set(true)" />
+      } @else {
+        <span class="trainer-avatar-fallback">{{ initials() }}</span>
+      }
+      <span class="photo-shade"></span><span class="photo-facet facet-one"></span
+      ><span class="photo-facet facet-two"></span>
+    </a>
+    @if (trainer().is_featured) {
+      <span class="trainer-featured">✦ {{ 'team_ui.featured' | translate }}</span>
     }
-    @if (trainer().is_available) {
-    <span class="availability-dot"></span>
-    }
+    <button
+      type="button"
+      class="trainer-save"
+      [class.is-saved]="saved.ids().includes(trainer().id)"
+      [attr.aria-pressed]="saved.ids().includes(trainer().id)"
+      [attr.aria-label]="'team_ui.save_local' | translate"
+      [title]="(saved.sessionOnly() ? 'team_ui.save_session' : 'team_ui.save_local') | translate"
+      (click)="saved.toggle(trainer().id)"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4Z" /></svg>
+    </button>
+    <span class="trainer-emblem" aria-hidden="true"
+      ><svg viewBox="0 0 24 24"><path [attr.d]="visual().icon" /></svg
+    ></span>
   </div>
-
   <div class="trainer-card-body">
-
-    <h3 class="trainer-card-name">{{ name() }}</h3>
-    <span class="trainer-card-spec">{{ specialization() }}</span>
-
-    @if (bio()) {
+    <a class="trainer-name-link" [routerLink]="['/team', trainer().slug]"
+      ><h3 class="trainer-card-name">{{ name() }}</h3></a
+    >
+    <p class="trainer-card-spec">{{ specialization() }}</p>
     <p class="trainer-card-bio">{{ bio() }}</p>
-    }
-
-    <div class="trainer-card-rating" [class.is-interactive]="interactiveRating() && isStudent()"
-      (click)="onRatingZoneClick($event)"
-      (mouseleave)="onStarLeave(); showRatingHint.set(false)" (mouseenter)="showRatingHint.set(true)">
-
-      <div class="rating-stars-row">
-        @for (star of starsArray; track star) {
-        <button type="button" class="rating-star-btn" [class.is-active]="isStarActive(star)"
-          [class.is-hovered]="isStarHovered(star)" [class.is-user-rated]="userRating() >= star"
-          (mouseenter)="onStarEnter(star)"
-          (click)="onStarClick(star, $event)" [disabled]="isRating() || !interactiveRating()"
-          [attr.aria-label]="'Rate ' + star">
-          <i class="fa-solid fa-star star-icon" [class.is-filled]="isStarActive(star)"></i>
-          <span class="star-glow"></span>
-        </button>
-        }
-      </div>
-
-      <div class="rating-meta">
-        <span class="rating-value">{{ displayRating() | number:'1.1-1' }}</span>
-        <span class="rating-count">({{ ratingsCount() }})</span>
-        @if (isRating()) {
-        <span class="rating-loading"><i class="fa-solid fa-spinner fa-spin"></i></span>
-        }
-        @if (ratingSuccess()) {
-        <span class="rating-success"><i class="fa-solid fa-check"></i> {{ ratingSuccessMsg() | translate }}</span>
-        }
-      </div>
-
-      @if (interactiveRating() && isStudent()) {
-      <span class="rating-hint" [class.is-visible]="showRatingHint() || hoverRating() > 0">
-        @if (hoverRating() > 0) {
-        {{ hoverRating() }} / 5 — {{ 'student_trainers.rate_hint' | translate }}
-        } @else {
-        {{ 'student_trainers.rate_hint' | translate }}
-        }
-      </span>
+    <div class="trainer-tags">
+      @if (specialization()) {
+        <span>{{ specialization() }}</span>
       }
-
-      @if (ratingError()) {
-      <span class="rating-error">{{ ratingError()! | translate }}</span>
+      @if (trainer().years_of_experience > 0) {
+        <span>{{ trainer().years_of_experience }} {{ 'team.card.years' | translate }}</span>
       }
     </div>
-
     <div class="trainer-card-stats">
-      @if (experienceYears() > 0) {
-      <span class="stat-chip">
-        <i class="fa-solid fa-briefcase"></i>
-        {{ experienceYears() }} {{ 'team.card.years' | translate }}
-      </span>
-      }
-      @if (studentsCount() > 0) {
-      <span class="stat-chip">
-        <i class="fa-solid fa-users"></i>
-        {{ studentsCount() }}
-      </span>
-      }
-      @if (programsCount() > 0) {
-      <span class="stat-chip">
-        <i class="fa-solid fa-book"></i>
-        {{ programsCount() }}
-      </span>
-      }
-      @if (certificatesCount() > 0) {
-      <span class="stat-chip">
-        <i class="fa-solid fa-certificate"></i>
-        {{ certificatesCount() }}
-      </span>
-      }
-    </div>
-
-    <div class="trainer-card-footer">
-      @if (hasPriceRange()) {
-      <div class="trainer-card-price">
-        <span class="price-label">{{ 'team.card.consultation_price' | translate }}</span>
-        <span class="price-value">
-          {{ priceFrom() }} - {{ priceTo() }}
-          <span class="price-currency">{{ 'trainer_programs.currency' | translate }}</span>
-        </span>
-        @if (duration()) {
-        <span class="price-duration">
-          <i class="fa-regular fa-clock"></i>
-          {{ duration() }} {{ 'team.card.minutes' | translate }}
-        </span>
-        }
+      <div class="trainer-stat">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m2 8 10-5 10 5-10 5ZM6 10v7c4 3 8 3 12 0v-7" /></svg
+        ><span
+          ><strong>{{ trainer()._count?.training_programs || 0 }}</strong
+          ><small>{{ 'team_ui.programs' | translate }}</small></span
+        >
       </div>
+      @if (interactiveRating()) {
+        <app-trainer-rating
+          [trainerId]="trainer().id"
+          [rating]="rating()"
+          [ratingsCount]="trainer().ratings_count || 0"
+        />
+      } @else {
+        <div class="readonly-rating">
+          <span aria-hidden="true">★</span>{{ rating() | number: '1.1-1' }}
+        </div>
       }
-
-      <button type="button" class="trainer-card-book-btn btn-accent" (click)="onBookClick($event)">
-        {{ bookBtnKey | translate }}
-      </button>
+      <div class="trainer-stat student-stat">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M8 4a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm9 1a3 3 0 1 0 0 6M2 21v-4a6 6 0 0 1 12 0v4m2-8a6 6 0 0 1 6 6v2"
+          /></svg
+        ><span
+          ><strong>{{ trainer().total_students || 0 }}</strong
+          ><small>{{ 'team_details.students' | translate }}</small></span
+        >
+      </div>
+      <a
+        class="trainer-card-view-details"
+        [routerLink]="['/team', trainer().slug]"
+        [attr.aria-label]="('team.card.view_profile' | translate) + ': ' + name()"
+        ><span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a
+      >
     </div>
-
-    <span class="trainer-card-view-details">
-      {{ 'team.card.view_profile' | translate }}
-      <i class="directional-arrow arrow-forward" aria-hidden="true">→</i>
-    </span>
-
+    <button class="trainer-card-book-btn" type="button" (click)="book.emit(trainer())">
+      {{ 'team.book_btn' | translate }}
+      <span class="directional-arrow arrow-forward" aria-hidden="true">→</span>
+    </button>
   </div>
-</a>
+</article>

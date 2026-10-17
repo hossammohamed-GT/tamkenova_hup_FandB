@@ -8,15 +8,14 @@ import { StudentService } from '../../../../core/services/student.service';
 import { SpecializationService } from '../../../../core/services/specialization.service';
 import { BookingService } from '../../../../core/services/booking.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { TrainerService } from '../../../../core/services/trainer.service';
+import { TrainerRatingComponent } from '../../../../shared/components/trainer-rating/trainer-rating.component';
 import { TrainerListItem } from '../../../../core/models/student.model';
 import { Specialization } from '../../../../core/models/specialization.model';
-import { apiErrorKey } from '../../../../core/utils/api-error';
 
 @Component({
   selector: 'app-student-trainers',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, TrainerRatingComponent],
   templateUrl: './student-trainers.component.html',
   styleUrls: ['../../portal-shared.css', './student-trainers.component.css'],
 })
@@ -25,7 +24,6 @@ export class StudentTrainersComponent {
   private specializationService = inject(SpecializationService);
   private bookingService = inject(BookingService);
   private authService = inject(AuthService);
-  private trainerService = inject(TrainerService);
   private router = inject(Router);
   private translate = inject(TranslateService);
 
@@ -40,13 +38,6 @@ export class StudentTrainersComponent {
   page = signal(1);
   totalPages = signal(1);
   total = signal(0);
-
-  hoverRatings = signal<Record<string, number>>({});
-  userRatings = signal<Record<string, number>>({});
-  ratingLoading = signal<Record<string, boolean>>({});
-  ratingSuccess = signal<Record<string, boolean>>({});
-  ratingSuccessMsg = signal<Record<string, string>>({});
-  ratingErrors = signal<Record<string, string | null>>({});
 
   private searchSubject = new Subject<string>();
 
@@ -117,14 +108,6 @@ export class StudentTrainersComponent {
     return t.average_rating ? Number(t.average_rating) : 0;
   }
 
-  displayRating(t: TrainerListItem): number {
-    const hover = this.hoverRatings()[t.id] ?? 0;
-    if (hover > 0) return hover;
-    const user = this.userRatings()[t.id] ?? 0;
-    if (user > 0) return user;
-    return this.ratingOf(t);
-  }
-
   specName(t: TrainerListItem): string {
     if (!t.specializations) return '';
     return this.isArabic ? t.specializations.name_ar : t.specializations.name_en;
@@ -132,96 +115,6 @@ export class StudentTrainersComponent {
 
   bioOf(t: TrainerListItem): string {
     return (this.isArabic ? t.bio_ar : t.bio_en) || t.bio_ar || t.bio_en || '';
-  }
-
-  onStarEnter(trainerId: string, star: number): void {
-    this.hoverRatings.update((m) => ({ ...m, [trainerId]: star }));
-  }
-
-  onStarLeave(trainerId: string): void {
-    this.hoverRatings.update((m) => {
-      const copy = { ...m };
-      delete copy[trainerId];
-      return copy;
-    });
-  }
-
-  rateTrainer(trainer: TrainerListItem, star: number, event: Event): void {
-    event.preventDefault();
-    event.stopPropagation();
-    if (this.ratingLoading()[trainer.id]) return;
-
-    // Never fail silently
-    if (!this.authService.isLoggedIn()) {
-      this.flashRatingError(trainer.id, 'student_trainers.login_to_rate');
-      return;
-    }
-
-    this.ratingLoading.update((m) => ({ ...m, [trainer.id]: true }));
-    this.ratingErrors.update((m) => ({ ...m, [trainer.id]: null }));
-    this.ratingSuccess.update((m) => {
-      const copy = { ...m };
-      delete copy[trainer.id];
-      return copy;
-    });
-
-    this.trainerService.createReview(trainer.id, { rating: star, comment: '' }).subscribe({
-      next: (res) => {
-        this.userRatings.update((m) => ({ ...m, [trainer.id]: star }));
-        this.ratingSuccessMsg.update((m) => ({
-          ...m,
-          [trainer.id]: res.updated
-            ? 'student_trainers.rating_updated'
-            : 'student_trainers.rating_success',
-        }));
-        this.ratingSuccess.update((m) => ({ ...m, [trainer.id]: true }));
-        this.ratingLoading.update((m) => ({ ...m, [trainer.id]: false }));
-        // Trust server counts
-        this.trainers.update((list) =>
-          list.map((t) =>
-            t.id === trainer.id
-              ? {
-                  ...t,
-                  average_rating:
-                    res.data != null
-                      ? String(res.data.average_rating)
-                      : String(
-                          (Number(t.average_rating || 0) * t.ratings_count + star) /
-                            (t.ratings_count + 1),
-                        ),
-                  ratings_count: res.data != null ? res.data.ratings_count : t.ratings_count + 1,
-                }
-              : t,
-          ),
-        );
-        setTimeout(() => {
-          this.ratingSuccess.update((m) => {
-            const copy = { ...m };
-            delete copy[trainer.id];
-            return copy;
-          });
-        }, 2500);
-      },
-      error: (err) => {
-        this.ratingLoading.update((m) => ({ ...m, [trainer.id]: false }));
-        if (err?.status === 409) {
-          this.flashRatingError(trainer.id, 'student_trainers.already_rated');
-        } else {
-          this.flashRatingError(trainer.id, apiErrorKey(err, 'auth.errors.generic'));
-        }
-      },
-    });
-  }
-
-  private flashRatingError(trainerId: string, key: string): void {
-    this.ratingErrors.update((m) => ({ ...m, [trainerId]: key }));
-    setTimeout(() => {
-      this.ratingErrors.update((m) => {
-        const copy = { ...m };
-        delete copy[trainerId];
-        return copy;
-      });
-    }, 3500);
   }
 
   bookConsultation(trainer: TrainerListItem, event: Event): void {

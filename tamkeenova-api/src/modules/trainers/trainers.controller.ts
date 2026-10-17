@@ -5,6 +5,7 @@ import {
   Body,
   Controller,
   Get,
+  Header,
   Patch,
   Req,
   UseGuards,
@@ -197,6 +198,15 @@ export class TrainersController {
   }
 
 
+
+  @Get('reviews/mine')
+  @Header('Cache-Control', 'private, no-store')
+  @Header('Vary', 'Authorization')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('STUDENT', 'CLIENT')
+  getMyReviewStatus(@CurrentUser() user: any) {
+    return this.trainersService.getMyReviewStatus(user.sub);
+  }
 
   // Handle create review
   @Post(':trainerId/reviews')

@@ -66,6 +66,7 @@ export interface Trainer {
   specialization?: string;
   rating?: number;
 
+  course_instructors?: Array<{ courses: TrainerPublicCourse }>;
   training_programs: TrainerProgramPreview[];
   trainer_reviews: TrainerReviewPreview[];
 }
@@ -77,8 +78,22 @@ export interface TrainerProgramPreview {
   price?: string;
 }
 
+export interface TrainerPublicCourse {
+  id: string;
+  slug: string;
+  title_ar: string;
+  title_en: string;
+  cover_image_url?: string | null;
+  duration_minutes: number;
+  level?: string | null;
+  average_rating: number | string;
+  ratings_count: number;
+}
+
 export interface TrainerReviewPreview {
   id: string;
   rating: number;
   comment?: string | null;
+  created_at?: string | null;
+  users?: { full_name?: string; profile_image?: string | null };
 }

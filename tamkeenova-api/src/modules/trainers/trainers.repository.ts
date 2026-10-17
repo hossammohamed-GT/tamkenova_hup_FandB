@@ -1,3 +1,4 @@
+import { publicCourseWhere } from '../courses/public-course-policy';
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../../prisma/prisma.service';
@@ -339,6 +340,13 @@ export class TrainersRepository {
   }
 
 
+  getReviewStatusForStudent(studentId: string) {
+    return this.prisma.trainer_reviews.findMany({
+      where: { student_id: studentId },
+      select: { trainer_id: true, rating: true },
+    });
+  }
+
   // Handle update review
   updateReview(id: string, data: { rating?: number; comment?: string }) {
     return this.prisma.trainer_reviews.update({
@@ -574,6 +582,24 @@ export class TrainersRepository {
         specializations: true,
 
         trainer_certificates: true,
+        course_instructors: {
+          where: { courses: { is: publicCourseWhere } },
+          select: {
+            courses: {
+              select: {
+                id: true,
+                slug: true,
+                title_ar: true,
+                title_en: true,
+                cover_image_url: true,
+                duration_minutes: true,
+                level: true,
+                average_rating: true,
+                ratings_count: true,
+              },
+            },
+          },
+        },
 
         trainer_reviews: {
           include: {

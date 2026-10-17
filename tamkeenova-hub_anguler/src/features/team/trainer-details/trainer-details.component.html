@@ -1,213 +1,341 @@
 @if (loading()) {
-<div class="trainer-details-skeleton">
-  <div class="skeleton-hero shimmer"></div>
-  <div class="skeleton-stats">
-    <div class="skeleton-box shimmer"></div>
-    <div class="skeleton-box shimmer"></div>
-    <div class="skeleton-box shimmer"></div>
-    <div class="skeleton-box shimmer"></div>
-    <div class="skeleton-box shimmer"></div>
+  <div class="profile-loading" role="status">
+    <div class="shimmer"></div>
+    {{ 'team_ui.loading_profile' | translate }}
   </div>
-  <div class="skeleton-card shimmer"></div>
-  <div class="skeleton-card shimmer"></div>
-</div>
-} @else if (notFound()) {
-<div class="trainer-not-found" appScrollReveal>
-  <i class="fa-solid fa-user-slash"></i>
-  <h2>{{ 'team_details.not_found_title' | translate }}</h2>
-  <p>{{ 'team_details.not_found_text' | translate }}</p>
-  <a routerLink="/team" class="btn-primary not-found-btn">
-    {{ 'team_details.back_to_team' | translate }}
-  </a>
-</div>
-} @else if (trainer(); as t) {
-<div class="trainer-details">
-  <app-breadcrumb [items]="crumbs()" />
-
-  <section class="trainer-hero surface chamfer-lg"
-    appScrollReveal>
-    <div class="trainer-hero-bg"></div>
-
-    <div class="trainer-hero-content">
-      <div class="trainer-hero-avatar-wrap">
-        @if (avatar()) {
-        <img [src]="avatar()" [alt]="name()"
-          class="trainer-hero-avatar"
-          fetchpriority="high" decoding="async" />
-        } @else {
-        <div class="trainer-hero-avatar-fallback">{{
-          initials() }}</div>
-        }
-        @if (t.is_available) {
-        <span class="hero-availability-dot"></span>
-        }
-      </div>
-
-      <h1 class="trainer-hero-name">{{ name() }}</h1>
-      <span class="trainer-hero-spec">{{ specialization()
-        }}</span>
-
-      @if (rating() > 0) {
-      <div class="trainer-hero-rating">
-        <app-star-rating [rating]="rating()" />
-        <span class="rating-value">{{ rating() | number:
-          '1.1-1' }}</span>
-        <span class="rating-count">({{ ratingsCount()
-          }})</span>
-      </div>
-      }
-
-      <button type="button" class="btn-accent hero-book-btn"
-        (click)="openBooking()">
-        <i class="fa-solid fa-calendar-check"></i>
-        {{ 'team.book_btn' | translate }}
+} @else if (loadFailed() || notFound()) {
+  <div class="profile-state">
+    <h1>
+      {{ (loadFailed() ? 'team_ui.load_error' : 'team_details.not_found_title') | translate }}
+    </h1>
+    @if (loadFailed()) {
+      <button type="button" (click)="retry()">
+        {{ 'programs.catalog.try_again' | translate }}
       </button>
-    </div>
-  </section>
-
-  <section class="trainer-stats-grid" appScrollReveal>
-    <div class="stat-box surface">
-      <i class="fa-solid fa-briefcase"></i>
-      <span class="stat-value">{{ experienceYears()
-        }}</span>
-      <span class="stat-label">{{ 'team_details.years_exp' |
-        translate }}</span>
-    </div>
-    <div class="stat-box surface">
-      <i class="fa-solid fa-users"></i>
-      <span class="stat-value">{{ studentsCount() }}</span>
-      <span class="stat-label">{{ 'team_details.students' |
-        translate }}</span>
-    </div>
-    <div class="stat-box surface">
-      <i class="fa-solid fa-book"></i>
-      <span class="stat-value">{{ programsCount() }}</span>
-      <span class="stat-label">{{ 'team_details.programs' |
-        translate }}</span>
-    </div>
-    <div class="stat-box surface">
-      <i class="fa-solid fa-certificate"></i>
-      <span class="stat-value">{{ certificates().length
-        }}</span>
-      <span class="stat-label">{{
-        'team_details.certificates' | translate }}</span>
-    </div>
-    <div class="stat-box surface">
-      <i class="fa-solid fa-star"></i>
-      <span class="stat-value">{{ reviewsCount() }}</span>
-      <span class="stat-label">{{ 'team_details.reviews' |
-        translate }}</span>
-    </div>
-  </section>
-
-  <div class="trainer-details-body">
-    <div class="trainer-details-main">
-      @if (bio()) {
-      <section class="detail-card surface" appScrollReveal>
-        <h2 class="detail-card-title">
-          <i class="fa-solid fa-quote-right"></i>
-          {{ 'team_details.bio' | translate }}
-        </h2>
-        <p class="detail-card-text">{{ bio() }}</p>
-      </section>
-      } @if (description()) {
-      <section class="detail-card surface" appScrollReveal>
-        <h2 class="detail-card-title">
-          <i class="fa-solid fa-align-right"></i>
-          {{ 'team_details.about' | translate }}
-        </h2>
-        <p class="detail-card-text">{{ description() }}</p>
-      </section>
-      }
-
-      <section class="detail-card surface" appScrollReveal>
-        <h2 class="detail-card-title">
-          <i class="fa-solid fa-certificate"></i>
-          {{ 'team_details.certificates_title' | translate
-          }}
-        </h2>
-        @if (certificates().length > 0) {
-        <div class="certificates-list">
-          @for (cert of certificates(); track cert.id) {
-          <a [href]="cert.certificate_url" target="_blank"
-            rel="noopener" class="certificate-chip">
-            <i class="fa-solid fa-award"></i>
-            <span>{{ cert.title ||
-              ('team_details.certificates' | translate)
-              }}</span>
-          </a>
+    }
+    <a routerLink="/team">{{ 'team_details.back_to_team' | translate }}</a>
+  </div>
+} @else if (trainer(); as t) {
+  <main
+    class="instructor-profile"
+    [style.--trainer-color]="visual().color"
+    [style.--trainer-light]="visual().light"
+  >
+    <header class="profile-hero">
+      <div class="profile-portrait" aria-hidden="true">
+        @if (avatar() && !imageFailed()) {
+          <img [src]="avatar()" alt="" fetchpriority="high" (error)="imageFailed.set(true)" />
+        } @else {
+          <span>{{ initials() }}</span>
+        }
+        <span class="profile-portrait-shade"></span>
+      </div>
+      <div class="profile-hero-copy">
+        <nav class="profile-breadcrumb" [attr.aria-label]="'nav.team' | translate">
+          <a routerLink="/team">{{ 'nav.team' | translate }}</a
+          ><span aria-hidden="true">›</span><span>{{ name() }}</span>
+        </nav>
+        <span class="profile-eyebrow">— {{ 'team_ui.instructor' | translate }}</span>
+        <h1>{{ name() }}</h1>
+        <p class="profile-specialty">{{ specialization() }}</p>
+        <p class="profile-intro">{{ bio() }}</p>
+        <div class="profile-tags">
+          @if (specialization()) {
+            <span>{{ specialization() }}</span>
+          }
+          @if (experienceYears()) {
+            <span>{{ experienceYears() }} {{ 'team.card.years' | translate }}</span>
           }
         </div>
-        } @else {
-        <p class="empty-text">{{
-          'team_details.no_certificates' | translate }}</p>
-        }
-      </section>
-
-      <section class="detail-card surface" appScrollReveal>
-        <h2 class="detail-card-title">
-          <i class="fa-solid fa-book-open"></i>
-          {{ 'team_details.programs_title' | translate }}
-        </h2>
-        @if (programs().length > 0) {
-        <div class="programs-preview-grid">
-          @for (p of programs(); track p.id) {
-          <a routerLink="/programs"
-            class="program-preview-card surface-alt">
-            <span class="program-preview-title">{{ p.title
-              }}</span>
-          </a>
-          }
+        <div class="profile-metrics">
+          <div>
+            <strong>{{ programsCount() }}</strong
+            ><small>{{ 'team_ui.programs' | translate }}</small>
+          </div>
+          <div>
+            <strong>{{ studentsCount() }}</strong
+            ><small>{{ 'team_details.students' | translate }}</small>
+          </div>
+          <div>
+            <strong>★ {{ rating() | number: '1.1-1' }}</strong
+            ><small>{{ 'team_ui.average_rating' | translate }}</small>
+          </div>
+          <div>
+            <strong>{{ experienceYears() }}</strong
+            ><small>{{ 'team_details.years_exp' | translate }}</small>
+          </div>
         </div>
-        } @else {
-        <p class="empty-text">{{ 'team_details.no_programs'
-          | translate }}</p>
-        }
-      </section>
-    </div>
-
-    <aside class="trainer-details-side">
-      @if (hasPriceRange()) {
-      <div class="price-card surface" appScrollReveal>
-        <span class="price-card-label">{{
-          'team_details.consultation_price' | translate
-          }}</span>
-        <div class="price-card-value">
-          {{ priceFrom() }} - {{ priceTo() }}
-          <span class="price-card-currency">{{
-            'trainer_programs.currency' | translate
-            }}</span>
-        </div>
-        @if (duration()) {
-        <span class="price-card-duration">
-          <i class="fa-regular fa-clock"></i>
-          {{ duration() }} {{ 'team_details.duration' |
-          translate }}
-        </span>
-        }
-        <button type="button"
-          class="btn-accent price-card-btn"
-          (click)="openBooking()">
+      </div>
+      <div class="profile-hero-action">
+        <p>{{ 'team_ui.profile_motto' | translate }}</p>
+        <button type="button" (click)="openBooking()">
           {{ 'team.book_btn' | translate }}
+          <span class="directional-arrow arrow-forward" aria-hidden="true">→</span>
         </button>
       </div>
-      } @if (socials().length > 0) {
-      <div class="socials-card surface" appScrollReveal>
-        <span class="socials-card-label">{{
-          'team_details.links' | translate }}</span>
-        <div class="socials-list">
-          @for (s of socials(); track s.key) {
-          <a [href]="s.url" target="_blank" rel="noopener"
-            class="social-link"
-            [title]="'team_details.' + s.key | translate">
-            <i [class]="s.icon"></i>
-          </a>
+      <span class="profile-emblem" aria-hidden="true"
+        ><svg viewBox="0 0 24 24"><path [attr.d]="visual().icon" /></svg
+      ></span>
+    </header>
+    <nav class="profile-tabs" [attr.aria-label]="'team_ui.profile_navigation' | translate">
+      <a href="#instructor-about">{{ 'team_ui.overview' | translate }}</a
+      ><a href="#instructor-courses">{{ 'team_details.programs' | translate }}</a
+      ><a href="#instructor-reviews">{{ 'team_details.reviews' | translate }}</a
+      ><a href="#instructor-certificates">{{ 'team_details.certificates' | translate }}</a>
+    </nav>
+    <div class="profile-layout">
+      <div class="profile-main">
+        <section class="profile-panel profile-about" id="instructor-about">
+          <div>
+            <h2><span aria-hidden="true">◇</span> {{ 'team_details.about' | translate }}</h2>
+            <div class="profile-long-copy" [class.expanded]="expanded()">
+              <p>{{ description() || bio() || ('team_ui.no_bio' | translate) }}</p>
+            </div>
+            @if ((description() || bio()).length > 230) {
+              <button
+                class="profile-read-more"
+                type="button"
+                [attr.aria-expanded]="expanded()"
+                (click)="expanded.set(!expanded())"
+              >
+                {{ (expanded() ? 'team_ui.read_less' : 'team_ui.read_more') | translate }} ⌄
+              </button>
+            }
+          </div>
+          <dl>
+            <div>
+              <dt>{{ 'team_ui.availability' | translate }}</dt>
+              <dd>
+                {{ (t.is_available ? 'team_ui.available' : 'team_ui.not_available') | translate }}
+              </dd>
+            </div>
+            @if (membershipDate()) {
+              <div>
+                <dt>{{ 'team_ui.member_since' | translate }}</dt>
+                <dd>{{ membershipDate() | date: 'MMM yyyy' }}</dd>
+              </div>
+            }
+            <div>
+              <dt>{{ 'team_details.certificates' | translate }}</dt>
+              <dd>{{ certificates().length }}</dd>
+            </div>
+          </dl>
+        </section>
+        @if (specialization()) {
+          <section class="profile-panel">
+            <h2><span aria-hidden="true">⬡</span> {{ 'team_ui.expertise' | translate }}</h2>
+            <div class="profile-expertise">
+              <span>{{ specialization() }}</span>
+            </div>
+          </section>
+        }
+        <section class="profile-panel" id="instructor-courses">
+          <div class="profile-section-heading">
+            <h2>
+              <span aria-hidden="true">◇</span> {{ 'team_details.programs_title' | translate }}
+            </h2>
+            <a routerLink="/programs"
+              >{{ 'team_ui.browse_courses' | translate }}
+              <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a
+            >
+          </div>
+          @if (courses().length) {
+            <div class="profile-courses">
+              @for (course of courses(); track course.id) {
+                <a class="profile-course" [routerLink]="['/programs/course', course.slug]">
+                  @if (course.cover_image_url) {
+                    <div class="profile-course-photo">
+                      <img [src]="course.cover_image_url" alt="" loading="lazy" /><span
+                        >{{ course.duration_minutes }} {{ 'team.card.minutes' | translate }}</span
+                      >
+                    </div>
+                  }
+                  <div class="profile-course-body">
+                    <h3>{{ english() ? course.title_en : course.title_ar }}</h3>
+                    <div>
+                      @if (course.ratings_count) {
+                        <span class="profile-course-rating"
+                          >★ {{ course.average_rating | number: '1.1-1' }}
+                          <small>({{ course.ratings_count }})</small></span
+                        >
+                      }
+                      @if (course.level) {
+                        <span class="profile-course-level">{{
+                          'programs.catalog.level_' +
+                            (course.level === 'ALL_LEVELS' ? 'all' : course.level.toLowerCase())
+                            | translate
+                        }}</span>
+                      }
+                      <span
+                        class="profile-course-arrow directional-arrow arrow-forward"
+                        aria-hidden="true"
+                        >→</span
+                      >
+                    </div>
+                  </div></a
+                >
+              }
+            </div>
           }
-        </div>
+          @if (programs().length) {
+            <div class="legacy-programs">
+              @for (program of programs(); track program.id) {
+                <div>
+                  <strong>{{ program.title }}</strong
+                  ><a routerLink="/programs">{{ 'team_ui.browse_courses' | translate }} →</a>
+                </div>
+              }
+            </div>
+          }
+          @if (!courses().length && !programs().length) {
+            <p class="profile-muted">{{ 'team_details.no_programs' | translate }}</p>
+          }
+        </section>
+        <section class="profile-panel" id="instructor-reviews">
+          <div class="profile-section-heading">
+            <h2>
+              <span class="gold" aria-hidden="true">★</span>
+              {{ 'team_ui.student_reviews' | translate }}
+            </h2>
+            <app-trainer-rating
+              [trainerId]="t.id"
+              [rating]="rating()"
+              [ratingsCount]="ratingsCount()"
+            />
+          </div>
+          <div class="profile-reviews-content">
+            <div class="profile-reviews-summary">
+              <div class="profile-rating-number">
+                <strong>{{ rating() | number: '1.1-1' }}</strong
+                ><span>★★★★★</span
+                ><small>{{ 'team_ui.review_count' | translate: { count: ratingsCount() } }}</small>
+              </div>
+              <div class="profile-rating-bars">
+                @for (row of histogram(); track row.stars) {
+                  <div>
+                    <span>{{ row.stars }} ★</span>
+                    <div><span [style.width.%]="row.percent"></span></div>
+                    <small>{{ row.count }}</small>
+                  </div>
+                }
+              </div>
+            </div>
+            @if (reviews().length) {
+              <div class="profile-review-list">
+                @for (review of reviews(); track review.id) {
+                  <article>
+                    <div class="review-avatar" aria-hidden="true">
+                      {{ (review.users?.full_name || '?').slice(0, 1) }}
+                    </div>
+                    <div>
+                      <h3>{{ review.users?.full_name || ('team_ui.learner' | translate) }}</h3>
+                      <div class="review-stars" [attr.aria-label]="review.rating + ' / 5'">
+                        @for (star of [1, 2, 3, 4, 5]; track star) {
+                          <span [class.filled]="star <= review.rating">★</span>
+                        }
+                      </div>
+                      @if (review.comment) {
+                        <p>{{ review.comment }}</p>
+                      }
+                    </div>
+                  </article>
+                }
+              </div>
+            } @else {
+              <p class="profile-muted">{{ 'team_ui.no_reviews' | translate }}</p>
+            }
+          </div>
+        </section>
+        <section class="profile-panel" id="instructor-certificates">
+          <h2>
+            <span aria-hidden="true">✧</span> {{ 'team_details.certificates_title' | translate }}
+          </h2>
+          @if (certificates().length) {
+            <div class="profile-certificates">
+              @for (cert of certificates(); track cert.id) {
+                @if (publicLink(cert.certificate_url); as link) {
+                  <a [href]="link" target="_blank" rel="noopener noreferrer"
+                    >◇ {{ cert.title || ('team_details.certificates' | translate) }} ↗</a
+                  >
+                }
+              }
+            </div>
+          } @else {
+            <p class="profile-muted">{{ 'team_details.no_certificates' | translate }}</p>
+          }
+        </section>
       </div>
-      }
-    </aside>
-  </div>
-
-</div>
+      <aside class="profile-side">
+        <section class="profile-message">
+          <div class="profile-message-image">
+            @if (avatar() && !imageFailed()) {
+              <img [src]="avatar()" alt="" loading="lazy" />
+            }
+            <span></span>
+            <div>
+              <h2>{{ 'team_ui.learn_with' | translate }} {{ name() }}</h2>
+              <p>{{ specialization() }}</p>
+            </div>
+          </div>
+          <button type="button" (click)="openBooking()">
+            {{ 'team.book_btn' | translate }}
+            <span class="directional-arrow arrow-forward" aria-hidden="true">→</span>
+          </button>
+        </section>
+        <section class="profile-panel">
+          <h2>{{ 'team_ui.professional_profile' | translate }}</h2>
+          <dl class="profile-facts">
+            <div>
+              <dt>{{ 'team_details.years_exp' | translate }}</dt>
+              <dd>{{ experienceYears() }} {{ 'team.card.years' | translate }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'team_details.students' | translate }}</dt>
+              <dd>{{ studentsCount() }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'team_ui.programs' | translate }}</dt>
+              <dd>{{ programsCount() }}</dd>
+            </div>
+          </dl>
+        </section>
+        @if (hasPriceRange()) {
+          <section class="profile-panel">
+            <h2>{{ 'team_details.consultation_price' | translate }}</h2>
+            <p class="consultation-price">
+              {{ priceFrom() }} – {{ priceTo() }} {{ 'trainer_programs.currency' | translate }}
+            </p>
+            @if (duration()) {
+              <p class="profile-muted">{{ duration() }} {{ 'team.card.minutes' | translate }}</p>
+            }
+          </section>
+        }
+        @if (socials().length) {
+          <section class="profile-panel">
+            <h2>{{ 'team_details.links' | translate }}</h2>
+            <div class="profile-socials">
+              @for (social of socials(); track social.key) {
+                <a
+                  [href]="social.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  [attr.aria-label]="'team_details.' + social.key | translate"
+                  [title]="'team_details.' + social.key | translate"
+                  >{{
+                    social.key === 'linkedin'
+                      ? 'in'
+                      : social.key === 'facebook'
+                        ? 'f'
+                        : social.key === 'website'
+                          ? '↗'
+                          : '◇'
+                  }}</a
+                >
+              }
+            </div>
+          </section>
+        }
+      </aside>
+    </div>
+  </main>
 }

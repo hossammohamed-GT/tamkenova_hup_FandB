@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
@@ -415,58 +416,24 @@ export class TrainersService {
 
 
 
-  // Handle create review (upsert: rating again updates the existing review)
+  // A card submits one review per learner. Explicit review management is separate.
   async createReview(userId: string, trainerId: string, dto: CreateReviewDto) {
     const user = await this.trainersRepository.findUserById(userId);
-
     if (!user || (user.role !== 'STUDENT' && user.role !== 'CLIENT')) {
       throw new ForbiddenException('Only students can rate trainers');
     }
-
     const trainer = await this.trainersRepository.findTrainerById(trainerId);
-
-    if (!trainer || trainer.trainer_status !== 'APPROVED') {
+    if (!trainer || trainer.trainer_status !== 'APPROVED')
       throw new BadRequestException('Trainer not found');
-    }
-
-    if (trainer.user_id === userId) {
+    if (trainer.user_id === userId)
       throw new BadRequestException('You cannot rate your own profile');
-    }
-
     const existing =
       await this.trainersRepository.findReviewByTrainerAndStudent(
         trainerId,
         userId,
       );
-
-    if (existing) {
-      const data: { rating: number; comment?: string } = {
-        rating: dto.rating,
-      };
-
-      // Star-only re-rates from cards must not wipe an existing written comment.
-      if (dto.comment !== undefined && dto.comment.trim() !== '') {
-        data.comment = dto.comment;
-      }
-
-      const review = await this.trainersRepository.updateReview(
-        existing.id,
-        data,
-      );
-      const stats = await this.trainersRepository.updateTrainerRating(trainerId);
-
-      return {
-        success: true,
-        message: 'Review updated successfully',
-        updated: true,
-
-        data: {
-          review,
-          ...stats,
-        },
-      };
-    }
-
+    if (existing)
+      throw new ConflictException('You have already rated this trainer');
     try {
       const review = await this.trainersRepository.createReview({
         trainer_id: trainerId,
@@ -474,52 +441,23 @@ export class TrainersService {
         rating: dto.rating,
         comment: dto.comment,
       });
-      const stats = await this.trainersRepository.updateTrainerRating(trainerId);
-
-      return {
-        success: true,
-        message: 'Review added successfully',
-        updated: false,
-
-        data: {
-          review,
-          ...stats,
-        },
-      };
-    } catch (e) {
-      // Concurrent double-submit raced past the existence check — treat as update.
-      if ((e as { code?: string })?.code === 'P2002') {
-        const raced =
-          await this.trainersRepository.findReviewByTrainerAndStudent(
-            trainerId,
-            userId,
-          );
-
-        if (raced) {
-          const review = await this.trainersRepository.updateReview(raced.id, {
-            rating: dto.rating,
-          });
-          const stats =
-            await this.trainersRepository.updateTrainerRating(trainerId);
-
-          return {
-            success: true,
-            message: 'Review updated successfully',
-            updated: true,
-
-            data: {
-              review,
-              ...stats,
-            },
-          };
-        }
-      }
-
-      throw e;
+      const stats =
+        await this.trainersRepository.updateTrainerRating(trainerId);
+      return { success: true, updated: false, data: { review, ...stats } };
+    } catch (error) {
+      // The existing database unique constraint also protects concurrent tabs.
+      if ((error as { code?: string })?.code === 'P2002')
+        throw new ConflictException('You have already rated this trainer');
+      throw error;
     }
   }
 
-
+  async getMyReviewStatus(userId: string) {
+    return {
+      success: true,
+      data: await this.trainersRepository.getReviewStatusForStudent(userId),
+    };
+  }
 
   // Handle get trainer reviews
   async getTrainerReviews(trainerId: string) {

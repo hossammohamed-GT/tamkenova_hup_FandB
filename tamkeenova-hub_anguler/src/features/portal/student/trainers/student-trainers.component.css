@@ -10,8 +10,14 @@
 }
 
 @keyframes filter-slide {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .filters-bar {
@@ -60,7 +66,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
-  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, border-color 0.3s ease;
+  transition:
+    transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
   background: var(--color-surface-1);
   opacity: 0;
   transform: translateY(18px);
@@ -69,12 +78,15 @@
 }
 
 @keyframes card-enter {
-  to { opacity: 1; transform: translateY(0); }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .glass-trainer-card:hover {
   transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
   border-color: color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
 }
 
@@ -93,7 +105,9 @@
   object-fit: cover;
   flex-shrink: 0;
   border: 2px solid var(--color-border);
-  transition: transform var(--transition-base), border-color var(--transition-base);
+  transition:
+    transform var(--transition-base),
+    border-color var(--transition-base);
 }
 
 .glass-trainer-card:hover .trainer-avatar {
@@ -132,108 +146,6 @@
   color: var(--color-text-muted);
 }
 
-.trainer-rating-interactive {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.75rem 0.9rem;
-  border-radius: var(--radius-md);
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  transition: all 0.3s ease;
-}
-
-.trainer-rating-interactive:hover {
-  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface-alt));
-  border-color: color-mix(in srgb, var(--color-accent) 20%, transparent);
-}
-
-.rating-stars {
-  display: flex;
-  gap: 0.1rem;
-}
-
-.star-btn {
-  position: relative;
-  width: 30px;
-  height: 30px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: transform var(--transition-fast);
-  padding: 0;
-}
-
-.star-btn:hover {
-  transform: scale(1.12);
-}
-
-.star-btn:active {
-  transform: scale(0.9);
-}
-
-.star-btn i {
-  font-size: 1.05rem;
-  color: var(--color-border);
-  transition: color var(--transition-fast);
-}
-
-.star-btn.is-active i,
-.star-btn.is-hovered i {
-  color: var(--color-accent);
-}
-
-.star-glow {
-  display: none;
-}
-
-.rating-info {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: var(--text-sm);
-}
-
-.rating-value {
-  font-weight: 700;
-  font-family: var(--font-numeric);
-  color: var(--color-text);
-}
-
-.rating-info small {
-  color: var(--color-text-muted);
-}
-
-.rating-spin {
-  color: var(--color-accent);
-  font-size: var(--text-sm);
-}
-
-.rating-success-msg {
-  color: var(--color-success);
-  font-weight: 700;
-  font-size: var(--text-xs);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  animation: success-in 0.35s ease;
-}
-
-@keyframes success-in {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.rating-error-msg {
-  font-size: var(--text-micro);
-  color: var(--color-danger);
-  font-weight: 600;
-}
-
 .trainer-stats {
   display: flex;
   gap: 1rem;
@@ -259,7 +171,9 @@
   border-radius: var(--radius-sm);
   cursor: pointer;
   flex: 1;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .btn-sm:hover {
@@ -304,4 +218,13 @@
     animation: none;
     transition: none;
   }
+}
+
+.glass-trainer-card {
+  position: relative;
+  overflow: visible;
+}
+.glass-trainer-card:focus-within,
+.glass-trainer-card:hover {
+  z-index: 5;
 }

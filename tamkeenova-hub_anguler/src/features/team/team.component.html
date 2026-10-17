@@ -1,59 +1,166 @@
-<section class="team-page">
-  <div class="team-header">
-    <span class="team-eyebrow">
-      <i class="fa-solid fa-users"></i>
-      {{ 'team.header.eyebrow' | translate }}
-    </span>
-    <h1 class="team-title">{{ 'team.header.title' |
-      translate }}</h1>
-    <p class="team-subtitle">{{ 'team.header.subtitle' |
-      translate }}</p>
-  </div>
-
-  <!-- Loading state -->
-  @if (isLoading()) {
-  <div class="team-grid">
-    @for (i of [1,2,3,4,5,6,7,8]; track i) {
-    <div
-      class="trainer-card-skeleton surface chamfer-sm animate-in"
-      [style.animation-delay]="(i * 0.05) + 's'">
-      <div class="skeleton-avatar shimmer"></div>
-      <div class="skeleton-info">
-        <div class="skeleton-line shimmer"
-          style="width: 80%"></div>
-        <div class="skeleton-line shimmer"
-          style="width: 60%"></div>
-        <div class="skeleton-line shimmer"
-          style="width: 40%"></div>
+<main class="team-page">
+  <section class="team-hero" aria-labelledby="team-heading">
+    <div class="team-hero-copy">
+      <span class="team-eyebrow">— {{ 'team.header.eyebrow' | translate }}</span>
+      <h1 id="team-heading">
+        {{ 'team_ui.meet' | translate }} <em>{{ 'team_ui.instructors' | translate }}</em>
+      </h1>
+      <p>{{ 'team.header.subtitle' | translate }}</p>
+      @if (!isLoading() && !errorMessage()) {
+        <div class="team-hero-stats">
+          <div>
+            <span aria-hidden="true"
+              ><svg viewBox="0 0 24 24">
+                <path
+                  d="M8 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM2 21v-5a6 6 0 0 1 12 0v5M17 3a3 3 0 1 1 0 6m0 3a5 5 0 0 1 5 5v4"
+                /></svg></span
+            ><strong>{{ trainers().length }}</strong
+            ><small>{{ 'team_ui.experts' | translate }}</small>
+          </div>
+          <div>
+            <span aria-hidden="true">◇</span><strong>{{ categories().length }}</strong
+            ><small>{{ 'team_ui.specialties' | translate }}</small>
+          </div>
+          <div>
+            <span aria-hidden="true"
+              ><svg viewBox="0 0 24 24">
+                <path d="m2 8 10-5 10 5-10 5ZM6 10v7c4 3 8 3 12 0v-7M22 8v9" /></svg></span
+            ><strong>{{ studentCount() }}</strong
+            ><small>{{ 'team_details.students' | translate }}</small>
+          </div>
+          <div>
+            <span class="gold" aria-hidden="true">★</span
+            ><strong>{{ overallRating() | number: '1.1-1' }}</strong
+            ><small>{{ 'team_ui.average_rating' | translate }}</small>
+          </div>
+        </div>
+      }
+    </div>
+    <div class="team-hero-art" aria-hidden="true">
+      <div class="portrait-line"></div>
+      @for (trainer of portraits(); track trainer.id; let i = $index) {
+        <div class="hero-portrait" [class]="'hero-portrait portrait-' + i">
+          <img
+            [src]="trainer.users.profile_image"
+            alt=""
+            (error)="$any($event.target).style.visibility = 'hidden'"
+          />
+        </div>
+      }
+      <span class="hero-crystal crystal-gold"></span><span class="hero-crystal crystal-teal"></span
+      ><span class="hero-motto">{{ 'team_ui.motto' | translate }}</span>
+    </div>
+  </section>
+  <section
+    class="team-directory"
+    [attr.aria-label]="'team_ui.instructors' | translate"
+    [attr.aria-busy]="isLoading()"
+  >
+    <div class="team-toolbar">
+      <label class="team-search"
+        ><svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10" cy="10" r="6.5" />
+          <path d="m15 15 6 6" /></svg
+        ><input
+          type="search"
+          [value]="search()"
+          (input)="search.set($any($event.target).value)"
+          [placeholder]="'team_ui.search' | translate"
+          [attr.aria-label]="'team_ui.search' | translate"
+      /></label>
+      <select
+        [value]="category()"
+        (change)="category.set($any($event.target).value)"
+        [attr.aria-label]="'team_ui.specialties' | translate"
+      >
+        <option value="">{{ 'team_ui.all_specialties' | translate }}</option>
+        @for (item of categories(); track item.id) {
+          <option [value]="item.id">{{ english() ? item.name_en : item.name_ar }}</option>
+        }
+      </select>
+      <select
+        [value]="experience()"
+        (change)="experience.set($any($event.target).value)"
+        [attr.aria-label]="'team_details.years_exp' | translate"
+      >
+        <option value="">{{ 'team_ui.all_experience' | translate }}</option>
+        <option value="5plus">{{ 'team_ui.experienced' | translate }}</option>
+        <option value="under5">{{ 'team_ui.under_five' | translate }}</option>
+      </select>
+      <select
+        [value]="availability()"
+        (change)="availability.set($any($event.target).value)"
+        [attr.aria-label]="'team_ui.availability' | translate"
+      >
+        <option value="">{{ 'team_ui.all_availability' | translate }}</option>
+        <option value="available">{{ 'team_ui.available' | translate }}</option>
+      </select>
+      <select
+        class="team-sort"
+        [value]="sort()"
+        (change)="sort.set($any($event.target).value)"
+        [attr.aria-label]="'programs.catalog.sort_by' | translate"
+      >
+        <option value="popular">{{ 'team_ui.popular' | translate }}</option>
+        <option value="rating">{{ 'team_ui.highest_rated' | translate }}</option>
+        <option value="name">{{ 'team_ui.name_sort' | translate }}</option>
+      </select>
+      <div
+        class="team-views"
+        role="group"
+        [attr.aria-label]="'programs.geometric.view' | translate"
+      >
+        <button
+          type="button"
+          [attr.aria-pressed]="layout() === 'grid'"
+          (click)="layout.set('grid')"
+          [attr.aria-label]="'programs.geometric.grid' | translate"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3 3h7v7H3zm11 0h7v7h-7zM3 14h7v7H3zm11 0h7v7h-7z" />
+          </svg></button
+        ><button
+          type="button"
+          [attr.aria-pressed]="layout() === 'list'"
+          (click)="layout.set('list')"
+          [attr.aria-label]="'programs.geometric.list' | translate"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 5h13M8 12h13M8 19h13M3 5h1m-1 7h1m-1 7h1" />
+          </svg>
+        </button>
       </div>
     </div>
+    @if (isLoading()) {
+      <div class="team-grid">
+        @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+          <div class="trainer-card-skeleton shimmer"></div>
+        }
+      </div>
+    } @else if (errorMessage()) {
+      <div class="team-empty" role="alert">
+        <h2>{{ errorMessage()! | translate }}</h2>
+        <button type="button" (click)="loadTrainers()">
+          {{ 'programs.catalog.try_again' | translate }}
+        </button>
+      </div>
+    } @else if (filtered().length) {
+      <p class="team-result-count" role="status">
+        {{ 'team_ui.result_count' | translate: { count: filtered().length } }}
+      </p>
+      <div class="team-grid" [class.team-list]="layout() === 'list'">
+        @for (trainer of filtered(); track trainer.id; let i = $index) {
+          <app-trainer-card [trainer]="trainer" [index]="i" (book)="onBook($event)" />
+        }
+      </div>
+    } @else {
+      <div class="team-empty">
+        <h2>{{ 'team_ui.empty_title' | translate }}</h2>
+        <p>{{ 'team_ui.empty_text' | translate }}</p>
+        @if (trainers().length) {
+          <button type="button" (click)="reset()">{{ 'team_ui.clear_filters' | translate }}</button>
+        }
+      </div>
     }
-  </div>
-  }
-
-  @else if (trainers().length > 0) {
-  <div class="team-grid">
-    @for (trainer of trainers(); track trainer.id; let i =
-    $index) {
-    <div class="animate-in"
-      [style.animation-delay]="(i * 0.04) + 's'">
-      <app-trainer-card [trainer]="trainer"
-        [index]="i" (book)="onBook($event)"></app-trainer-card>
-    </div>
-    }
-  </div>
-  }
-
-  <!-- Empty state -->
-  @else {
-  <div class="empty-state surface chamfer-sm animate-in">
-    <div class="empty-icon">
-      <i class="fa-solid fa-users"></i>
-    </div>
-    <h2 class="empty-title">{{ 'team.empty_title' |
-      translate }}</h2>
-    <p class="empty-text">{{ 'team.empty_text' | translate
-      }}</p>
-  </div>
-  }
-</section>
+  </section>
+</main>
