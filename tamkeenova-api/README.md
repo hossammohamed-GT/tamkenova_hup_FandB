@@ -165,3 +165,35 @@ completion and automatic bilingual certificates are documented in
 
 Apply the reviewed additive schema with `npm run db:course-workflow` before deploying
 the updated API. Checkout stays disabled until an administrator configures real accounts.
+
+### Admin-managed course categories and learner-role boundaries
+
+`/admin/course-categories` is restricted to the **current database role** ADMIN/SUPER_ADMIN:
+GET lists all records including hidden categories and reference counts; POST creates; PUT
+`/:id` updates bilingual names/descriptions, slug, image URL, parent, display order and visibility;
+PATCH `/:id/visibility` changes only visibility; DELETE `/:id` permanently removes only empty
+categories. A referenced category returns 409: hide it or move course/program/child references
+first. Serializable transactions, relation predicates and foreign keys protect concurrent writes.
+Parents must be top-level categories; self-parenting/deep nesting are rejected. Slug conflicts
+and invalid values use the existing inline `field_errors` contract.
+
+POST `/admin/course-categories/image` accepts one `image` multipart field, up to 5MB. The
+existing Supabase `tamkeenova` storage bucket/configuration is reused under `course-categories/`;
+only magic-byte-checked JPG/PNG/WEBP are accepted, never SVG. No new public write endpoint,
+client-provided storage credentials or database reset is required. Image URLs may instead be
+HTTPS or a local `/path`. Uploading saves the file immediately; replacing a category image does
+not delete old storage objects automatically. Existing category fields are sufficient: **no new
+Prisma schema/DDL change** for this feature. Deploy the matching frontend and backend together.
+
+Public category lists/filters suppress hidden categories and children of hidden roots. Hidden
+category links are omitted from public course metadata. Hiding is navigation/organization, not
+course unpublication: course content, purchase history and enrollments are preserved.
+
+ADMIN/SUPER_ADMIN (like TRAINER) cannot enter the learner workflow: checkout, transfer reports,
+free enrollment, library, progress and completion endpoints return 403 before invoking the
+service. They retain the separate administration/review routes. STUDENT/CLIENT/EMPLOYEE/
+VOLUNTEER learner roles remain supported. Older enrollments are not deleted.
+
+`npm run test:course-workflow` includes category HTTP/DTO/upload/role and transactional service
+regressions. Browser fixtures are explicit mocks; passing them does not establish a live DB or
+Supabase upload/deployment.

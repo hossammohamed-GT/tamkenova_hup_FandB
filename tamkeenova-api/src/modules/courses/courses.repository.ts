@@ -1,4 +1,4 @@
-import { publicCourseWhere } from './public-course-policy';
+import { publicCourseWhere, publicCategoryWhere } from './public-course-policy';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CourseCatalogQueryDto } from './dto/course-catalog-query.dto';
@@ -10,6 +10,7 @@ export class CoursesRepository {
   private courseCardInclude() {
     return {
       category_links: {
+        where: { course_categories: { is: publicCategoryWhere } },
         orderBy: { display_order: 'asc' as const },
         include: {
           course_categories: {
@@ -114,7 +115,7 @@ export class CoursesRepository {
 
     if (query.category) {
       const category = await this.prisma.course_categories.findFirst({
-        where: { slug: query.category, is_active: true },
+        where: { slug: query.category, ...publicCategoryWhere },
         select: {
           id: true,
           children: {
@@ -137,7 +138,7 @@ export class CoursesRepository {
           }
         : {
             some: {
-              course_categories: { slug: query.category, is_active: true },
+              course_categories: { slug: query.category, ...publicCategoryWhere },
             },
           };
     }

@@ -1188,6 +1188,7 @@
     "view_pdf": "عرض الشهادة"
   },
   "admin_nav": {
+    "course_categories": "تصنيفات الكورسات",
     "dashboard": "لوحة التحكم",
     "users": "المستخدمون",
     "trainers": "المدربون",

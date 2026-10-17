@@ -44,6 +44,19 @@ describe('Learner progress actions', () => {
     fixture.detectChanges();
     return fixture;
   }
+  it.each(['ADMIN', 'SUPER_ADMIN', 'TRAINER'])('%s gets management only, even when the widget is mounted directly', role => {
+    TestBed.overrideProvider(AuthService, {useValue: {isLoggedIn: () => true, role: () => role}});
+    const fixture = setup();
+    expect(fixture.nativeElement.querySelector('a[href$="/checkout"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('a[href*="/portal/"]')).toBeTruthy();
+    fixture.componentInstance.enroll();
+    fixture.componentInstance.mark();
+    fixture.componentInstance.request();
+    expect(api.learning).not.toHaveBeenCalled();
+    expect(api.enroll).not.toHaveBeenCalled();
+    expect(api.mark).not.toHaveBeenCalled();
+    expect(api.requestCompletion).not.toHaveBeenCalled();
+  });
   it('does not infer paid enrollment from being logged in', () => {
     const fixture = setup();
     expect(fixture.componentInstance.state()).toBeNull();

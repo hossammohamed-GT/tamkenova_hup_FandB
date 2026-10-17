@@ -88,8 +88,8 @@ describe('Workflow HTTP authentication, current roles and DTO boundary', () => {
     active = true;
     for (const fn of Object.values(service)) (fn as any).mockClear();
   });
-  it('trainers cannot enter learner checkout, enrollment, library or completion routes', async () => {
-    role = 'TRAINER';
+  it.each(['TRAINER', 'ADMIN', 'SUPER_ADMIN'])('%s cannot enter learner checkout, enrollment, library or completion routes', async blockedRole => {
+    role = blockedRole;
     for (const path of [
       `checkout/${id}`,
       'library',
@@ -104,6 +104,7 @@ describe('Workflow HTTP authentication, current roles and DTO boundary', () => {
       `enroll/${id}/free`,
       `checkout/${id}/report`,
       `learning/${id}/completion`,
+      `learning/${id}/lessons/${id}/done`,
     ])
       await request(app.getHttpServer())
         .post('/api/course-workflow/' + path)
@@ -112,13 +113,12 @@ describe('Workflow HTTP authentication, current roles and DTO boundary', () => {
         .expect(403);
     expect(service.enrollFree).not.toHaveBeenCalled();
     expect(service.reportTransfer).not.toHaveBeenCalled();
+    expect(service.markLesson).not.toHaveBeenCalled();
   });
-  it('preserves learner access for every existing non-trainer role, including clients', async () => {
+  it('preserves learner access for learner roles, including clients', async () => {
     for (const learnerRole of [
       'STUDENT',
       'CLIENT',
-      'ADMIN',
-      'SUPER_ADMIN',
       'EMPLOYEE',
       'VOLUNTEER',
     ]) {

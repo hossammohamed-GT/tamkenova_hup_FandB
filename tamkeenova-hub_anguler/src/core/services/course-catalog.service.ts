@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map, shareReplay } from 'rxjs';
+import { Observable, Subject, map, shareReplay, startWith, switchMap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   Course,
@@ -29,9 +29,14 @@ export class CourseCatalogService {
   private readonly baseUrl = `${environment.apiUrl}/courses`;
 
   // Shared between the eager navbar and Programs page; failed requests remain retryable.
-  private readonly categories$ = this.http
-      .get<CourseCatalogResponse<CourseCategory[]>>(`${this.baseUrl}/categories`)
-      .pipe(map((response) => response.data ?? []), shareReplay({ bufferSize: 1, refCount: false }));
+  private readonly categoryRefresh = new Subject<void>();
+  private readonly categories$ = this.categoryRefresh.pipe(
+    startWith(undefined),
+    switchMap(() => this.http.get<CourseCatalogResponse<CourseCategory[]>>(`${this.baseUrl}/categories`)),
+    map(response => response.data ?? []),
+    shareReplay({ bufferSize: 1, refCount: false }),
+  );
+  refreshCategories(): void { this.categoryRefresh.next(); }
 
   getCategories(): Observable<CourseCategory[]> {
     return this.categories$;

@@ -1,3 +1,6 @@
+@if (managementRoute(); as route) {
+  <section class="panel"><h2>{{ t('إدارة الكورس', 'Course management') }}</h2><a class="button" [routerLink]="route">{{ t('فتح لوحة الإدارة', 'Open management workspace') }}</a></section>
+} @else {
 <section class="panel learning-actions">
   <h2>{{ t('رحلتك في الكورس', 'Your course journey') }}</h2>
   @if (error()) {
@@ -133,3 +136,5 @@
     }
   }
 </section>
+
+}

@@ -29,7 +29,7 @@ export class ProgramsMegaMenuComponent {
   readonly sort = signal('popular');
   readonly english = computed(() => this.theme.language() === 'en');
   readonly sorts = [{ value: 'popular', key: 'popular' }, { value: 'newest', key: 'new' }, { value: 'rating', key: 'rated' }];
-  private readonly requests = new Subject<{ category: string; sort: string }>();
+  private readonly requests = new Subject<{ category: string; sort: string } | null>();
   // Mounted with the navbar, not recreated by hover. Never cache failed requests.
   private readonly inFlight = new Map<string, Observable<Course[]>>();
   private readonly cache = new Map<string, Course[]>();
@@ -44,6 +44,7 @@ export class ProgramsMegaMenuComponent {
     this.requests.pipe(
       tap(() => { this.loadingCourses.set(true); this.coursesError.set(false); this.courses.set([]); }),
       switchMap(query => {
+        if (!query) return of({ courses: [] as Course[], failed: false });
         return this.fetchCourses(query.category, query.sort).pipe(
           map(courses => ({ courses, failed: false })),
           catchError(() => of({ courses: [] as Course[], failed: true })),
@@ -63,12 +64,17 @@ export class ProgramsMegaMenuComponent {
     this.categoriesError.set(false);
     this.catalog.getCategories().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: categories => {
+        const previousSlug = this.selected()?.slug;
+        this.requests.next(null);
         this.categories.set(categories);
+        this.selected.set(null);
+        this.cache.clear();
+        this.courses.set([]);
         this.loadingCategories.set(false);
         if (categories.length) {
-          this.selectCategory(categories[0]);
+          this.selectCategory(categories.find(category => category.slug === previousSlug) ?? categories[0]);
           // Warm popular courses for every remaining category, with bounded concurrency.
-          from(categories.slice(1)).pipe(
+          from(categories.filter(category => category.slug !== this.selected()?.slug)).pipe(
             mergeMap(category => this.fetchCourses(category.slug, 'popular').pipe(catchError(() => EMPTY)), 3),
             takeUntilDestroyed(this.destroyRef),
           ).subscribe();

@@ -924,3 +924,15 @@ for (const language of ['ar', 'en']) {
       await expect(button).toHaveCSS('min-block-size', '44px');
   });
 }
+
+for(const role of ['ADMIN','SUPER_ADMIN']) for(const language of ['ar','en']) {
+  test(`${role} sees management, never purchase/enrollment, including direct learner links: ${language}`,async({page})=>{
+    const {calls}=await setup(page,role,language);
+    await page.goto('/programs/course/'+sample.slug);
+    await expect(page.locator('.course-detail-aside>a[href$="checkout"], .course-detail-aside a[href$="checkout"], app-course-learning-actions')).toHaveCount(0);
+    await expect(page.locator('.course-detail-aside a[href="/portal/admin/course-workflow"]')).toBeVisible();
+    await page.goto('/programs/course/'+sample.slug+'/checkout');await expect(page).toHaveURL(/\/portal\/admin\/course-workflow$/);
+    await page.goto('/my-courses');await expect(page).toHaveURL(/\/portal\/admin\/course-workflow$/);
+    expect(calls.some(c=>c.path.includes('/report')||c.path.includes('/enroll/'))).toBe(false);
+  });
+}

@@ -1188,6 +1188,7 @@
     "view_pdf": "View Certificate"
   },
   "admin_nav": {
+    "course_categories": "Course categories",
     "dashboard": "Dashboard",
     "users": "Users",
     "trainers": "Trainers",

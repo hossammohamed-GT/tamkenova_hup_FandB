@@ -152,8 +152,8 @@
         }
       </div>
       <aside class="course-detail-aside">
-        @if(auth.role() === 'TRAINER') {
-          <section class="detail-panel"><h2>{{ 'course_workflow.manage' | translate }}</h2><a routerLink="/portal/trainer/courses">{{ 'course_workflow.studio' | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a></section>
+        @if(managementRoute(); as route) {
+          <section class="detail-panel"><h2>{{ 'course_workflow.manage' | translate }}</h2><a [routerLink]="route">{{ (auth.role() === 'TRAINER' ? 'course_workflow.studio' : 'course_workflow.admin') | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a></section>
         } @else {<app-course-learning-actions [course]="item" [lesson]="selectedLesson()" />}
         <section class="detail-panel curriculum-panel">
           <div class="curriculum-heading">
@@ -179,8 +179,8 @@
           @if (accessNotice()) {
             <div class="access-notice" role="alert">
               <p>{{ 'programs.video.enrollment_required' | translate }}</p>
-              @if (auth.role() === 'TRAINER') {
-                <a routerLink="/portal/trainer/courses">{{ 'course_workflow.manage' | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a>
+              @if (managementRoute(); as route) {
+                <a [routerLink]="route">{{ 'course_workflow.manage' | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a>
               } @else if (!auth.isLoggedIn()) {
                 <a
                   routerLink="/login"

@@ -1,3 +1,4 @@
+import { CategoryModule } from './modules/course-categories/category.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -55,6 +56,7 @@ import { CoursesModule } from './modules/courses/courses.module';
     PartnersModule,
     LoggerModule,
     CoursesModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

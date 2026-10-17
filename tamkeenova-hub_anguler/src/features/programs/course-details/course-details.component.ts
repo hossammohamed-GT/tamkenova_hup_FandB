@@ -1,3 +1,4 @@
+import { courseManagementRoute } from '../../../core/utils/course-role';
 import { CourseLearningActionsComponent } from '../../course-workflow/course-learning-actions.component';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
@@ -33,6 +34,7 @@ export class CourseDetailsComponent {
   private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
   readonly auth = inject(AuthService);
+  readonly managementRoute = computed(() => courseManagementRoute(this.auth.role?.()));
   private readonly reload = new Subject<void>();
   private readonly selections = new Subject<CourseLesson | null>();
   readonly course = signal<Course | null>(null);

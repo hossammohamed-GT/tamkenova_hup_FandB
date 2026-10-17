@@ -34,3 +34,16 @@ describe('Course category preload cache', () => {
     expect(recovered).toHaveBeenCalledWith([]);
   });
 });
+
+it('refreshes all mounted category consumers after an admin mutation, without duplicate requests', () => {
+  TestBed.configureTestingModule({providers:[provideHttpClient(),provideHttpClientTesting()]});
+  const service=TestBed.inject(CourseCatalogService), http=TestBed.inject(HttpTestingController);
+  const navbar=vi.fn(), programs=vi.fn();
+  service.getCategories().subscribe(navbar);service.getCategories().subscribe(programs);
+  http.expectOne('/api/courses/categories').flush({data:[]});
+  service.refreshCategories();
+  const data=[{id:'new',slug:'new',name_ar:'جديد',name_en:'New'}];
+  http.expectOne('/api/courses/categories').flush({data});
+  expect(navbar).toHaveBeenLastCalledWith(data);expect(programs).toHaveBeenLastCalledWith(data);
+  http.verify();
+});

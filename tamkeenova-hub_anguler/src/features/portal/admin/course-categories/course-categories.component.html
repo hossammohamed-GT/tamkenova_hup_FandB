@@ -1,0 +1,284 @@
+<main class="category-admin">
+  <header class="page-head">
+    <div>
+      <span class="eyebrow">TamkeeNova · Catalog</span>
+      <h1>{{ t('إدارة تصنيفات الكورسات', 'Course categories') }}</h1>
+      <p>
+        {{
+          t(
+            'أضف التصنيفات وصورها، ونظّم ظهورها في البرامج والقائمة.',
+            'Add categories and images, and manage visibility in the catalog and menu.'
+          )
+        }}
+      </p>
+    </div>
+    <button class="primary" type="button" [disabled]="busy()" (click)="open()">
+      <span aria-hidden="true">+</span> {{ t('تصنيف جديد', 'New category') }}
+    </button>
+  </header>
+  <app-admin-nav />
+  <p class="notice">
+    {{
+      t(
+        'إخفاء تصنيف رئيسي يخفي تصنيفاته الفرعية من القوائم، ولا يحذف الكورسات أو تسجيلات الطلاب. الحذف النهائي متاح فقط للتصنيف الخالي من الارتباطات.',
+        'Hiding a parent also hides its children from navigation. Courses and enrollments are preserved. Only unreferenced categories can be permanently deleted.'
+      )
+    }}
+  </p>
+  @if (success()) {
+    <p class="success" role="status">{{ success() }}</p>
+  }
+  @if (error()) {
+    <div class="error" role="alert">
+      {{ error() }}
+      <button type="button" [disabled]="busy()" (click)="load()">
+        {{ t('تحديث', 'Refresh') }}
+      </button>
+    </div>
+  }
+  @if (showForm()) {
+    <section class="editor">
+      <div class="page-head">
+        <h2>
+          {{ editing() ? t('تعديل التصنيف', 'Edit category') : t('تصنيف جديد', 'New category') }}
+        </h2>
+        <button type="button" [disabled]="busy()" (click)="close()">
+          {{ t('إغلاق', 'Close') }}
+        </button>
+      </div>
+      <form #form="ngForm" [appFormFeedback]="feedback" (ngSubmit)="save(form)">
+        <fieldset class="form-feedback-fields" [disabled]="busy()">
+          <div class="form-grid">
+            <label
+              >{{ t('الاسم بالعربية', 'Arabic name')
+              }}<input
+                name="name_ar"
+                fieldPath="name_ar"
+                [(ngModel)]="draft.name_ar"
+                required
+                maxlength="180"
+            /></label>
+            <label
+              >{{ t('الاسم بالإنجليزية', 'English name')
+              }}<input
+                name="name_en"
+                fieldPath="name_en"
+                [(ngModel)]="draft.name_en"
+                required
+                maxlength="180"
+            /></label>
+            <label
+              >{{ t('رابط التصنيف', 'Category slug')
+              }}<input
+                name="slug"
+                fieldPath="slug"
+                [(ngModel)]="draft.slug"
+                required
+                maxlength="180"
+                pattern="[a-z0-9]+(-[a-z0-9]+)*"
+                dir="ltr"
+              /><small>{{
+                t(
+                  'حروف إنجليزية صغيرة وأرقام وشرطة، مثل food-safety',
+                  'Lowercase English letters, numbers and hyphens, e.g. food-safety'
+                )
+              }}</small></label
+            >
+            <label
+              >{{ t('التصنيف الرئيسي', 'Parent category')
+              }}<select name="parent_id" fieldPath="parent_id" [(ngModel)]="draft.parent_id">
+                <option [ngValue]="null">{{ t('تصنيف رئيسي مستقل', 'Top-level category') }}</option>
+                @for (parent of parents(); track parent.id) {
+                  <option [ngValue]="parent.id">
+                    {{ name(parent) }} {{ parent.is_active ? '' : t('— مخفي', '— Hidden') }}
+                  </option>
+                }
+              </select></label
+            >
+            <label
+              >{{ t('الوصف بالعربية', 'Arabic description')
+              }}<textarea
+                name="description_ar"
+                fieldPath="description_ar"
+                [(ngModel)]="draft.description_ar"
+                maxlength="4000"
+              ></textarea>
+            </label>
+            <label
+              >{{ t('الوصف بالإنجليزية', 'English description')
+              }}<textarea
+                name="description_en"
+                fieldPath="description_en"
+                [(ngModel)]="draft.description_en"
+                maxlength="4000"
+              ></textarea>
+            </label>
+            <label class="wide"
+              >{{ t('رابط صورة التصنيف', 'Category image URL')
+              }}<input
+                name="image_url"
+                fieldPath="image_url"
+                [(ngModel)]="draft.image_url"
+                maxlength="2048"
+                dir="ltr"
+                pattern="(https://[^\s]+|/(?!/)[^\s]*)"
+              /><small>{{
+                t(
+                  'رابط HTTPS أو مسار صورة محلي، أو ارفع صورة من جهازك.',
+                  'An HTTPS URL or local image path; or upload an image below.'
+                )
+              }}</small></label
+            >
+            <label
+              >{{ t('رفع صورة من الجهاز', 'Upload an image')
+              }}<input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                (change)="upload($event)"
+              /><small>JPG · PNG · WEBP · {{ t('حتى 5MB', 'Up to 5MB') }}</small></label
+            >
+            <div class="image-preview">
+              @if (draft.image_url) {
+                <img
+                  [src]="draft.image_url"
+                  [alt]="t('معاينة الصورة', 'Image preview')"
+                  referrerpolicy="no-referrer"
+                />
+              } @else {
+                <span>{{ t('معاينة الصورة', 'Image preview') }}</span>
+              }
+            </div>
+            <label
+              >{{ t('ترتيب العرض', 'Display order')
+              }}<input
+                type="number"
+                name="display_order"
+                fieldPath="display_order"
+                [(ngModel)]="draft.display_order"
+                required
+                min="0"
+                max="100000"
+                step="1"
+            /></label>
+            <label class="check"
+              ><input
+                type="checkbox"
+                name="is_active"
+                fieldPath="is_active"
+                [(ngModel)]="draft.is_active"
+              />{{ t('إظهار التصنيف', 'Visible category') }}</label
+            >
+          </div>
+          <div class="actions">
+            <button class="primary" type="submit" [disabled]="busy()">
+              {{
+                busy()
+                  ? t('جارٍ الحفظ أو الرفع…', 'Saving or uploading…')
+                  : t('حفظ التصنيف', 'Save category')
+              }}</button
+            ><button type="button" [disabled]="busy()" (click)="close()">
+              {{ t('إلغاء', 'Cancel') }}
+            </button>
+          </div>
+        </fieldset>
+      </form>
+    </section>
+  }
+  @if (loading()) {
+    <p role="status">{{ t('جارٍ تحميل التصنيفات…', 'Loading categories…') }}</p>
+  } @else {
+    <section class="category-list" [attr.aria-label]="t('التصنيفات', 'Categories')">
+      @for (row of rows(); track row.id) {
+        <article class="category-row" [attr.data-category-id]="row.id">
+          <div class="category-photo">
+            @if (row.image_url) {
+              <img
+                [src]="row.image_url"
+                [alt]="name(row)"
+                loading="lazy"
+                referrerpolicy="no-referrer"
+              />
+            } @else {
+              <span aria-hidden="true">◇</span>
+            }
+          </div>
+          <div class="category-info">
+            <span class="status" [class.hidden-status]="!isVisible(row)">{{
+              isVisible(row) ? t('ظاهر', 'Visible') : t('مخفي', 'Hidden')
+            }}</span>
+            <h2>{{ name(row) }}</h2>
+            <p>
+              {{ parentName(row) }} · <bdi>{{ row.slug }}</bdi>
+            </p>
+            <p>
+              {{ t('كورسات', 'Courses') }}: {{ row._count.course_links }} ·
+              {{ t('تصنيفات فرعية', 'Children') }}: {{ row._count.children }} ·
+              {{ t('برامج', 'Programs') }}: {{ row._count.learning_programs }} ·
+              {{ t('الترتيب', 'Order') }}: {{ row.display_order }}
+            </p>
+          </div>
+          <div class="actions">
+            <button type="button" [disabled]="busy()" (click)="open(row)">
+              {{ t('تعديل', 'Edit') }}</button
+            ><button type="button" [disabled]="busy()" (click)="toggle(row)">
+              {{ row.is_active ? t('إخفاء', 'Hide') : t('إظهار', 'Show') }}</button
+            ><button
+              class="danger"
+              type="button"
+              [disabled]="busy() || !canDelete(row)"
+              [attr.title]="
+                canDelete(row)
+                  ? t('حذف نهائي', 'Permanently delete')
+                  : t(
+                      'انقل الارتباطات أولًا، أو استخدم الإخفاء',
+                      'Move references first, or hide instead'
+                    )
+              "
+              (click)="pendingDelete.set(row)"
+            >
+              {{ t('حذف', 'Delete') }}
+            </button>
+          </div>
+        </article>
+      } @empty {
+        <p class="notice">
+          {{
+            t('لا توجد تصنيفات بعد. أضف أول تصنيف.', 'No categories yet. Add your first category.')
+          }}
+        </p>
+      }
+    </section>
+  }
+  @if (pendingDelete(); as row) {
+    <dialog
+      #confirmation
+      (cancel)="cancelDelete($event)"
+      class="delete-confirm"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="delete-category-title"
+    >
+      <div>
+        <h2 id="delete-category-title">
+          {{ t('حذف التصنيف نهائيًا؟', 'Permanently delete category?') }}
+        </h2>
+        <p>
+          {{ name(row) }} —
+          {{
+            t(
+              'لا يمكن التراجع عن الحذف. يمكنك إخفاؤه بدلًا من ذلك.',
+              'Deletion cannot be undone. You can hide it instead.'
+            )
+          }}
+        </p>
+        <div class="actions">
+          <button class="danger" type="button" [disabled]="busy()" (click)="remove()">
+            {{ t('تأكيد الحذف', 'Confirm deletion') }}</button
+          ><button type="button" [disabled]="busy()" (click)="pendingDelete.set(null)" autofocus>
+            {{ t('إلغاء', 'Cancel') }}
+          </button>
+        </div>
+      </div>
+    </dialog>
+  }
+</main>

@@ -58,7 +58,7 @@ export class ProgramsComponent {
     const order = ['business-professional-skills', 'technology-innovation', 'arts-design-media',
       'wellbeing', 'education-academics', 'lifestyle'];
     const rank = (slug: string) => { const index = order.indexOf(slug); return index < 0 ? order.length : index; };
-    const records = [...this.categories()].sort((a, b) => rank(a.slug) - rank(b.slug));
+    const records = [...this.categories()].sort((a, b) => (a.display_order ?? rank(a.slug)) - (b.display_order ?? rank(b.slug)));
     return records;
   });
   readonly categoryCount = signal<number | null>(null);

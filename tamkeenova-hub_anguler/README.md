@@ -80,3 +80,20 @@ they break inline search, chat and icon-only controls. Workflow/player controls 
 44px targets. Browser regressions cover Arabic/English at 320–1440px, hover/language changes,
 admin dialogs/pagination, actual **mock embedded-document loading under CSP**, and rejection
 of unrelated frame hosts. These tests do not establish live YouTube playback or owner permission.
+
+## Course category administration
+
+Admins/super-admins have **Course categories / تصنيفات الكورسات** in the admin navigation at
+`/portal/admin/course-categories`. They can add/edit bilingual names and descriptions, category
+slugs, images (HTTPS/local URL or JPG/PNG/WEBP upload up to 5MB), parent categories, ordering
+and visibility. Only unreferenced categories can be deleted, after confirmation. The native
+confirmation dialog traps focus and supports Escape/cancel; a conflict closes it and shows the
+server's actionable error without deleting the record. Hiding a parent hides its children from
+navigation while retaining all courses/enrollments. Public menus update after saves without
+reloading; category display order is respected, and new categories use the existing SVG artwork.
+
+Admin/super-admin course pages show management instead of purchase/enrollment. Direct learner
+checkout/library links revalidate the session role and redirect to `/portal/admin/course-workflow`;
+trainers continue to their authoring studio. The backend independently enforces this separation.
+Live image uploads require the existing API Supabase storage configuration; browser tests use
+explicit local API fixtures, not live category insertion or real storage writes.

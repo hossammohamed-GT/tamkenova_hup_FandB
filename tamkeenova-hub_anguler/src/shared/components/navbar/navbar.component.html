@@ -197,8 +197,8 @@
   <div class="mobile-panel chamfer-lg" [class.is-open]="isMobileMenuOpen()">
     <nav class="mobile-links" [attr.aria-label]="'nav.mobile_navigation' | translate">
       @if (isLoggedIn()) {
-        <a [routerLink]="authService.isTrainer() ? '/portal/trainer/courses' : '/my-courses'" class="mobile-link" (click)="closeMobileMenu()">{{
-          (authService.isTrainer() ? 'course_workflow.manage' : 'course_workflow.library') | translate
+        <a [routerLink]="isAdminRole() ? '/portal/admin/course-workflow' : authService.isTrainer() ? '/portal/trainer/courses' : '/my-courses'" class="mobile-link" (click)="closeMobileMenu()">{{
+          (isAdminRole() ? 'course_workflow.admin' : authService.isTrainer() ? 'course_workflow.manage' : 'course_workflow.library') | translate
         }}</a>
       }
       @for (link of navLinks; track link.route) {

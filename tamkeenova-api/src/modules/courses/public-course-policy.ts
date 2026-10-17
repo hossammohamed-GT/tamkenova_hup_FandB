@@ -12,3 +12,9 @@ export const publicCourseWhere = {
   status: 'PUBLISHED' as const,
   NOT: demoCourseWhere,
 };
+
+/** A hidden root also hides its children from public navigation and filters. */
+export const publicCategoryWhere = {
+  is_active: true,
+  OR: [{ parent_id: null }, { parent: { is: { is_active: true, parent_id: null } } }],
+};

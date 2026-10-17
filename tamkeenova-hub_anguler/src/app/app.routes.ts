@@ -343,6 +343,11 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'course-categories',
+        data: { seo: { titleKey: 'admin_nav.course_categories', descriptionKey: 'seo.portal.description' } },
+        loadComponent: () => import('../features/portal/admin/course-categories/course-categories.component').then(m => m.CourseCategoriesComponent),
+      },
+      {
         path: 'users',
         data: { seo: { titleKey: 'admin_users.title', descriptionKey: 'seo.portal.description' } },
         loadComponent: () =>

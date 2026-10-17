@@ -1,8 +1,17 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
+import { catchError, map, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-/** Trainers author courses; they do not enter the learner checkout/library journey. */
-export const courseLearnerGuard: CanActivateFn = () =>
-  inject(AuthService).role() === 'TRAINER'
-    ? inject(Router).createUrlTree(['/portal/trainer/courses'])
-    : true;
+import { courseManagementRoute } from '../utils/course-role';
+/** Revalidate the current role; admins review, trainers author, learners enroll. */
+export const courseLearnerGuard: CanActivateFn = () => {
+  const auth = inject(AuthService),
+    router = inject(Router);
+  return auth.syncSession().pipe(
+    map((user) => {
+      const destination = courseManagementRoute(user.role);
+      return destination ? router.createUrlTree([destination]) : true;
+    }),
+    catchError(() => of(router.createUrlTree(['/login']))),
+  );
+};

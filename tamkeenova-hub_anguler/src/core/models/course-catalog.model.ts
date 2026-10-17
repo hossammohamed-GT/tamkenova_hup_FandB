@@ -13,6 +13,8 @@ export interface CourseCategory {
   courses_count?: number;
   parent_id?: string | null;
   children?: CourseCategory[];
+  display_order?: number;
+  is_active?: boolean;
 }
 
 export interface CourseInstructor {
