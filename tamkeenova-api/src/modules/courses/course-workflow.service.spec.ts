@@ -781,3 +781,38 @@ it('a draft with unfinished lesson video cannot be submitted or notify administr
   expect(db.courses.updateMany).not.toHaveBeenCalled();
   expect(db.notifications.createMany).not.toHaveBeenCalled();
 });
+
+it('submission reports deterministic nested description/video/duration paths before changing state', async () => {
+  const { db, service } = setup();
+  teacher(db);
+  db.courses.findFirst.mockResolvedValue({
+    ...course,
+    status: 'DRAFT',
+    review_status: 'DRAFT',
+    description_en: '',
+  });
+  db.course_sections.findMany.mockResolvedValue([
+    {
+      lessons: [
+        { media_url: '', duration_minutes: 0 },
+        { media_url: course.preview_video_url, duration_minutes: -1 },
+      ],
+    },
+  ]);
+  const result = await service
+    .submitCourse('teacher', 'course')
+    .catch((error) => error.getResponse());
+  expect(Object.keys(result.field_errors).sort()).toEqual([
+    'description_en',
+    'sections.0.lessons.0.duration_minutes',
+    'sections.0.lessons.0.media_url',
+    'sections.0.lessons.1.duration_minutes',
+  ]);
+  expect(db.course_sections.findMany).toHaveBeenCalledWith({
+    where: { course_id: 'course' },
+    orderBy: { position: 'asc' },
+    include: { lessons: { orderBy: { position: 'asc' } } },
+  });
+  expect(db.courses.updateMany).not.toHaveBeenCalled();
+  expect(db.notifications.createMany).not.toHaveBeenCalled();
+});

@@ -1,3 +1,6 @@
+import { FormFeedback } from '../../shared/forms/form-feedback';
+import { INLINE_ERRORS } from '../../shared/forms/inline-errors.directive';
+import type { NgForm } from '@angular/forms';
 import { Component, DestroyRef, effect, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -15,7 +18,7 @@ import {
   selector: 'app-course-learning-actions',
   host: { class: 'learning-widget' },
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [...INLINE_ERRORS, FormsModule, RouterLink],
   templateUrl: './course-learning-actions.component.html',
   styleUrl: './workflow.css',
 })
@@ -30,6 +33,7 @@ export class CourseLearningActionsComponent {
   loading = signal(false);
   busy = signal(false);
   error = signal('');
+  readonly feedback = new FormFeedback();
   nameAr = '';
   nameEn = '';
   constructor() {
@@ -104,7 +108,8 @@ export class CourseLearningActionsComponent {
         },
       });
   }
-  request() {
+  request(form?: NgForm) {
+    if (!this.feedback.validate(form)) return;
     this.busy.set(true);
     this.api
       .requestCompletion(this.course().id, {
@@ -119,7 +124,7 @@ export class CourseLearningActionsComponent {
         },
         error: (e) => {
           this.busy.set(false);
-          this.error.set(workflowError(e));
+          this.feedback.fail(e);
         },
       });
   }

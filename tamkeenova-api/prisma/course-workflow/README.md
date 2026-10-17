@@ -154,3 +154,43 @@ PDF test renders/downloads the real existing template. Unit/HTTP tests mock Pris
 PGlite executes the SQL constraints, not a deployed Prisma connection. These checks do not
 claim production DB deployment, actual transfer receipt, email delivery or live YouTube
 embedding availability.
+
+## Field-level validation and mismatched deployment versions
+
+API validation now includes `field_errors` keyed by exact paths such as
+`short_description_ar` or `sections.0.lessons.1.description_en`, alongside the
+backward-compatible `message` array. The shared application validation pipe
+keeps whitelisting/unknown-field rejection enabled and omits target/value data.
+The global exception filter preserves those paths. Course business validation
+also identifies the affected intro, cover, category, chapter/lesson, account,
+transfer date, review reference/amount and rejection note where applicable.
+
+The authoring, checkout, admin operations and completion-name forms use shared
+`FormFeedback` + `INLINE_ERRORS` helpers. Local errors show after blur or an
+attempted submission; server errors render beneath the matching field with
+`aria-invalid` / `aria-describedby`. Focus scrolls to the first problem. Unmapped,
+permission/network/conflict errors stay beside the relevant form/action, not in
+a page-wide list. Dynamic lesson paths use current indices; reorder/removal clears
+stale errors. Entries remain in the open form after a failed request. No automatic
+POST retry, silent field removal or local-storage draft persistence is performed.
+
+If a server returns **`property short_description_ar should not exist`** (likewise
+`short_description_en`, `content_type` or nested lesson descriptions), the API
+that received the request does not support the current authoring contract. These
+fields already have validators in `CourseDraftDto` / `LessonDraftDto` in this
+branch; regression tests send both lessons' descriptions through Nest's actual
+validation pipeline. Do not remove the fields or turn off whitelisting to bypass it.
+
+**Deploy the backend and frontend from the same revision.** A frontend-only deploy
+or restarting an old `dist` build cannot fix this. For local development, stop the
+old API process, pull/update the working branch, install its dependencies if needed,
+and run `npm run start:dev` from `tamkeenova-api`. In production, run `npm ci` and
+`npm run build` on that revision, then restart/redeploy the API service using your
+normal hosting process. Verify the frontend `/api` proxy points at that updated
+service. Follow the existing additive schema deployment steps above if not already
+applied; this validation fix itself adds no schema changes and requires no reset.
+
+The browser also recognizes the legacy nested whitelist error format, highlights
+the corresponding fields, and gives an explicit matching-backend deployment notice
+without discarding the submitted metadata. The coding sandbox does not control
+or verify the user's running/deployed API process.

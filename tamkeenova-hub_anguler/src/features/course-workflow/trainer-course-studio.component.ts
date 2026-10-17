@@ -1,3 +1,6 @@
+import { FormFeedback } from '../../shared/forms/form-feedback';
+import { INLINE_ERRORS } from '../../shared/forms/inline-errors.directive';
+import type { NgForm } from '@angular/forms';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,7 +22,7 @@ import { YoutubePlayerComponent } from '../../shared/components/youtube-player/y
 @Component({
   selector: 'app-trainer-course-studio',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, YoutubePlayerComponent],
+  imports: [...INLINE_ERRORS, CommonModule, FormsModule, RouterLink, YoutubePlayerComponent],
   templateUrl: './trainer-course-studio.component.html',
   styleUrl: './workflow.css',
 })
@@ -37,6 +40,7 @@ export class TrainerCourseStudioComponent {
   loading = signal(true);
   busy = signal(false);
   error = signal('');
+  readonly feedback = new FormFeedback();
   success = signal('');
   editor = signal(false);
   editingId: string | undefined;
@@ -52,7 +56,7 @@ export class TrainerCourseStudioComponent {
     });
   }
   loadCategories() {
-    this.error.set('');
+    this.feedback.clearField('category_id');
     this.categoriesLoading.set(true);
     this.catalog
       .getCategories()
@@ -65,7 +69,7 @@ export class TrainerCourseStudioComponent {
         },
         error: (e) => {
           this.categoriesLoading.set(false);
-          this.error.set(workflowError(e));
+          this.feedback.setField('category_id', workflowError(e));
         },
       });
   }
@@ -97,6 +101,7 @@ export class TrainerCourseStudioComponent {
   move<T>(rows: T[], index: number, offset: number) {
     const target = index + offset;
     if (target < 0 || target >= rows.length) return;
+    this.feedback.reset();
     [rows[index], rows[target]] = [rows[target], rows[index]];
   }
 
@@ -170,6 +175,7 @@ export class TrainerCourseStudioComponent {
       )
     )
       return;
+    this.feedback.reset();
     this.selectedCategoryId = '';
     this.preview.set('');
     this.editingId = undefined;
@@ -180,6 +186,7 @@ export class TrainerCourseStudioComponent {
     this.success.set('');
   }
   edit(course: WorkflowCourse) {
+    this.feedback.reset();
     this.busy.set(true);
     this.api
       .course(course.id)
@@ -226,8 +233,8 @@ export class TrainerCourseStudioComponent {
         },
       });
   }
-  save(submitAfterSave = false) {
-    if (this.busy()) return;
+  save(submitAfterSave = false, form?: NgForm) {
+    if (this.busy() || !this.feedback.validate(form)) return;
     this.busy.set(true);
     this.error.set('');
     this.api
@@ -254,8 +261,7 @@ export class TrainerCourseStudioComponent {
                 },
                 error: (e) => {
                   this.busy.set(false);
-                  this.error.set(workflowError(e));
-                  this.load();
+                  this.feedback.fail(e);
                 },
               });
             return;
@@ -272,11 +278,17 @@ export class TrainerCourseStudioComponent {
         },
         error: (e) => {
           this.busy.set(false);
-          this.error.set(workflowError(e));
+          this.feedback.fail(e);
         },
       });
   }
+  private readonly rowFeedback = new Map<string, FormFeedback>();
+  feedbackFor(id: string) {
+    if (!this.rowFeedback.has(id)) this.rowFeedback.set(id, new FormFeedback());
+    return this.rowFeedback.get(id)!;
+  }
   submit(course: WorkflowCourse) {
+    this.feedbackFor(course.id).reset();
     this.busy.set(true);
     this.error.set('');
     this.api
@@ -292,11 +304,16 @@ export class TrainerCourseStudioComponent {
         },
         error: (e) => {
           this.busy.set(false);
-          this.error.set(workflowError(e));
+          this.feedbackFor(course.id).fail(e);
         },
       });
   }
   review(row: WorkflowEnrollment, approve: boolean) {
+    this.feedbackFor(row.id).reset();
+    if (!approve && !this.completionNotes[row.id]?.trim()) {
+      this.feedbackFor(row.id).setField('note', this.t('سبب القرار مطلوب', 'A reason is required'));
+      return;
+    }
     this.busy.set(true);
     this.error.set('');
     this.api
@@ -323,7 +340,7 @@ export class TrainerCourseStudioComponent {
         },
         error: (e) => {
           this.busy.set(false);
-          this.error.set(workflowError(e));
+          this.feedbackFor(row.id).fail(e);
         },
       });
   }

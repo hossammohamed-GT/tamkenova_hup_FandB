@@ -70,7 +70,12 @@
         @if (enrollment.completion_note) {
           <p class="notice">{{ enrollment.completion_note }}</p>
         }
-        <form class="completion-names" (ngSubmit)="request()" #completionForm="ngForm">
+        <form
+          class="completion-names"
+          [appFormFeedback]="feedback"
+          (ngSubmit)="request(completionForm)"
+          #completionForm="ngForm"
+        >
           <p class="muted">
             {{
               t(
@@ -84,6 +89,7 @@
               >{{ t('اسمك بالعربي', 'Arabic recipient name')
               }}<input
                 name="nameAr"
+                fieldPath="recipient_name_ar"
                 [(ngModel)]="nameAr"
                 required
                 minlength="2"
@@ -93,6 +99,7 @@
               >{{ t('اسمك بالإنجليزي', 'English recipient name')
               }}<input
                 name="nameEn"
+                fieldPath="recipient_name_en"
                 [(ngModel)]="nameEn"
                 required
                 minlength="2"
@@ -100,7 +107,7 @@
                 dir="ltr"
             /></label>
           </div>
-          <button class="gold" type="submit" [disabled]="busy() || completionForm.invalid">
+          <button class="gold" type="submit" [disabled]="busy()">
             {{ t('طلب اعتماد الإتمام من الأستاذ', 'Request instructor completion approval') }}
           </button>
         </form>

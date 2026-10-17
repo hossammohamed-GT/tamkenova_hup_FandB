@@ -1,4 +1,10 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { LoggerService } from '../logger/logger.service';
 
 @Catch()
@@ -8,15 +14,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const response = host.switchToHttp().getResponse();
     const request = host.switchToHttp().getRequest();
-    let status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
-    if (!Number.isInteger(status) || status < 100 || status > 599) status = HttpStatus.INTERNAL_SERVER_ERROR;
+    let status =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
+    if (!Number.isInteger(status) || status < 100 || status > 599)
+      status = HttpStatus.INTERNAL_SERVER_ERROR;
 
     if (exception instanceof HttpException) {
       const body = exception.getResponse();
       const message =
         typeof body === 'string'
           ? body
-          : (body as { message?: string | string[] }).message ?? exception.message;
+          : ((body as { message?: string | string[] }).message ??
+            exception.message);
       this.logger.logError({
         event: 'HTTP_EXCEPTION',
         error: exception,
@@ -27,13 +38,27 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       response.status(status).json({
         success: false,
         message,
-        error_code: status === 401 ? 'UNAUTHORIZED' : status === 403 ? 'FORBIDDEN' : 'REQUEST_FAILED',
+        ...(typeof body === 'object' && 'field_errors' in body
+          ? { field_errors: body.field_errors }
+          : {}),
+        error_code:
+          typeof body === 'object' && 'field_errors' in body
+            ? 'VALIDATION_FAILED'
+            : status === 401
+              ? 'UNAUTHORIZED'
+              : status === 403
+                ? 'FORBIDDEN'
+                : 'REQUEST_FAILED',
       });
       return;
     }
 
-    const rawMessage = exception instanceof Error ? exception.message : 'Unknown error';
-    const infrastructure = /P1001|database|supabase|storage|fetch failed|ENOTFOUND|ECONNREFUSED|timeout/i.test(rawMessage);
+    const rawMessage =
+      exception instanceof Error ? exception.message : 'Unknown error';
+    const infrastructure =
+      /P1001|database|supabase|storage|fetch failed|ENOTFOUND|ECONNREFUSED|timeout/i.test(
+        rawMessage,
+      );
     const safeMessage = infrastructure
       ? 'A temporary service problem occurred. Please try again shortly.'
       : 'The request could not be completed.';

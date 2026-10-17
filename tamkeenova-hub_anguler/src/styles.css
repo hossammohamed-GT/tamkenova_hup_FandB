@@ -1196,3 +1196,14 @@ body.route-enter router-outlet + * {
   from { opacity: 0.72; transform: scale(1.075); }
   to { opacity: 1; transform: scale(1); }
 }
+
+/* Shared inline feedback: directly below the affected control, in RTL and LTR. */
+.field-error, .form-feedback-error {
+  display: block; color: var(--color-error, #c43838); font-size: .875rem;
+  line-height: 1.6; margin-block: .35rem .65rem; overflow-wrap: anywhere;
+}
+.field-error[hidden], .form-feedback-error[hidden] { display: none; }
+[aria-invalid="true"] { outline: 2px solid var(--color-error, #c43838); outline-offset: 2px; }
+[data-theme="dark"] .field-error, [data-theme="dark"] .form-feedback-error { color: #ffadad; }
+
+.form-feedback-fields { border: 0; padding: 0; margin: 0; min-width: 0; }

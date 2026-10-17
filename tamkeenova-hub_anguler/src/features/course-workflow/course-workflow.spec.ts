@@ -166,7 +166,7 @@ describe('Checkout state and safe report submission', () => {
     component.transferredAt = 'invalid';
     expect(() => component.submit()).not.toThrow();
     expect(api.report).not.toHaveBeenCalled();
-    expect(component.error()).toBeTruthy();
+    expect(component.feedback.fields()['transferred_at']).toBeTruthy();
   });
 });
 describe('Workflow notification routing and errors', () => {

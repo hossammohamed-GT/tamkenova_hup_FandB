@@ -1,3 +1,7 @@
+import {
+  invalidField,
+  fieldValidationException,
+} from '../../common/validation/field-validation';
 import { publicCourseWhere } from './public-course-policy';
 import {
   BadRequestException,
@@ -185,15 +189,25 @@ export class CourseWorkflowService {
       ) > 500
     )
       throw new BadRequestException('A course supports up to 500 lessons');
-    if (dto.preview_video_url) requireYoutube(dto.preview_video_url);
+    if (dto.preview_video_url)
+      requireYoutube(dto.preview_video_url, 'preview_video_url');
     if (
       dto.cover_image_url &&
       !/^https:\/\/[^\s]+$|^\/(?!\/)[^\s]*$/.test(dto.cover_image_url)
     )
-      throw new BadRequestException('Invalid cover URL');
-    for (const section of dto.sections)
-      for (const lesson of section.lessons)
-        if (lesson.media_url) requireYoutube(lesson.media_url);
+      invalidField(
+        'cover_image_url',
+        'أدخل رابط صورة HTTPS أو مسار صورة من الموقع / Use an HTTPS or site-relative cover URL',
+      );
+    dto.sections.forEach((section, s) =>
+      section.lessons.forEach((lesson, l) => {
+        if (lesson.media_url)
+          requireYoutube(
+            lesson.media_url,
+            `sections.${s}.lessons.${l}.media_url`,
+          );
+      }),
+    );
     return this.mutate(async (tx) => {
       const trainer = await this.trainer(tx, userId);
       let original:
@@ -214,15 +228,20 @@ export class CourseWorkflowService {
       const category = await tx.course_categories.findFirst({
         where: { id: dto.category_id, is_active: true },
       });
-      if (!category) throw new BadRequestException('Select an active category');
+      if (!category)
+        invalidField(
+          'category_id',
+          'اختر تصنيفًا نشطًا من الكتالوج / Select an active category',
+        );
       if (
         category.parent_id &&
         !(await tx.course_categories.findFirst({
           where: { id: category.parent_id, parent_id: null, is_active: true },
         }))
       )
-        throw new BadRequestException(
-          'Select a subcategory belonging to an active main category',
+        invalidField(
+          'category_id',
+          'اختر تصنيفًا فرعيًا تابعًا لمجال نشط / Select a subcategory belonging to an active main category',
         );
       const lessons = dto.sections.flatMap((s) => s.lessons);
       const duration = lessons.reduce((n, l) => n + l.duration_minutes, 0);
@@ -342,21 +361,43 @@ export class CourseWorkflowService {
         training_hours: Math.max(1, Math.ceil(course.duration_minutes / 60)),
         issued_at: new Date().toISOString().slice(0, 10),
       });
-      requireYoutube(course.preview_video_url || '');
-      if (!course.description_ar?.trim() || !course.description_en?.trim())
-        throw new BadRequestException('Both course descriptions are required');
+      requireYoutube(course.preview_video_url || '', 'preview_video_url');
+      const fields: Record<string, string[]> = {};
+      for (const field of ['description_ar', 'description_en'] as const)
+        if (!course[field]?.trim())
+          fields[field] = [
+            'الوصف مطلوب قبل الإرسال للمراجعة / Description is required before submission',
+          ];
       const sections = await tx.course_sections.findMany({
         where: { course_id: id },
-        include: { lessons: true },
+        orderBy: { position: 'asc' },
+        include: { lessons: { orderBy: { position: 'asc' } } },
       });
-      if (!sections.length || sections.some((s) => !s.lessons.length))
-        throw new BadRequestException('Every chapter must contain a lesson');
-      for (const section of sections)
-        for (const lesson of section.lessons) {
-          requireYoutube(lesson.media_url || '');
+      if (!sections.length)
+        fields.sections = [
+          'أضف جزءًا يحتوي على درس / Add a chapter containing a lesson',
+        ];
+      sections.forEach((section, s) => {
+        if (!section.lessons.length)
+          fields[`sections.${s}.lessons`] = [
+            'أضف درسًا لهذا الجزء / Add a lesson to this chapter',
+          ];
+        section.lessons.forEach((lesson, l) => {
+          const path = `sections.${s}.lessons.${l}`;
+          try {
+            requireYoutube(lesson.media_url || '', `${path}.media_url`);
+          } catch {
+            fields[`${path}.media_url`] = [
+              'أدخل رابط فيديو يوتيوب صحيح / Use a valid YouTube video URL',
+            ];
+          }
           if (lesson.duration_minutes < 1)
-            throw new BadRequestException('Set lesson durations');
-        }
+            fields[`${path}.duration_minutes`] = [
+              'حدد مدة الدرس / Set the lesson duration',
+            ];
+        });
+      });
+      if (Object.keys(fields).length) throw fieldValidationException(fields);
       const changed = await tx.courses.updateMany({
         where: {
           id,
@@ -471,16 +512,23 @@ export class CourseWorkflowService {
       instapay = dto.instapay?.trim() || null;
     const phone = /^(?:0|\+?20)1[0125]\d{8}$/;
     if (wallet && !phone.test(wallet))
-      throw new BadRequestException('Invalid Vodafone Cash phone number');
+      invalidField(
+        'vodafone_cash',
+        'رقم فودافون كاش غير صحيح / Invalid Vodafone Cash phone number',
+      );
     if (
       instapay &&
       !phone.test(instapay) &&
       !/^[-\w.+]+@[\w.-]+$/.test(instapay)
     )
-      throw new BadRequestException('Invalid InstaPay address or phone');
+      invalidField(
+        'instapay',
+        'عنوان أو رقم إنستاباي غير صحيح / Invalid InstaPay address or phone',
+      );
     if (dto.enabled && !wallet && !instapay)
-      throw new BadRequestException(
-        'Add a receiving account before enabling payments',
+      invalidField(
+        'vodafone_cash',
+        'أضف حساب فودافون كاش أو إنستاباي قبل تفعيل الدفع / Add a Vodafone Cash or InstaPay receiving account before enabling payments',
       );
     return this.mutate(async (tx) => {
       const data = {
@@ -577,7 +625,10 @@ export class CourseWorkflowService {
     dto: TransferReportDto,
   ) {
     if (dto.sender_account.trim().length < 3)
-      throw new BadRequestException('Enter the actual sender number/account');
+      invalidField(
+        'sender_account',
+        'أدخل حساب أو رقم المرسل الفعلي / Enter the actual sender number/account',
+      );
     let quote: {
       kind: string;
       user_id: string;
@@ -606,9 +657,15 @@ export class CourseWorkflowService {
       throw new BadRequestException('Invalid payment quote');
     const destination = quote.methods.find((m) => m.method === dto.method);
     if (!destination)
-      throw new BadRequestException('Payment method is not available');
+      invalidField(
+        'method',
+        'وسيلة الدفع غير متاحة / Payment method is not available',
+      );
     if (new Date(dto.transferred_at).getTime() > Date.now() + 300000)
-      throw new BadRequestException('Transfer time cannot be in the future');
+      invalidField(
+        'transferred_at',
+        'وقت التحويل لا يمكن أن يكون في المستقبل / Transfer time cannot be in the future',
+      );
     return this.mutate(async (tx) => {
       const course = await tx.courses.findFirst({
         where: { id: courseId, ...publicCourseWhere },
@@ -684,8 +741,9 @@ export class CourseWorkflowService {
           dto.confirmed_amount === undefined ||
           cents(dto.confirmed_amount) !== cents(payment.expected_amount)
         )
-          throw new BadRequestException(
-            'Confirm the exact received course price / المبلغ المستلم يجب أن يساوي سعر الطلب',
+          invalidField(
+            'confirmed_amount',
+            'المبلغ المستلم يجب أن يساوي سعر الطلب / Confirm the exact received course price',
           );
         if (payment.courses.status !== 'PUBLISHED')
           throw new ConflictException(

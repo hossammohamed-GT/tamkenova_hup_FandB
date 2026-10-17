@@ -41,12 +41,17 @@
           )
         }}
       </p>
-      <form (ngSubmit)="saveSettings()">
+      <form
+        [appFormFeedback]="feedback"
+        #settingsForm="ngForm"
+        (ngSubmit)="saveSettings(settingsForm)"
+      >
         <div class="form-grid">
           <label
             >{{ t('رقم فودافون كاش', 'Vodafone Cash number')
             }}<input
               name="wallet"
+              fieldPath="vodafone_cash"
               [(ngModel)]="settings.vodafone_cash"
               maxlength="30"
               dir="ltr"
@@ -55,6 +60,7 @@
             >{{ t('عنوان أو رقم إنستاباي', 'InstaPay address or phone')
             }}<input
               name="instapay"
+              fieldPath="instapay"
               [(ngModel)]="settings.instapay"
               maxlength="120"
               dir="ltr" /></label
@@ -62,6 +68,7 @@
             >{{ t('تعليمات الدفع بالعربي', 'Arabic payment instructions')
             }}<textarea
               name="instructions_ar"
+              fieldPath="instructions_ar"
               [(ngModel)]="settings.instructions_ar"
               maxlength="1000"
             ></textarea></label
@@ -69,13 +76,17 @@
             >{{ t('تعليمات الدفع بالإنجليزي', 'English payment instructions')
             }}<textarea
               name="instructions_en"
+              fieldPath="instructions_en"
               [(ngModel)]="settings.instructions_en"
               maxlength="1000"
             ></textarea></label
           ><label class="check"
-            ><input name="enabled" type="checkbox" [(ngModel)]="settings.enabled" />{{
-              t('تفعيل استقبال طلبات الدفع', 'Enable payment reporting')
-            }}</label
+            ><input
+              name="enabled"
+              type="checkbox"
+              fieldPath="enabled"
+              [(ngModel)]="settings.enabled"
+            />{{ t('تفعيل استقبال طلبات الدفع', 'Enable payment reporting') }}</label
           >
         </div>
         <button class="gold" type="submit" [disabled]="busy()">
@@ -118,7 +129,7 @@
       }
     </section>
     @if (selected(); as course) {
-      <section class="panel">
+      <section class="panel" [appFormFeedback]="feedback">
         <div class="row">
           <h2>{{ title(course) }}</h2>
           <button type="button" (click)="selected.set(null)">{{ t('إغلاق', 'Close') }}</button>
@@ -148,7 +159,7 @@
         @if (course.review_status === 'PENDING') {
           <label
             >{{ t('ملاحظات المراجعة — مطلوبة للرفض', 'Review notes — required to reject')
-            }}<textarea [(ngModel)]="reviewNote" maxlength="1000"></textarea>
+            }}<textarea fieldPath="note" [(ngModel)]="reviewNote" maxlength="1000"></textarea>
           </label>
           <div class="actions">
             <button class="primary" type="button" (click)="decide(true)" [disabled]="busy()">
@@ -202,7 +213,7 @@
       }
     </section>
     @if (selectedPayment(); as payment) {
-      <section class="panel">
+      <section class="panel" [appFormFeedback]="feedback">
         <div class="row">
           <h2>{{ t('مطابقة التحويل', 'Reconcile transfer') }}</h2>
           <button type="button" (click)="selectedPayment.set(null)">
@@ -238,13 +249,26 @@
           <div class="form-grid">
             <label
               >{{ t('المبلغ المستلم فعليًا بالجنيه', 'Actual amount received in EGP')
-              }}<input type="number" [(ngModel)]="confirmedAmount" min="0.01" step="0.01" /></label
+              }}<input
+                type="number"
+                fieldPath="confirmed_amount"
+                [(ngModel)]="confirmedAmount"
+                min="0.01"
+                step="0.01" /></label
             ><label
               >{{ t('رقم العملية المؤكد من الحساب', 'Confirmed reference from your account')
-              }}<input [(ngModel)]="confirmedReference" maxlength="120" dir="ltr" /></label
+              }}<input
+                fieldPath="confirmed_reference"
+                [(ngModel)]="confirmedReference"
+                maxlength="120"
+                dir="ltr" /></label
             ><label class="wide"
               >{{ t('ملاحظات — مطلوبة للرفض', 'Notes — required to reject')
-              }}<textarea [(ngModel)]="reviewNote" maxlength="1000"></textarea></label
+              }}<textarea
+                fieldPath="note"
+                [(ngModel)]="reviewNote"
+                maxlength="1000"
+              ></textarea></label
             ><label class="check wide"
               ><input type="checkbox" [(ngModel)]="acknowledged" />{{
                 t(

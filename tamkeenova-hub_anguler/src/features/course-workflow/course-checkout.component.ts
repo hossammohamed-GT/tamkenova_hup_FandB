@@ -1,3 +1,6 @@
+import { FormFeedback } from '../../shared/forms/form-feedback';
+import { INLINE_ERRORS } from '../../shared/forms/inline-errors.directive';
+import type { NgForm } from '@angular/forms';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,7 +18,7 @@ import {
 @Component({
   selector: 'app-course-checkout',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [...INLINE_ERRORS, CommonModule, FormsModule, RouterLink],
   templateUrl: './course-checkout.component.html',
   styleUrl: './workflow.css',
 })
@@ -27,6 +30,7 @@ export class CourseCheckoutComponent {
   private readonly destroy = inject(DestroyRef);
   data = signal<Checkout | null>(null);
   error = signal('');
+  readonly feedback = new FormFeedback();
   success = signal('');
   loading = signal(true);
   busy = signal(false);
@@ -117,12 +121,16 @@ export class CourseCheckoutComponent {
         },
       });
   }
-  submit() {
+  submit(form?: NgForm) {
+    if (!this.feedback.validate(form)) return;
     const data = this.data();
     if (!data?.quote_token || !this.confirmed || this.busy()) return;
     const time = new Date(this.transferredAt);
     if (!Number.isFinite(time.getTime())) {
-      this.error.set(this.t('اختار تاريخ التحويل.', 'Choose the transfer date.'));
+      this.feedback.setField(
+        'transferred_at',
+        this.t('اختار تاريخ التحويل.', 'Choose the transfer date.'),
+      );
       return;
     }
     this.busy.set(true);
@@ -151,7 +159,7 @@ export class CourseCheckoutComponent {
         },
         error: (e) => {
           this.busy.set(false);
-          this.error.set(workflowError(e));
+          this.feedback.fail(e);
         },
       });
   }

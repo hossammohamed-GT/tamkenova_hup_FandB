@@ -8,7 +8,10 @@ import {
   jest,
 } from '@jest/globals';
 import { Test } from '@nestjs/testing';
-import { ValidationPipe, type INestApplication } from '@nestjs/common';
+import { type INestApplication } from '@nestjs/common';
+import { applicationValidationPipe } from '../../common/validation/field-validation';
+import { GlobalExceptionFilter } from '../../common/filters/global-exception.filter';
+import type { LoggerService } from '../../common/logger/logger.service';
 import request from 'supertest';
 import jwt from 'jsonwebtoken';
 import { CoursesModule } from './courses.module';
@@ -72,12 +75,11 @@ describe('Workflow HTTP authentication, current roles and DTO boundary', () => {
       .compile();
     app = module.createNestApplication();
     app.setGlobalPrefix('api');
-    app.useGlobalPipes(
-      new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-      }),
+    app.useGlobalPipes(applicationValidationPipe());
+    app.useGlobalFilters(
+      new GlobalExceptionFilter({
+        logError: jest.fn(),
+      } as unknown as LoggerService),
     );
     await app.init();
   });
@@ -130,6 +132,99 @@ describe('Workflow HTTP authentication, current roles and DTO boundary', () => {
         .set('Authorization', `Bearer ${token}`)
         .expect(200);
     }
+  });
+  const detailedDraft = () => ({
+    title_ar: 'عنوان الكورس',
+    title_en: 'Course title',
+    description_ar: 'الوصف',
+    description_en: 'Description',
+    short_description_ar: 'نبذة',
+    short_description_en: 'Summary',
+    content_type: 'PODCOURSE',
+    category_id: id,
+    preview_video_url: 'https://youtu.be/5BciHXh074k',
+    cover_image_url: '',
+    price: 0,
+    language: 'ar',
+    level: 'BEGINNER',
+    sections: [
+      {
+        title_ar: 'جزء',
+        title_en: 'Chapter',
+        lessons: [
+          {
+            title_ar: 'درس',
+            title_en: 'Lesson',
+            description_ar: 'وصف الدرس',
+            description_en: 'Lesson description',
+            media_url: 'https://youtu.be/5BciHXh074k',
+            duration_minutes: 10,
+            is_preview: false,
+          },
+        ],
+      },
+    ],
+  });
+  it('accepts all seven fields reported as forbidden by the outdated deployed API, without dropping them', async () => {
+    role = 'TRAINER';
+    const draft = detailedDraft();
+    draft.sections[0].lessons.push({
+      ...draft.sections[0].lessons[0],
+      title_ar: 'الدرس الثاني',
+      title_en: 'Second lesson',
+    });
+    await request(app.getHttpServer())
+      .post('/api/course-workflow/trainer/courses')
+      .set('Authorization', `Bearer ${token}`)
+      .send(draft)
+      .expect(201);
+    expect(
+      service.saveCourse.mock.calls[0][1].sections[0].lessons,
+    ).toHaveLength(2);
+    expect(
+      service.saveCourse.mock.calls[0][1].sections[0].lessons[1],
+    ).toMatchObject({
+      description_ar: 'وصف الدرس',
+      description_en: 'Lesson description',
+    });
+    expect(service.saveCourse).toHaveBeenCalledWith(
+      id,
+      expect.objectContaining({
+        short_description_ar: 'نبذة',
+        short_description_en: 'Summary',
+        content_type: 'PODCOURSE',
+        sections: [
+          expect.objectContaining({
+            lessons: expect.arrayContaining([
+              expect.objectContaining({
+                description_ar: 'وصف الدرس',
+                description_en: 'Lesson description',
+              }),
+            ]),
+          }),
+        ],
+      }),
+    );
+  });
+  it('preserves exact nested field paths through the actual validation pipe and global exception filter, without echoing request values', async () => {
+    role = 'TRAINER';
+    const draft = detailedDraft();
+    draft.sections[0].lessons[0].duration_minutes = 0;
+    (draft.sections[0].lessons[0] as any).status = 'PUBLISHED';
+    draft.title_ar = 'x';
+    const result = await request(app.getHttpServer())
+      .post('/api/course-workflow/trainer/courses')
+      .set('Authorization', `Bearer ${token}`)
+      .send(draft)
+      .expect(400);
+    expect(result.body.error_code).toBe('VALIDATION_FAILED');
+    expect(Object.keys(result.body.field_errors).sort()).toEqual([
+      'sections.0.lessons.0.duration_minutes',
+      'sections.0.lessons.0.status',
+      'title_ar',
+    ]);
+    expect(JSON.stringify(result.body)).not.toContain('وصف الدرس');
+    expect(service.saveCourse).not.toHaveBeenCalled();
   });
   afterAll(async () => {
     await app?.close();

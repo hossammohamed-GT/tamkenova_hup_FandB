@@ -1,3 +1,4 @@
+import { invalidField } from '../../common/validation/field-validation';
 import { BadRequestException } from '@nestjs/common';
 export function cents(value: unknown): number {
   const amount = Number(value);
@@ -7,7 +8,7 @@ export function cents(value: unknown): number {
     throw new BadRequestException('Use at most two decimal places');
   return Math.round(amount * 100);
 }
-export function requireYoutube(value: string): void {
+export function requireYoutube(value: string, path?: string): void {
   try {
     const url = new URL(value);
     const parts = url.pathname.split('/').filter(Boolean);
@@ -42,20 +43,25 @@ export function requireYoutube(value: string): void {
     }
     if (!id || !/^[-\w]{11}$/.test(id)) throw new Error();
   } catch {
+    if (path)
+      invalidField(
+        path,
+        'أدخل رابط فيديو يوتيوب صحيح / Use a valid YouTube video URL',
+      );
     throw new BadRequestException(
       'Use a valid YouTube video URL / أدخل رابط فيديو يوتيوب صحيح',
     );
   }
 }
-export function requireNote(note?: string): string {
+export function requireNote(note?: string, path = 'note'): string {
   if (!note?.trim())
-    throw new BadRequestException('A reason is required / سبب القرار مطلوب');
+    invalidField(path, 'سبب القرار مطلوب / A reason is required');
   return note.trim();
 }
 export const transactionOptions = { maxWait: 60000, timeout: 60000 };
 
 export function normalizedReference(value?: string) {
-  const result = requireNote(value)
+  const result = requireNote(value, 'confirmed_reference')
     .normalize('NFKC')
     .replace(/\s+/g, '')
     .toUpperCase();
@@ -64,8 +70,9 @@ export function normalizedReference(value?: string) {
     result.length > 120 ||
     /[\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/u.test(result)
   )
-    throw new BadRequestException(
-      'Enter a valid confirmed transaction reference',
+    invalidField(
+      'confirmed_reference',
+      'أدخل رقم العملية المؤكد الصحيح / Enter a valid confirmed transaction reference',
     );
   return result;
 }

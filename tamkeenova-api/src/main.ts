@@ -1,5 +1,5 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { ValidationPipe } from '@nestjs/common';
+import { applicationValidationPipe } from './common/validation/field-validation';
 import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
@@ -38,13 +38,7 @@ async function bootstrap() {
 
   app.useGlobalFilters(new GlobalExceptionFilter(app.get(LoggerService)));
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
+  app.useGlobalPipes(applicationValidationPipe());
 
   await app.listen(process.env.PORT || 3000);
 }

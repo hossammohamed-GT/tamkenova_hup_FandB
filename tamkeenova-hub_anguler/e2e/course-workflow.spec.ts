@@ -585,5 +585,214 @@ test('instructor can retry catalog category loading without inventing local cate
   await expect(page.getByRole('button', { name: 'Reload categories', exact: true })).toHaveCount(0);
   await page.getByLabel('Main category', { exact: true }).selectOption('real-category');
   await expect(page.getByLabel('Main category', { exact: true })).toHaveValue('real-category');
-  await expect(page.locator('app-trainer-course-studio [role=alert]')).toHaveCount(0);
+  await expect(page.locator('app-trainer-course-studio [role=alert]:visible')).toHaveCount(0);
+});
+
+async function fillInstructorDraft(page: Page) {
+  await page.goto('/portal/trainer/courses?new=1');
+  await page.locator('[name=title_ar]').fill('كورس حقيقي');
+  await page.locator('[name=title_en]').fill('Real course');
+  await page.locator('[name=description_ar]').fill('وصف الكورس');
+  await page.locator('[name=description_en]').fill('Course description');
+  await page.locator('[name=short_ar]').fill('نبذة الكورس');
+  await page.locator('[name=short_en]').fill('Card summary');
+  await page.getByLabel('Main category', { exact: true }).selectOption('category');
+  await page.getByLabel('Arabic chapter title').fill('الجزء الأول');
+  await page.getByLabel('English chapter title').fill('First chapter');
+  const lesson = page.locator('.lesson-editor').first();
+  await lesson.getByLabel('Arabic title', { exact: true }).fill('درس حقيقي');
+  await lesson.getByLabel('English title', { exact: true }).fill('Real lesson');
+  await lesson.getByLabel('Arabic lesson description').fill('وصف الدرس');
+  await lesson.getByLabel('English lesson description').fill('Lesson description');
+}
+const field = (page: Page, path: string) => page.locator(`[data-field-path="${path}"]`);
+const inlineMessage = (page: Page, path: string) =>
+  field(page, path).locator('..').locator('.field-error');
+
+test('invalid authoring fields show local messages and focus the first problem instead of silently disabling save', async ({
+  page,
+}) => {
+  const { calls } = await setup(page, 'TRAINER');
+  await page.goto('/portal/trainer/courses?new=1');
+  await page.locator('[name=title_ar]').focus();
+  await page.locator('[name=title_en]').focus();
+  await expect(inlineMessage(page, 'title_ar')).toContainText('required');
+  await page.getByRole('button', { name: 'Save draft', exact: true }).click();
+  await expect(field(page, 'title_ar')).toBeFocused();
+  await expect(inlineMessage(page, 'sections.0.lessons.0.title_ar')).toContainText('required');
+  expect(calls.filter((c) => c.path.endsWith('/trainer/courses'))).toHaveLength(0);
+  await field(page, 'title_ar').fill('عنوان صحيح');
+  await expect(inlineMessage(page, 'title_ar')).toBeHidden();
+});
+
+test('the reported outdated-API errors appear beneath each affected summary/type/lesson field and preserve every entry', async ({
+  page,
+}) => {
+  await setup(page, 'TRAINER');
+  let posts = 0;
+  await page.route('**/api/course-workflow/trainer/courses', (route) => {
+    if (route.request().method() === 'GET') return route.fallback();
+    posts++;
+    return route.fulfill({
+      status: 400,
+      json: {
+        message: [
+          'property short_description_ar should not exist',
+          'property short_description_en should not exist',
+          'property content_type should not exist',
+          'sections.0.lessons.0.property description_en should not exist',
+          'sections.0.lessons.0.property description_ar should not exist',
+        ],
+      },
+    });
+  });
+  await fillInstructorDraft(page);
+  await page.getByRole('button', { name: 'Save draft', exact: true }).click();
+  for (const path of [
+    'short_description_ar',
+    'short_description_en',
+    'content_type',
+    'sections.0.lessons.0.description_ar',
+    'sections.0.lessons.0.description_en',
+  ])
+    await expect(inlineMessage(page, path)).toContainText('updated API');
+  await expect(page.locator('#course-editor form .form-feedback-error')).toContainText(
+    'API is out of date',
+  );
+  await expect(page.locator('app-trainer-course-studio > main > .error')).toHaveCount(0);
+  await expect(field(page, 'short_description_ar')).toBeFocused();
+  await expect(field(page, 'short_description_ar')).toHaveValue('نبذة الكورس');
+  await expect(field(page, 'sections.0.lessons.0.description_en')).toHaveValue(
+    'Lesson description',
+  );
+  expect(posts).toBe(1);
+});
+
+test('nested server errors point to the correct second lesson, clear on edit, and do not follow an old index on reorder', async ({
+  page,
+}) => {
+  await setup(page, 'TRAINER');
+  await page.route('**/api/course-workflow/trainer/courses', (route) =>
+    route.request().method() === 'GET'
+      ? route.fallback()
+      : route.fulfill({
+          status: 400,
+          json: {
+            field_errors: { 'sections.0.lessons.1.media_url': ['Second lesson URL is invalid'] },
+          },
+        }),
+  );
+  await fillInstructorDraft(page);
+  await page.getByRole('button', { name: 'Add lesson', exact: false }).click();
+  await expect(page.locator('.lesson-editor')).toHaveCount(2);
+  const second = page.locator('.lesson-editor').nth(1);
+  await second.getByLabel('Arabic title', { exact: true }).fill('الدرس الثاني');
+  await second.getByLabel('English title', { exact: true }).fill('Second lesson');
+  await page.getByRole('button', { name: 'Save draft', exact: true }).click();
+  await expect(inlineMessage(page, 'sections.0.lessons.1.media_url')).toHaveText(
+    'Second lesson URL is invalid',
+  );
+  await expect(field(page, 'sections.0.lessons.1.media_url')).toBeFocused();
+  await expect(page.locator('.lesson-editor').first().locator('.field-error')).toHaveCount(0);
+  await field(page, 'sections.0.lessons.1.media_url').fill('https://youtu.be/5BciHXh074k');
+  await expect(inlineMessage(page, 'sections.0.lessons.1.media_url')).toBeHidden();
+  await second.getByRole('button', { name: 'Move lesson up', exact: false }).click();
+  await expect(field(page, 'sections.0.lessons.0.title_en')).toHaveValue('Second lesson');
+  await expect(page.locator('.field-error:not([hidden])')).toHaveCount(0);
+});
+
+test('unrelated server failure stays at the save action and never clears the draft or retries writes automatically', async ({
+  page,
+}) => {
+  await setup(page, 'TRAINER');
+  let posts = 0;
+  await page.route('**/api/course-workflow/trainer/courses', (route) => {
+    if (route.request().method() === 'GET') return route.fallback();
+    posts++;
+    return route.fulfill({ status: 503, json: { message: 'Temporarily unavailable' } });
+  });
+  await fillInstructorDraft(page);
+  await page.getByRole('button', { name: 'Save draft', exact: true }).click();
+  await expect(page.locator('#course-editor form .form-feedback-error')).toHaveText(
+    'Temporarily unavailable',
+  );
+  await expect(field(page, 'title_en')).toHaveValue('Real course');
+  expect(posts).toBe(1);
+});
+
+test('checkout report validation is rendered beneath the actual transferred amount', async ({
+  page,
+}) => {
+  await setup(page);
+  await page.route('**/api/course-workflow/checkout/*/report', (route) =>
+    route.fulfill({
+      status: 400,
+      json: { field_errors: { reported_amount: ['Enter the exact transferred amount'] } },
+    }),
+  );
+  await page.goto('/programs/course/' + sample.slug + '/checkout');
+  await page.locator('[name=sender]').fill('01012345678');
+  await page.locator('[name=time]').fill('2026-10-17T09:00');
+  await page.locator('[name=confirmed]').check();
+  await page.getByRole('button', { name: 'Submit for review', exact: true }).click();
+  await expect(inlineMessage(page, 'reported_amount')).toHaveText(
+    'Enter the exact transferred amount',
+  );
+  await expect(field(page, 'reported_amount')).toBeFocused();
+});
+
+test('admin payment settings errors stay beneath the affected receiving account', async ({
+  page,
+}) => {
+  await setup(page, 'ADMIN');
+  await page.route('**/api/course-workflow/admin/settings', (route) =>
+    route.request().method() === 'GET'
+      ? route.fallback()
+      : route.fulfill({
+          status: 400,
+          json: { field_errors: { vodafone_cash: ['Invalid receiving wallet'] } },
+        }),
+  );
+  await page.goto('/portal/admin/course-workflow');
+  await page.getByRole('button', { name: 'Payment settings', exact: true }).click();
+  await page.getByRole('button', { name: 'Save settings', exact: true }).click();
+  await expect(inlineMessage(page, 'vodafone_cash')).toHaveText('Invalid receiving wallet');
+  await expect(field(page, 'vodafone_cash')).toBeFocused();
+});
+
+test('completion name errors stay in the recipient form instead of the course header', async ({
+  page,
+}) => {
+  const { state } = await setup(page);
+  state.learning = true;
+  state.progress = 100;
+  await page.route('**/api/course-workflow/learning/*/completion', (route) =>
+    route.fulfill({
+      status: 400,
+      json: { field_errors: { recipient_name_en: ['Enter your full English certificate name'] } },
+    }),
+  );
+  await page.goto('/programs/course/' + sample.slug);
+  await page.getByLabel('Arabic recipient name').fill('ليلى أحمد');
+  await page.getByLabel('English recipient name').fill('Layla');
+  await page.getByRole('button', { name: 'Request instructor completion approval' }).click();
+  await expect(inlineMessage(page, 'recipient_name_en')).toHaveText(
+    'Enter your full English certificate name',
+  );
+  await expect(field(page, 'recipient_name_en')).toBeFocused();
+  await expect(field(page, 'recipient_name_ar')).toHaveValue('ليلى أحمد');
+});
+
+test('Arabic mobile validation is readable directly beneath the field without horizontal overflow', async ({
+  page,
+}) => {
+  await setup(page, 'TRAINER', 'ar');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/portal/trainer/courses?new=1');
+  await page.getByRole('button', { name: 'حفظ المسودة', exact: true }).click();
+  await expect(inlineMessage(page, 'title_ar')).toHaveText('هذا الحقل مطلوب.');
+  await expect(field(page, 'title_ar')).toBeFocused();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  const id = await field(page, 'title_ar').getAttribute('aria-describedby');
+  await expect(page.locator('#' + id)).toHaveText('هذا الحقل مطلوب.');
 });

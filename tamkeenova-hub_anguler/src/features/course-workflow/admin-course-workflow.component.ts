@@ -1,3 +1,6 @@
+import { FormFeedback } from '../../shared/forms/form-feedback';
+import { INLINE_ERRORS } from '../../shared/forms/inline-errors.directive';
+import type { NgForm } from '@angular/forms';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,7 +21,7 @@ import { YoutubePlayerComponent } from '../../shared/components/youtube-player/y
 @Component({
   selector: 'app-admin-course-workflow',
   standalone: true,
-  imports: [CommonModule, FormsModule, AdminNavComponent, YoutubePlayerComponent],
+  imports: [...INLINE_ERRORS, CommonModule, FormsModule, AdminNavComponent, YoutubePlayerComponent],
   templateUrl: './admin-course-workflow.component.html',
   styleUrl: './workflow.css',
 })
@@ -35,6 +38,7 @@ export class AdminCourseWorkflowComponent {
   busy = signal(false);
   loading = signal(false);
   error = signal('');
+  readonly feedback = new FormFeedback();
   success = signal('');
   settings: CheckoutSettings = {
     enabled: false,
@@ -111,11 +115,13 @@ export class AdminCourseWorkflowComponent {
     this.tab.set(tab);
     this.selected.set(null);
     this.selectedPayment.set(null);
+    this.feedback.reset();
     this.error.set('');
     this.success.set('');
     if (tab !== 'settings') this.load();
   }
   open(course: WorkflowCourse) {
+    this.feedback.reset();
     this.busy.set(true);
     this.api
       .course(course.id, true)
@@ -134,6 +140,7 @@ export class AdminCourseWorkflowComponent {
       });
   }
   run(request: Observable<unknown>, message: string) {
+    this.feedback.reset();
     this.busy.set(true);
     this.error.set('');
     request.pipe(takeUntilDestroyed(this.destroy)).subscribe({
@@ -146,7 +153,7 @@ export class AdminCourseWorkflowComponent {
       },
       error: (e) => {
         this.busy.set(false);
-        this.error.set(workflowError(e));
+        this.feedback.fail(e);
       },
     });
   }
@@ -162,6 +169,7 @@ export class AdminCourseWorkflowComponent {
     );
   }
   openPayment(payment: Transfer) {
+    this.feedback.reset();
     this.selectedPayment.set(payment);
     this.reviewNote = '';
     this.confirmedReference = '';
@@ -187,7 +195,8 @@ export class AdminCourseWorkflowComponent {
       ),
     );
   }
-  saveSettings() {
+  saveSettings(form?: NgForm) {
+    if (!this.feedback.validate(form)) return;
     this.run(
       this.api.saveSettings(this.settings),
       this.t('اتحفظت بيانات الدفع.', 'Payment settings saved.'),
