@@ -10,6 +10,7 @@ import { TrainerCardComponent } from './trainer-card.component';
 import { Trainer } from '../../../core/models/trainer.model';
 import { trainerVisual, safePublicLink } from './trainer-visual';
 import { SavedTrainersService } from '../../../core/services/saved-trainers.service';
+import { DEFAULT_TRAINER_PORTRAIT } from '../../directives/trainer-portrait.directive';
 
 describe('Geometric instructor card real data and semantics', () => {
   beforeEach(async () => {
@@ -59,8 +60,12 @@ describe('Geometric instructor card real data and semantics', () => {
       '/team/real-instructor',
     );
     expect(f.nativeElement.textContent).not.toContain('Featured instructor');
-    expect(f.nativeElement.querySelector('.trainer-photo-link img')).toBeNull();
-    expect(f.nativeElement.querySelector('.trainer-avatar-fallback').textContent).toContain('RI');
+    expect(f.nativeElement.querySelector('.trainer-photo-link img').getAttribute('src')).toBe(
+      DEFAULT_TRAINER_PORTRAIT,
+    );
+    expect(f.nativeElement.querySelector('.trainer-photo-link img').classList).toContain(
+      'is-default-portrait',
+    );
   });
   it('uses the selected language rather than always preferring the Arabic biography', () => {
     const f = create();

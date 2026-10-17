@@ -4,13 +4,14 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TrainersService } from '../../core/services/trainers.service';
 import { Trainer } from '../../core/models/trainer.model';
+import { TrainerPortraitDirective } from '../../shared/directives/trainer-portrait.directive';
 import { TrainerCardComponent } from '../../shared/components/trainer-card/trainer-card.component';
 import { BookingService } from '../../core/services/booking.service';
 
 @Component({
   selector: 'app-team',
   standalone: true,
-  imports: [TranslatePipe, DecimalPipe, TrainerCardComponent],
+  imports: [TranslatePipe, DecimalPipe, TrainerCardComponent, TrainerPortraitDirective],
   templateUrl: './team.component.html',
   styleUrl: './team.component.css',
 })
@@ -38,10 +39,10 @@ export class TeamComponent implements OnInit {
       ).values(),
     ),
   );
+  // Four decorative slots keep the hero balanced even without uploaded photos.
+  // These are illustrations, not extra instructors or fabricated catalog data.
   readonly portraits = computed(() =>
-    this.trainers()
-      .filter((t) => t.users?.profile_image)
-      .slice(0, 4),
+    Array.from({ length: 4 }, (_, index) => this.trainers()[index]?.users?.profile_image ?? null),
   );
   readonly studentCount = computed(() =>
     this.trainers().reduce((sum, t) => sum + (t.total_students || 0), 0),

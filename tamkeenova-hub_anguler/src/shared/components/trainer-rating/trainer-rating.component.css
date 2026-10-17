@@ -133,3 +133,23 @@ a:focus-visible {
     transform: none !important;
   }
 }
+
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .rating-popover {
+    background:
+      linear-gradient(135deg, #ffffff1f, #ffffff03),
+      color-mix(in srgb, var(--color-surface) 88%, transparent);
+    -webkit-backdrop-filter: blur(20px) saturate(130%);
+    backdrop-filter: blur(20px) saturate(130%);
+    box-shadow:
+      0 12px 35px #062d3930,
+      inset 0 1px 0 #ffffff45;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .rating-popover {
+    background: var(--color-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}

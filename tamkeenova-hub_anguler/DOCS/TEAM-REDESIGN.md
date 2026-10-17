@@ -13,6 +13,23 @@
 - Arabic/English, RTL/LTR, light/dark, keyboard interaction, reduced motion and
   narrow/mobile layouts are covered by automated tests.
 
+## Frosted glass and default portraits
+
+- Directory hero, filter toolbar, geometric shared instructor cards, profile
+  overview/sidebar panels, profile hero summary, sticky tabs and rating popovers
+  use translucent surfaces, backdrop blur, fine highlight borders and restrained
+  shadows. Theme-local muted text remains readable in dark mode. No text or
+  actionable content is blurred. Opaque fallbacks cover browsers without blur
+  support and the `prefers-reduced-transparency` accessibility preference.
+- Missing, blank and failed image URLs use the original local
+  `/assets/trainers/default-portrait.svg` illustration. Uploaded portraits keep
+  priority. The same directive covers home/shared cards, the directory collage,
+  both profile portraits and learner-portal avatars; updated image inputs can
+  recover from an earlier failed image without a reload.
+- The hero always has four decorative slots, including with zero/one instructor,
+  without changing real instructor counts or introducing fictional profiles.
+  See `public/assets/trainers/README.md` for asset provenance.
+
 ## Rating contract
 
 Deploy the frontend and API together.

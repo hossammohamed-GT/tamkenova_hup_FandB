@@ -337,9 +337,14 @@ test('directory distinguishes a failed request, a real empty catalog, and image 
   await page.unroute('**/api/trainers');
   await page.route('**/test-portraits/**', (route) => route.abort());
   await page.reload();
-  await expect(page.locator('.trainer-avatar-fallback')).toHaveCount(8);
+  await expect(page.locator('.trainer-photo-link img.is-default-portrait')).toHaveCount(8);
+  await expect(page.locator('.hero-portrait img.is-default-portrait')).toHaveCount(4);
   await page.locator('.trainer-card-view-details').first().click();
-  await expect(page.locator('.profile-portrait')).toContainText('AR');
+  await expect(page.locator('.profile-portrait img')).toHaveAttribute(
+    'src',
+    '/assets/trainers/default-portrait.svg',
+  );
+  await expect(page.locator('.profile-message-image img.is-default-portrait')).toHaveCount(1);
 });
 test('the learner portal uses the same server-backed read-only rating state', async ({ page }) => {
   const api = await setup(page, { already: true });
@@ -348,13 +353,161 @@ test('the learner portal uses the same server-backed read-only rating state', as
   );
   await page.route('**/api/students/trainers?**', (route) =>
     route.fulfill({
-      json: { success: true, data: [trainers[0]], meta: { total: 1, totalPages: 1 } },
+      json: {
+        success: true,
+        data: [{ ...trainers[0], users: { ...trainers[0].users, profile_image: null } }],
+        meta: { total: 1, totalPages: 1 },
+      },
     }),
   );
   await page.goto('/portal/student/trainers');
+  await expect(page.locator('.trainer-avatar.is-default-portrait')).toHaveCount(1);
   const zone = page.locator('app-trainer-rating').first();
   await zone.locator('.rating-trigger').click();
   await expect(zone.locator('.already-rated')).toBeVisible();
   await expect(zone.locator('.rating-star-btn')).toHaveCount(0);
   expect(api.posts()).toBe(0);
+});
+
+for (const [language, width, theme] of [
+  ['en', 1440, 'light'],
+  ['ar', 320, 'light'],
+  ['en', 390, 'dark'],
+  ['ar', 1440, 'dark'],
+] as const) {
+  test(`default portraits and frosted glass remain complete: ${language} ${width}px ${theme}`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.addInitScript((theme) => localStorage.setItem('tamkeenova-theme', theme), theme);
+    await setup(page, { language });
+    const withoutPhotos = trainers.map((trainer, index) => ({
+      ...trainer,
+      users: { ...trainer.users, profile_image: index % 2 ? '' : null },
+    }));
+    await page.route('**/api/trainers', (route) =>
+      route.fulfill({ json: { success: true, data: withoutPhotos } }),
+    );
+    await page.route('**/api/trainers/profile/**', (route) =>
+      route.fulfill({ json: { success: true, data: withoutPhotos[0] } }),
+    );
+    await page.goto('/team');
+    await expect(page.locator('.trainer-photo-link img.is-default-portrait')).toHaveCount(8);
+    await expect(page.locator('.hero-portrait img.is-default-portrait')).toHaveCount(4);
+    await expect
+      .poll(() =>
+        page
+          .locator('.hero-portrait img')
+          .evaluateAll((images) =>
+            images.every((image) => (image as HTMLImageElement).naturalWidth > 0),
+          ),
+      )
+      .toBe(true);
+    expect(
+      await page.locator('.team-toolbar').evaluate((el) => getComputedStyle(el).backdropFilter),
+    ).toContain('blur');
+    expect(
+      await page
+        .locator('.trainer-card-body')
+        .first()
+        .evaluate((el) => getComputedStyle(el, '::before').backdropFilter),
+    ).toContain('blur');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
+      true,
+    );
+    await page.evaluate(() => document.fonts.ready);
+    await page.screenshot({
+      path: info.outputPath('default-instructors.png'),
+      fullPage: true,
+      animations: 'disabled',
+    });
+    const card = page.locator('.trainer-card').first();
+    await card.locator('.rating-trigger').click();
+    await expect(card.locator('.rating-star-btn')).toHaveCount(5);
+    const popup = await card.locator('.rating-popover').boundingBox();
+    const trigger = await card.locator('.rating-trigger').boundingBox();
+    expect(popup!.y + popup!.height).toBeLessThanOrEqual(trigger!.y);
+    await card.locator('.rating-trigger').press('Escape');
+    await card.locator('.trainer-card-view-details').click();
+    await expect(page.locator('h1')).toHaveText(names[0]);
+    await expect(page.locator('.profile-portrait img.is-default-portrait')).toHaveCount(1);
+    await expect(page.locator('.profile-message-image img.is-default-portrait')).toHaveCount(1);
+    if (width <= 600) {
+      const side = await page.locator('.profile-side').boundingBox();
+      const message = await page.locator('.profile-message').boundingBox();
+      expect(message!.width).toBeGreaterThanOrEqual(side!.width - 2);
+    }
+
+    await expect
+      .poll(() =>
+        page
+          .locator('.profile-portrait img')
+          .evaluate((image) => (image as HTMLImageElement).naturalWidth),
+      )
+      .toBeGreaterThan(0);
+    expect(
+      await page
+        .locator('.profile-panel')
+        .first()
+        .evaluate((el) => getComputedStyle(el).backdropFilter),
+    ).toContain('blur');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
+      true,
+    );
+    await page.screenshot({
+      path: info.outputPath('default-instructor-profile.png'),
+      fullPage: true,
+      animations: 'disabled',
+    });
+  });
+}
+
+test('one real instructor keeps the decorative collage balanced without inventing instructor counts', async ({
+  page,
+}) => {
+  await setup(page);
+  await page.route('**/api/trainers', (route) =>
+    route.fulfill({ json: { success: true, data: [trainers[0]] } }),
+  );
+  await page.goto('/team');
+  await expect(page.locator('.trainer-card')).toHaveCount(1);
+  await expect(page.locator('.hero-portrait img')).toHaveCount(4);
+  await expect(page.locator('.hero-portrait img.is-default-portrait')).toHaveCount(3);
+  await expect(page.locator('.team-hero-stats strong').first()).toHaveText('1');
+});
+
+test('reduced transparency preserves opaque, readable panels and functional ratings', async ({
+  page,
+}) => {
+  await setup(page);
+  // Playwright does not expose reduced-transparency in emulateMedia.
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Emulation.setEmulatedMedia', {
+    features: [{ name: 'prefers-reduced-transparency', value: 'reduce' }],
+  });
+  await page.goto('/team');
+  await expect(page.locator('.trainer-card')).toHaveCount(8);
+  expect(
+    await page.locator('.team-toolbar').evaluate((el) => getComputedStyle(el).backdropFilter),
+  ).toBe('none');
+  expect(
+    await page
+      .locator('.trainer-card-body')
+      .first()
+      .evaluate((el) => getComputedStyle(el, '::before').backdropFilter),
+  ).toBe('none');
+  await page.locator('.rating-trigger').first().click();
+  await expect(page.locator('.rating-star-btn')).toHaveCount(5);
+  expect(
+    await page.locator('.rating-popover').evaluate((el) => getComputedStyle(el).backdropFilter),
+  ).toBe('none');
+  await page.locator('.trainer-card-view-details').first().click();
+  await expect(page.locator('h1')).toHaveText(names[0]);
+  expect(
+    await page
+      .locator('.profile-panel')
+      .first()
+      .evaluate((el) => getComputedStyle(el).backdropFilter),
+  ).toBe('none');
+  await cdp.detach();
 });

@@ -11,6 +11,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { TrainersService } from '../../../core/services/trainers.service';
 import { Trainer } from '../../../core/models/trainer.model';
+import { TrainerPortraitDirective } from '../../../shared/directives/trainer-portrait.directive';
 import { BookingService } from '../../../core/services/booking.service';
 import { SeoService } from '../../../core/seo/seo.service';
 import { Crumb } from '../../../shared/components/breadcrumb/breadcrumb.component';
@@ -18,7 +19,13 @@ import { Crumb } from '../../../shared/components/breadcrumb/breadcrumb.componen
 @Component({
   selector: 'app-trainer-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslatePipe, TrainerRatingComponent],
+  imports: [
+    CommonModule,
+    RouterLink,
+    TranslatePipe,
+    TrainerRatingComponent,
+    TrainerPortraitDirective,
+  ],
   templateUrl: './trainer-details.component.html',
   styleUrl: './trainer-details.component.css',
 })
@@ -48,7 +55,6 @@ export class TrainerDetailsComponent implements OnInit {
   readonly english = computed(() => this.translate.currentLang() === 'en');
   readonly loadFailed = signal(false);
   readonly expanded = signal(false);
-  readonly imageFailed = signal(false);
   readonly visual = computed(() =>
     trainerVisual(
       this.trainer()?.specializations?.name_en || this.trainer()?.specialization_id || '',
@@ -82,7 +88,6 @@ export class TrainerDetailsComponent implements OnInit {
           this.loadFailed.set(false);
           this.trainer.set(null);
           this.expanded.set(false);
-          this.imageFailed.set(false);
         }),
         switchMap((params) => {
           const slug = params.get('slug');
@@ -158,14 +163,6 @@ export class TrainerDetailsComponent implements OnInit {
     ]
       .map((s) => ({ ...s, url: safePublicLink(s.url) }))
       .filter((s) => !!s.url);
-  });
-
-  initials = computed(() => {
-    const n = this.name();
-    if (!n) return '';
-    const parts = n.trim().split(/\s+/);
-    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-    return n.slice(0, 2).toUpperCase();
   });
 
   openBooking(): void {

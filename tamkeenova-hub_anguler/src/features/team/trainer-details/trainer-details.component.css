@@ -5,8 +5,9 @@
 .instructor-profile {
   padding-top: 56px;
   background:
-    radial-gradient(at 0 70%, #82c4cf12, transparent 38%),
-    radial-gradient(at 100% 100%, #c9a36a14, transparent 45%), var(--color-background);
+    radial-gradient(ellipse at 0 48%, #82c4cf40, transparent 42%),
+    radial-gradient(ellipse at 100% 65%, #d6b77d30, transparent 45%),
+    radial-gradient(ellipse at 40% 100%, #9ec7da2e, transparent 40%), var(--color-background);
   min-height: 100vh;
   overflow: clip;
   color: var(--color-text);
@@ -51,22 +52,24 @@
   object-fit: cover;
   object-position: center 22%;
 }
-.profile-portrait > span:not(.profile-portrait-shade) {
-  display: grid;
-  place-items: center;
-  height: 100%;
-  font-size: 5rem;
-  min-height: 310px;
-}
 .profile-portrait-shade {
   position: absolute;
   inset: 0;
   background: linear-gradient(0deg, #052a3c55, transparent 60%);
 }
 .profile-hero-copy {
-  padding: 18px 0 24px;
+  padding: 20px 24px;
+  margin-block: 18px;
   align-self: center;
   min-width: 0;
+  border: 1px solid #d6f2f22e;
+  border-radius: 22px;
+  background: linear-gradient(125deg, #d8f4f222, #ffffff06);
+  -webkit-backdrop-filter: blur(20px) saturate(135%);
+  backdrop-filter: blur(20px) saturate(135%);
+  box-shadow:
+    0 14px 34px #001b2a24,
+    inset 0 1px 0 #ffffff22;
 }
 .profile-breadcrumb {
   display: flex;
@@ -203,8 +206,9 @@
   gap: 15px;
   justify-content: center;
   padding: 0 24px;
-  background: color-mix(in srgb, var(--color-surface) 96%, transparent);
-  backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--color-surface) 72%, transparent);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  backdrop-filter: blur(22px) saturate(140%);
   border-bottom: 1px solid var(--color-border);
   box-shadow: 0 6px 12px #18343a05;
   overflow-x: auto;
@@ -240,10 +244,16 @@
   position: relative;
   min-width: 0;
   padding: 16px 20px;
-  border: 1px solid color-mix(in srgb, var(--color-border) 45%, transparent);
-  border-radius: 15px;
-  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-  box-shadow: 0 8px 24px #173b4804;
+  border: 1px solid color-mix(in srgb, var(--color-surface) 72%, var(--color-border));
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, #ffffff30, #ffffff03),
+    color-mix(in srgb, var(--color-surface) 62%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(135%);
+  backdrop-filter: blur(20px) saturate(135%);
+  box-shadow:
+    0 10px 30px #163d4910,
+    inset 0 1px 0 #ffffff55;
   scroll-margin-top: 120px;
 }
 .profile-panel h2 {
@@ -539,8 +549,13 @@
 .profile-message {
   border-radius: 14px;
   overflow: hidden;
-  background: #073242;
-  box-shadow: 0 6px 20px #173b4810;
+  border: 1px solid #c6eeed38;
+  background: linear-gradient(130deg, #164859d9, #073242d9);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  box-shadow:
+    0 10px 30px #173b4820,
+    inset 0 1px 0 #ffffff20;
 }
 .profile-message-image {
   aspect-ratio: 1.5;
@@ -747,10 +762,6 @@ button:focus-visible {
     align-self: center;
     margin: 0;
   }
-  .profile-portrait > span:not(.profile-portrait-shade) {
-    min-height: 225px;
-    font-size: 4rem;
-  }
   .profile-hero-copy {
     padding-bottom: 15px;
   }
@@ -799,6 +810,7 @@ button:focus-visible {
   }
   .profile-side {
     display: flex;
+    align-items: stretch;
   }
   .profile-about dl {
     grid-template-columns: 1fr 1fr;
@@ -861,4 +873,29 @@ button:focus-visible {
   .profile-reviews-content {
     grid-template-columns: 1fr;
   }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .profile-panel,
+  .profile-tabs {
+    background: var(--color-surface);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .profile-panel,
+  .profile-tabs {
+    background: var(--color-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .profile-hero-copy,
+  .profile-message {
+    background: #164555;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+:host-context([data-theme='dark']) .instructor-profile {
+  --color-text-muted: #cbd5d6;
 }

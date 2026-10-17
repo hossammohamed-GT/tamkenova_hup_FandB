@@ -58,13 +58,12 @@
           [style.--i]="$index * 0.06 + 's'"
         >
           <a [routerLink]="['/team', t.slug]" class="trainer-top">
-            @if (t.users.profile_image) {
-              <img [src]="t.users.profile_image" [alt]="t.users.full_name" class="trainer-avatar" />
-            } @else {
-              <div class="trainer-avatar trainer-avatar-fallback">
-                <i class="fa-solid fa-user"></i>
-              </div>
-            }
+            <img
+              [appTrainerPortrait]="t.users.profile_image"
+              alt=""
+              class="trainer-avatar"
+              loading="lazy"
+            />
             <div class="trainer-identity">
               <h3>{{ t.users.full_name }}</h3>
               @if (specName(t)) {

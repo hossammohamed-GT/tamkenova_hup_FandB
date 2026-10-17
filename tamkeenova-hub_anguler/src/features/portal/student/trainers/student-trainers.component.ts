@@ -9,13 +9,21 @@ import { SpecializationService } from '../../../../core/services/specialization.
 import { BookingService } from '../../../../core/services/booking.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { TrainerRatingComponent } from '../../../../shared/components/trainer-rating/trainer-rating.component';
+import { TrainerPortraitDirective } from '../../../../shared/directives/trainer-portrait.directive';
 import { TrainerListItem } from '../../../../core/models/student.model';
 import { Specialization } from '../../../../core/models/specialization.model';
 
 @Component({
   selector: 'app-student-trainers',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, TrainerRatingComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    TranslatePipe,
+    TrainerRatingComponent,
+    TrainerPortraitDirective,
+  ],
   templateUrl: './student-trainers.component.html',
   styleUrls: ['../../portal-shared.css', './student-trainers.component.css'],
 })

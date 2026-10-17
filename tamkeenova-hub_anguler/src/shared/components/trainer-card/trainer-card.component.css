@@ -10,10 +10,7 @@
   flex-direction: column;
   height: 100%;
   min-width: 0;
-  filter: drop-shadow(0 14px 15px #17374316);
-  transition:
-    transform 350ms,
-    filter 350ms;
+  transition: transform 350ms;
 }
 .trainer-card-cover {
   position: relative;
@@ -33,16 +30,6 @@
   object-fit: cover;
   object-position: center 30%;
   transition: transform 650ms;
-}
-.trainer-avatar-fallback {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  height: 100%;
-  font-size: 4rem;
-  color: white;
-  background:
-    radial-gradient(at 70% 10%, var(--trainer-light), transparent 65%), var(--trainer-color);
 }
 .photo-shade {
   position: absolute;
@@ -84,7 +71,10 @@
   width: 36px;
   height: 38px;
   color: white;
-  background: #17374325;
+  background: #17374330;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 #ffffff50;
   border: 0;
   border-radius: 7px;
   cursor: pointer;
@@ -147,7 +137,20 @@
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: color-mix(in srgb, var(--color-surface) 96%, var(--trainer-light));
+  background:
+    linear-gradient(125deg, #ffffff52, #ffffff06 65%),
+    linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--trainer-light) 12%, transparent),
+      transparent 70%
+    ),
+    color-mix(in srgb, var(--color-surface) 70%, transparent);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+  box-shadow:
+    inset 0 1px 0 #ffffffb0,
+    inset 1px 0 0 #ffffff65,
+    inset -1px -1px 0 color-mix(in srgb, var(--trainer-color) 14%, transparent);
   clip-path: polygon(5% 0, 64% 0, 100% 33%, 100% 91%, 91% 100%, 8% 100%, 0 91%, 0 6%);
   border-radius: 12px 10px 25px 24px;
 }
@@ -198,7 +201,8 @@
   padding: 3px 7px;
   border-radius: 7px;
   color: var(--color-text);
-  background: color-mix(in srgb, var(--trainer-light) 30%, var(--color-surface));
+  background: color-mix(in srgb, var(--trainer-light) 24%, transparent);
+  border: 1px solid color-mix(in srgb, var(--trainer-light) 40%, transparent);
   max-width: 100%;
   overflow-wrap: anywhere;
 }
@@ -323,7 +327,6 @@ button:focus-visible {
   .trainer-card:hover,
   .trainer-card:focus-within {
     transform: translateY(-5px);
-    filter: drop-shadow(0 19px 18px #17374325);
     z-index: 5;
   }
   .trainer-card:hover .trainer-photo-link img {
@@ -363,4 +366,29 @@ button:focus-visible {
     transition: none;
     transform: none !important;
   }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .trainer-card-body::before {
+    background: var(--color-surface);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .trainer-card-body::before,
+  .trainer-save {
+    background: var(--color-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .trainer-save {
+    color: var(--color-text);
+  }
+}
+
+:host-context([data-theme='dark']) {
+  --color-text-muted: #cbd5d6;
+}
+
+:host-context([data-theme='dark']) .trainer-card-spec {
+  color: color-mix(in srgb, var(--trainer-light) 85%, var(--color-text));
 }

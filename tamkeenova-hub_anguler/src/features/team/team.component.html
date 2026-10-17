@@ -38,13 +38,9 @@
     </div>
     <div class="team-hero-art" aria-hidden="true">
       <div class="portrait-line"></div>
-      @for (trainer of portraits(); track trainer.id; let i = $index) {
+      @for (portrait of portraits(); track $index; let i = $index) {
         <div class="hero-portrait" [class]="'hero-portrait portrait-' + i">
-          <img
-            [src]="trainer.users.profile_image"
-            alt=""
-            (error)="$any($event.target).style.visibility = 'hidden'"
-          />
+          <img [appTrainerPortrait]="portrait" alt="" />
         </div>
       }
       <span class="hero-crystal crystal-gold"></span><span class="hero-crystal crystal-teal"></span

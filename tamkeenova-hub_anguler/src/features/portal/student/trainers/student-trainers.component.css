@@ -115,15 +115,6 @@
   border-color: var(--color-primary);
 }
 
-.trainer-avatar-fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-surface-alt);
-  color: var(--color-text-muted);
-  font-size: var(--text-2xl);
-}
-
 .trainer-identity h3 {
   font-size: var(--text-lg);
   font-weight: 700;

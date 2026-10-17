@@ -23,11 +23,7 @@
   >
     <header class="profile-hero">
       <div class="profile-portrait" aria-hidden="true">
-        @if (avatar() && !imageFailed()) {
-          <img [src]="avatar()" alt="" fetchpriority="high" (error)="imageFailed.set(true)" />
-        } @else {
-          <span>{{ initials() }}</span>
-        }
+        <img [appTrainerPortrait]="avatar()" alt="" fetchpriority="high" />
         <span class="profile-portrait-shade"></span>
       </div>
       <div class="profile-hero-copy">
@@ -268,9 +264,7 @@
       <aside class="profile-side">
         <section class="profile-message">
           <div class="profile-message-image">
-            @if (avatar() && !imageFailed()) {
-              <img [src]="avatar()" alt="" loading="lazy" />
-            }
+            <img [appTrainerPortrait]="avatar()" alt="" loading="lazy" />
             <span></span>
             <div>
               <h2>{{ 'team_ui.learn_with' | translate }} {{ name() }}</h2>

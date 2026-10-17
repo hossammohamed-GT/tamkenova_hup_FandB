@@ -11,11 +11,7 @@
       [attr.aria-label]="name()"
       class="trainer-photo-link"
     >
-      @if (avatar() && !imageFailed()) {
-        <img [src]="avatar()" alt="" loading="lazy" (error)="imageFailed.set(true)" />
-      } @else {
-        <span class="trainer-avatar-fallback">{{ initials() }}</span>
-      }
+      <img [appTrainerPortrait]="avatar()" alt="" loading="lazy" />
       <span class="photo-shade"></span><span class="photo-facet facet-one"></span
       ><span class="photo-facet facet-two"></span>
     </a>

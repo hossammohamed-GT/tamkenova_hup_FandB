@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1000" viewBox="0 0 1200 1000" fill="none">
+  <title>Default instructor illustration</title>
+  <defs>
+    <linearGradient id="studio" x1="80" y1="30" x2="1050" y2="1000" gradientUnits="userSpaceOnUse"><stop stop-color="#406b77"/><stop offset=".52" stop-color="#174758"/><stop offset="1" stop-color="#092c3e"/></linearGradient>
+    <radialGradient id="light"><stop stop-color="#bcf3eb" stop-opacity=".6"/><stop offset="1" stop-color="#9dd6d6" stop-opacity="0"/></radialGradient>
+    <linearGradient id="pearl" x1="480" y1="220" x2="790" y2="570" gradientUnits="userSpaceOnUse"><stop stop-color="#fcfaf2"/><stop offset=".4" stop-color="#dfebe6"/><stop offset=".8" stop-color="#9dc4c6"/><stop offset="1" stop-color="#658f9d"/></linearGradient>
+    <linearGradient id="neck" x1="533" y1="490" x2="685" y2="660" gradientUnits="userSpaceOnUse"><stop stop-color="#92b7b8"/><stop offset=".7" stop-color="#e0eee7"/><stop offset="1" stop-color="#bddad6"/></linearGradient>
+    <linearGradient id="jacket" x1="345" y1="580" x2="820" y2="930" gradientUnits="userSpaceOnUse"><stop stop-color="#b9dedb"/><stop offset=".46" stop-color="#70a9ae"/><stop offset="1" stop-color="#315e73"/></linearGradient>
+    <linearGradient id="lapel" x1="480" y1="570" x2="680" y2="850" gradientUnits="userSpaceOnUse"><stop stop-color="#edf5e9"/><stop offset="1" stop-color="#8bb9bc"/></linearGradient>
+    <linearGradient id="edge" x1="120" y1="60" x2="1100" y2="960" gradientUnits="userSpaceOnUse"><stop stop-color="#e5fff5" stop-opacity=".65"/><stop offset="1" stop-color="#d1bd8c" stop-opacity=".08"/></linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="28"/></filter>
+    <filter id="shadow" x="-40%" y="-30%" width="180%" height="180%"><feDropShadow dx="15" dy="25" stdDeviation="22" flood-color="#001f2d" flood-opacity=".25"/></filter>
+  </defs>
+  <path fill="url(#studio)" d="M0 0h1200v1000H0z"/>
+  <ellipse cx="590" cy="330" rx="510" ry="510" fill="url(#light)"/>
+  <circle cx="600" cy="395" r="289" stroke="url(#edge)" stroke-width="2"/>
+  <circle cx="600" cy="395" r="310" stroke="#c9e9e3" stroke-opacity=".1"/>
+  <path d="M65 730 315 585V285L65 140m1070 570L910 580V300l225-130M125 45l950 900" stroke="#c7e8e6" stroke-opacity=".09" stroke-width="2"/>
+  <path d="m1010 70 125 73v145l-125 73-125-73V143Z" fill="#d7bd85" fill-opacity=".08" stroke="#e8d8ae" stroke-opacity=".16"/>
+  <path d="m130 540 130 75v150l-130 75L0 765V615Z" fill="#a4e4df" fill-opacity=".08" stroke="#cbf5eb" stroke-opacity=".15"/>
+  <ellipse cx="603" cy="889" rx="296" ry="38" fill="#001d2a" fill-opacity=".25" filter="url(#blur)"/>
+  <g filter="url(#shadow)">
+    <path d="M535 485h130v113l69 49-136 109-132-109 69-49Z" fill="url(#neck)"/>
+    <path d="M530 564c-99 36-169 70-209 127-34 49-44 124-50 195 180 55 472 55 658 0-6-71-16-146-50-195-40-57-110-91-209-127l-70 96Z" fill="url(#jacket)"/>
+    <path d="m529 564-66 26-40 96 94 6-24 41 107 130V660Z" fill="url(#lapel)" fill-opacity=".85"/>
+    <path d="m671 564 66 26 40 96-94 6 24 41-107 130V660Z" fill="url(#lapel)" fill-opacity=".55"/>
+    <path d="M460 338c0-97 54-168 140-168s140 71 140 168v47c0 88-63 157-140 157s-140-69-140-157Z" fill="url(#pearl)"/>
+    <path d="M485 319c4-61 37-111 93-125" stroke="#fffdf3" stroke-opacity=".56" stroke-width="9" stroke-linecap="round"/>
+    <path d="M710 354v34c0 61-41 119-84 132" stroke="#6a9ba5" stroke-opacity=".2" stroke-width="5" stroke-linecap="round"/>
+    <path d="M334 730c-13 39-22 80-26 124m558-124c13 39 22 80 26 124" stroke="#d4eee5" stroke-opacity=".3" stroke-width="2" stroke-linecap="round"/>
+    <path d="M600 756v141" stroke="#f2f8e9" stroke-opacity=".28" stroke-width="2"/>
+    <circle cx="600" cy="783" r="5" fill="#d9eadd"/>
+    <circle cx="600" cy="832" r="5" fill="#bcd9d1"/>
+  </g>
+  <g stroke="#f2e0b0" stroke-opacity=".65" stroke-linecap="round"><path d="M940 405v18m-9-9h18M270 275v12m-6-6h12"/></g>
+  <circle cx="885" cy="565" r="4" fill="#c7eae3" fill-opacity=".6"/>
+</svg>
