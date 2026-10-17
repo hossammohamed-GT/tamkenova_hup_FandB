@@ -81,6 +81,17 @@ textarea:focus-visible {
 .error {
   color: var(--color-danger);
 }
+.load-error h2 {
+  font-size: 18px;
+  margin: 0 0 12px;
+}
+.load-error p {
+  margin: 12px 0;
+}
+.request-diagnostic {
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
 .success {
   color: var(--color-success);
 }

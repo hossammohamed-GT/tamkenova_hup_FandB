@@ -8,6 +8,8 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -16,6 +18,7 @@ import {
   CourseCategoryAdminService,
   CategoryDraft,
   ManagedCategory,
+  InvalidCategoryListResponse,
 } from '../../../../core/services/course-category-admin.service';
 import { AdminNavComponent } from '../admin-nav/admin-nav.component';
 import { FormFeedback } from '../../../../shared/forms/form-feedback';
@@ -40,6 +43,9 @@ export class CourseCategoriesComponent {
   private readonly confirmation = viewChild<ElementRef<HTMLDialogElement>>('confirmation');
   readonly pendingDelete = signal<ManagedCategory | null>(null);
   readonly error = signal('');
+  readonly loadFailure = signal<{ status: number | null; invalidResponse: boolean } | null>(null);
+  readonly listEndpoint = this.api.endpoint;
+  private listRequest?: Subscription;
   readonly success = signal('');
   readonly feedback = new FormFeedback();
   readonly parents = computed(() =>
@@ -74,9 +80,11 @@ export class CourseCategoriesComponent {
     };
   }
   load() {
+    this.listRequest?.unsubscribe();
     this.loading.set(true);
+    this.loadFailure.set(null);
     this.error.set('');
-    this.api
+    this.listRequest = this.api
       .list()
       .pipe(takeUntilDestroyed(this.destroy))
       .subscribe({
@@ -85,10 +93,55 @@ export class CourseCategoriesComponent {
           this.loading.set(false);
         },
         error: (e) => {
-          this.error.set(workflowError(e));
+          this.loadFailure.set({
+            status:
+              e instanceof HttpErrorResponse
+                ? e.status
+                : e instanceof InvalidCategoryListResponse
+                  ? 200
+                  : null,
+            invalidResponse:
+              e instanceof InvalidCategoryListResponse ||
+              (e instanceof HttpErrorResponse && e.status === 200),
+          });
           this.loading.set(false);
         },
       });
+  }
+  loadFailureMessage() {
+    const failure = this.loadFailure();
+    if (failure?.invalidResponse)
+      return this.t(
+        'الخادم لم يُرجع قائمة تصنيفات صالحة. تحقّق من توجيه /api إلى الباك إند ونشر نسختَي الواجهة والباك إند المتوافقتين.',
+        'The server did not return a valid category list. Check the /api proxy and deploy compatible frontend and backend versions.',
+      );
+    switch (failure?.status) {
+      case 0:
+        return this.t(
+          'تعذّر الاتصال بالخادم. تحقّق من الاتصال وتوفّر خدمة API وإعدادات CORS ثم أعد المحاولة.',
+          'Cannot reach the server. Check your connection, API availability and CORS settings, then retry.',
+        );
+      case 401:
+        return this.t(
+          'انتهت جلسة الدخول. سجّل الدخول مجددًا.',
+          'Your session has expired. Sign in again.',
+        );
+      case 403:
+        return this.t(
+          'الحساب الحالي لا يملك صلاحية إدارة التصنيفات.',
+          'This account does not have permission to manage categories.',
+        );
+      case 404:
+        return this.t(
+          'مسار إدارة التصنيفات غير متاح. تحقّق من نشر الباك إند المحدّث وتوجيه /api إليه؛ تحديث الواجهة وحدها لا يكفي.',
+          'The category management endpoint is unavailable. Check the backend deployment and /api routing; deploying only the frontend is not enough.',
+        );
+      default:
+        return this.t(
+          'تعذّر تحميل التصنيفات من الخادم. أعد المحاولة، وإن استمر الخطأ افحص سجلات الباك إند واتصال قاعدة البيانات باستخدام حالة الطلب أدناه. لم يتم حذف أي بيانات.',
+          'Categories could not be loaded from the server. Retry; if this persists, check backend logs and database connectivity using the status below. No data has been deleted.',
+        );
+    }
   }
   name(row: ManagedCategory) {
     return this.t(row.name_ar, row.name_en);
@@ -107,6 +160,7 @@ export class CourseCategoriesComponent {
     return Object.values(row._count).every((n) => n === 0);
   }
   open(row?: ManagedCategory) {
+    if (this.busy() || this.loading() || this.loadFailure()) return;
     this.editing.set(row?.id ?? null);
     this.feedback.reset();
     this.success.set('');
@@ -133,7 +187,8 @@ export class CourseCategoriesComponent {
     }
   }
   save(form: NgForm) {
-    if (this.busy() || !this.feedback.validate(form)) return;
+    if (this.busy() || this.loading() || this.loadFailure() || !this.feedback.validate(form))
+      return;
     const draft = {
       ...this.draft,
       name_ar: this.draft.name_ar.trim(),

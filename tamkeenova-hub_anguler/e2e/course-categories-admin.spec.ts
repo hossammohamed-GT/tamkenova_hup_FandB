@@ -124,7 +124,11 @@ for (const [language, width] of [
     await form.locator('[name=description_en]').fill('A real category description');
     await form.locator('[name=image_url]').fill('/assets/course-categories/soft-skills.jpg');
     await form.locator('[name=display_order]').fill('0');
-    await page.screenshot({ path: info.outputPath('category-editor.png'), fullPage: true, animations: 'disabled' });
+    await page.screenshot({
+      path: info.outputPath('category-editor.png'),
+      fullPage: true,
+      animations: 'disabled',
+    });
     await form
       .getByRole('button', {
         name: language === 'ar' ? 'حفظ التصنيف' : 'Save category',
@@ -218,16 +222,14 @@ test('image upload and server field errors keep entries and show errors beside t
     .setInputFiles({ name: 'wrong.svg', mimeType: 'image/svg+xml', buffer: Buffer.from('<svg/>') });
   await expect(form.locator('[name=image_url]')).toHaveAttribute('aria-invalid', 'true');
   expect(state.writes).toHaveLength(0);
-  await form
-    .locator('input[type=file]')
-    .setInputFiles({
-      name: 'image.png',
-      mimeType: 'image/png',
-      buffer: Buffer.from(
-        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==',
-        'base64',
-      ),
-    });
+  await form.locator('input[type=file]').setInputFiles({
+    name: 'image.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==',
+      'base64',
+    ),
+  });
   await expect(form.locator('[name=image_url]')).toHaveValue(
     '/assets/course-categories/technology-innovation.jpg',
   );
@@ -299,3 +301,79 @@ test('hiding a parent refreshes an already mounted menu and preserves its child 
   await expect(page.locator('.programs-mega .mega-category')).toHaveCount(8);
   await expect(child.locator('.status')).toHaveText('Visible');
 });
+
+for (const language of ['ar', 'en']) {
+  for (const failure of ['network', 'not-found', 'server', 'html', 'incompatible'] as const) {
+    test(`category load ${failure} is not an empty catalog and Retry recovers: ${language}`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width: language === 'ar' ? 320 : 1440, height: 1000 });
+      await setup(page, language);
+      let fail = true;
+      await page.route('**/api/admin/course-categories', async (route) => {
+        if (!fail) return route.fallback();
+        if (failure === 'network') return route.abort('failed');
+        if (failure === 'html')
+          return route.fulfill({ contentType: 'text/html', body: '<html>SPA fallback</html>' });
+        if (failure === 'incompatible')
+          return route.fulfill({ json: { data: [{ id: 'old-public-category' }] } });
+        return route.fulfill({
+          status: failure === 'not-found' ? 404 : 500,
+          contentType: 'text/html',
+          body: '<html>upstream error</html>',
+        });
+      });
+      await page.goto('/portal/admin/course-categories');
+      const alert = page.locator('.load-error');
+      await expect(alert).toBeVisible();
+      await expect(alert).toContainText('GET /api/admin/course-categories');
+      if (failure === 'not-found') {
+        await expect(alert).toContainText('HTTP 404');
+        await expect(alert).toContainText(language === 'ar' ? 'الباك إند' : 'backend');
+      }
+      if (failure === 'server') await expect(alert).toContainText('HTTP 500');
+      await expect(page.locator('.category-list')).toHaveCount(0);
+      await expect(page.locator('.category-admin')).not.toContainText(
+        language === 'ar' ? 'لا توجد تصنيفات بعد' : 'No categories yet',
+      );
+      await expect(
+        page.getByRole('button', {
+          name: language === 'ar' ? 'تصنيف جديد' : 'New category',
+          exact: true,
+        }),
+      ).toBeDisabled();
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
+      ).toBe(true);
+      fail = false;
+      await alert
+        .getByRole('button', { name: language === 'ar' ? 'إعادة المحاولة' : 'Retry', exact: true })
+        .click();
+      await expect(page.locator('.category-row')).toHaveCount(9);
+      await expect(alert).toHaveCount(0);
+      await expect(
+        page.getByRole('button', {
+          name: language === 'ar' ? 'تصنيف جديد' : 'New category',
+          exact: true,
+        }),
+      ).toBeEnabled();
+    });
+  }
+  test(`only a successful empty response shows the empty catalog message: ${language}`, async ({
+    page,
+  }) => {
+    const state = await setup(page, language);
+    state.getRows().splice(0);
+    await page.goto('/portal/admin/course-categories');
+    await expect(page.locator('.category-list')).toContainText(
+      language === 'ar' ? 'لا توجد تصنيفات بعد' : 'No categories yet',
+    );
+    await expect(page.locator('.load-error')).toHaveCount(0);
+    await expect(
+      page.getByRole('button', {
+        name: language === 'ar' ? 'تصنيف جديد' : 'New category',
+        exact: true,
+      }),
+    ).toBeEnabled();
+  });
+}

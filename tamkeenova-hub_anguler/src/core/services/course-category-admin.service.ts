@@ -20,33 +20,63 @@ export interface CategoryDraft {
   display_order: number;
   is_active: boolean;
 }
+export class InvalidCategoryListResponse extends Error {
+  constructor() {
+    super('The category API returned an incompatible response.');
+  }
+}
+
 @Injectable({ providedIn: 'root' })
 export class CourseCategoryAdminService {
   private readonly http = inject(HttpClient);
   private readonly catalog = inject(CourseCatalogService);
-  private readonly url = `${environment.apiUrl}/admin/course-categories`;
+  readonly endpoint = `${environment.apiUrl}/admin/course-categories`;
   list() {
-    return this.http
-      .get<CourseCatalogResponse<ManagedCategory[]>>(this.url)
-      .pipe(map((r) => r.data));
+    return this.http.get<CourseCatalogResponse<ManagedCategory[]>>(this.endpoint).pipe(
+      map((r) => {
+        // A stale API or a proxy serving the SPA must not look like an empty catalog.
+        if (
+          !Array.isArray(r?.data) ||
+          r.data.some(
+            (row) =>
+              !row ||
+              typeof row.id !== 'string' ||
+              typeof row.name_ar !== 'string' ||
+              typeof row.name_en !== 'string' ||
+              typeof row.is_active !== 'boolean' ||
+              !row._count ||
+              !['children', 'course_links', 'learning_programs'].every((key) => {
+                const count = row._count[key as keyof ManagedCategory['_count']];
+                return Number.isInteger(count) && count >= 0;
+              }),
+          )
+        )
+          throw new InvalidCategoryListResponse();
+        return r.data;
+      }),
+    );
   }
   save(draft: CategoryDraft, id?: string) {
-    const call = id ? this.http.put(`${this.url}/${id}`, draft) : this.http.post(this.url, draft);
+    const call = id
+      ? this.http.put(`${this.endpoint}/${id}`, draft)
+      : this.http.post(this.endpoint, draft);
     return call.pipe(tap(() => this.catalog.refreshCategories()));
   }
   visibility(row: ManagedCategory) {
     return this.http
-      .patch(`${this.url}/${row.id}/visibility`, { is_active: !row.is_active })
+      .patch(`${this.endpoint}/${row.id}/visibility`, { is_active: !row.is_active })
       .pipe(tap(() => this.catalog.refreshCategories()));
   }
   remove(id: string) {
-    return this.http.delete(`${this.url}/${id}`).pipe(tap(() => this.catalog.refreshCategories()));
+    return this.http
+      .delete(`${this.endpoint}/${id}`)
+      .pipe(tap(() => this.catalog.refreshCategories()));
   }
   upload(file: File) {
     const data = new FormData();
     data.append('image', file);
     return this.http
-      .post<CourseCatalogResponse<{ image_url: string }>>(`${this.url}/image`, data)
+      .post<CourseCatalogResponse<{ image_url: string }>>(`${this.endpoint}/image`, data)
       .pipe(map((r) => r.data.image_url));
   }
 }

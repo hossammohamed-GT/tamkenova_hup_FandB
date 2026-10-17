@@ -12,7 +12,12 @@
         }}
       </p>
     </div>
-    <button class="primary" type="button" [disabled]="busy()" (click)="open()">
+    <button
+      class="primary"
+      type="button"
+      [disabled]="busy() || loading() || !!loadFailure()"
+      (click)="open()"
+    >
       <span aria-hidden="true">+</span> {{ t('تصنيف جديد', 'New category') }}
     </button>
   </header>
@@ -31,7 +36,7 @@
   @if (error()) {
     <div class="error" role="alert">
       {{ error() }}
-      <button type="button" [disabled]="busy()" (click)="load()">
+      <button type="button" [disabled]="busy() || loading()" (click)="load()">
         {{ t('تحديث', 'Refresh') }}
       </button>
     </div>
@@ -47,7 +52,7 @@
         </button>
       </div>
       <form #form="ngForm" [appFormFeedback]="feedback" (ngSubmit)="save(form)">
-        <fieldset class="form-feedback-fields" [disabled]="busy()">
+        <fieldset class="form-feedback-fields" [disabled]="busy() || loading() || !!loadFailure()">
           <div class="form-grid">
             <label
               >{{ t('الاسم بالعربية', 'Arabic name')
@@ -186,6 +191,24 @@
   }
   @if (loading()) {
     <p role="status">{{ t('جارٍ تحميل التصنيفات…', 'Loading categories…') }}</p>
+  } @else if (loadFailure(); as failure) {
+    <section class="error load-error" role="alert" aria-labelledby="category-load-error-title">
+      <h2 id="category-load-error-title">
+        {{ t('تعذّر تحميل التصنيفات', 'Could not load categories') }}
+      </h2>
+      <p>{{ loadFailureMessage() }}</p>
+      <p class="request-diagnostic">
+        <bdi dir="ltr"
+          >GET {{ listEndpoint }}
+          @if (failure.status !== null) {
+            · HTTP {{ failure.status }}
+          }
+        </bdi>
+      </p>
+      <button type="button" [disabled]="busy() || loading()" (click)="load()">
+        {{ t('إعادة المحاولة', 'Retry') }}
+      </button>
+    </section>
   } @else {
     <section class="category-list" [attr.aria-label]="t('التصنيفات', 'Categories')">
       @for (row of rows(); track row.id) {
