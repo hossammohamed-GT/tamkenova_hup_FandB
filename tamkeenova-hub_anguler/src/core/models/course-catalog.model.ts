@@ -44,6 +44,7 @@ export interface Course {
   language: string;
   level?: CourseLevel | null;
   content_type: CourseContentType;
+  price?: number | string;
   is_free: boolean;
   duration_minutes: number;
   lessons_count: number;

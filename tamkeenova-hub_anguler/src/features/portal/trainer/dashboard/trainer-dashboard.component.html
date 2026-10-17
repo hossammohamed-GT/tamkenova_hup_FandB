@@ -138,7 +138,17 @@
           </div>
         </a>
 
-        <a routerLink="/portal/trainer/programs" class="section-card surface chamfer-sm stable-card">
+        <a routerLink="/portal/trainer/courses" class="section-card surface chamfer-sm"
+          ><div class="section-card-icon">
+            <i class="fa-solid fa-circle-play" aria-hidden="true"></i>
+          </div>
+          <h3>{{ 'course_workflow.studio' | translate }}</h3>
+          <p>{{ 'course_workflow.dashboard_hint' | translate }}</p></a
+        >
+        <a
+          routerLink="/portal/trainer/programs"
+          class="section-card surface chamfer-sm stable-card"
+        >
           <div class="section-card-header">
             <div class="section-card-icon">
               <i class="fa-solid fa-book"></i>

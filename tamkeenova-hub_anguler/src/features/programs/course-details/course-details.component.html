@@ -42,6 +42,8 @@
           <span>{{ 'programs.catalog.video_courses' | translate }}</span>
           @if (item.is_free) {
             <span class="detail-free-tag">{{ 'programs.catalog.free' | translate }}</span>
+          } @else if (item.price) {
+            <span class="detail-free-tag">{{ item.price }} EGP</span>
           }
         </div>
         <h1>{{ title(item) }}</h1>
@@ -150,6 +152,7 @@
         }
       </div>
       <aside class="course-detail-aside">
+        <app-course-learning-actions [course]="item" [lesson]="selectedLesson()" />
         <section class="detail-panel curriculum-panel">
           <div class="curriculum-heading">
             <div>
@@ -181,7 +184,9 @@
                   >{{ 'nav.login' | translate }} →</a
                 >
               } @else {
-                <a routerLink="/consulting">{{ 'programs.video.contact' | translate }} →</a>
+                <a [routerLink]="['/programs/course', item.slug, 'checkout']"
+                  >{{ 'course_workflow.checkout' | translate }} →</a
+                >
               }
             </div>
           }

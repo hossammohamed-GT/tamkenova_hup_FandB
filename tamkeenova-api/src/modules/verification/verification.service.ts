@@ -47,7 +47,13 @@ export class VerificationService {
           image: certificate.users.profile_image,
         },
         program: certificate.template_version
-          ? (certificate.program_name ? { title: certificate.program_name, duration_hours: certificate.training_hours, level: null } : null)
+          ? certificate.program_name
+            ? {
+                title: certificate.program_name,
+                duration_hours: certificate.training_hours,
+                level: null,
+              }
+            : null
           : certificate.training_programs
           ? {
               title: certificate.training_programs.title,
@@ -79,11 +85,10 @@ export class VerificationService {
       throw new NotFoundException('User not found or not verified');
     }
 
-
-    const totalHours =
-      user.total_training_hours ||
-      user.certificates.reduce((sum, c) => sum + (c.training_hours || 0), 0);
-
+    const totalHours = Math.max(
+      user.total_training_hours || 0,
+      user.certificates.reduce((sum, c) => sum + (c.training_hours || 0), 0),
+    );
 
     const trainersMap = new Map();
     user.certificates.forEach((c) => {
@@ -119,7 +124,12 @@ export class VerificationService {
         training_hours: c.training_hours,
         pdf_url: c.pdf_url,
         qr_code_url: c.qr_code_url,
-        program: c.training_programs
+        program: c.course
+          ? {
+              title: c.course.title_ar,
+              duration_hours: Math.ceil(c.course.duration_minutes / 60),
+            }
+          : c.training_programs
           ? {
               title: c.training_programs.title,
               duration_hours: c.training_programs.duration_hours,
@@ -132,7 +142,8 @@ export class VerificationService {
             }
           : null,
       })),
-      completed_programs: user.student_enrollments.map((e) => ({
+      completed_programs: [
+        ...user.student_enrollments.map((e) => ({
         id: e.id,
         completed_at: e.completed_at,
         program: {
@@ -145,6 +156,22 @@ export class VerificationService {
           slug: e.training_programs.trainers.slug,
         },
       })),
+        ...user.course_enrollments.map((e) => ({
+          id: e.id,
+          completed_at: e.completed_at,
+          program: {
+            title: e.courses.title_ar,
+            duration_hours: Math.ceil(e.courses.duration_minutes / 60),
+            level: e.courses.level,
+          },
+          trainer: e.courses.owner
+            ? {
+                name: e.courses.owner.users.full_name,
+                slug: e.courses.owner.slug,
+              }
+            : null,
+        })),
+      ],
       trainers: Array.from(trainersMap.values()),
       skills: user.student_skills.map((s) => ({
         name: s.skill_name,
@@ -152,7 +179,8 @@ export class VerificationService {
       })),
       stats: {
         total_certificates: user.certificates.length,
-        total_completed_programs: user.student_enrollments.length,
+        total_completed_programs:
+          user.student_enrollments.length + user.course_enrollments.length,
         total_trainers: trainersMap.size,
         total_skills: user.student_skills.length,
         total_training_hours: totalHours,

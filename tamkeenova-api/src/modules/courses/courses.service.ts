@@ -10,6 +10,19 @@ import { CoursesRepository } from './courses.repository';
 export class CoursesService {
   constructor(private readonly repository: CoursesRepository) {}
 
+  private publicCourse<T>(course: T): T {
+    const safe = { ...course };
+    for (const field of [
+      'review_note',
+      'reviewed_by',
+      'reviewed_at',
+      'revision',
+      'review_status',
+    ])
+      delete (safe as Record<string, unknown>)[field];
+    return safe;
+  }
+
   async getCategories() {
     const data = await this.repository.getCategories();
     return { success: true, count: data.length, data };
@@ -27,7 +40,7 @@ export class CoursesService {
     return {
       success: true,
       count: data.length,
-      data,
+      data: data.map((course) => this.publicCourse(course)),
       meta: {
         page,
         limit,
@@ -39,12 +52,26 @@ export class CoursesService {
 
   async getCollections() {
     const data = await this.repository.getCollections();
-    return { success: true, count: data.length, data };
+    return {
+      success: true,
+      count: data.length,
+      data: data.map((shelf) => ({
+        ...shelf,
+        courses: shelf.courses.map((course) => this.publicCourse(course)),
+      })),
+    };
   }
 
   async getLearningPrograms() {
     const data = await this.repository.getLearningPrograms();
-    return { success: true, count: data.length, data };
+    return {
+      success: true,
+      count: data.length,
+      data: data.map((program) => ({
+        ...program,
+        courses: program.courses.map((course) => this.publicCourse(course)),
+      })),
+    };
   }
 
   async getCourseBySlug(slug: string) {
@@ -55,7 +82,7 @@ export class CoursesService {
       ...lesson,
       media_url: course.is_free || lesson.is_preview ? lesson.media_url : null,
     }));
-    return { success: true, data: { ...course, lessons } };
+    return { success: true, data: { ...this.publicCourse(course), lessons } };
   }
 
   async getCourseAccess(slug: string, userId: string) {

@@ -430,7 +430,12 @@ export class TrainersRepository {
       return null;
     }
 
-    const [programsCount, reviewsCount, availabilityCount] = await Promise.all([
+    const [
+      programsCount,
+      reviewsCount,
+      availabilityCount,
+      recordedCoursesCount,
+    ] = await Promise.all([
       this.prisma.training_programs.count({
         where: {
           trainer_id: trainer.id,
@@ -448,10 +453,12 @@ export class TrainersRepository {
           trainer_id: trainer.id,
         },
       }),
+      this.prisma.courses.count({ where: { owner_trainer_id: trainer.id } }),
     ]);
 
     return {
-      programs_count: programsCount,
+      programs_count: programsCount + recordedCoursesCount,
+      recorded_courses_count: recordedCoursesCount,
 
       reviews_count: reviewsCount,
 

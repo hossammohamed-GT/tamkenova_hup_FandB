@@ -43,6 +43,7 @@ export class StudentsService {
     }
 
     const {
+      course_enrollments,
       student_enrollments,
       certificates,
       student_skills,
@@ -51,8 +52,13 @@ export class StudentsService {
 
     return {
       ...userData,
-      completed_programs_count: student_enrollments.length,
+      completed_programs_count:
+        student_enrollments.length + course_enrollments.length,
       certificates_count: certificates.length,
+      total_training_hours: Math.max(
+        userData.total_training_hours || 0,
+        certificates.reduce((sum, cert) => sum + (cert.training_hours || 0), 0),
+      ),
       skills: student_skills.map((s) => ({
         name: s.skill_name,
         source: s.source,
@@ -416,6 +422,7 @@ export class StudentsService {
     }
 
     const {
+      course_enrollments,
       student_enrollments,
       certificates,
       student_skills,
@@ -430,12 +437,28 @@ export class StudentsService {
 
     return {
       ...userData,
-      total_training_hours: userData.total_training_hours || totalHours,
-      completed_programs: student_enrollments.map((e) => ({
+      total_training_hours: Math.max(
+        userData.total_training_hours || 0,
+        totalHours,
+      ),
+      completed_programs: [
+        ...student_enrollments.map((e) => ({
         id: e.id,
         completed_at: e.completed_at,
         program: e.training_programs,
       })),
+        ...course_enrollments.map((e) => ({
+          id: e.id,
+          completed_at: e.completed_at,
+          program: {
+            id: e.courses.id,
+            title: e.courses.title_ar,
+            slug: e.courses.slug,
+            duration_hours: Math.ceil(e.courses.duration_minutes / 60),
+            trainers: null,
+          },
+        })),
+      ],
       certificates: certificates.map((c) => ({
         id: c.id,
         title: c.title,
@@ -450,10 +473,14 @@ export class StudentsService {
         source: s.source,
       })),
       stats: {
-        completed_programs_count: student_enrollments.length,
+        completed_programs_count:
+          student_enrollments.length + course_enrollments.length,
         certificates_count: certificates.length,
         skills_count: student_skills.length,
-        total_training_hours: userData.total_training_hours || totalHours,
+        total_training_hours: Math.max(
+          userData.total_training_hours || 0,
+          totalHours,
+        ),
       },
     };
   }

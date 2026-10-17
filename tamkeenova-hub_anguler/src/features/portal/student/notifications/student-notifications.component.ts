@@ -1,3 +1,5 @@
+import { courseWorkflowNotificationTarget } from '../../../../core/utils/course-workflow-notification';
+import { Router } from '@angular/router';
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -21,6 +23,7 @@ import { TranslateService } from '@ngx-translate/core';
   styleUrls: ['../../portal-shared.css', './student-notifications.component.css'],
 })
 export class StudentNotificationsComponent {
+  private router = inject(Router);
   private notificationsService = inject(NotificationsService);
   private consultationService = inject(ConsultationService);
   private corporateService = inject(CorporateRequestService);
@@ -84,6 +87,8 @@ export class StudentNotificationsComponent {
       this.markAsRead(item);
     }
 
+    const workflowTarget=courseWorkflowNotificationTarget(item);
+    if(workflowTarget){this.closeDetails();this.router.navigate(workflowTarget.commands,{queryParams:workflowTarget.queryParams});return;}
     const refId = item.reference_id;
     const refType = (item.reference_type ?? item.type ?? '').toUpperCase();
     if (!refId) {

@@ -1,0 +1,282 @@
+<main class="workflow-page">
+  <header class="workflow-header">
+    <div>
+      <span class="eyebrow">TamkeeNova • Course operations</span>
+      <h1>{{ t('إدارة الكورسات والمدفوعات', 'Course & payment operations') }}</h1>
+      <p>
+        {{
+          t(
+            'مراجعة النشر، مطابقة التحويلات، وضبط بيانات الاستقبال.',
+            'Review publishing, reconcile transfers, and configure receiving accounts.'
+          )
+        }}
+      </p>
+    </div>
+    <button type="button" (click)="load()" [disabled]="busy()">{{ t('تحديث', 'Refresh') }}</button>
+  </header>
+  <app-admin-nav />
+  <nav class="tabs">
+    <button type="button" [class.active]="tab() === 'courses'" (click)="switchTab('courses')">
+      {{ t('مراجعة الكورسات', 'Course reviews') }}</button
+    ><button type="button" [class.active]="tab() === 'payments'" (click)="switchTab('payments')">
+      {{ t('مراجعة التحويلات', 'Payment reviews') }}</button
+    ><button type="button" [class.active]="tab() === 'settings'" (click)="switchTab('settings')">
+      {{ t('إعدادات الدفع', 'Payment settings') }}
+    </button>
+  </nav>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (success()) {
+    <p class="success" role="status">{{ success() }}</p>
+  }
+  @if (tab() === 'settings') {
+    <section class="panel">
+      <h2>{{ t('حسابات استقبال التحويل', 'Transfer receiving accounts') }}</h2>
+      <p class="notice">
+        {{
+          t(
+            'لن يظهر أي رقم افتراضي. الدفع غير متاح إلا بعد تفعيله وإضافة حساب صحيح.',
+            'No placeholder account is published. Payments stay unavailable until enabled with a valid receiving account.'
+          )
+        }}
+      </p>
+      <form (ngSubmit)="saveSettings()">
+        <div class="form-grid">
+          <label
+            >{{ t('رقم فودافون كاش', 'Vodafone Cash number')
+            }}<input
+              name="wallet"
+              [(ngModel)]="settings.vodafone_cash"
+              maxlength="30"
+              dir="ltr"
+              inputmode="tel" /></label
+          ><label
+            >{{ t('عنوان أو رقم إنستاباي', 'InstaPay address or phone')
+            }}<input
+              name="instapay"
+              [(ngModel)]="settings.instapay"
+              maxlength="120"
+              dir="ltr" /></label
+          ><label
+            >{{ t('تعليمات الدفع بالعربي', 'Arabic payment instructions')
+            }}<textarea
+              name="instructions_ar"
+              [(ngModel)]="settings.instructions_ar"
+              maxlength="1000"
+            ></textarea></label
+          ><label
+            >{{ t('تعليمات الدفع بالإنجليزي', 'English payment instructions')
+            }}<textarea
+              name="instructions_en"
+              [(ngModel)]="settings.instructions_en"
+              maxlength="1000"
+            ></textarea></label
+          ><label class="check"
+            ><input name="enabled" type="checkbox" [(ngModel)]="settings.enabled" />{{
+              t('تفعيل استقبال طلبات الدفع', 'Enable payment reporting')
+            }}</label
+          >
+        </div>
+        <button class="gold" type="submit" [disabled]="busy()">
+          {{ t('حفظ الإعدادات', 'Save settings') }}
+        </button>
+      </form>
+    </section>
+  }
+  @if (tab() === 'courses') {
+    <div class="row">
+      <h2>{{ t('كورسات الأستاذة', 'Instructor courses') }}</h2>
+      <label
+        >{{ t('حالة المراجعة', 'Review status')
+        }}<select [(ngModel)]="courseFilter" (ngModelChange)="load()">
+          <option value="PENDING">{{ t('بانتظار المراجعة', 'Pending') }}</option>
+          <option value="APPROVED">{{ t('مقبول', 'Approved') }}</option>
+          <option value="REJECTED">{{ t('مرفوض', 'Rejected') }}</option>
+          <option value="DRAFT">{{ t('مسودة', 'Draft') }}</option>
+        </select></label
+      >
+    </div>
+    @if (loading()) {
+      <p role="status">{{ t('جارٍ التحميل…', 'Loading…') }}</p>
+    }
+    <section class="grid">
+      @for (course of courses(); track course.id) {
+        <article class="card">
+          <span class="status">{{ statusLabel(course.review_status) }}</span>
+          <h2>{{ title(course) }}</h2>
+          <p>
+            {{ course.owner?.users?.full_name }} · {{ course.price }} EGP ·
+            {{ course.lessons_count }} {{ t('دروس', 'lessons') }}
+          </p>
+          <button class="primary" type="button" (click)="open(course)" [disabled]="busy()">
+            {{ t('فتح المحتوى والمراجعة', 'Open content & review') }}
+          </button>
+        </article>
+      } @empty {
+        <p class="empty">{{ t('لا توجد كورسات بهذه الحالة.', 'No courses with this status.') }}</p>
+      }
+    </section>
+    @if (selected(); as course) {
+      <section class="panel">
+        <div class="row">
+          <h2>{{ title(course) }}</h2>
+          <button type="button" (click)="selected.set(null)">{{ t('إغلاق', 'Close') }}</button>
+        </div>
+        <p>{{ course.price }} EGP · {{ t('الإصدار', 'Revision') }} {{ course.revision }}</p>
+        <p class="muted">{{ t(course.description_ar || '', course.description_en || '') }}</p>
+        <div class="preview-review">
+          <app-youtube-player [url]="video()" [title]="title(course)" />
+        </div>
+        @for (section of course.sections; track $index) {
+          <div class="section-editor">
+            <h3>{{ t(section.title_ar, section.title_en) }}</h3>
+            @for (lesson of section.lessons; track $index) {
+              <div class="row">
+                <p>
+                  {{ t(lesson.title_ar, lesson.title_en) }} · {{ lesson.duration_minutes }}
+                  {{ t('دقيقة', 'min') }} ·
+                  {{ lesson.is_preview ? t('معاينة', 'Preview') : t('درس', 'Lesson') }}
+                </p>
+                <button type="button" (click)="video.set(lesson.media_url)">
+                  {{ t('مشاهدة', 'Watch') }}
+                </button>
+              </div>
+            }
+          </div>
+        }
+        @if (course.review_status === 'PENDING') {
+          <label
+            >{{ t('ملاحظات المراجعة — مطلوبة للرفض', 'Review notes — required to reject')
+            }}<textarea [(ngModel)]="reviewNote" maxlength="1000"></textarea>
+          </label>
+          <div class="actions">
+            <button class="primary" type="button" (click)="decide(true)" [disabled]="busy()">
+              {{ t('قبول ونشر الكورس', 'Approve & publish') }}</button
+            ><button
+              class="danger"
+              type="button"
+              (click)="decide(false)"
+              [disabled]="busy() || !reviewNote.trim()"
+            >
+              {{ t('رفض مع السبب', 'Reject with reason') }}
+            </button>
+          </div>
+        }
+      </section>
+    }
+  }
+  @if (tab() === 'payments') {
+    <div class="row">
+      <h2>{{ t('طلبات مراجعة التحويل', 'Transfer review queue') }}</h2>
+      <label
+        >{{ t('الحالة', 'Status')
+        }}<select [(ngModel)]="paymentFilter" (ngModelChange)="load()">
+          <option value="PENDING">{{ t('قيد المراجعة', 'Pending') }}</option>
+          <option value="APPROVED">{{ t('مقبول', 'Approved') }}</option>
+          <option value="REJECTED">{{ t('مرفوض', 'Rejected') }}</option>
+        </select></label
+      >
+    </div>
+    <p class="notice">
+      {{
+        t(
+          'البيانات المرسلة من الطالب ليست دليل وصول الأموال. راجع المحفظة أو الحساب فعليًا قبل الاعتماد. رقم العملية المؤكد لا يمكن استخدامه مرتين لنفس وسيلة الدفع.',
+          'A learner report is not proof of receipt. Verify your actual wallet/account before approving. A confirmed transaction reference cannot be reused for the same payment method.'
+        )
+      }}
+    </p>
+    <section class="grid">
+      @for (payment of payments(); track payment.id) {
+        <article class="card">
+          <span class="status">{{ statusLabel(payment.status) }}</span>
+          <h2>{{ payment.courses && title(payment.courses) }}</h2>
+          <p>{{ payment.users?.full_name }} · {{ payment.reported_amount }} EGP</p>
+          <p class="muted">{{ payment.method }} · {{ payment.created_at | date: 'short' }}</p>
+          <button type="button" (click)="openPayment(payment)">
+            {{ t('تفاصيل التحويل', 'Review transfer') }}
+          </button>
+        </article>
+      } @empty {
+        <p class="empty">{{ t('لا توجد طلبات بهذه الحالة.', 'No requests with this status.') }}</p>
+      }
+    </section>
+    @if (selectedPayment(); as payment) {
+      <section class="panel">
+        <div class="row">
+          <h2>{{ t('مطابقة التحويل', 'Reconcile transfer') }}</h2>
+          <button type="button" (click)="selectedPayment.set(null)">
+            {{ t('إغلاق', 'Close') }}
+          </button>
+        </div>
+        <div class="details-list">
+          <span
+            >{{ t('الطالب', 'Learner') }}:
+            <strong>{{ payment.users?.full_name }} · {{ payment.users?.email }}</strong></span
+          ><span
+            >{{ t('من حساب', 'Sender account') }}:
+            <strong dir="ltr">{{ payment.sender_account }}</strong></span
+          ><span
+            >{{ t('لحساب الاستقبال وقت الطلب', 'Receiving account at checkout') }}:
+            <strong dir="ltr">{{ payment.recipient_account }}</strong></span
+          ><span
+            >{{ t('قيمة الطلب', 'Quoted price') }}:
+            <strong>{{ payment.expected_amount }} EGP</strong></span
+          ><span
+            >{{ t('المبلغ الذي ذكره الطالب', 'Reported amount') }}:
+            <strong>{{ payment.reported_amount }} EGP</strong></span
+          ><span
+            >{{ t('تاريخ التحويل', 'Transfer time') }}:
+            <strong>{{ payment.transferred_at | date: 'medium' }}</strong></span
+          ><span
+            >{{ t('رقم العملية الذي ذكره الطالب', 'Reported transaction reference') }}:
+            <strong>{{ payment.transfer_reference || '—' }}</strong></span
+          >
+          <p>{{ payment.notes }}</p>
+        </div>
+        @if (payment.status === 'PENDING') {
+          <div class="form-grid">
+            <label
+              >{{ t('المبلغ المستلم فعليًا بالجنيه', 'Actual amount received in EGP')
+              }}<input type="number" [(ngModel)]="confirmedAmount" min="0.01" step="0.01" /></label
+            ><label
+              >{{ t('رقم العملية المؤكد من الحساب', 'Confirmed reference from your account')
+              }}<input [(ngModel)]="confirmedReference" maxlength="120" dir="ltr" /></label
+            ><label class="wide"
+              >{{ t('ملاحظات — مطلوبة للرفض', 'Notes — required to reject')
+              }}<textarea [(ngModel)]="reviewNote" maxlength="1000"></textarea></label
+            ><label class="check wide"
+              ><input type="checkbox" [(ngModel)]="acknowledged" />{{
+                t(
+                  'راجعت وصول الأموال فعليًا للحساب الصحيح.',
+                  'I verified receipt in the correct actual account.'
+                )
+              }}</label
+            >
+          </div>
+          <div class="actions">
+            <button
+              class="gold"
+              type="button"
+              (click)="decidePayment(true)"
+              [disabled]="
+                busy() || !acknowledged || !confirmedAmount || confirmedReference.trim().length < 3
+              "
+            >
+              {{ t('اعتماد وتفعيل الكورس', 'Approve & activate course') }}</button
+            ><button
+              class="danger"
+              type="button"
+              (click)="decidePayment(false)"
+              [disabled]="busy() || !reviewNote.trim()"
+            >
+              {{ t('رفض وإشعار الطالب', 'Reject & notify learner') }}
+            </button>
+          </div>
+        } @else {
+          <p class="notice">{{ payment.review_note }} · {{ payment.confirmed_reference }}</p>
+        }
+      </section>
+    }
+  }
+</main>

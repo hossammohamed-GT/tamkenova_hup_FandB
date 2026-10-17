@@ -30,12 +30,28 @@ export class StudentsRepository {
         total_training_hours: true,
         role: true,
         created_at: true,
+        course_enrollments: {
+          where: { status: 'COMPLETED' },
+          select: {
+            id: true,
+            completed_at: true,
+            courses: {
+              select: {
+                id: true,
+                slug: true,
+                title_ar: true,
+                title_en: true,
+                duration_minutes: true,
+              },
+            },
+          },
+        },
         student_enrollments: {
           where: { status: 'COMPLETED' },
           select: { id: true },
         },
         certificates: {
-          select: { id: true },
+          select: { id: true, training_hours: true },
         },
         student_skills: {
           select: { id: true, skill_name: true, source: true },
@@ -831,6 +847,22 @@ export class StudentsRepository {
         total_training_hours: true,
         role: true,
         created_at: true,
+        course_enrollments: {
+          where: { status: 'COMPLETED' },
+          select: {
+            id: true,
+            completed_at: true,
+            courses: {
+              select: {
+                id: true,
+                slug: true,
+                title_ar: true,
+                title_en: true,
+                duration_minutes: true,
+              },
+            },
+          },
+        },
         student_enrollments: {
           where: { status: 'COMPLETED' },
           select: {

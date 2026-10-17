@@ -1,0 +1,225 @@
+<main class="workflow-page">
+  <header class="workflow-header">
+    <div>
+      <span class="eyebrow">TamkeeNova • Secure review</span>
+      <h1>{{ t('التسجيل والدفع', 'Enrollment & payment') }}</h1>
+      <p>
+        {{
+          t(
+            'تحويل يدوي، ومراجعة فعلية قبل تفعيل الوصول.',
+            'Manual transfer, verified by an administrator before access is activated.'
+          )
+        }}
+      </p>
+    </div>
+    <a class="button" routerLink="/my-courses">{{ t('كورساتي', 'My courses') }}</a>
+  </header>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (success()) {
+    <p class="success" role="status">{{ success() }}</p>
+  }
+  @if (loading()) {
+    <p class="notice" role="status">{{ t('جارٍ تحميل بيانات التسجيل…', 'Loading checkout…') }}</p>
+  }
+  @if (data(); as info) {
+    <div class="checkout-layout">
+      <section>
+        @if (info.enrollment && info.enrollment.status !== 'CANCELLED') {
+          <div class="panel">
+            <h2>{{ t('الكورس متاح في حسابك', 'This course is in your library') }}</h2>
+            <a class="button primary" [routerLink]="['/programs/course', slug]">{{
+              t('ابدأ التعلّم', 'Start learning')
+            }}</a>
+          </div>
+        } @else if (info.course.is_free) {
+          <div class="panel">
+            <h2>{{ t('سجّل مجانًا', 'Enroll for free') }}</h2>
+            <p class="muted">
+              {{
+                t(
+                  'التسجيل يحفظ تقدمك ويسمح بطلب اعتماد الإتمام من الأستاذ.',
+                  'Enrollment saves your progress and lets you request instructor completion approval.'
+                )
+              }}
+            </p>
+            <button class="gold" type="button" (click)="enroll()" [disabled]="busy()">
+              {{ t('تسجيل مجاني', 'Enroll for free') }}
+            </button>
+          </div>
+        } @else if (pending()) {
+          <div class="panel">
+            <span class="status">{{ t('قيد المراجعة', 'Awaiting review') }}</span>
+            <h2>{{ t('استلمنا بيانات التحويل', 'Your transfer report was received') }}</h2>
+            <p class="notice">
+              {{
+                t(
+                  'لا تحول مرة ثانية. الأدمن يراجع الحساب الفعلي ثم يفعّل الكورس أو يرسل لك سبب الرفض.',
+                  'Do not transfer again. An admin will check the actual account, then activate the course or send a rejection reason.'
+                )
+              }}
+            </p>
+            <button type="button" (click)="refresh()">
+              {{ t('تحديث حالة الطلب', 'Refresh status') }}
+            </button>
+          </div>
+        } @else if (!info.payment_enabled) {
+          <div class="panel">
+            <h2>{{ t('الدفع غير متاح حاليًا', 'Payment is currently unavailable') }}</h2>
+            <p class="notice">
+              {{
+                t(
+                  'لم يتم تفعيل حسابات استقبال التحويل. لا ترسل أي مبلغ لحساب غير ظاهر هنا.',
+                  'Receiving accounts have not been enabled. Do not transfer money to an account not displayed here.'
+                )
+              }}
+            </p>
+            <a routerLink="/consulting">{{ t('تواصل مع الإدارة', 'Contact the team') }}</a>
+          </div>
+        } @else {
+          <section class="panel">
+            <h2>
+              01 ·
+              {{ t('حوّل لحساب الاستقبال الرسمي', 'Transfer to an official receiving account') }}
+            </h2>
+            <p class="muted">
+              {{
+                t(
+                  'اختار وسيلة الدفع وراجع الحساب قبل التحويل.',
+                  'Choose a method and verify the account before transferring.'
+                )
+              }}
+            </p>
+            @for (destination of info.methods; track destination.method) {
+              <div class="account-box">
+                <div class="row">
+                  <strong>{{
+                    destination.method === 'VODAFONE_CASH'
+                      ? t('فودافون كاش', 'Vodafone Cash')
+                      : t('إنستاباي', 'InstaPay')
+                  }}</strong
+                  ><button type="button" (click)="copy(destination.account)">
+                    {{ t('نسخ', 'Copy') }}
+                  </button>
+                </div>
+                <p class="account" dir="ltr">{{ destination.account }}</p>
+              </div>
+            }
+            <p class="review-note">
+              {{ t(info.instructions_ar || '', info.instructions_en || '') }}
+            </p>
+          </section>
+          <section class="panel">
+            <h2>02 · {{ t('سجّل تفاصيل التحويل', 'Report your transfer') }}</h2>
+            <form (ngSubmit)="submit()" #transferForm="ngForm">
+              <div class="form-grid">
+                <label
+                  >{{ t('وسيلة التحويل', 'Transfer method')
+                  }}<select name="method" [(ngModel)]="method" required>
+                    @for (destination of info.methods; track destination.method) {
+                      <option [value]="destination.method">{{ destination.method }}</option>
+                    }
+                  </select></label
+                ><label
+                  >{{ t('رقم / حساب المرسل', 'Sender number / account')
+                  }}<input
+                    name="sender"
+                    [(ngModel)]="sender"
+                    required
+                    minlength="3"
+                    maxlength="120"
+                    dir="ltr" /></label
+                ><label
+                  >{{ t('المبلغ المحوّل بالضبط بالجنيه', 'Exact amount transferred in EGP')
+                  }}<input
+                    name="amount"
+                    [(ngModel)]="amount"
+                    type="number"
+                    min="0.01"
+                    max="1000000"
+                    step="0.01"
+                    required /></label
+                ><label
+                  >{{ t('تاريخ ووقت التحويل', 'Transfer date and time')
+                  }}<input
+                    name="time"
+                    [(ngModel)]="transferredAt"
+                    type="datetime-local"
+                    required /></label
+                ><label
+                  >{{ t('رقم العملية — إن وجد', 'Transaction reference — if available')
+                  }}<input
+                    name="reference"
+                    [(ngModel)]="reference"
+                    maxlength="120"
+                    dir="ltr" /></label
+                ><label
+                  >{{ t('ملاحظات إضافية', 'Additional notes')
+                  }}<textarea name="notes" [(ngModel)]="notes" maxlength="1000"></textarea></label
+                ><label class="check wide"
+                  ><input name="confirmed" type="checkbox" [(ngModel)]="confirmed" required />{{
+                    t(
+                      'حوّلت بالفعل للحساب الصحيح وأدخلت البيانات كما هي.',
+                      'I have transferred to the correct account and entered the actual details.'
+                    )
+                  }}</label
+                >
+              </div>
+              <button
+                type="submit"
+                class="gold"
+                [disabled]="transferForm.invalid || !confirmed || busy()"
+              >
+                {{ t('إرسال للمراجعة', 'Submit for review') }}
+              </button>
+            </form>
+          </section>
+        }
+        @if (info.requests.length) {
+          <section class="panel">
+            <h2>{{ t('سجل طلباتك لهذا الكورس', 'Your transfer reports') }}</h2>
+            @for (row of info.requests; track row.id) {
+              <article class="section-editor">
+                <div class="row">
+                  <span class="status">{{ statusLabel(row.status) }}</span
+                  ><strong>{{ row.reported_amount }} EGP</strong>
+                </div>
+                <p>{{ row.method }} · {{ row.transferred_at | date: 'short' }}</p>
+                @if (row.review_note) {
+                  <p class="review-note">{{ row.review_note }}</p>
+                }
+              </article>
+            }
+          </section>
+        }
+      </section>
+      <aside class="panel sticky-summary">
+        @if (info.course.cover_image_url) {
+          <img
+            [src]="info.course.cover_image_url"
+            alt=""
+            style="width: 100%; border-radius: 10px"
+          />
+        }
+        <h2>{{ t(info.course.title_ar, info.course.title_en) }}</h2>
+        <p class="amount">{{ info.course.price }} EGP</p>
+        <p class="muted">
+          {{ info.course.lessons_count }} {{ t('دروس', 'lessons') }} ·
+          {{ info.course.duration_minutes }} {{ t('دقيقة', 'minutes') }}
+        </p>
+        <p class="notice">
+          {{
+            t(
+              'لا يتم تفعيل الكورس بمجرد إرسال البيانات. يلزم اعتماد التحويل من الأدمن. الشهادة بعد اعتماد الأستاذ للإتمام.',
+              'Submitting a report does not activate access. Admin payment approval is required. Certificates follow instructor completion approval.'
+            )
+          }}
+        </p>
+        <a [routerLink]="['/programs/course', slug]"
+          >{{ t('العودة للكورس', 'Back to course') }} →</a
+        >
+      </aside>
+    </div>
+  }
+</main>

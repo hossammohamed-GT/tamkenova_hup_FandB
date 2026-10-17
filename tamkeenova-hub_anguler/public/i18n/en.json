@@ -1896,5 +1896,12 @@
     "trainerConsultations": {
       "title": "Manage Consultations"
     }
+  },
+  "course_workflow": {
+    "library": "My course library",
+    "checkout": "Enroll & pay",
+    "studio": "Recorded course studio",
+    "admin": "Courses & payments",
+    "dashboard_hint": "Recorded courses, progress, completion approvals and certificates"
   }
 }

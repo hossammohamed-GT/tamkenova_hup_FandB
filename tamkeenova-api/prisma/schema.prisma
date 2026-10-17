@@ -7,7 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 enum booking_status {
   PENDING
   APPROVED
@@ -108,7 +107,6 @@ enum course_enrollment_status {
   COMPLETED
   CANCELLED
 }
-
 
 model email_otps {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -231,6 +229,7 @@ model trainers {
   consultations                     consultations[]
   certificates                      certificates[]
   training_programs                 training_programs[]
+  authored_courses                  courses[]              @relation("course_author")
   course_instructors               course_instructors[]
   users_trainers_approved_byTousers users?                 @relation("trainers_approved_byTousers", fields: [approved_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_trainer_approved_by")
   specializations                   specializations?       @relation(fields: [specialization_id], references: [id], onUpdate: NoAction, map: "fk_trainers_specialization")
@@ -276,6 +275,7 @@ model users {
   student_enrollments                  student_enrollments[]
   course_enrollments                   course_enrollments[]
   course_reviews                       course_reviews[]
+  course_payment_requests              course_payment_requests[]
   certificates                         certificates[]
   consultations_student_idTousers      consultations[]                @relation("consultations_student_idTousers")
   consultation_reviews                 consultation_reviews[]
@@ -348,7 +348,6 @@ model trainer_certificates {
   trainers        trainers  @relation(fields: [trainer_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_trainer_certificate_trainer")
 }
 
-
 model student_enrollments {
   id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   student_id     String            @db.Uuid
@@ -371,6 +370,10 @@ model student_enrollments {
 }
 
 model certificates {
+  course_id            String?             @db.Uuid
+  course_enrollment_id String?             @unique(map: "certificates_course_enrollment_unique") @db.Uuid
+  course               courses?            @relation("course_certificate", fields: [course_id], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_certificate_course")
+  course_enrollment    course_enrollments? @relation("course_enrollment_certificate", fields: [course_enrollment_id], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_certificate_course_enrollment")
   certificate_language String?      @db.VarChar(2)
   partner_logos      Json?
   recipient_name    String?          @db.VarChar(120)
@@ -511,7 +514,6 @@ model student_skills {
   @@index([student_id], map: "idx_student_skills_student")
 }
 
-
 model volunteers {
   id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id           String           @unique @db.Uuid
@@ -529,7 +531,6 @@ model volunteers {
   @@index([user_id], map: "idx_volunteers_user_id")
   @@index([volunteer_status], map: "idx_volunteers_status")
 }
-
 
 model tasks {
   id              String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -621,7 +622,6 @@ model task_comments {
   @@index([task_id], map: "idx_task_comments_task")
 }
 
-
 model activity_logs {
   id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id     String   @db.Uuid
@@ -647,6 +647,7 @@ model strategic_partners {
   display_order Int      @default(0)
   created_at    DateTime @default(now()) @db.Timestamptz(6)
   updated_at    DateTime @default(now()) @db.Timestamptz(6)
+
   @@index([is_active, display_order], map: "idx_strategic_partners_active_order")
 }
 
@@ -679,6 +680,16 @@ model course_categories {
 /// Self-paced, subscription-style courses; kept separate from the existing
 /// trainer-led training_programs table so current enrollments/certificates remain intact.
 model courses {
+  owner_trainer_id     String?                   @db.Uuid
+  price                Decimal                   @default(0) @db.Decimal(10, 2)
+  review_status        String                    @default("DRAFT") @db.VarChar(30)
+  revision             Int                       @default(1)
+  reviewed_by          String?                   @db.Uuid
+  reviewed_at          DateTime?                 @db.Timestamptz(6)
+  review_note          String?
+  owner                trainers?                 @relation("course_author", fields: [owner_trainer_id], references: [id], onDelete: SetNull, onUpdate: NoAction, map: "fk_course_author")
+  payments             course_payment_requests[]
+  certificates         certificates[]            @relation("course_certificate")
   id                   String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   slug                 String               @unique @db.VarChar(255)
   title_ar             String               @db.VarChar(255)
@@ -712,6 +723,7 @@ model courses {
   collection_items course_collection_items[]
   program_links    learning_program_courses[]
 
+  @@index([owner_trainer_id, review_status], map: "idx_courses_author_review")
   @@index([status, published_at], map: "idx_courses_status_published")
   @@index([content_type, status], map: "idx_courses_type_status")
   @@index([is_free, status], map: "idx_courses_free_status")
@@ -736,6 +748,7 @@ model course_sections {
 }
 
 model course_lessons {
+  progress         course_lesson_progress[]
   section_id       String?   @db.Uuid
   id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   course_id        String    @db.Uuid
@@ -755,8 +768,8 @@ model course_lessons {
 
   sections course_sections? @relation(fields: [section_id, course_id], references: [id, course_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_course_lesson_section")
 
-  @@index([section_id], map: "idx_course_lessons_section")
   @@unique([course_id, position], map: "course_lessons_course_position_unique")
+  @@index([section_id], map: "idx_course_lessons_section")
   @@index([course_id, is_active, position], map: "idx_course_lessons_course_active_order")
 }
 
@@ -790,6 +803,14 @@ model course_category_links {
 }
 
 model course_enrollments {
+  completion_state        String                   @default("NOT_REQUESTED") @db.VarChar(30)
+  completion_requested_at DateTime?                @db.Timestamptz(6)
+  completion_note         String?
+  completion_reviewed_by  String?                  @db.Uuid
+  recipient_name_ar       String?                  @db.VarChar(120)
+  recipient_name_en       String?                  @db.VarChar(120)
+  lesson_progress         course_lesson_progress[]
+  certificate             certificates?            @relation("course_enrollment_certificate")
   id                 String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id            String                    @db.Uuid
   course_id          String                    @db.Uuid
@@ -805,6 +826,7 @@ model course_enrollments {
   courses courses @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_enrollment_course")
 
   @@unique([user_id, course_id], map: "course_enrollments_user_course_unique")
+  @@index([completion_state, course_id], map: "idx_course_completion_queue")
   @@index([course_id, status], map: "idx_course_enrollments_course_status")
   @@index([user_id, status], map: "idx_course_enrollments_user_status")
 }
@@ -905,4 +927,55 @@ model learning_program_courses {
   @@id([learning_program_id, course_id], map: "learning_program_courses_pkey")
   @@unique([learning_program_id, position], map: "learning_program_courses_program_position_unique")
   @@index([course_id], map: "idx_learning_program_courses_course")
+}
+
+model course_checkout_settings {
+  id              String   @id @default("default") @db.VarChar(30)
+  enabled         Boolean  @default(false)
+  vodafone_cash   String?  @db.VarChar(30)
+  instapay        String?  @db.VarChar(120)
+  instructions_ar String?  @db.VarChar(1000)
+  instructions_en String?  @db.VarChar(1000)
+  updated_by      String?  @db.Uuid
+  updated_at      DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+}
+
+model course_payment_requests {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id             String    @db.Uuid
+  course_id           String    @db.Uuid
+  method              String    @db.VarChar(30)
+  recipient_account   String    @db.VarChar(120)
+  expected_amount     Decimal   @db.Decimal(10, 2)
+  reported_amount     Decimal   @db.Decimal(10, 2)
+  sender_account      String    @db.VarChar(120)
+  transfer_reference  String?   @db.VarChar(120)
+  transferred_at      DateTime  @db.Timestamptz(6)
+  notes               String?   @db.VarChar(1000)
+  status              String    @default("PENDING") @db.VarChar(30)
+  reviewed_by         String?   @db.Uuid
+  reviewed_at         DateTime? @db.Timestamptz(6)
+  review_note         String?
+  confirmed_reference String?   @db.VarChar(120)
+  confirmed_amount    Decimal?  @db.Decimal(10, 2)
+  created_at          DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
+  users               users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_course_payment_user")
+  courses             courses   @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_course_payment_course")
+
+  @@unique([method, confirmed_reference], map: "course_payment_confirmed_reference_unique")
+  /// SQL-only partial unique index course_payment_one_pending(user_id,course_id) WHERE status=PENDING must also be preserved.
+  @@index([status, created_at], map: "idx_course_payment_queue")
+  @@index([user_id, course_id, status], map: "idx_course_payment_user_course")
+}
+
+model course_lesson_progress {
+  id            String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  enrollment_id String             @db.Uuid
+  lesson_id     String             @db.Uuid
+  completed_at  DateTime           @default(now()) @db.Timestamptz(6)
+  enrollment    course_enrollments @relation(fields: [enrollment_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_progress_enrollment")
+  lesson        course_lessons     @relation(fields: [lesson_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_course_progress_lesson")
+
+  @@unique([enrollment_id, lesson_id], map: "course_progress_enrollment_lesson_unique")
 }

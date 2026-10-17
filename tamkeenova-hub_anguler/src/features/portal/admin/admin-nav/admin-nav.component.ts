@@ -23,6 +23,7 @@ export class AdminNavComponent {
   protected adminUi = inject(AdminUiService);
 
   readonly links: AdminNavLink[] = [
+    { labelKey: 'course_workflow.admin', route: '/portal/admin/course-workflow', icon: 'fa-wallet' },
     { labelKey: 'admin_nav.dashboard', route: '/portal/admin', icon: 'fa-gauge-high', exact: true },
     { labelKey: 'admin_nav.users', route: '/portal/admin/users', icon: 'fa-users' },
     { labelKey: 'admin_nav.trainers', route: '/portal/admin/trainers', icon: 'fa-chalkboard-user', badge: 'trainers' },

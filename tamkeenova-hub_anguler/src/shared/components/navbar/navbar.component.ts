@@ -1,4 +1,14 @@
-import { Component, DestroyRef, HostListener, inject, signal, computed, ElementRef, effect } from '@angular/core';
+import { courseWorkflowNotificationTarget } from '../../../core/utils/course-workflow-notification';
+import {
+  Component,
+  DestroyRef,
+  HostListener,
+  inject,
+  signal,
+  computed,
+  ElementRef,
+  effect,
+} from '@angular/core';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -77,9 +87,17 @@ export class NavbarComponent {
       });
     this.destroyRef.onDestroy(() => this.cancelProgramsClose());
     effect(() => {
-      if (this.isLoggedIn()) {
+      if (!this.isLoggedIn()) return;
+      this.notificationsService.refreshUnreadCount();
+    });
+    effect((onCleanup) => {
+      if (!this.isLoggedIn()) return;
+      const timer = setInterval(() => {
+        if (document.visibilityState !== 'visible') return;
         this.notificationsService.refreshUnreadCount();
-      }
+        if (this.isNotifDropdownOpen()) this.loadRecentNotifications();
+      }, 30000);
+      onCleanup(() => clearInterval(timer));
     });
   }
 
@@ -233,7 +251,7 @@ export class NavbarComponent {
   onNotifMouseEnter(): void {
     this.isNotifHovering.set(true);
     this.isNotifDropdownOpen.set(true);
-    if (this.recentNotifications().length === 0 && !this.isLoadingNotifications()) {
+    if (!this.isLoadingNotifications()) {
       this.loadRecentNotifications();
     }
   }
@@ -342,6 +360,12 @@ export class NavbarComponent {
       });
     }
 
+    const workflowTarget = courseWorkflowNotificationTarget(notif);
+    if (workflowTarget) {
+      this.closeNotifDetail();
+      this.router.navigate(workflowTarget.commands, { queryParams: workflowTarget.queryParams });
+      return;
+    }
     const refId = notif.reference_id;
     const refType = (notif.reference_type ?? notif.type ?? '').toUpperCase();
     if (this.authService.isAdmin() && refType.includes('TRAINER')) {

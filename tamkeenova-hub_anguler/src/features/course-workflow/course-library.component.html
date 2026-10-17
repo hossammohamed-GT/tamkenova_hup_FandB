@@ -1,0 +1,107 @@
+<main class="workflow-page">
+  <header class="workflow-header">
+    <div>
+      <span class="eyebrow">TamkeeNova • My learning</span>
+      <h1>{{ t('مكتبتي التعليمية', 'My course library') }}</h1>
+      <p>
+        {{
+          t(
+            'كورساتك المسجلة، تقدمك، واعتمادات الإتمام والشهادات.',
+            'Your enrollments, progress, completion reviews and certificates.'
+          )
+        }}
+      </p>
+    </div>
+    <a class="button gold" routerLink="/programs">{{ t('اكتشف كورسات', 'Explore courses') }}</a>
+  </header>
+  <nav class="workflow-nav">
+    <a routerLink="/portal">{{ t('لوحة حسابي', 'My dashboard') }}</a
+    ><a routerLink="/portal/certificates">{{ t('كل شهاداتي', 'All my certificates') }}</a
+    ><button type="button" (click)="load()">{{ t('تحديث', 'Refresh') }}</button>
+  </nav>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (loading()) {
+    <p role="status">{{ t('جارٍ تحميل المكتبة…', 'Loading library…') }}</p>
+  }
+  <section class="grid">
+    @for (row of rows(); track row.id) {
+      <article class="card">
+        @if (row.courses?.cover_image_url) {
+          <img [src]="row.courses?.cover_image_url" alt="" />
+        }
+        <span class="status">{{ statusLabel(row.status) }}</span>
+        <h2>{{ row.courses && t(row.courses.title_ar, row.courses.title_en) }}</h2>
+        <div class="progress-track"><span [style.width.%]="row.progress"></span></div>
+        <p>{{ row.progress }}% · {{ statusLabel(row.completion_state) }}</p>
+        @if (row.completion_note) {
+          <p class="notice">{{ row.completion_note }}</p>
+        }
+        <div class="actions">
+          <a class="button primary" [routerLink]="['/programs/course', row.courses?.slug]">{{
+            t('فتح الكورس', 'Open course')
+          }}</a>
+          @if (row.status === 'CANCELLED') {
+            <a class="button" [routerLink]="['/programs/course', row.courses?.slug, 'checkout']">{{
+              t('التسجيل مجددًا', 'Re-enroll')
+            }}</a>
+          }
+        </div>
+        @if (row.certificate?.is_valid) {
+          <p class="success">{{ t('شهادتك جاهزة', 'Your certificate is ready') }}</p>
+          <div class="actions">
+            <button
+              type="button"
+              class="gold"
+              (click)="download(row, 'ar')"
+              [disabled]="downloading()"
+            >
+              PDF · العربية</button
+            ><button
+              type="button"
+              class="gold"
+              (click)="download(row, 'en')"
+              [disabled]="downloading()"
+            >
+              PDF · English</button
+            ><a
+              [routerLink]="['/verify']"
+              [queryParams]="{ code: row.certificate.verification_code }"
+              >{{ t('تحقق من الشهادة', 'Verify certificate') }}</a
+            >
+          </div>
+        }
+      </article>
+    } @empty {
+      <p class="empty">
+        {{
+          t(
+            'لم تسجل في كورسات مسجلة بعد. ابحث عن كورس وابدأ.',
+            'No recorded-course enrollments yet. Find a course and begin.'
+          )
+        }}
+      </p>
+    }
+  </section>
+  <section class="panel">
+    <h2>{{ t('متابعة طلبات الدفع', 'Payment report tracking') }}</h2>
+    @for (payment of payments(); track payment.id) {
+      <article class="section-editor">
+        <div class="row">
+          <h3>{{ payment.courses && t(payment.courses.title_ar, payment.courses.title_en) }}</h3>
+          <span class="status">{{ statusLabel(payment.status) }}</span>
+        </div>
+        <p>{{ payment.reported_amount }} EGP · {{ payment.transferred_at | date: 'short' }}</p>
+        @if (payment.review_note) {
+          <p class="notice">{{ payment.review_note }}</p>
+        }
+        <a class="button" [routerLink]="['/programs/course', payment.courses?.slug, 'checkout']">{{
+          t('تفاصيل الطلب والتسجيل', 'Report & enrollment details')
+        }}</a>
+      </article>
+    } @empty {
+      <p class="muted">{{ t('لا توجد طلبات دفع.', 'No payment reports.') }}</p>
+    }
+  </section>
+</main>

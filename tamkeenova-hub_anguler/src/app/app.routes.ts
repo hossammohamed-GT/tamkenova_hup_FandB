@@ -100,6 +100,46 @@ export const routes: Routes = [
       ),
   },
 
+  {
+    path: 'my-courses',
+    canActivate: [authGuard],
+    data: {
+      seo: { titleKey: 'course_workflow.library', descriptionKey: 'seo.portal.description' },
+    },
+    loadComponent: () =>
+      import('../features/course-workflow/course-library.component').then(
+        (m) => m.CourseLibraryComponent,
+      ),
+  },
+  {
+    path: 'programs/course/:slug/checkout',
+    canActivate: [authGuard],
+    data: {
+      seo: { titleKey: 'course_workflow.checkout', descriptionKey: 'seo.portal.description' },
+    },
+    loadComponent: () =>
+      import('../features/course-workflow/course-checkout.component').then(
+        (m) => m.CourseCheckoutComponent,
+      ),
+  },
+  {
+    path: 'portal/trainer/courses',
+    canActivate: [authGuard, roleGuard(['TRAINER']), trainerStatusGuard],
+    data: { seo: { titleKey: 'course_workflow.studio', descriptionKey: 'seo.portal.description' } },
+    loadComponent: () =>
+      import('../features/course-workflow/trainer-course-studio.component').then(
+        (m) => m.TrainerCourseStudioComponent,
+      ),
+  },
+  {
+    path: 'portal/admin/course-workflow',
+    canActivate: [authGuard, roleGuard(['ADMIN', 'SUPER_ADMIN'])],
+    data: { seo: { titleKey: 'course_workflow.admin', descriptionKey: 'seo.portal.description' } },
+    loadComponent: () =>
+      import('../features/course-workflow/admin-course-workflow.component').then(
+        (m) => m.AdminCourseWorkflowComponent,
+      ),
+  },
   // Shared by all roles
   {
     path: 'portal/certificates',

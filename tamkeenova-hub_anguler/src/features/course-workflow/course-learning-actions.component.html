@@ -1,0 +1,128 @@
+<section class="panel learning-actions">
+  <h2>{{ t('رحلتك في الكورس', 'Your course journey') }}</h2>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (!auth.isLoggedIn()) {
+    <p class="muted">
+      {{
+        t(
+          'سجّل الدخول لحفظ تقدّمك وطلب شهادة الإتمام. دروس المعاينة متاحة بدون تسجيل.',
+          'Sign in to save progress and request completion certification. Preview lessons are available without enrollment.'
+        )
+      }}
+    </p>
+    <a
+      class="button gold"
+      routerLink="/login"
+      [queryParams]="{ returnUrl: '/programs/course/' + course().slug + '/checkout' }"
+      >{{ t('تسجيل الدخول', 'Sign in') }}</a
+    >
+  } @else if (loading()) {
+    <p role="status">{{ t('جارٍ تحميل حالة التسجيل…', 'Loading enrollment…') }}</p>
+  } @else if (state(); as enrollment) {
+    <div class="row">
+      <span class="status">{{ statusLabel(enrollment.status) }}</span
+      ><a routerLink="/my-courses">{{ t('مكتبتي', 'My library') }}</a>
+    </div>
+    <div class="progress-track"><span [style.width.%]="enrollment.progress"></span></div>
+    <p class="muted">
+      {{ enrollment.progress }}% ·
+      {{
+        t(
+          'تقدم محفوظ حسب الدروس التي أتممتها. اعتماد الإتمام النهائي مسؤولية الأستاذ.',
+          'Progress reflects lessons you marked complete. Final completion is confirmed by your instructor.'
+        )
+      }}
+    </p>
+    @if (enrollment.status === 'COMPLETED') {
+      <p class="success">
+        {{
+          t(
+            'اعتمد الأستاذ إتمامك والشهادة جاهزة.',
+            'Your instructor approved completion and your certificate is ready.'
+          )
+        }}
+      </p>
+      <a class="button gold" routerLink="/my-courses">{{
+        t('عرض وتحميل الشهادة', 'View & download certificate')
+      }}</a>
+    } @else {
+      @if (lesson()) {
+        <button class="primary" type="button" (click)="mark()" [disabled]="busy() || done()">
+          {{
+            done()
+              ? t('تم تسجيل إتمام الدرس', 'Lesson marked complete')
+              : t('أتممت هذا الدرس', 'Mark this lesson complete')
+          }}
+        </button>
+      }
+      @if (enrollment.completion_state === 'PENDING') {
+        <p class="notice">
+          {{
+            t(
+              'طلب الإتمام عند الأستاذ للمراجعة. الشهادة تصدر تلقائيًا بعد الاعتماد.',
+              'Your completion request is awaiting instructor review. The certificate is issued automatically after approval.'
+            )
+          }}
+        </p>
+      } @else if (enrollment.progress >= 100) {
+        @if (enrollment.completion_note) {
+          <p class="notice">{{ enrollment.completion_note }}</p>
+        }
+        <form class="completion-names" (ngSubmit)="request()" #completionForm="ngForm">
+          <p class="muted">
+            {{
+              t(
+                'اكتب اسمك الصحيح للنسختين العربية والإنجليزية للشهادة.',
+                'Enter your correct name for the Arabic and English certificate editions.'
+              )
+            }}
+          </p>
+          <div class="form-grid">
+            <label
+              >{{ t('اسمك بالعربي', 'Arabic recipient name')
+              }}<input
+                name="nameAr"
+                [(ngModel)]="nameAr"
+                required
+                minlength="2"
+                maxlength="120"
+                dir="rtl" /></label
+            ><label
+              >{{ t('اسمك بالإنجليزي', 'English recipient name')
+              }}<input
+                name="nameEn"
+                [(ngModel)]="nameEn"
+                required
+                minlength="2"
+                maxlength="120"
+                dir="ltr"
+            /></label>
+          </div>
+          <button class="gold" type="submit" [disabled]="busy() || completionForm.invalid">
+            {{ t('طلب اعتماد الإتمام من الأستاذ', 'Request instructor completion approval') }}
+          </button>
+        </form>
+      }
+    }
+  } @else {
+    <p class="muted">
+      {{
+        t(
+          'سجّل في الكورس لحفظ التقدم. لو مدفوع، التفعيل بعد اعتماد التحويل.',
+          'Enroll to save progress. Paid access activates after transfer approval.'
+        )
+      }}
+    </p>
+    @if (course().is_free) {
+      <button class="gold" type="button" (click)="enroll()" [disabled]="busy()">
+        {{ t('تسجيل مجاني', 'Enroll for free') }}
+      </button>
+    } @else {
+      <a class="button gold" [routerLink]="['/programs/course', course().slug, 'checkout']"
+        >{{ t('التسجيل والدفع', 'Enroll & pay') }} · {{ course().price }} EGP</a
+      >
+    }
+  }
+</section>

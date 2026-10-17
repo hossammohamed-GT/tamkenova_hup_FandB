@@ -438,6 +438,8 @@
           }
           @if (course.is_free) {
             <span class="cover-badge badge-free">{{ 'programs.catalog.free' | translate }}</span>
+          } @else if (course.price) {
+            <span class="cover-badge badge-free">{{ course.price }} EGP</span>
           }
         </div>
         <span class="cover-play"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>

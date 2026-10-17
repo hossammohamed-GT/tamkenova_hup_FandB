@@ -1,0 +1,330 @@
+<main class="workflow-page">
+  <header class="workflow-header">
+    <div>
+      <span class="eyebrow">TamkeeNova • Instructor Studio</span>
+      <h1>{{ t('استوديو الكورسات', 'Course studio') }}</h1>
+      <p>
+        {{
+          t(
+            'جهّز المحتوى، ابعته للمراجعة، واعتمد إتمام طلابك.',
+            'Create content, submit it for review, and confirm learner completion.'
+          )
+        }}
+      </p>
+    </div>
+    <button class="gold" type="button" (click)="create()" [disabled]="busy()">
+      ＋ {{ t('كورس جديد', 'New course') }}
+    </button>
+  </header>
+  <nav class="workflow-nav">
+    <a routerLink="/portal/trainer">{{ t('لوحة الأستاذ', 'Instructor dashboard') }}</a
+    ><a routerLink="/portal/trainer/programs">{{
+      t('البرامج التدريبية القديمة', 'Legacy training programs')
+    }}</a
+    ><a routerLink="/my-courses">{{ t('كورساتي كمتعلّم', 'My learning') }}</a
+    ><button type="button" (click)="load()" [disabled]="busy()">{{ t('تحديث', 'Refresh') }}</button>
+  </nav>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (success()) {
+    <p class="success" role="status">{{ success() }}</p>
+  }
+  @if (editor()) {
+    <section class="panel">
+      <div class="row">
+        <h2>{{ t('إعداد محتوى الكورس', 'Course content editor') }}</h2>
+        <button type="button" (click)="editor.set(false)" [disabled]="busy()">
+          {{ t('إغلاق', 'Close') }}
+        </button>
+      </div>
+      <p class="notice">
+        {{
+          t(
+            'الحفظ لا ينشر الكورس. بعد الإرسال، أي أدمن يقدر يراجعه. لا يمكن تعديل المحتوى بعد النشر أو تسجيل طلاب.',
+            'Saving does not publish. Submit for an admin to review. Published courses and courses with learners are immutable.'
+          )
+        }}
+      </p>
+      <form (ngSubmit)="save()" #editorForm="ngForm">
+        <div class="form-grid">
+          <label
+            >{{ t('العنوان بالعربي', 'Arabic title')
+            }}<input
+              name="title_ar"
+              [(ngModel)]="draft.title_ar"
+              required
+              minlength="3"
+              maxlength="180"
+              dir="rtl" /></label
+          ><label
+            >{{ t('العنوان بالإنجليزي', 'English title')
+            }}<input
+              name="title_en"
+              [(ngModel)]="draft.title_en"
+              required
+              minlength="3"
+              maxlength="180"
+              dir="ltr"
+          /></label>
+          <label
+            >{{ t('الوصف بالعربي', 'Arabic description')
+            }}<textarea
+              name="description_ar"
+              [(ngModel)]="draft.description_ar"
+              maxlength="10000"
+              dir="rtl"
+            ></textarea></label
+          ><label
+            >{{ t('الوصف بالإنجليزي', 'English description')
+            }}<textarea
+              name="description_en"
+              [(ngModel)]="draft.description_en"
+              maxlength="10000"
+              dir="ltr"
+            ></textarea>
+          </label>
+          <label
+            >{{ t('المجال', 'Category')
+            }}<select name="category" [(ngModel)]="draft.category_id" required>
+              <option value="">{{ t('اختر المجال', 'Choose category') }}</option>
+              @for (category of categories(); track category.id) {
+                <option [value]="category.id">{{ t(category.name_ar, category.name_en) }}</option>
+              }
+            </select></label
+          >
+          <label
+            >{{ t('السعر بالجنيه المصري — صفر للمجاني', 'Price in EGP — zero for free')
+            }}<input
+              name="price"
+              [(ngModel)]="draft.price"
+              type="number"
+              min="0"
+              max="1000000"
+              step="0.01"
+              required
+          /></label>
+          <label
+            >{{ t('رابط المقدمة من يوتيوب', 'YouTube introduction URL')
+            }}<input
+              name="intro"
+              [(ngModel)]="draft.preview_video_url"
+              type="url"
+              maxlength="500"
+              dir="ltr" /></label
+          ><label
+            >{{ t('رابط صورة الغلاف', 'Cover image URL')
+            }}<input name="cover" [(ngModel)]="draft.cover_image_url" maxlength="1000" dir="ltr"
+          /></label>
+          <label
+            >{{ t('لغة الكورس', 'Course language')
+            }}<select name="language" [(ngModel)]="draft.language">
+              <option value="ar">العربية</option>
+              <option value="en">English</option>
+            </select></label
+          ><label
+            >{{ t('المستوى', 'Level')
+            }}<select name="level" [(ngModel)]="draft.level">
+              <option value="BEGINNER">{{ t('مبتدئ', 'Beginner') }}</option>
+              <option value="INTERMEDIATE">{{ t('متوسط', 'Intermediate') }}</option>
+              <option value="ADVANCED">{{ t('متقدم', 'Advanced') }}</option>
+              <option value="ALL_LEVELS">{{ t('كل المستويات', 'All levels') }}</option>
+            </select></label
+          >
+        </div>
+        @for (section of draft.sections; track $index; let s = $index) {
+          <div class="section-editor">
+            <div class="row">
+              <h2>{{ t('الجزء', 'Chapter') }} {{ s + 1 }}</h2>
+              <button type="button" class="danger" (click)="draft.sections.splice(s, 1)">
+                {{ t('حذف الجزء', 'Remove chapter') }}
+              </button>
+            </div>
+            <div class="form-grid">
+              <label
+                >{{ t('عنوان الجزء بالعربي', 'Arabic chapter title')
+                }}<input
+                  [name]="'chapter-ar-' + s"
+                  [(ngModel)]="section.title_ar"
+                  required
+                  minlength="2"
+                  maxlength="180" /></label
+              ><label
+                >{{ t('عنوان الجزء بالإنجليزي', 'English chapter title')
+                }}<input
+                  [name]="'chapter-en-' + s"
+                  [(ngModel)]="section.title_en"
+                  required
+                  minlength="2"
+                  maxlength="180"
+              /></label>
+            </div>
+            @for (lesson of section.lessons; track $index; let l = $index) {
+              <div class="lesson-editor">
+                <div class="row">
+                  <strong>{{ t('الدرس', 'Lesson') }} {{ l + 1 }}</strong
+                  ><button type="button" (click)="section.lessons.splice(l, 1)">
+                    {{ t('حذف الدرس', 'Remove lesson') }}
+                  </button>
+                </div>
+                <div class="form-grid">
+                  <label
+                    >{{ t('العنوان بالعربي', 'Arabic title')
+                    }}<input
+                      [name]="'lesson-ar-' + s + '-' + l"
+                      [(ngModel)]="lesson.title_ar"
+                      required
+                      minlength="2"
+                      maxlength="180" /></label
+                  ><label
+                    >{{ t('العنوان بالإنجليزي', 'English title')
+                    }}<input
+                      [name]="'lesson-en-' + s + '-' + l"
+                      [(ngModel)]="lesson.title_en"
+                      required
+                      minlength="2"
+                      maxlength="180" /></label
+                  ><label
+                    >{{ t('رابط يوتيوب', 'YouTube URL')
+                    }}<input
+                      [name]="'url-' + s + '-' + l"
+                      [(ngModel)]="lesson.media_url"
+                      type="url"
+                      dir="ltr"
+                      required
+                      maxlength="500" /></label
+                  ><label
+                    >{{ t('المدة بالدقائق', 'Duration in minutes')
+                    }}<input
+                      [name]="'duration-' + s + '-' + l"
+                      [(ngModel)]="lesson.duration_minutes"
+                      type="number"
+                      min="1"
+                      max="600"
+                      required /></label
+                  ><label class="check"
+                    ><input
+                      [name]="'preview-' + s + '-' + l"
+                      type="checkbox"
+                      [(ngModel)]="lesson.is_preview"
+                    />{{ t('درس معاينة مجاني', 'Free preview lesson') }}</label
+                  ><button type="button" (click)="preview.set(lesson.media_url)">
+                    {{ t('معاينة الفيديو', 'Preview video') }}
+                  </button>
+                </div>
+              </div>
+            }
+            <button
+              type="button"
+              (click)="
+                section.lessons.push({
+                  title_ar: '',
+                  title_en: '',
+                  media_url: '',
+                  duration_minutes: 1,
+                  is_preview: false,
+                })
+              "
+            >
+              ＋ {{ t('إضافة درس', 'Add lesson') }}
+            </button>
+          </div>
+        }
+        <div class="actions">
+          <button type="button" (click)="draft.sections.push(chapter())">
+            ＋ {{ t('إضافة جزء', 'Add chapter') }}</button
+          ><button class="primary" type="submit" [disabled]="editorForm.invalid || busy()">
+            {{ t('حفظ المسودة', 'Save draft') }}
+          </button>
+        </div>
+      </form>
+      @if (preview()) {
+        <div class="preview-review">
+          <app-youtube-player [url]="preview()" [title]="t('معاينة المحتوى', 'Content preview')" />
+        </div>
+      }
+    </section>
+  }
+  @if (loading()) {
+    <p class="notice" role="status">{{ t('جارٍ تحميل الكورسات…', 'Loading courses…') }}</p>
+  } @else {
+    <section class="grid">
+      @for (course of courses(); track course.id) {
+        <article class="card">
+          <span class="status">{{ statusLabel(course.review_status) }}</span>
+          <h2>{{ title(course) }}</h2>
+          <p>{{ course.lessons_count }} {{ t('دروس', 'lessons') }} · {{ course.price }} EGP</p>
+          @if (course.review_note) {
+            <p class="notice review-note">{{ course.review_note }}</p>
+          }
+          <div class="actions">
+            @if (course.status !== 'PUBLISHED' && course.review_status !== 'PENDING') {
+              <button type="button" (click)="edit(course)" [disabled]="busy()">
+                {{ t('تعديل', 'Edit') }}</button
+              ><button class="primary" type="button" (click)="submit(course)" [disabled]="busy()">
+                {{ t('إرسال للمراجعة', 'Submit for review') }}
+              </button>
+            }
+            @if (course.status === 'PUBLISHED') {
+              <a class="button" [routerLink]="['/programs/course', course.slug]">{{
+                t('فتح الكورس', 'Open course')
+              }}</a>
+            }
+          </div>
+        </article>
+      } @empty {
+        <p class="empty">
+          {{ t('ابدأ بإضافة أول كورس لك.', 'Create your first course to get started.') }}
+        </p>
+      }
+    </section>
+  }
+  <section class="panel">
+    <h2>{{ t('طلبات اعتماد الإتمام', 'Completion review requests') }}</h2>
+    <p class="muted">
+      {{
+        t(
+          'راجع إتمام الطالب قبل الاعتماد. الاعتماد يصدر شهادة النظام تلقائيًا مرة واحدة.',
+          'Verify learner completion before approving. Approval automatically issues one certificate using the existing template.'
+        )
+      }}
+    </p>
+    @for (row of completions(); track row.id) {
+      <article class="section-editor">
+        <h2>{{ row.users?.full_name }} · {{ row.courses && title(row.courses) }}</h2>
+        <p>{{ row.progress }}% · {{ row.users?.email }}</p>
+        <div class="recipient-preview">
+          <strong>{{ row.recipient_name_ar }}</strong
+          ><strong>{{ row.recipient_name_en }}</strong>
+        </div>
+        <div class="form-grid">
+          <label
+            >{{
+              t(
+                'اسم التوقيع — الافتراضي اسمك بالحساب',
+                'Signature name — defaults to your profile name'
+              )
+            }}<input [(ngModel)]="signatures[row.id]" maxlength="80" /></label
+          ><label
+            >{{ t('ملاحظات — مطلوبة للرفض', 'Notes — required to reject')
+            }}<textarea [(ngModel)]="completionNotes[row.id]" maxlength="1000"></textarea>
+          </label>
+        </div>
+        <div class="actions">
+          <button class="primary" type="button" (click)="review(row, true)" [disabled]="busy()">
+            {{ t('اعتماد وإصدار الشهادة', 'Approve & issue certificate') }}</button
+          ><button
+            class="danger"
+            type="button"
+            (click)="review(row, false)"
+            [disabled]="busy() || !completionNotes[row.id]?.trim()"
+          >
+            {{ t('إعادة للطالب', 'Return to learner') }}
+          </button>
+        </div>
+      </article>
+    } @empty {
+      <p class="empty">{{ t('لا توجد طلبات إتمام حاليًا.', 'No completion requests pending.') }}</p>
+    }
+  </section>
+</main>

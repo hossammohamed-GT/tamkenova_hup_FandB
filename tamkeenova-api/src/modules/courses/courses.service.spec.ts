@@ -107,3 +107,7 @@ describe('Course video access', () => {
     ).toBe(true);
   });
 });
+
+it('keeps internal publication reviewer identities and notes out of the public course response',async()=>{
+ const {repo,service}=setup();const row={title_en:'Public course',is_free:true,lessons:[],review_note:'Internal only',reviewed_by:'admin-id',reviewed_at:new Date(),review_status:'APPROVED',revision:3};repo.getCourseBySlug.mockResolvedValue(row);const {data}=await service.getCourseBySlug('course');for(const key of ['review_note','reviewed_by','reviewed_at','review_status','revision'])expect(data).not.toHaveProperty(key);expect(row.review_note).toBe('Internal only');
+});

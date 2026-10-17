@@ -107,6 +107,13 @@ export class VerificationRepository {
             title: true,
             description: true,
             template_version: true,
+            course: {
+              select: {
+                title_ar: true,
+                title_en: true,
+                duration_minutes: true,
+              },
+            },
             issued_at: true,
             training_hours: true,
             pdf_url: true,
@@ -133,7 +140,28 @@ export class VerificationRepository {
           },
         },
 
-
+        course_enrollments: {
+          where: { status: 'COMPLETED' },
+          orderBy: { completed_at: 'desc' },
+          select: {
+            id: true,
+            completed_at: true,
+            courses: {
+              select: {
+                title_ar: true,
+                title_en: true,
+                duration_minutes: true,
+                level: true,
+                owner: {
+                  select: {
+                    slug: true,
+                    users: { select: { full_name: true } },
+                  },
+                },
+              },
+            },
+          },
+        },
         student_enrollments: {
           where: { status: 'COMPLETED' },
           orderBy: { completed_at: 'desc' },

@@ -76,6 +76,13 @@
       <h2 class="section-title">{{ 'student_dashboard.overview' | translate }}</h2>
 
       <div class="sections-grid">
+        <a routerLink="/my-courses" class="section-card surface chamfer-sm"
+          ><div class="section-card-icon">
+            <i class="fa-solid fa-circle-play" aria-hidden="true"></i>
+          </div>
+          <h3>{{ 'course_workflow.library' | translate }}</h3>
+          <p>{{ 'course_workflow.dashboard_hint' | translate }}</p></a
+        >
         <a routerLink="/portal/student/enrollments" class="section-card surface chamfer-sm">
           <div class="section-card-header">
             <div class="section-card-icon">

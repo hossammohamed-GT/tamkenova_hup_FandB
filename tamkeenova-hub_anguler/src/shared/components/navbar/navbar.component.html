@@ -2,7 +2,7 @@
   <div class="navbar-inner">
 
     <a routerLink="/" class="navbar-brand" (click)="closeMobileMenu()">
-      <img src="/images/logo.svg" alt="TamkeeNova" class="brand-mark">
+      <img src="/images/logo.svg" alt="TamkeeNova" class="brand-mark" />
       <span class="brand-word">
         <span class="brand-word-main">
           Tamkee<span class="brand-word-accent">Nova</span>
@@ -104,8 +104,13 @@
                   <span class="notif-glass-title">{{ titleFor(n) }}</span>
                   @if (!n.is_read) { <span class="notif-glass-dot"></span> }
                 </div>
-                <p class="notif-glass-msg">{{ (messageFor(n) || '') | slice:0:70 }}{{ (messageFor(n) || '').length > 70 ? '…' : '' }}</p>
-                <span class="notif-glass-time"><i class="fa-regular fa-clock"></i> {{ timeAgo(n.created_at) }}</span>
+                      <p class="notif-glass-msg">
+                        {{ messageFor(n) || '' | slice: 0 : 70
+                        }}{{ (messageFor(n) || '').length > 70 ? '…' : '' }}
+                      </p>
+                      <span class="notif-glass-time"
+                        ><i class="fa-regular fa-clock"></i> {{ timeAgo(n.created_at) }}</span
+                      >
               </div>
             </article>
             }
@@ -147,6 +152,10 @@
           </div>
           <div class="user-dropdown-divider"></div>
           @if (!isAdminRole()) {
+              <a routerLink="/my-courses" class="user-dropdown-link" (click)="closeUserMenu()"
+                ><i class="fa-solid fa-circle-play" aria-hidden="true"></i
+                >{{ 'course_workflow.library' | translate }}</a
+              >
           <a [routerLink]="profileRoute()" class="user-dropdown-link" (click)="closeUserMenu()">
             <i class="fa-solid fa-user"></i>
             {{ 'nav.my_profile' | translate }}
@@ -187,6 +196,11 @@
 
   <div class="mobile-panel chamfer-lg" [class.is-open]="isMobileMenuOpen()">
     <nav class="mobile-links" [attr.aria-label]="'nav.mobile_navigation' | translate">
+      @if (isLoggedIn()) {
+        <a routerLink="/my-courses" class="mobile-link" (click)="closeMobileMenu()">{{
+          'course_workflow.library' | translate
+        }}</a>
+      }
       @for (link of navLinks; track link.route) {
       @if (link.route === '/programs') {
         <button class="mobile-link mobile-programs-link programs-entry" type="button" (click)="openMobilePrograms()">{{ link.labelKey | translate }} <span aria-hidden="true">→</span></button>

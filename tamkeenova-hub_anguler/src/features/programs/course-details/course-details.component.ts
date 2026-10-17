@@ -1,3 +1,4 @@
+import { CourseLearningActionsComponent } from '../../course-workflow/course-learning-actions.component';
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -22,7 +23,7 @@ import { YoutubePlayerComponent } from '../../../shared/components/youtube-playe
 @Component({
   selector: 'app-course-details',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslatePipe, YoutubePlayerComponent],
+  imports: [CommonModule, RouterLink, TranslatePipe, YoutubePlayerComponent, CourseLearningActionsComponent],
   templateUrl: './course-details.component.html',
   styleUrl: './course-details.component.css',
 })

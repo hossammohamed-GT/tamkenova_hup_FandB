@@ -154,3 +154,14 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+
+## Recorded course workflow
+
+Instructor authoring/publication approval, administrator-configured Vodafone Cash/InstaPay
+manual checkout, verified payment activation, learner progress, instructor-confirmed
+completion and automatic bilingual certificates are documented in
+[prisma/course-workflow/README.md](prisma/course-workflow/README.md).
+
+Apply the reviewed additive schema with `npm run db:course-workflow` before deploying
+the updated API. Checkout stays disabled until an administrator configures real accounts.

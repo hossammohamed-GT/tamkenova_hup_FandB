@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { AuthVisualPanelComponent } from '../../../shared/components/auth-visual-panel/auth-visual-panel.component';
@@ -18,6 +18,7 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -68,6 +69,12 @@ export class LoginComponent {
         this.authService.setSession(res);
         this.isLoading.set(false);
 
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+        // Only known, internal learning URLs; never redirect to an external host.
+        if (returnUrl && (/^\/programs\/course\/[a-zA-Z0-9_-]+(?:\/checkout)?$/.test(returnUrl) || returnUrl === '/my-courses')) {
+          this.router.navigateByUrl(returnUrl);
+          return;
+        }
         const role = res.data.user.role;
         if (role === 'TRAINER') {
           this.router.navigate(['/portal/trainer']);
