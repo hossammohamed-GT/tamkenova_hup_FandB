@@ -32,7 +32,10 @@
     "db:security": "prisma db execute --file prisma/security-hardening.sql --schema prisma/schema.prisma",
     "db:demo-courses": "node --env-file-if-exists=.env prisma/demo-catalog/manage.cjs seed",
     "db:demo-courses:remove": "node --env-file-if-exists=.env prisma/demo-catalog/manage.cjs remove",
-    "test:demo-courses": "node --test test/demo-catalog.test.cjs test/demo-catalog-prisma.test.cjs"
+    "test:demo-courses": "node --test test/demo-catalog.test.cjs test/demo-catalog-prisma.test.cjs",
+    "db:course-videos": "node --env-file-if-exists=.env prisma/course-videos/apply.cjs",
+    "db:demo-course-videos": "node --env-file-if-exists=.env prisma/course-videos/seed-demo.cjs",
+    "test:course-videos": "node --experimental-vm-modules node_modules/jest/bin/jest.js --config jest.courses.config.mjs --runInBand && node --test test/course-video-schema.test.cjs test/course-video-demo.test.cjs"
   },
   "dependencies": {
     "@codegenie/serverless-express": "^5.0.0",

@@ -60,6 +60,14 @@ export class CourseCatalogService {
     return this.http.get<CourseListResponse>(this.baseUrl, { params });
   }
 
+  getCourseAccess(slug: string): Observable<{ can_watch: boolean }> {
+    return this.http.get<CourseCatalogResponse<{ can_watch: boolean }>>(`${this.baseUrl}/${encodeURIComponent(slug)}/access`).pipe(map(response => response.data));
+  }
+
+  getLessonPlayback(slug: string, lessonId: string): Observable<{ id: string; media_url: string }> {
+    return this.http.get<CourseCatalogResponse<{ id: string; media_url: string }>>(`${this.baseUrl}/${encodeURIComponent(slug)}/lessons/${encodeURIComponent(lessonId)}/playback`).pipe(map(response => response.data));
+  }
+
   getCourseBySlug(slug: string): Observable<Course> {
     return this.http
       .get<CourseCatalogResponse<Course>>(`${this.baseUrl}/${encodeURIComponent(slug)}`)

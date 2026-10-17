@@ -22,7 +22,7 @@
       "no_categories": "No categories are available yet.",
       "welcome": "Find your next skill. Choose a field to explore.",
       "close": "Close Programs menu"
-},
+    },
     "tagline": "Empowerment & Training Platform",
     "home": "Home",
     "programs": "Programs",
@@ -276,6 +276,34 @@
       "detail_preview": "Preview available",
       "detail_locked": "Included in the course",
       "detail_back": "Browse more programs"
+    },
+    "video": {
+      "introduction": "Course introduction",
+      "player": "Course video player",
+      "now_playing": "Now playing",
+      "fullscreen": "Full screen with TamkeeNova branding",
+      "fullscreen_error": "Full screen is not available in this browser.",
+      "unavailable": "A YouTube video has not been added yet, or this link is not supported.",
+      "youtube_note": "YouTube video · If embedding is unavailable, open the video on YouTube.",
+      "open_youtube": "Open on YouTube",
+      "demo_note": "Temporary demo content: the introduction and lessons use the supplied test video, not the actual training material.",
+      "not_found": "This course could not be found.",
+      "loading": "Loading lesson…",
+      "playback_error": "We could not load this lesson. Please select it again to retry.",
+      "previous": "Previous",
+      "next": "Next lesson",
+      "about": "About this course",
+      "content": "Course content",
+      "expand_all": "Expand all",
+      "sections": "sections",
+      "checking_access": "Checking your course access…",
+      "enrollment_required": "This lesson requires an active course enrollment. Preview lessons remain available.",
+      "contact": "Ask about course access",
+      "free_previews": "Free preview lessons",
+      "preview": "Preview",
+      "locked": "Enrollment required",
+      "empty": "The course curriculum has not been added yet.",
+      "ungrouped": "Lessons"
     }
   },
   "consultingPage": {

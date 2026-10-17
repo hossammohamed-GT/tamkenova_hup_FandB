@@ -1,0 +1,37 @@
+{
+  "youtube_url": "https://youtu.be/5BciHXh074k?list=RD5BciHXh074k",
+  "sections": [
+    {
+      "title_en": "Getting started — demo",
+      "title_ar": "البداية — جزء تجريبي",
+      "lessons": [
+        {
+          "title_en": "Welcome and course roadmap — demo",
+          "title_ar": "الترحيب وخطة الكورس — درس تجريبي",
+          "is_preview": true
+        },
+        {
+          "title_en": "The foundations — demo",
+          "title_ar": "الأساسيات — درس تجريبي",
+          "is_preview": false
+        }
+      ]
+    },
+    {
+      "title_en": "Putting learning into practice — demo",
+      "title_ar": "من التعلّم إلى التطبيق — جزء تجريبي",
+      "lessons": [
+        {
+          "title_en": "A practical example — demo",
+          "title_ar": "مثال تطبيقي — درس تجريبي",
+          "is_preview": true
+        },
+        {
+          "title_en": "Recap and next steps — demo",
+          "title_ar": "المراجعة والخطوة التالية — درس تجريبي",
+          "is_preview": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,237 +1,277 @@
 <main class="course-details-page">
   @if (isLoading()) {
-    <div class="details-state">
-      <span class="details-spinner"><i class="fa-solid fa-spinner fa-spin"></i></span>
+    <div class="details-state" role="status">
+      <span class="details-spinner">◌</span>
       <p>{{ 'programs.catalog.detail_loading' | translate }}</p>
     </div>
-  } @else if (notFound() || !course()) {
-    <div class="details-state not-found-state">
-      <span class="details-state-icon"><i class="fa-solid fa-book-open"></i></span>
-      <h1>{{ 'programs.catalog.detail_error' | translate }}</h1>
-      <a routerLink="/programs" class="detail-back-button"
-        ><i class="fa-solid fa-arrow-left"></i>
-        {{ 'programs.catalog.back_to_catalog' | translate }}</a
-      >
+  } @else if (notFound() || loadError() || !course()) {
+    <div class="details-state">
+      <h1>
+        {{
+          (notFound() ? 'programs.video.not_found' : 'programs.catalog.detail_error') | translate
+        }}
+      </h1>
+      @if (loadError()) {
+        <button class="detail-back-button" type="button" (click)="retry()">
+          {{ 'programs.catalog.try_again' | translate }}
+        </button>
+      }
+      <a routerLink="/programs" class="back-link">{{
+        'programs.catalog.back_to_catalog' | translate
+      }}</a>
     </div>
   } @else {
-    @let selectedCourse = course()!;
+    @let item = course()!;
     <header class="course-detail-hero">
-      @if (selectedCourse.cover_image_url) {
+      @if (item.cover_image_url) {
         <div
           class="detail-hero-image"
-          [style.background-image]="'url(' + selectedCourse.cover_image_url + ')'"
+          [style.background-image]="'url(' + item.cover_image_url + ')'"
           aria-hidden="true"
         ></div>
       }
       <div class="detail-hero-shade"></div>
       <div class="detail-hero-content content-width">
         <a routerLink="/programs" class="back-link"
-          ><i class="fa-solid fa-arrow-left"></i>
-          {{ 'programs.catalog.back_to_catalog' | translate }}</a
+          >← {{ 'programs.catalog.back_to_catalog' | translate }}</a
         >
         <div class="detail-tags">
-          @if (categoryName(selectedCourse)) {
-            <span>{{ categoryName(selectedCourse) }}</span>
+          @if (categoryName(item)) {
+            <span>{{ categoryName(item) }}</span>
           }
-          <span>{{
-            selectedCourse.content_type === 'PODCOURSE'
-              ? ('programs.catalog.podcourse' | translate)
-              : ('programs.catalog.video_courses' | translate)
-          }}</span>
-          @if (selectedCourse.is_free) {
+          <span>{{ 'programs.catalog.video_courses' | translate }}</span>
+          @if (item.is_free) {
             <span class="detail-free-tag">{{ 'programs.catalog.free' | translate }}</span>
           }
         </div>
-        <h1>{{ title(selectedCourse) }}</h1>
-        @if (selectedCourse.short_description_en || selectedCourse.short_description_ar) {
-          <p class="detail-hero-summary">
-            {{
-              isEnglish()
-                ? selectedCourse.short_description_en
-                : selectedCourse.short_description_ar
-            }}
-          </p>
-        }
+        <h1>{{ title(item) }}</h1>
+        <p class="detail-hero-summary">
+          {{ isEnglish() ? item.short_description_en : item.short_description_ar }}
+        </p>
         <div class="detail-hero-meta">
-          @if (hasRatings(selectedCourse)) {
+          <span>{{ levelLabel(item.level) }}</span>
+          <span>{{ languageLabel(item.language) }}</span>
+          @if (item.duration_minutes) {
+            <span>{{ formatDuration(item.duration_minutes) }}</span>
+          }
+          <span>{{ lessons().length }} {{ 'programs.catalog.lessons' | translate }}</span>
+          @if (hasRatings(item)) {
             <span class="detail-rating"
-              ><i class="fa-solid fa-star"></i> {{ formatRating(selectedCourse.average_rating) }}
-              <small>({{ selectedCourse.ratings_count }})</small></span
-            >
-          }
-          <span><i class="fa-solid fa-signal"></i> {{ levelLabel(selectedCourse.level) }}</span>
-          @if (selectedCourse.duration_minutes) {
-            <span
-              ><i class="fa-regular fa-clock"></i>
-              {{ formatDuration(selectedCourse.duration_minutes) }}</span
-            >
-          }
-          @if (selectedCourse.lessons_count) {
-            <span
-              ><i class="fa-solid fa-circle-play"></i> {{ selectedCourse.lessons_count }}
-              {{ 'programs.catalog.lessons' | translate }}</span
+              >★ {{ formatRating(item.average_rating) }} ({{ item.ratings_count }})</span
             >
           }
         </div>
       </div>
     </header>
-
     <div class="course-details-layout content-width">
       <div class="course-detail-main">
-        @if (selectedCourse.preview_video_url) {
-          <a
-            class="preview-link"
-            [href]="selectedCourse.preview_video_url"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <span><i class="fa-solid fa-circle-play"></i></span>
-            <span
-              ><strong>{{ 'programs.catalog.detail_preview' | translate }}</strong
-              ><small>{{ 'programs.catalog.detail_overview' | translate }}</small></span
-            >
-            <i class="fa-solid fa-arrow-up-right-from-square preview-external"></i>
-          </a>
+        @if (isDemo()) {
+          <p class="demo-video-note">{{ 'programs.video.demo_note' | translate }}</p>
         }
-
+        <section
+          id="course-player"
+          class="course-player-panel"
+          [attr.aria-label]="'programs.video.player' | translate"
+          [attr.aria-busy]="playbackBusy()"
+        >
+          <app-youtube-player [url]="videoUrl()" [title]="playingTitle() + ' — ' + title(item)" />
+          <div class="playing-caption">
+            <div>
+              <span class="detail-section-kicker">{{
+                (selectedLesson() ? 'programs.video.now_playing' : 'programs.video.introduction')
+                  | translate
+              }}</span>
+              <h2>{{ selectedLesson() ? lessonTitle(selectedLesson()!) : title(item) }}</h2>
+            </div>
+            <button
+              class="intro-button"
+              type="button"
+              (click)="selectLesson(null)"
+              [class.is-active]="!selectedLesson()"
+            >
+              {{ 'programs.video.introduction' | translate }}
+            </button>
+          </div>
+          @if (playbackBusy()) {
+            <p class="player-message" role="status">{{ 'programs.video.loading' | translate }}</p>
+          }
+          @if (playbackError()) {
+            <p class="player-message" role="alert">
+              {{ 'programs.video.playback_error' | translate }}
+            </p>
+          }
+          <div class="lesson-navigation">
+            <button
+              type="button"
+              (click)="navigateLesson(-1)"
+              [disabled]="!selectedLesson() || playbackBusy()"
+            >
+              ← {{ 'programs.video.previous' | translate }}
+            </button>
+            <span dir="ltr"
+              >{{ selectedLesson() ? currentIndex() + 1 : 0 }} / {{ lessons().length }}</span
+            >
+            <button
+              type="button"
+              (click)="navigateLesson(1)"
+              [disabled]="currentIndex() >= lessons().length - 1 || playbackBusy()"
+            >
+              {{ 'programs.video.next' | translate }} →
+            </button>
+          </div>
+        </section>
         <section class="detail-panel overview-panel">
           <span class="detail-section-kicker">{{
             'programs.catalog.detail_overview' | translate
           }}</span>
-          <h2>{{ title(selectedCourse) }}</h2>
-          @if (description(selectedCourse)) {
-            <p class="course-description">{{ description(selectedCourse) }}</p>
-          } @else {
-            <p class="course-description muted-copy">
-              {{ 'programs.catalog.detail_description_empty' | translate }}
-            </p>
-          }
+          <h2>{{ 'programs.video.about' | translate }}</h2>
+          <p class="course-description">
+            {{ description(item) || ('programs.catalog.detail_description_empty' | translate) }}
+          </p>
         </section>
-
-        @if (selectedCourse.lessons?.length) {
-          <section class="detail-panel curriculum-panel">
-            <div class="curriculum-heading">
-              <div>
-                <span class="detail-section-kicker">{{
-                  'programs.catalog.detail_curriculum' | translate
-                }}</span>
-                <h2>{{ 'programs.catalog.detail_lessons' | translate }}</h2>
-              </div>
-              <span class="lesson-total">{{
-                'programs.catalog.detail_lesson_count'
-                  | translate: { count: selectedCourse.lessons!.length }
-              }}</span>
-            </div>
-            <ol class="lesson-list">
-              @for (lesson of selectedCourse.lessons; track lesson.id) {
-                <li class="lesson-row">
-                  <span class="lesson-index">{{ lesson.position + 1 | number: '2.0-0' }}</span>
-                  <span class="lesson-icon"
-                    ><i
-                      class="fa-solid"
-                      [class]="
-                        selectedCourse.content_type === 'PODCOURSE'
-                          ? 'fa-solid fa-headphones'
-                          : 'fa-solid fa-play'
-                      "
-                    ></i
-                  ></span>
-                  <span class="lesson-title-group">
-                    <strong>{{ isEnglish() ? lesson.title_en : lesson.title_ar }}</strong>
-                    @if (lesson.is_preview) {
-                      <small>{{ 'programs.catalog.detail_preview' | translate }}</small>
-                    }
-                  </span>
-                  @if (lesson.is_preview) {
-                    <span class="lesson-preview">{{
-                      'programs.catalog.detail_preview' | translate
-                    }}</span>
-                  }
-                  <span class="lesson-duration">{{ formatDuration(lesson.duration_minutes) }}</span>
-                </li>
-              }
-            </ol>
-          </section>
-        }
-      </div>
-
-      <aside class="course-detail-aside">
-        <div class="enrollment-card">
-          @if (selectedCourse.cover_image_url) {
-            <img
-              class="enrollment-cover"
-              [src]="selectedCourse.cover_image_url"
-              [alt]="title(selectedCourse)"
-            />
-          } @else {
-            <div class="enrollment-cover enrollment-cover-placeholder">
-              <i class="fa-solid fa-book-open-reader"></i>
-            </div>
-          }
-          <div class="enrollment-card-body">
-            <span class="enrollment-access">{{
-              selectedCourse.is_free
-                ? ('programs.catalog.free' | translate)
-                : ('programs.catalog.detail_locked' | translate)
-            }}</span>
-            <h2>{{ 'programs.catalog.detail_signup' | translate }}</h2>
-            <p>{{ 'programs.catalog.detail_signup_note' | translate }}</p>
-            <a routerLink="/register" class="signup-button"
-              >{{ 'nav.register' | translate }} <i class="fa-solid fa-arrow-right"></i
-            ></a>
-            <div class="course-facts">
-              @if (selectedCourse.duration_minutes) {
-                <span
-                  ><i class="fa-regular fa-clock"></i>
-                  {{ formatDuration(selectedCourse.duration_minutes) }}</span
-                >
-              }
-              @if (selectedCourse.lessons_count) {
-                <span
-                  ><i class="fa-solid fa-circle-play"></i> {{ selectedCourse.lessons_count }}
-                  {{ 'programs.catalog.lessons' | translate }}</span
-                >
-              }
-              <span
-                ><i class="fa-solid fa-globe"></i>
-                {{ languageLabel(selectedCourse.language) }}</span
-              >
-            </div>
-          </div>
-        </div>
-
-        @if (selectedCourse.instructors?.length) {
-          <div class="instructor-card">
+        @if (item.instructors?.length) {
+          <section class="instructor-card">
             <span class="detail-section-kicker">{{
               'programs.catalog.detail_instructor' | translate
             }}</span>
             <div class="instructor-detail-head">
-              @if (instructorImage(selectedCourse)) {
-                <img
-                  [src]="instructorImage(selectedCourse)"
-                  [alt]="instructorName(selectedCourse)"
-                />
-              } @else {
-                <span class="instructor-detail-avatar"><i class="fa-solid fa-user"></i></span>
+              @if (instructorImage(item)) {
+                <img [src]="instructorImage(item)" [alt]="instructorName(item)" />
               }
-              <div>
-                <strong>{{ instructorName(selectedCourse) }}</strong>
-                @if (selectedCourse.instructors?.[0]?.trainers.specializations; as spec) {
-                  <small>{{ isEnglish() ? spec.name_en : spec.name_ar }}</small>
-                }
-              </div>
+              <strong>{{ instructorName(item) }}</strong>
             </div>
-            @if (instructorBio(selectedCourse)) {
-              <p>{{ instructorBio(selectedCourse) }}</p>
+            <p>{{ instructorBio(item) }}</p>
+            @if (instructorSlug(item)) {
+              <a [routerLink]="['/team', instructorSlug(item)]"
+                >{{ 'programs.catalog.detail_instructor' | translate }} →</a
+              >
             }
-            @if (instructorSlug(selectedCourse)) {
-              <a [routerLink]="['/team', instructorSlug(selectedCourse)]"
-                >{{ 'programs.catalog.detail_instructor' | translate }}
-                <i class="fa-solid fa-arrow-right"></i
-              ></a>
-            }
-          </div>
+          </section>
         }
+      </div>
+      <aside class="course-detail-aside">
+        <section class="detail-panel curriculum-panel">
+          <div class="curriculum-heading">
+            <div>
+              <span class="detail-section-kicker">{{
+                'programs.catalog.detail_curriculum' | translate
+              }}</span>
+              <h2>{{ 'programs.video.content' | translate }}</h2>
+            </div>
+            <button type="button" class="expand-all" (click)="expandAll()">
+              {{ 'programs.video.expand_all' | translate }}
+            </button>
+          </div>
+          <p class="curriculum-summary">
+            {{ chapters().length }} {{ 'programs.video.sections' | translate }} ·
+            {{ lessons().length }} {{ 'programs.catalog.lessons' | translate }}
+          </p>
+          @if (accessLoading()) {
+            <p class="player-message" role="status">
+              {{ 'programs.video.checking_access' | translate }}
+            </p>
+          }
+          @if (accessNotice()) {
+            <div class="access-notice" role="alert">
+              <p>{{ 'programs.video.enrollment_required' | translate }}</p>
+              @if (!auth.isLoggedIn()) {
+                <a
+                  routerLink="/login"
+                  [queryParams]="{ returnUrl: '/programs/course/' + item.slug }"
+                  >{{ 'nav.login' | translate }} →</a
+                >
+              } @else {
+                <a routerLink="/consulting">{{ 'programs.video.contact' | translate }} →</a>
+              }
+            </div>
+          }
+          @if (previews().length) {
+            <div class="free-previews">
+              <h3>{{ 'programs.video.free_previews' | translate }}</h3>
+              @for (lesson of previews(); track lesson.id) {
+                <button
+                  type="button"
+                  (click)="selectLesson(lesson)"
+                  [class.is-playing]="selectedLesson()?.id === lesson.id"
+                >
+                  <span aria-hidden="true">▷</span><span>{{ lessonTitle(lesson) }}</span
+                  ><span class="lesson-preview">{{ 'programs.video.preview' | translate }}</span>
+                </button>
+              }
+            </div>
+          }
+          @for (chapter of chapters(); track chapter.id; let index = $index) {
+            <div class="chapter" [class.is-expanded]="expanded().has(chapter.id)">
+              <h3>
+                <button
+                  class="chapter-toggle"
+                  type="button"
+                  (click)="toggleChapter(chapter.id)"
+                  [attr.aria-expanded]="expanded().has(chapter.id)"
+                  [attr.aria-controls]="'chapter-' + chapter.id"
+                >
+                  <span class="chapter-number">{{ index + 1 }}</span
+                  ><span class="chapter-title"
+                    >{{ chapterTitle(chapter)
+                    }}<small
+                      >{{ chapter.lessons.length }} {{ 'programs.catalog.lessons' | translate }}
+                      @if (chapterDuration(chapter.lessons)) {
+                        · {{ formatDuration(chapterDuration(chapter.lessons)) }}
+                      }
+                    </small></span
+                  ><span aria-hidden="true">{{ expanded().has(chapter.id) ? '−' : '+' }}</span>
+                </button>
+              </h3>
+              <ol
+                class="chapter-lessons"
+                [id]="'chapter-' + chapter.id"
+                [hidden]="!expanded().has(chapter.id)"
+              >
+                @for (lesson of chapter.lessons; track lesson.id; let lessonIndex = $index) {
+                  <li>
+                    <button
+                      type="button"
+                      class="lesson-button"
+                      (click)="selectLesson(lesson)"
+                      [class.is-playing]="selectedLesson()?.id === lesson.id"
+                      [class.is-locked]="!available(lesson)"
+                      [disabled]="accessLoading() && !item.is_free && !lesson.is_preview"
+                      [attr.aria-current]="selectedLesson()?.id === lesson.id ? 'true' : null"
+                    >
+                      <span class="lesson-index">{{ lessonIndex + 1 | number: '2.0-0' }}</span
+                      ><svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          [attr.d]="
+                            available(lesson)
+                              ? 'm9 5 11 7-11 7z'
+                              : 'M6 10h12v11H6zM8 10V6a4 4 0 0 1 8 0v4'
+                          "
+                        /></svg
+                      ><span class="lesson-title-group"
+                        ><strong>{{ lessonTitle(lesson) }}</strong>
+                        @if (lesson.is_preview) {
+                          <small>{{ 'programs.video.preview' | translate }}</small>
+                        }
+                        @if (!available(lesson)) {
+                          <small class="locked-label">{{
+                            'programs.video.locked' | translate
+                          }}</small>
+                        }
+                      </span>
+                      @if (lesson.duration_minutes) {
+                        <span class="lesson-duration">{{
+                          formatDuration(lesson.duration_minutes)
+                        }}</span>
+                      }
+                    </button>
+                  </li>
+                }
+              </ol>
+            </div>
+          } @empty {
+            <p class="curriculum-empty">{{ 'programs.video.empty' | translate }}</p>
+          }
+        </section>
       </aside>
     </div>
   }

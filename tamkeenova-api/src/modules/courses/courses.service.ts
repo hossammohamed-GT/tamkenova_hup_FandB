@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CourseCatalogQueryDto } from './dto/course-catalog-query.dto';
 import { CoursesRepository } from './courses.repository';
 
@@ -46,6 +50,42 @@ export class CoursesService {
   async getCourseBySlug(slug: string) {
     const course = await this.repository.getCourseBySlug(slug);
     if (!course) throw new NotFoundException('Course not found');
-    return { success: true, data: course };
+    // Never publish paid lesson URLs through the public course endpoint.
+    const lessons = course.lessons.map((lesson) => ({
+      ...lesson,
+      media_url: course.is_free || lesson.is_preview ? lesson.media_url : null,
+    }));
+    return { success: true, data: { ...course, lessons } };
+  }
+
+  async getCourseAccess(slug: string, userId: string) {
+    const course = await this.repository.getCourseAccess(slug, userId);
+    if (!course) throw new NotFoundException('Course not found');
+    return {
+      success: true,
+      data: { can_watch: course.is_free || course.enrollments.length > 0 },
+    };
+  }
+
+  async getLessonPlayback(slug: string, lessonId: string, userId: string) {
+    const lesson = await this.repository.getLessonPlayback(
+      slug,
+      lessonId,
+      userId,
+    );
+    if (!lesson) throw new NotFoundException('Lesson not found');
+    if (
+      !lesson.is_preview &&
+      !lesson.courses.is_free &&
+      !lesson.courses.enrollments.length
+    ) {
+      throw new ForbiddenException('Course enrollment required');
+    }
+    if (!lesson.media_url)
+      throw new NotFoundException('Lesson video is not configured');
+    return {
+      success: true,
+      data: { id: lesson.id, media_url: lesson.media_url },
+    };
   }
 }

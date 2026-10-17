@@ -219,6 +219,10 @@ export class CoursesRepository {
       where: { slug, status: 'PUBLISHED' },
       include: {
         ...this.courseCardInclude(),
+        sections: {
+          orderBy: { position: 'asc' },
+          select: { id: true, title_ar: true, title_en: true, position: true },
+        },
         lessons: {
           where: { is_active: true },
           orderBy: { position: 'asc' },
@@ -231,6 +235,51 @@ export class CoursesRepository {
             duration_minutes: true,
             position: true,
             is_preview: true,
+            section_id: true,
+            media_url: true,
+          },
+        },
+      },
+    });
+  }
+
+  async getCourseAccess(slug: string, userId: string) {
+    return this.prisma.courses.findFirst({
+      where: { slug, status: 'PUBLISHED' },
+      select: {
+        id: true,
+        is_free: true,
+        enrollments: {
+          where: { user_id: userId, status: { in: ['ACTIVE', 'COMPLETED'] } },
+          select: { id: true },
+          take: 1,
+        },
+      },
+    });
+  }
+
+  async getLessonPlayback(slug: string, lessonId: string, userId: string) {
+    return this.prisma.course_lessons.findFirst({
+      where: {
+        id: lessonId,
+        is_active: true,
+        courses: { slug, status: 'PUBLISHED' },
+      },
+      select: {
+        id: true,
+        media_url: true,
+        is_preview: true,
+        courses: {
+          select: {
+            is_free: true,
+            enrollments: {
+              where: {
+                user_id: userId,
+                status: { in: ['ACTIVE', 'COMPLETED'] },
+              },
+              select: { id: true },
+              take: 1,
+            },
           },
         },
       },

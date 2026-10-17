@@ -703,6 +703,7 @@ model courses {
   created_at           DateTime             @default(now()) @db.Timestamptz(6)
   updated_at           DateTime             @default(now()) @updatedAt @db.Timestamptz(6)
 
+  sections         course_sections[]
   lessons          course_lessons[]
   category_links   course_category_links[]
   instructors      course_instructors[]
@@ -717,7 +718,25 @@ model courses {
   @@index([enrollments_count], map: "idx_courses_enrollments_count")
 }
 
+/// Ordered chapters for a course. Legacy lessons can remain ungrouped.
+model course_sections {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  course_id   String   @db.Uuid
+  title_ar    String   @db.VarChar(255)
+  title_en    String   @db.VarChar(255)
+  position    Int      @default(0)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  courses courses          @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_section_course")
+  lessons course_lessons[]
+
+  @@unique([id, course_id], map: "course_sections_id_course_unique")
+  @@unique([course_id, position], map: "course_sections_course_position_unique")
+}
+
 model course_lessons {
+  section_id       String?   @db.Uuid
   id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   course_id        String    @db.Uuid
   title_ar         String    @db.VarChar(255)
@@ -734,6 +753,9 @@ model course_lessons {
 
   courses courses @relation(fields: [course_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_course_lesson_course")
 
+  sections course_sections? @relation(fields: [section_id, course_id], references: [id, course_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_course_lesson_section")
+
+  @@index([section_id], map: "idx_course_lessons_section")
   @@unique([course_id, position], map: "course_lessons_course_position_unique")
   @@index([course_id, is_active, position], map: "idx_course_lessons_course_active_order")
 }

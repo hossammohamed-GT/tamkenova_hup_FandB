@@ -58,16 +58,28 @@ export interface Course {
     is_primary: boolean;
     trainers: CourseInstructor;
   }>;
-  lessons?: Array<{
-    id: string;
-    title_ar: string;
-    title_en: string;
-    description_ar?: string | null;
-    description_en?: string | null;
-    duration_minutes: number;
-    position: number;
-    is_preview: boolean;
-  }>;
+  sections?: CourseSection[];
+  lessons?: CourseLesson[];
+}
+
+export interface CourseSection {
+  id: string;
+  title_ar: string;
+  title_en: string;
+  position: number;
+}
+
+export interface CourseLesson {
+  id: string;
+  section_id?: string | null;
+  title_ar: string;
+  title_en: string;
+  description_ar?: string | null;
+  description_en?: string | null;
+  duration_minutes: number;
+  position: number;
+  is_preview: boolean;
+  media_url?: string | null;
 }
 
 export interface CourseCollection {
