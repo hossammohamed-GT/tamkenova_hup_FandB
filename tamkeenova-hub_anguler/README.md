@@ -1,5 +1,13 @@
 # TamkeenovaHubAnguler
 
+
+## Production API connection
+
+The browser uses the same-origin `/api` base. On Vercel, this project's `vercel.json` rewrites it to `https://tamkeenova-api.vercel.app/api` before the Angular SPA fallback. `proxy.conf.json` is development-only and is not deployed as a production proxy.
+
+Set the frontend Vercel Root Directory to `tamkeenova-hub_anguler`, deploy the updated configuration, and run `npm run test:deployment` to check the routing contract. See [production diagnosis and deployment checks](../DOCS/PRODUCTION-CONNECTION.md).
+
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.4.
 
 ## Development server

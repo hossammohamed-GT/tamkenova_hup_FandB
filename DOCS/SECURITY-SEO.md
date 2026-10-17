@@ -14,7 +14,7 @@ Validated locally on 2026-10-17. This is application hardening, not a production
 - Nodemailer cannot fetch local files or remote URL attachments. Unused mailer/deployment dependencies were removed and vulnerable runtime dependencies remediated. A narrowly scoped Prisma config dependency override is used rather than an unrelated Prisma major upgrade.
 - A dormant, unregistered development storage-upload controller/module was removed to prevent accidental future exposure.
 - The Angular interceptor attaches tokens and processes authentication failures only for the configured API origin and path boundary. Translation files, assets, protocol-relative hostile URLs and external HTTP requests do not receive bearer credentials or trigger unrelated logout behavior.
-- Frontend CSP rejects inline scripts, plugin objects, foreign base URLs and foreign form destinations while retaining supported YouTube embeds and existing remote resources. Vercel configuration adds response security headers, anti-framing and private-route no-store/noindex headers. It intentionally adds no deployment rewrites.
+- Frontend CSP rejects inline scripts, plugin objects, foreign base URLs and foreign form destinations while retaining supported YouTube embeds and existing remote resources. Vercel configuration adds response security headers, anti-framing and private-route no-store/noindex headers. A subsequent production-routing fix adds a same-origin `/api` rewrite to the production backend and a final Angular SPA fallback; see `DOCS/PRODUCTION-CONNECTION.md`.
 
 ## SEO changes
 
@@ -66,7 +66,7 @@ Dependency audit results at validation time:
 
 ## Production checklist and remaining boundaries
 
-1. Deploy both applications from the updated branch. Confirm Vercel uses the frontend project directory so its header configuration is applied. Existing routing/proxy settings are not changed. Verify actual HTTPS responses, cache behavior and private-route headers at the public edge; development preview responses do not prove Vercel header delivery.
+1. Deploy both applications from the updated branch. Confirm Vercel uses the frontend project directory so its header configuration is applied. Confirm the production API rewrite targets the actual HTTPS backend, ahead of the SPA fallback. The development proxy remains local. Verify actual HTTPS responses, cache behavior and private-route headers at the public edge; development preview responses do not prove Vercel header delivery.
 2. Use private environment configuration for random JWT/OTP secrets, database credentials, Supabase service credentials and mail credentials. Rotate any previously exposed credentials. Keep the current Prisma schema/migrations consistent with the database using the established reviewed, non-destructive deployment process; no live database migration/reset was performed here.
 3. If changing the public domain, update `SEO_PUBLIC_ORIGIN`, static index sharing/canonical URLs, robots/sitemap URLs and the API CORS origin together. Set additional `FRONTEND_ORIGINS` to exact trusted origins only.
 4. Audit Supabase bucket policies and object access. Application documents, attachments and payment evidence may contain private data: signature validation and random filenames do not make a public bucket private. Review least-privilege keys, private buckets/signed-download authorization, malware scanning, retention and backups against the actual deployment.

@@ -10,7 +10,8 @@
     "certificates:artwork": "node scripts/build-certificate-artwork-v3.mjs",
     "test:certificates": "vitest run src/core/certificates/",
     "test:certificates:e2e": "playwright test",
-    "certificates:artwork:legacy": "node scripts/build-certificate-artwork.mjs"
+    "certificates:artwork:legacy": "node scripts/build-certificate-artwork.mjs",
+    "test:deployment": "node --test scripts/deployment-routing.test.mjs"
   },
   "private": true,
   "packageManager": "npm@11.17.0",
