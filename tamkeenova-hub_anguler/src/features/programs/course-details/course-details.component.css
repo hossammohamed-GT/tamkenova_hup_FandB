@@ -16,8 +16,8 @@
 .detail-hero-content { position: relative; }
 .back-link { display: inline-flex; align-items: center; gap: 0.55rem; color: rgba(255, 255, 255, 0.78); font-size: 0.82rem; font-weight: 650; text-decoration: none; }
 .back-link:hover { color: #fff; }
-.back-link i { transition: transform 150ms ease; }
-.back-link:hover i { transform: translateX(-3px); }
+.back-link .directional-arrow { transition: transform 150ms ease; }
+.back-link:hover .directional-arrow { transform: translateX(-3px); }
 .detail-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 2rem; }
 .detail-tags span { padding: 0.35rem 0.68rem; border: 1px solid rgba(255, 255, 255, 0.27); border-radius: 5px; background: rgba(255, 255, 255, 0.1); color: #fff; font-size: 0.72rem; font-weight: 700; }
 .detail-tags .detail-free-tag { border-color: #cbe9d3; background: #e7f6eb; color: #227244; }
@@ -86,11 +86,6 @@
 .details-state h1 { margin: 0 0 1.1rem; color: var(--color-text); font-size: 1.4rem; }
 .details-state p { margin: 0; }
 .detail-back-button { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.7rem 1rem; border-radius: 6px; background: var(--color-primary); color: #fff; font-size: 0.82rem; font-weight: 700; text-decoration: none; }
-
-:host-context([dir='rtl']) .back-link i,
-:host-context([dir='rtl']) .detail-back-button i { transform: rotate(180deg); }
-:host-context([dir='rtl']) .signup-button i,
-:host-context([dir='rtl']) .instructor-card > a i { transform: rotate(180deg); }
 
 @media (max-width: 900px) {
   .course-details-layout { grid-template-columns: minmax(0, 1fr) 290px; gap: 1.2rem; }
@@ -196,3 +191,6 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   .overview-panel { order: 3; width: 100%; }
   .instructor-card { order: 4; width: 100%; }
 }
+
+.lesson-navigation { gap: var(--action-gap, 12px); flex-wrap: wrap; }
+.intro-button, .lesson-navigation button { min-height: 44px; }

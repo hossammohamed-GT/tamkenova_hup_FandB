@@ -20,7 +20,7 @@
     <p class="hero-subtitle">{{ 'home.hero.subtitle' | translate }}</p>
     <a routerLink="/programs" class="btn-primary hero-cta">
       {{ 'home.hero.cta' | translate }}
-      <i class="fa-solid fa-arrow-left rtl-flip"></i>
+      <i class="directional-arrow arrow-forward" aria-hidden="true">→</i>
     </a>
   </div>
 </section>
@@ -96,7 +96,7 @@
         <p class="service-desc">{{ service.descKey | translate }}</p>
         <span class="service-link">
           {{ service.linkKey | translate }}
-          <span class="service-arrow"><i class="fa-solid fa-arrow-left rtl-flip"></i></span>
+          <span class="service-arrow"><i class="directional-arrow arrow-forward" aria-hidden="true">→</i></span>
         </span>
       </a>
     }
@@ -119,7 +119,7 @@
 
     <a routerLink="/gallery" class="btn-primary gallery-cta">
       {{ 'home.gallery.link' | translate }}
-      <i class="fa-solid fa-arrow-left rtl-flip"></i>
+      <i class="directional-arrow arrow-forward" aria-hidden="true">→</i>
     </a>
   </div>
 
@@ -152,7 +152,7 @@
             <span class="contact-card-label">{{ channel.labelKey | translate }}</span>
             <span class="contact-card-value" dir="ltr">{{ channel.value }}</span>
           </span>
-          <span class="contact-card-arrow"><i class="fa-solid fa-arrow-left rtl-flip"></i></span>
+          <span class="contact-card-arrow"><i class="directional-arrow arrow-forward" aria-hidden="true">→</i></span>
         </a>
       }
     </div>

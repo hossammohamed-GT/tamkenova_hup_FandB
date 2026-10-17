@@ -32,7 +32,7 @@
             </button>
           }
           <button type="submit" class="search-submit" [attr.aria-label]="'programs.catalog.search' | translate">
-            <i class="fa-solid fa-arrow-right rtl-flip" aria-hidden="true"></i>
+            <i class="directional-arrow arrow-forward" aria-hidden="true">→</i>
           </button>
         </form>
 
@@ -93,7 +93,7 @@
     </div>
     <div class="category-detail-content">
       <button type="button" class="category-back-button" (click)="showAllCategories()">
-        <i class="fa-solid fa-arrow-left rtl-flip" aria-hidden="true"></i>
+        <i class="directional-arrow arrow-back" aria-hidden="true">←</i>
         {{ 'programs.catalog.back_to_all_categories' | translate }}
       </button>
       <span class="eyebrow">
@@ -166,7 +166,7 @@
                 </span>
               </span>
               <span class="category-arrow" aria-hidden="true">
-                <svg class="rtl-flip" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6" /></svg>
+                <svg class="directional-arrow arrow-forward" viewBox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6" /></svg>
               </span>
             </span>
             </span>
@@ -194,8 +194,7 @@
         </div>
         <a class="text-link" href="#course-list"
           >{{ 'programs.catalog.explore_courses' | translate }}
-          <i class="fa-solid fa-arrow-right"></i
-        ></a>
+          <i class="directional-arrow arrow-forward" aria-hidden="true">→</i></a>
       </div>
       <div class="course-row">
         @for (course of collection.courses; track course.id) {
@@ -256,7 +255,7 @@
                 @if (program.courses.length) {
                   <a class="path-link" [routerLink]="['/programs/course', program.courses[0].slug]">
                     {{ 'programs.catalog.explore_path' | translate }}
-                    <i class="fa-solid fa-arrow-right"></i>
+                    <i class="directional-arrow arrow-forward" aria-hidden="true">→</i>
                   </a>
                 } @else {
                   <span class="path-link is-disabled">{{
@@ -279,7 +278,7 @@
         <p>{{ 'programs.catalog.results_summary' | translate: { count: totalCourses() } }}</p>
         @if (selectedCategory()) {
           <button type="button" class="category-return-link text-link" (click)="showAllCategories()">
-            <i class="fa-solid fa-arrow-left rtl-flip" aria-hidden="true"></i>
+            <i class="directional-arrow arrow-back" aria-hidden="true">←</i>
             {{ 'programs.catalog.back_to_all_categories' | translate }}
           </button>
         }
@@ -491,8 +490,7 @@
             [routerLink]="['/programs/course', course.slug]"
             class="course-arrow"
             [attr.aria-label]="'programs.catalog.view_course' | translate"
-            ><i class="fa-solid fa-arrow-right"></i
-          ></a>
+            ><i class="directional-arrow arrow-forward" aria-hidden="true">→</i></a>
         </div>
       </div>
     </article>

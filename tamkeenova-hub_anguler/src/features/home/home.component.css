@@ -530,7 +530,7 @@
   box-shadow: 0 8px 18px color-mix(in srgb, var(--color-action) 35%, transparent);
 }
 
-html[dir='rtl'] .service-card:hover .service-arrow {
+:host-context([dir='rtl']) .service-card:hover .service-arrow {
   transform: translateX(-4px) scale(1.08);
 }
 
@@ -771,7 +771,7 @@ html[dir='rtl'] .service-card:hover .service-arrow {
   transform: translateX(4px);
 }
 
-html[dir='rtl'] .contact-card:hover .contact-card-arrow {
+:host-context([dir='rtl']) .contact-card:hover .contact-card-arrow {
   transform: translateX(-4px);
 }
 

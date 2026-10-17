@@ -313,13 +313,6 @@
   background: var(--color-primary-hover);
 }
 
-.rtl-flip {
-  transform: scaleX(1);
-}
-html[dir='rtl'] .rtl-flip {
-  transform: scaleX(-1);
-}
-
 /* Temporary placeholder */
 .soon-card {
   margin: 2.5rem auto;

@@ -148,8 +148,8 @@
 
     @if (totalPages() > 1) {
       <div class="pagination">
-        <button type="button" class="page-btn" [disabled]="page() === 1" (click)="goToPage(page() - 1)">
-          <i class="fa-solid fa-chevron-start rtl-flip"></i>
+        <button type="button" class="page-btn" [disabled]="page() === 1" (click)="goToPage(page() - 1)" [attr.aria-label]="'common.previous_page' | translate">
+          <i class="directional-arrow arrow-back" aria-hidden="true">‹</i>
         </button>
         @for (p of pages(); track p) {
           <button type="button" class="page-btn" [class.is-active]="p === page()" (click)="goToPage(p)">
@@ -161,8 +161,8 @@
           class="page-btn"
           [disabled]="page() === totalPages()"
           (click)="goToPage(page() + 1)"
-        >
-          <i class="fa-solid fa-chevron-end rtl-flip"></i>
+         [attr.aria-label]="'common.next_page' | translate">
+          <i class="directional-arrow arrow-forward" aria-hidden="true">›</i>
         </button>
         <span class="page-info">{{ 'admin_users.total_label' | translate }} {{ total() }}</span>
       </div>

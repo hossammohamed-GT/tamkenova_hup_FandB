@@ -364,7 +364,7 @@
 }
 
 .trainer-card:hover .trainer-card-view-details i {
-  transform: translateX(-3px);
+  transform: translateX(3px);
 }
 
 html[dir='ltr'] .trainer-card:hover .trainer-card-view-details i {

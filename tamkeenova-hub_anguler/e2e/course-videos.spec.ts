@@ -162,3 +162,104 @@ test('unsupported links never become trusted iframe sources', async ({ page }) =
   await page.locator('.free-previews button').click();
   await expect(page.locator('iframe')).toHaveAttribute('src', /youtube-nocookie.com/);
 });
+
+test('the real page CSP permits the inline YouTube document, not just an iframe src attribute', async ({
+  page,
+}) => {
+  await mock(page);
+  let embeddedRequests = 0;
+  await page.route('https://www.youtube-nocookie.com/embed/**', (route) => {
+    embeddedRequests++;
+    // Explicit embedded-document fixture, NOT a claim of live YouTube playback.
+    return route.fulfill({
+      contentType: 'text/html',
+      body: '<!doctype html><html><body><button>Embedded player ready</button></body></html>',
+    });
+  });
+  await page.goto('/programs/course/' + sample.slug);
+  await expect(
+    page
+      .locator('app-youtube-player iframe')
+      .contentFrame()
+      .getByRole('button', { name: 'Embedded player ready' }),
+  ).toBeVisible();
+  expect(embeddedRequests).toBe(1);
+  await expect(page).toHaveURL(new RegExp('/programs/course/' + sample.slug + '$'));
+});
+
+for (const language of ['ar', 'en'] as const) {
+  test(`logical previous/next arrows and player controls: ${language}`, async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 900 });
+    await mock(page);
+    await page.addInitScript(
+      (language) => localStorage.setItem('tamkeenova-lang', language),
+      language,
+    );
+    await page.goto('/programs/course/' + sample.slug);
+    const back = page.locator('.back-link .arrow-back');
+    const previous = page.locator('.lesson-navigation .arrow-back');
+    const next = page.locator('.lesson-navigation .arrow-forward');
+    for (const [arrow, glyph] of [
+      [back, '←'],
+      [previous, '←'],
+      [next, '→'],
+    ] as const) {
+      await expect(arrow).toHaveText(glyph);
+      await expect(arrow).toHaveCSS('scale', language === 'ar' ? '-1 1' : '1');
+    }
+    await page.addStyleTag({
+      content:
+        '*, *::before, *::after { animation: none !important; transition: none !important; }',
+    });
+    const buttons = await page.locator('.lesson-navigation button').all();
+    for (const button of buttons) {
+      const rect = await button.boundingBox();
+      expect(rect!.height).toBeGreaterThanOrEqual(44);
+    }
+    const full = await page.locator('.video-brand-strip button').boundingBox();
+    expect(full!.height).toBeGreaterThanOrEqual(44);
+    expect(full!.width).toBeGreaterThanOrEqual(44);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  });
+}
+
+test('changing language updates arrow direction in place, including after hover', async ({
+  page,
+}) => {
+  await mock(page);
+  await page.addInitScript(() => localStorage.setItem('tamkeenova-lang', 'en'));
+  await page.goto('/programs/course/' + sample.slug);
+  const arrow = page.locator('.back-link .directional-arrow');
+  await expect(arrow).toHaveCSS('scale', '1');
+  await page.locator('.desktop-only[aria-label="Change language"]').click();
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(arrow).toHaveCSS('scale', '-1 1');
+  await page.locator('.back-link').hover();
+  await expect(arrow).toHaveCSS('scale', '-1 1');
+});
+
+test('allowing YouTube frames still blocks unrelated external iframes', async ({ page }) => {
+  await mock(page);
+  await page.goto('/programs/course/' + sample.slug);
+  const violation = await page.evaluate(
+    () =>
+      new Promise<{ directive: string; url: string }>((resolve) => {
+        const onViolation = (event: SecurityPolicyViolationEvent) => {
+          if (event.effectiveDirective !== 'frame-src') return;
+          document.removeEventListener('securitypolicyviolation', onViolation);
+          resolve({ directive: event.effectiveDirective, url: event.blockedURI });
+        };
+        document.addEventListener('securitypolicyviolation', onViolation);
+        const frame = document.createElement('iframe');
+        frame.src = 'https://untrusted-frame.example.test/player';
+        frame.hidden = true;
+        document.body.append(frame);
+      }),
+  );
+  expect(violation).toEqual({
+    directive: 'frame-src',
+    url: 'https://untrusted-frame.example.test',
+  });
+});

@@ -120,7 +120,7 @@
           <div class="notif-glass-footer">
             <button type="button" class="notif-glass-view-all" (click)="goToNotifications()">
               {{ 'nav.notifications_view_all' | translate }}
-              <i class="fa-solid fa-arrow-left rtl-flip"></i>
+              <i class="directional-arrow arrow-forward" aria-hidden="true">→</i>
             </button>
           </div>
         </div>
@@ -203,7 +203,7 @@
       }
       @for (link of navLinks; track link.route) {
       @if (link.route === '/programs') {
-        <button class="mobile-link mobile-programs-link programs-entry" type="button" (click)="openMobilePrograms()">{{ link.labelKey | translate }} <span aria-hidden="true">→</span></button>
+        <button class="mobile-link mobile-programs-link programs-entry" type="button" (click)="openMobilePrograms()">{{ link.labelKey | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></button>
       } @else {
       <a
         [routerLink]="link.route"
@@ -213,7 +213,7 @@
         (click)="closeMobileMenu()"
       >
         {{ link.labelKey | translate }}
-        <i class="fa-solid fa-arrow-left mobile-link-icon rtl-flip"></i>
+        <i class="mobile-link-icon directional-arrow arrow-forward" aria-hidden="true">→</i>
       </a>
       }
       }

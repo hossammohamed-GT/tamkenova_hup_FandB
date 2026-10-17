@@ -57,3 +57,26 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Embedded video and logical action controls
+
+Course introduction/lesson playback remains inside the shared YouTube player. The HTML CSP
+explicitly allows `frame-src https://www.youtube-nocookie.com https://www.youtube.com`;
+URL validation and all other CSP restrictions remain in place. If the hosting platform also
+sends a **Content-Security-Policy response header**, its `frame-src` must permit these hosts
+too: an HTML policy cannot override a stricter response header. Do not use `frame-src *`.
+The external YouTube link is an optional fallback, not the normal lesson flow. YouTube still
+controls video availability, age/region restrictions and whether an owner permits embedding.
+
+Horizontal navigation uses `.directional-arrow` with a right-facing source glyph for
+`.arrow-forward` and a left-facing glyph for `.arrow-back`. RTL mirrors either once via the
+individual CSS `scale` property, independently of hover transforms. Do not also rotate these
+icons in a component. Local text/SVG arrows work even when the external icon font is blocked.
+Physical fullscreen/download/external-link and vertical reorder icons are not navigation arrows.
+
+Shared action groups use `--action-gap` (12px; compact table action groups 8px), wrap when
+needed, and have explicit separation from stacked form controls. Avoid blanket button margins:
+they break inline search, chat and icon-only controls. Workflow/player controls retain at least
+44px targets. Browser regressions cover Arabic/English at 320–1440px, hover/language changes,
+admin dialogs/pagination, actual **mock embedded-document loading under CSP**, and rejection
+of unrelated frame hosts. These tests do not establish live YouTube playback or owner permission.

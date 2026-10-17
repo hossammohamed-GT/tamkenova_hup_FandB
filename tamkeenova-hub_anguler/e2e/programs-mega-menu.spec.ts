@@ -47,6 +47,11 @@ for (const [language, width, theme] of [['en', 1440, 'light'], ['ar', 1280, 'lig
     await expect(panel.locator('.mega-category')).toHaveCount(9);
     await expect(panel.locator('.mega-course')).toHaveCount(3);
     await expect(panel.locator('.mega-rating')).toHaveCount(0);
+    for (const arrow of await panel.locator('.directional-arrow').all()) {
+      await expect(arrow).toHaveCSS('scale', language === 'ar' ? '-1 1' : '1');
+      await expect(arrow).toHaveCSS('transform', 'none');
+    }
+    await expect(panel.locator('.mega-tabs')).toHaveCSS('gap', '12px');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: info.outputPath('programs-menu.png'), animations: 'disabled' });
     await panel.locator('.mega-tabs button').nth(1).click();

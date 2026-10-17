@@ -16,11 +16,11 @@
           (focus)="selectCategory(category)" (click)="selectCategory(category)">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(category.slug)"/></svg>
           <span>{{ categoryName(category) }}</span>
-          <svg class="mega-direction" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
+          <svg class="mega-direction directional-arrow arrow-forward" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>
         </button>
       }
     </div>
-    <a class="mega-browse-all" routerLink="/programs" (click)="closed.emit()">{{ 'nav.mega.browse_all' | translate }} <span aria-hidden="true">→</span></a>
+    <a class="mega-browse-all" routerLink="/programs" (click)="closed.emit()">{{ 'nav.mega.browse_all' | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a>
   </aside>
 
   <section class="mega-main" [attr.aria-label]="'nav.mega.courses' | translate">
@@ -28,7 +28,7 @@
       <div class="mega-heading">
         <span class="mega-heading-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="icon(category.slug)"/></svg></span>
         <div><h2>{{ categoryName(category) }}</h2><p>{{ (english() ? category.description_en : category.description_ar) || ('nav.mega.subtitle' | translate) }}</p></div>
-        <a routerLink="/programs" [queryParams]="{category: category.slug}" (click)="closed.emit()">{{ 'nav.mega.view_all' | translate }} <span aria-hidden="true">→</span></a>
+        <a routerLink="/programs" [queryParams]="{category: category.slug}" (click)="closed.emit()">{{ 'nav.mega.view_all' | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a>
       </div>
       <div class="mega-tabs" role="group" [attr.aria-label]="'programs.catalog.sort_by' | translate">
         @for (tab of sorts; track tab.value) {
@@ -42,7 +42,7 @@
         } @else if (coursesError()) {
           <div class="mega-state"><p>{{ 'nav.mega.error' | translate }}</p><button type="button" class="mega-retry" (click)="loadCourses()">{{ 'programs.catalog.try_again' | translate }}</button></div>
         } @else if (!courses().length) {
-          <div class="mega-state"><p>{{ 'nav.mega.empty' | translate }}</p><a routerLink="/programs" [queryParams]="{category: category.slug}" (click)="closed.emit()">{{ 'nav.mega.view_all' | translate }} →</a></div>
+          <div class="mega-state"><p>{{ 'nav.mega.empty' | translate }}</p><a routerLink="/programs" [queryParams]="{category: category.slug}" (click)="closed.emit()">{{ 'nav.mega.view_all' | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a></div>
         }
         @for (course of courses(); track course.id) {
           <a class="mega-course" [routerLink]="['/programs/course', course.slug]" (click)="closed.emit()">
@@ -55,7 +55,7 @@
                 @if (course.is_free) { <span class="mega-free">{{ 'programs.catalog.free' | translate }}</span> }
               </span>
             </span>
-            <svg class="mega-course-arrow mega-direction" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
+            <svg class="mega-course-arrow mega-direction directional-arrow arrow-forward" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16m-6-6 6 6-6 6"/></svg>
           </a>
         }
       </div>
@@ -79,7 +79,7 @@
           <li><span class="mega-benefit-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path [attr.d]="benefit === 'growth' ? 'M4 19V5M4 19h16M7 14l4-4 4 2 5-8M15 4h5v5' : benefit === 'practical' ? 'M4 7h16v13H4zM8 7V4h8v3M4 12l8 3 8-3M10 14h4v3h-4z' : 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 7v5l4 2'"/></svg></span>{{ 'nav.mega.' + benefit | translate }}</li>
         }
       </ul>
-      <a routerLink="/programs" [queryParams]="selected() ? {category: selected()!.slug} : {}" (click)="closed.emit()">{{ 'nav.mega.explore' | translate }} <span aria-hidden="true">→</span></a>
+      <a routerLink="/programs" [queryParams]="selected() ? {category: selected()!.slug} : {}" (click)="closed.emit()">{{ 'nav.mega.explore' | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a>
     </div>
     <svg class="mega-feature-photo" viewBox="0 0 300 480" aria-hidden="true">
       <defs>

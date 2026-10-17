@@ -33,7 +33,7 @@
       <div class="detail-hero-shade"></div>
       <div class="detail-hero-content content-width">
         <a routerLink="/programs" class="back-link"
-          >← {{ 'programs.catalog.back_to_catalog' | translate }}</a
+          ><span class="directional-arrow arrow-back" aria-hidden="true">←</span> {{ 'programs.catalog.back_to_catalog' | translate }}</a
         >
         <div class="detail-tags">
           @if (categoryName(item)) {
@@ -108,7 +108,7 @@
               (click)="navigateLesson(-1)"
               [disabled]="!selectedLesson() || playbackBusy()"
             >
-              ← {{ 'programs.video.previous' | translate }}
+              <span class="directional-arrow arrow-back" aria-hidden="true">←</span> {{ 'programs.video.previous' | translate }}
             </button>
             <span dir="ltr"
               >{{ selectedLesson() ? currentIndex() + 1 : 0 }} / {{ lessons().length }}</span
@@ -118,7 +118,7 @@
               (click)="navigateLesson(1)"
               [disabled]="currentIndex() >= lessons().length - 1 || playbackBusy()"
             >
-              {{ 'programs.video.next' | translate }} →
+              {{ 'programs.video.next' | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span>
             </button>
           </div>
         </section>
@@ -145,7 +145,7 @@
             <p>{{ instructorBio(item) }}</p>
             @if (instructorSlug(item)) {
               <a [routerLink]="['/team', instructorSlug(item)]"
-                >{{ 'programs.catalog.detail_instructor' | translate }} →</a
+                >{{ 'programs.catalog.detail_instructor' | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a
               >
             }
           </section>
@@ -153,7 +153,7 @@
       </div>
       <aside class="course-detail-aside">
         @if(auth.role() === 'TRAINER') {
-          <section class="detail-panel"><h2>{{ 'course_workflow.manage' | translate }}</h2><a routerLink="/portal/trainer/courses">{{ 'course_workflow.studio' | translate }} →</a></section>
+          <section class="detail-panel"><h2>{{ 'course_workflow.manage' | translate }}</h2><a routerLink="/portal/trainer/courses">{{ 'course_workflow.studio' | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a></section>
         } @else {<app-course-learning-actions [course]="item" [lesson]="selectedLesson()" />}
         <section class="detail-panel curriculum-panel">
           <div class="curriculum-heading">
@@ -180,16 +180,16 @@
             <div class="access-notice" role="alert">
               <p>{{ 'programs.video.enrollment_required' | translate }}</p>
               @if (auth.role() === 'TRAINER') {
-                <a routerLink="/portal/trainer/courses">{{ 'course_workflow.manage' | translate }} →</a>
+                <a routerLink="/portal/trainer/courses">{{ 'course_workflow.manage' | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a>
               } @else if (!auth.isLoggedIn()) {
                 <a
                   routerLink="/login"
                   [queryParams]="{ returnUrl: '/programs/course/' + item.slug }"
-                  >{{ 'nav.login' | translate }} →</a
+                  >{{ 'nav.login' | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a
                 >
               } @else {
                 <a [routerLink]="['/programs/course', item.slug, 'checkout']"
-                  >{{ 'course_workflow.checkout' | translate }} →</a
+                  >{{ 'course_workflow.checkout' | translate }} <span class="directional-arrow arrow-forward" aria-hidden="true">→</span></a
                 >
               }
             </div>

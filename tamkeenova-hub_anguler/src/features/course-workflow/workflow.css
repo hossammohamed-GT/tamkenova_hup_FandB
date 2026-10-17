@@ -38,7 +38,7 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--action-gap, 12px);
   align-items: center;
 }
 .workflow-nav {
@@ -63,6 +63,10 @@ button,
   justify-content: center;
   gap: 8px;
   cursor: pointer;
+  min-height: 44px;
+  max-width: 100%;
+  line-height: 1.5;
+  white-space: normal;
   padding: 10px 16px;
   border: 1px solid var(--color-border);
   border-radius: 9px;
@@ -350,3 +354,12 @@ input[type='checkbox'] {
 .workflow-page aside {
   min-width: 0;
 }
+
+/* Keep actions away from fields/headings, including nested authoring rows. */
+.form-grid { margin-block: 16px; }
+.actions { margin-block-start: var(--action-separation, 18px); }
+.row > .actions { margin-block: 0; }
+.lesson-editor > .row, .section-editor > .row { margin-block-end: 16px; }
+.form-feedback-fields > h3 { margin-block: 26px 14px; }
+.form-feedback-fields > h3:first-child { margin-block-start: 0; }
+.card > .actions, .panel > .actions { padding-block-start: 4px; }

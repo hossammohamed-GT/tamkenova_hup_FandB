@@ -776,6 +776,8 @@
     "portfolio": "Portfolio"
   },
   "common": {
+    "previous_page": "Previous page",
+    "next_page": "Next page",
     "save": "Save",
     "cancel": "Cancel",
     "close": "Close",

@@ -458,10 +458,6 @@
 .course-card-skeleton i:nth-child(3) { width: 48%; }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
-:host-context([dir='rtl']) .text-link i,
-:host-context([dir='rtl']) .course-arrow i { transform: rotate(180deg); }
-:host-context([dir='rtl']) .text-link:hover i { transform: rotate(180deg) translateX(3px); }
-
 @media (max-width: 960px) {
   .content-width { width: min(100% - 52px, 860px); }
   .hero-content { grid-template-columns: minmax(0, 1fr) 152px; gap: 1.5rem; }

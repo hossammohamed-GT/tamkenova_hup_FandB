@@ -796,3 +796,131 @@ test('Arabic mobile validation is readable directly beneath the field without ho
   const id = await field(page, 'title_ar').getAttribute('aria-describedby');
   await expect(page.locator('#' + id)).toHaveText('هذا الحقل مطلوب.');
 });
+
+for (const language of ['ar', 'en'])
+  for (const width of [320, 1440]) {
+    test(`authoring buttons have breathing room and wrap without overlap: ${language}, ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 1000 });
+      await setup(page, 'TRAINER', language);
+      await page.goto('/portal/trainer/courses?new=1');
+      const form = page.locator('app-trainer-course-studio form');
+      await expect(form).toBeVisible();
+      await page.addStyleTag({
+        content:
+          '*, *::before, *::after { animation: none !important; transition: none !important; }',
+      });
+      const actions = form.locator('fieldset > .actions');
+      await actions.locator('button').first().click();
+      const buttons = await actions.locator('button').all();
+      expect(buttons.length).toBe(3);
+      for (const button of buttons) {
+        const box = await button.boundingBox();
+        expect(box!.height).toBeGreaterThanOrEqual(44);
+        expect(box!.x).toBeGreaterThanOrEqual(0);
+        expect(box!.x + box!.width).toBeLessThanOrEqual(width + 1);
+      }
+      for (let i = 0; i < buttons.length; i++)
+        for (let j = i + 1; j < buttons.length; j++) {
+          const a = (await buttons[i].boundingBox())!,
+            b = (await buttons[j].boundingBox())!;
+          const xGap = Math.max(b.x - a.x - a.width, a.x - b.x - b.width);
+          const yGap = Math.max(b.y - a.y - a.height, a.y - b.y - b.height);
+          expect(Math.max(xGap, yGap)).toBeGreaterThanOrEqual(11.5);
+        }
+      const sectionBox = (await form.locator('.section-editor').last().boundingBox())!,
+        actionBox = (await actions.boundingBox())!;
+      expect(actionBox.y - sectionBox.y - sectionBox.height).toBeGreaterThanOrEqual(17.5);
+      const editor = form.locator('.section-editor').last();
+      const row = (await editor.locator(':scope > .row').boundingBox())!;
+      const fields = (await editor.locator(':scope > .form-grid').boundingBox())!;
+      expect(fields.y - row.y - row.height).toBeGreaterThanOrEqual(15.5);
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
+      ).toBe(true);
+    });
+    test(`checkout submit stays clear of payment fields: ${language}, ${width}px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 1000 });
+      await setup(page, 'CLIENT', language);
+      await page.goto('/programs/course/' + sample.slug + '/checkout');
+      const form = page.locator('app-course-checkout form');
+      await expect(form).toBeVisible();
+      await page.addStyleTag({
+        content:
+          '*, *::before, *::after { animation: none !important; transition: none !important; }',
+      });
+      const fields = (await form.locator('.form-grid').boundingBox())!;
+      const button = await form.locator('button[type=submit]').boundingBox();
+      expect(button!.y - fields.y - fields.height).toBeGreaterThanOrEqual(17.5);
+      expect(button!.height).toBeGreaterThanOrEqual(44);
+      const back = page.locator('.workflow-page .arrow-back');
+      await expect(back).toHaveText('←');
+      await expect(back).toHaveCSS('scale', language === 'ar' ? '-1 1' : '1');
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
+      ).toBe(true);
+    });
+  }
+
+for (const language of ['ar', 'en']) {
+  test(`shared admin table/modal spacing and logical pagination: ${language}`, async ({ page }) => {
+    await setup(page, 'ADMIN', language);
+    const pages: string[] = [];
+    await page.route('**/api/admin/users**', (route) => {
+      const current = new URL(route.request().url()).searchParams.get('page') || '1';
+      pages.push(current);
+      return route.fulfill({
+        json: {
+          success: true,
+          data: [
+            {
+              id: 'learner',
+              full_name: 'Test Learner',
+              email: 'test@example.test',
+              role: 'STUDENT',
+              is_active: true,
+              email_verified: true,
+              created_at: '2026-10-17T07:00:00Z',
+            },
+          ],
+          meta: { page: Number(current), total: 40, totalPages: 2 },
+        },
+      });
+    });
+    await page.goto('/portal/admin/users');
+    const cells = page.locator('.cell-actions');
+    await expect(cells).toHaveCount(1);
+    await expect(cells).toHaveCSS('gap', '8px');
+    const pagination = page.locator('.pagination');
+    for (const [direction, glyph] of [
+      ['back', '‹'],
+      ['forward', '›'],
+    ]) {
+      const arrow = pagination.locator('.arrow-' + direction);
+      await expect(arrow).toHaveText(glyph);
+      await expect(arrow).toHaveCSS('scale', language === 'ar' ? '-1 1' : '1');
+      await expect(arrow).toHaveCSS('transform', 'none');
+    }
+    const next = pagination.getByRole('button', {
+      name: language === 'ar' ? 'الصفحة التالية' : 'Next page',
+      exact: true,
+    });
+    await next.click();
+    await expect.poll(() => pages.includes('2')).toBe(true);
+    await expect(
+      pagination.getByRole('button', {
+        name: language === 'ar' ? 'الصفحة السابقة' : 'Previous page',
+        exact: true,
+      }),
+    ).toBeEnabled();
+    await cells.locator('button').first().click();
+    const actions = page.locator('.modal-card .form-actions');
+    await expect(actions).toBeVisible();
+    await expect(actions).toHaveCSS('gap', '12px');
+    for (const button of await actions.locator('button').all())
+      await expect(button).toHaveCSS('min-block-size', '44px');
+  });
+}

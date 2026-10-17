@@ -776,6 +776,8 @@
     "portfolio": "الأعمال (Portfolio)"
   },
   "common": {
+    "previous_page": "الصفحة السابقة",
+    "next_page": "الصفحة التالية",
     "save": "حفظ",
     "cancel": "إلغاء",
     "close": "إغلاق",

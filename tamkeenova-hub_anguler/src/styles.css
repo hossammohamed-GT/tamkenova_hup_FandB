@@ -733,13 +733,9 @@ html[dir='rtl'] .marquee-track {
   }
 }
 
-.rtl-flip {
-  transform: scaleX(-1);
-}
-
-html[dir='rtl'] .rtl-flip {
-  transform: scaleX(1);
-}
+/* Right-facing send/logout symbols use the same logical mirroring convention. */
+.rtl-flip { scale: 1 1; }
+.rtl-flip:dir(rtl) { scale: -1 1; }
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -934,11 +930,9 @@ body.route-enter router-outlet + * {
 .programs-page .text-link:hover i { transform: translateX(3px); }
 
 /* Category icons are local SVGs: no external icon-font loading dependency. */
-.programs-page .category-section svg.rtl-flip { transform: none; }
 .programs-page .category-icon-badge svg,
 .programs-page .category-arrow svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
 .programs-page .category-section .category-icon-badge svg { width: 100%; height: 100%; }
-[dir='rtl'] .programs-page .category-section svg.rtl-flip { transform: scaleX(-1); }
 /* Transparent corners must not steal clicks from another sculpture behind them. */
 .programs-page .category-tile:not(.category-skeleton) { pointer-events: none; }
 .programs-page .category-tile .category-content { pointer-events: auto; }
@@ -1207,3 +1201,41 @@ body.route-enter router-outlet + * {
 [data-theme="dark"] .field-error, [data-theme="dark"] .form-feedback-error { color: #ffadad; }
 
 .form-feedback-fields { border: 0; padding: 0; margin: 0; min-width: 0; }
+
+
+/* Logical navigation: source glyph points right for forward, left for back.
+   Use individual scale, so a hover translate/animation cannot undo RTL mirroring. */
+.directional-arrow {
+  display: inline-block;
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-style: normal;
+  flex-shrink: 0;
+  line-height: 1;
+  text-align: center;
+  scale: 1 1;
+}
+.directional-arrow:dir(rtl) { scale: -1 1; }
+
+/* Site-wide action rhythm. No blanket margins on icons or navigation items. */
+:root { --action-gap: 12px; --action-separation: 18px; }
+:root body :is(.actions, .form-actions, .modal-actions, .dialog-actions,
+  .success-actions, .notfound-actions, .button-group, .btn-group,
+  .task-card-actions, .trainer-card-actions, .volunteer-card-actions,
+  .consult-actions, .corp-actions, .card-actions, .notif-detail-actions, .pagination) {
+  gap: var(--action-gap);
+  flex-wrap: wrap;
+}
+:root body :is(.cell-actions, .item-row-actions, .logo-actions, .edition-buttons) {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+:root body :is(form, .form-feedback-fields) > .form-actions {
+  margin-block-start: 24px;
+}
+:root body :is(.form-grid, .form-group, .input-group, .fields-grid)
+  + :is(button, .button, .btn-primary, .actions, .form-actions) {
+  margin-block-start: var(--action-separation);
+}
+:root body :is(.form-actions, .modal-actions, .dialog-actions, .success-actions)
+  > :is(button, a) { min-block-size: 44px; }

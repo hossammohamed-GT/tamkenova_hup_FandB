@@ -107,12 +107,12 @@
 
   @if (totalPages() > 1) {
   <div class="pagination">
-    <button type="button" class="icon-btn" (click)="goToPage(page() - 1)" [disabled]="page() === 1">
-      <i class="fa-solid fa-chevron-right rtl-flip"></i>
+    <button type="button" class="icon-btn" (click)="goToPage(page() - 1)" [disabled]="page() === 1" [attr.aria-label]="'common.previous_page' | translate">
+      <i class="directional-arrow arrow-back" aria-hidden="true">‹</i>
     </button>
     <span class="page-info">{{ page() }} / {{ totalPages() }}</span>
-    <button type="button" class="icon-btn" (click)="goToPage(page() + 1)" [disabled]="page() === totalPages()">
-      <i class="fa-solid fa-chevron-left rtl-flip"></i>
+    <button type="button" class="icon-btn" (click)="goToPage(page() + 1)" [disabled]="page() === totalPages()" [attr.aria-label]="'common.next_page' | translate">
+      <i class="directional-arrow arrow-forward" aria-hidden="true">›</i>
     </button>
   </div>
   }

@@ -441,7 +441,7 @@
 }
 
 .quick-action-card:hover .quick-action-arrow {
-  transform: translateX(-4px);
+  transform: translateX(4px);
 }
 
 html[dir='ltr'] .quick-action-card:hover .quick-action-arrow {
@@ -539,7 +539,7 @@ html[dir='ltr'] .quick-action-card:hover .quick-action-arrow {
 }
 
 .section-card:hover .section-card-footer i {
-  transform: translateX(-4px);
+  transform: translateX(4px);
 }
 
 html[dir='ltr'] .section-card:hover .section-card-footer i {

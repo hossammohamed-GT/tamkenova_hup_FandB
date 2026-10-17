@@ -38,8 +38,8 @@ for (const [language, width] of [['en', 1024], ['ar', 1024], ['en', 1280], ['ar'
     await expect(cards.first()).toHaveAttribute('data-category', slugs[0]);
     await expect(cards.nth(4)).toHaveAttribute('data-category', 'education-academics');
     await expect(page.locator('.category-icon-badge svg').first()).toBeVisible();
-    expect(await page.locator('.category-arrow svg').first().evaluate((el) => getComputedStyle(el).transform))
-      .toBe(language === 'en' ? 'none' : 'matrix(-1, 0, 0, 1, 0, 0)');
+    expect(await page.locator('.category-arrow svg').first().evaluate((el) => getComputedStyle(el).scale))
+      .toBe(language === 'en' ? '1' : '-1 1');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     // Every category is present immediately; no carousel controls or horizontal scroll.
     await expect(page.locator('.category-controls, .category-nav')).toHaveCount(0);
@@ -80,8 +80,11 @@ for (const [language, width] of [['en', 1024], ['ar', 1024], ['en', 1280], ['ar'
       expect(floorAfter.width).toBeCloseTo(floorBefore.width, 1);
       expect(floorAfter.height).toBeCloseTo(floorBefore.height, 1);
       expect((await sculpture.boundingBox())!.y).toBeLessThan(bodyBefore.y - 5);
-      expect(await first.locator('.category-foreground').evaluate(el => getComputedStyle(el).transform))
-        .toBe(await sculpture.evaluate(el => getComputedStyle(el).transform));
+      // Read both animated transforms in one browser frame; separate round trips race the transition.
+      await expect.poll(() => first.evaluate(card =>
+        getComputedStyle(card.querySelector('.category-foreground')!).transform ===
+        getComputedStyle(card.querySelector('.category-sculpture')!).transform,
+      )).toBe(true);
       expect(await orbit.evaluate(el => getComputedStyle(el).animationPlayState)).toBe('running');
       const dashBefore = await orbit.evaluate(el => getComputedStyle(el).strokeDashoffset);
       await expect.poll(() => orbit.evaluate(el => getComputedStyle(el).strokeDashoffset)).not.toBe(dashBefore);
@@ -124,5 +127,9 @@ for (const [language, width] of [['en', 1024], ['ar', 1024], ['en', 1280], ['ar'
     await cards.last().click();
     await expect(page.locator('#selected-category-heading')).toHaveText(language === 'en' ? names[8] : arabicNames[8]);
     await expect(page.locator('.category-detail-hero')).toBeVisible();
+    const back = page.locator('.category-back-button .arrow-back');
+    await expect(back).toHaveText('←');
+    await expect(back).toHaveCSS('scale', language === 'ar' ? '-1 1' : '1');
+    await expect(back).toHaveCSS('transform', 'none');
   });
 }
